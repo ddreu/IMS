@@ -1,0 +1,90 @@
+.container {
+    width: 50%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-form label {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.profile-form input, .profile-form select, .profile-form button {
+    margin-top: 5px;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.profile-form button {
+    margin-top: 20px;
+    background-color: #28a745;
+    color: #fff;
+    cursor: pointer;
+}
+
+.profile-form button:hover {
+    background-color: #218838;
+}
+
+.success {
+    color: green;
+    text-align: center;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+
+.password-container {
+    position: relative;
+    display: inline-block;
+    width: 100%; /* Set width to 100% for better alignment */
+}
+
+.password-container input {
+    width: 100%; /* Make input take full width */
+    padding: 10px 40px 10px 10px; /* Add space for the icon */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px; /* Position the eye icon */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer; /* Change cursor to pointer */
+    z-index: 1; /* Ensure the icon is above the input */
+    color: #aaa; /* Change color for better visibility */
+}
+.btn {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 10px 0;
+    color: white;
+    background-color: #007bff; /* Bootstrap primary color */
+    border: none;
+    border-radius: 5px;
+    text-decoration: none; /* Remove underline */
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Bootstrap secondary color */
+}
+
+.btn:hover {
+    background-color: #0056b3; /* Darken on hover */
+}

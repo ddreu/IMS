@@ -1,0 +1,29 @@
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+.env
+
+# IDE/Editor-specific files
+.vscode/
+.idea/
+.project
+.classpath
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Build directories
+dist/
+build/
+bin/
+obj/
+
+# Composer (PHP dependencies)
+vendor/
+
+# Git LFS
+*.psd
+*.mp4

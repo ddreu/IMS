@@ -1,0 +1,502 @@
+/* Import Google Fonts */
+@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
+
+/* CSS Variables for Color Scheme */
+:root {
+    --primary-color: #3C99DC; /* Blue */
+    --secondary-color: #23b788; /* Teal */
+    --accent-color: #DE2C7C; /* Pink */
+    --background-color: #f4f6f9; /* Light Gray */
+    --sidebar-color: #2C3E50; /* Dark Blue/Gray */
+    --sidebar-hover-color: #1A252F; /* Darker Shade */
+    --text-color: #ffffff; /* White */
+    --card-bg-color: #ffffff; /* White for cards */
+    --card-text-color: #333333; /* Dark Gray for text */
+    --sidebar-width: 250px;
+    --sidebar-mini-width: 70px;
+    --transition-speed: 0.3s;
+    --body-bg: #f4f6f9;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--background-color);
+    color: var(--card-text-color);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+p {
+    font-size: 1.1em;
+    font-weight: 300;
+    line-height: 1.7em;
+}
+
+/* Link Styles */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover,
+a:focus {
+    color: var(--secondary-color);
+}
+
+/* Headings */
+h2 {
+    color: var(--card-text-color);
+}
+
+/* Reset body and html */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+
+
+/* Sidebar styles */
+#sidebar {
+    min-width: var(--sidebar-mini-width);
+    max-width: var(--sidebar-mini-width);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    transition: all var(--transition-speed);
+    background: var(--card-bg-color);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    height: 100vh;
+    padding-bottom: 60px; /* Add padding at the bottom for better scroll visibility */
+}
+
+/* Subtle scrollbar styling */
+#sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+#sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+#sidebar:hover {
+    min-width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+}
+
+/* Sidebar Header */
+#sidebar .sidebar-header {
+    padding: 1rem;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Hide text elements by default */
+#sidebar .school-name,
+#sidebar .system-name,
+#sidebar .badge-container,
+#sidebar span:not(.fas) {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-speed);
+}
+
+/* Show text elements on hover */
+#sidebar:hover .school-name,
+#sidebar:hover .system-name,
+#sidebar:hover .badge-container,
+#sidebar:hover span:not(.fas) {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Logo Image */
+.logo-image {
+    width: 45px;
+    transition: all var(--transition-speed);
+}
+
+#sidebar:hover .logo-image {
+    width: 110px;
+}
+
+/* Navigation Items */
+#sidebar ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+#sidebar ul li a {
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    color: var(--card-text-color);
+    text-decoration: none;
+    transition: all var(--transition-speed);
+}
+
+#sidebar ul li a:hover {
+    background: rgba(0, 123, 255, 0.1);
+    color: var(--primary-color);
+}
+
+/* Icons */
+#sidebar ul li a i {
+    min-width: calc(var(--sidebar-mini-width) - 30px);
+    text-align: center;
+    font-size: 1.2rem;
+    margin-right: 0.75rem;
+}
+
+/* Submenu Styles */
+#sidebar .collapse {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+#sidebar .submenu-item {
+    padding-left: 3.5rem !important;
+}
+
+/* Active State */
+#sidebar .active {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: var(--primary-color);
+}
+
+/* Content Adjustment */
+#content {
+    width: calc(100% - var(--sidebar-mini-width));
+    margin-left: var(--sidebar-mini-width);
+    min-height: 100vh;
+    transition: all var(--transition-speed);
+    position: relative;
+    padding-top: 20px;
+    border-top-left-radius: 10px; /* Adjust the radius as needed */
+    background-color: #f0f0f0; /* Adjust to your desired background color */
+}
+
+
+
+#sidebar:hover + #content {
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: calc(-1 * var(--sidebar-mini-width));
+    }
+    
+    #sidebar.show {
+        margin-left: 0;
+    }
+    
+    #content {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+/* Sidebar Admin */
+.sidebar-admin-container {
+    background-color: #343a40; /* Dark gray background for a modern look */
+    color: #ced4da; /* Light gray text color for better readability against dark background */
+    width: 250px;
+    position: fixed;
+    height: 100vh;
+    overflow-y: overlay; /* Enable overlay scrollbar */
+    padding-right: 8px; /* Compensate for scrollbar width to prevent shifting */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3); /* Slightly stronger shadow for depth */
+    -ms-overflow-style: none; /* Hide scrollbar in IE */
+    scrollbar-width: thin; /* Custom scrollbar width for Firefox */
+}
+
+/* Hide the scrollbar completely when inactive */
+.sidebar-admin-container::-webkit-scrollbar {
+    width: 8px; /* Set scrollbar width for Chrome/Safari */
+    background-color: transparent; /* Make scrollbar track transparent */
+}
+
+.sidebar-admin-container:hover::-webkit-scrollbar-thumb {
+    background-color: #6c757d; /* Gray scrollbar thumb on hover */
+    border-radius: 4px; /* Rounded scrollbar for a modern look */
+}
+
+
+/* Sidebar Admin */
+.sidebar-admin-container {
+    background-color: #343a40; /* Dark gray background for a modern look */
+    color: #ced4da; /* Light gray text color for better readability against dark background */
+    width: 70px; /* Shrink width to show only icons by default */
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto; /* Ensure scrolling for content */
+    transition: width 0.3s ease; /* Smooth transition for width change */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar expands on hover */
+.sidebar-admin-container:hover {
+    width: 250px; /* Expand to full width on hover */
+}
+
+/* Sidebar Header */
+.sidebar-admin-header {
+    background-color: #212529; /* Darker gray for header */
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for separation */
+    position: sticky; /* Keep header fixed at the top */
+    top: 0; /* Stick the header to the top of the container */
+    z-index: 10; /* Ensure it stays above other elements */
+}
+
+/* Sidebar Menu */
+.sidebar-admin-menu {
+    padding: 15px 0;
+    list-style: none;
+    margin: 0;
+}
+
+.sidebar-admin-item {
+    margin-bottom: 10px;
+}
+
+.sidebar-admin-item-link {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #ced4da;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border-radius: 6px;
+    overflow: hidden; /* Prevent text overflow */
+    white-space: nowrap;
+    text-overflow: ellipsis; /* Ellipsis for long text when collapsed */
+}
+
+.sidebar-admin-item-link:hover {
+    background-color: #0056b3;
+    color: #ffffff;
+}
+
+/* Icons only visible in collapsed state */
+.sidebar-admin-item-link-icon {
+    margin-right: 10px;
+    color: #adb5bd;
+    font-size: 1.25rem; /* Larger icons for better visibility */
+}
+
+/* Hide the text by default */
+.sidebar-admin-item-link span {
+    display: none;
+}
+
+/* Show text on hover */
+.sidebar-admin-container:hover .sidebar-admin-item-link span {
+    display: inline;
+    margin-left: 10px; /* Add space between icon and text */
+}
+
+.sidebar-admin-item.logout > .sidebar-admin-item-link {
+    color: #ff6b6b; /* A soft red for logout button */
+}
+
+.sidebar-admin-item.logout > .sidebar-admin-item-link:hover {
+    background-color: #ffdfdf; /* Light red background on hover for logout */
+    color: #ff6b6b; /* Keep the logout text color consistent */
+}
+
+/* Responsive Sidebar Behavior */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: calc(-1 * var(--sidebar-width));
+        transition: margin-left var(--transition-speed) ease;
+    }
+
+    #sidebar.show {
+        margin-left: 0;
+    }
+
+    #sidebar.collapse:not(.show) {
+        display: block;
+    }
+
+    .wrapper {
+        margin-left: 0;
+    }
+}
+
+/* Card Wrap and Card Box Styles */
+.card_wrap {
+    display: flex;  /* You can keep this for any additional custom flex properties */
+    flex-wrap: wrap;  /* Allows wrapping */
+    justify-content: space-between; /* Keeps spacing between cards */
+}
+
+.card.box {
+    padding: 18px;
+    background: #f9f9fb;
+    border-radius: 8px;
+    color: #333;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex: 1 0 30%;  /* Flex-basis of about 30% for responsiveness, adjust as needed */
+}
+
+.card.box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Info Section Inside Card */
+.card.box .info {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #343a40; /* Modern accent color */
+}
+
+.card.box .info i {
+    font-size: 1.8rem;
+    color: #343a40;
+    margin-bottom: 8px;
+}
+
+/* Card Span (User Count and Announcements) */
+.card.box span h4 {
+    margin-top: 6px;
+    font-size: 1.2rem;
+    color: #666;
+    font-weight: 400;
+}
+
+/* Hover Animation for Icon */
+.card.box:hover .info i {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Table Styles */
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 16px;
+}
+
+.table-container th {
+    background-color: #4a90e2;
+    color: #ffffff;
+    padding: 10px;
+    font-weight: 400;
+    text-align: left;
+}
+
+.table-container td {
+    padding: 10px;
+    color: #333;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.table-container tr:hover {
+    background-color: #f5f5f5;
+}
+
+
+/* Button Styles */
+.btn-announcement, .button-container a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.btn-announcement:hover, .button-container a:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Alert Styles */
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+
+    #sidebar.active {
+        margin-left: 0;
+    }
+
+    #content {
+        width: 100%;
+        margin-left: 0;
+        padding-bottom: 80px; /* Larger padding for mobile */
+    }
+
+    .card_wrap, .games-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card.box, .game-card {
+        flex: 0 0 100%;
+    }
+
+
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .d-flex.justify-content-between.align-items-center .btn {
+        margin-top: 10px;
+        align-self: flex-end;
+    }
+}
+
+
+/* chart */
+.chart {
+    max-width: 300px; 
+    max-height: 300px; 
+    width: 100%; 
+    height: auto;
+    margin-left: 70px; 
+    margin-bottom: 100px;
+}
+

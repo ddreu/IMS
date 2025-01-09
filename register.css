@@ -1,0 +1,139 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+
+    height: 100vh;
+
+    background-color: #FFFFFF;
+}
+
+/* .container {
+    display: flex;
+    width: 1200px;
+    height: 550px;
+    max-width: 90%;
+    background-color: #FFFFFF;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+} */
+
+
+.back-button {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #4e507a;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    color: #4e507a;
+}
+
+/* Left side (Image) */
+.image-section {
+    width: 38vw;
+    height: 100vh; /* Full height of viewport */
+    background-image: url('images/gradient.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Right side (Form) */
+.form-section {
+    width: 50vw; /* Take up half the screen width */
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    color: #333333;
+    background-color: #FFFFFF;
+}
+
+.form-section h1 {
+    /*font-size: 1.5em;
+    /*color: #333333;*/
+    color: #2a2d54;
+    margin-bottom: 5px;
+}
+
+.form-section p {
+    font-size: 0.9em;
+    color: #666666;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.form-section form {
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.field label {
+    font-size: 0.9em;
+    color: #333333;
+    margin-bottom: 5px;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #CCCCCC;
+    font-size: 1em;
+}
+
+/* Sign Up Button Styling */
+.form-section button {
+    width: auto;
+    padding: 12px 30px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 20px;
+}
+
+.form-section button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 12px rgba(0, 91, 187, 0.4);
+}
+
+.form-section a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.form-section a:hover {
+    text-decoration: underline;
+}

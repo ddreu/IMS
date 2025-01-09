@@ -1,0 +1,477 @@
+[2024-12-20 12:09:47][INFO] Script started with API Key: fcc19...
+[2024-12-20 12:09:47][INFO] Received POST data - Schedule ID: 80, Team A: 240, Team B: 320
+[2024-12-20 12:09:47][INFO] Sending test message to 639887378278
+[2024-12-20 12:09:47][INFO] Attempting to send SMS to: 639887378278
+[2024-12-20 12:09:47][INFO] Formatted number: 639887378278
+[2024-12-20 12:09:47][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639887378278","message":"This is a test message from your game notification system."}
+[2024-12-20 12:09:48][INFO] API Response (HTTP 200): [{"message_id":237828997,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639887378278","message":"This is a test message from your game notification system.","sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Single","source":"Api","created_at":"2024-12-20 19:09:48","updated_at":"2024-12-20 19:09:48"}]
+[2024-12-20 19:09:48][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2024-12-21","schedule_time":"09:00:00","venue":"Gym"}
+[2024-12-20 19:09:48][INFO] Game: Basketball, Team A: BSCS - Basketball, Team B: EDUC - Basketball
+[2024-12-20 19:09:48][INFO] SMS Body prepared: Game: Basketball
+BSCS - Basketball vs EDUC - Basketball
+Date: Dec 21, 2024
+Time: 9:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2024-12-20 19:09:48][INFO] Found player number: Hanes Dizon - +639887378278
+[2024-12-20 19:09:48][INFO] Found player number: Andrew De Guzman - +639754136497
+[2024-12-20 19:09:48][INFO] Found 2 players for Team A
+[2024-12-20 19:09:48][INFO] Attempting to send SMS to: +639887378278
+[2024-12-20 19:09:48][INFO] Formatted number: 639887378278
+[2024-12-20 19:09:48][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639887378278","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!"}
+[2024-12-20 19:09:48][INFO] API Response (HTTP 200): [{"message_id":237828998,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639887378278","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Single","source":"Api","created_at":"2024-12-20 19:09:49","updated_at":"2024-12-20 19:09:49"}]
+[2024-12-20 19:09:48][INFO] Attempting to send SMS to: +639754136497
+[2024-12-20 19:09:48][INFO] Formatted number: 639754136497
+[2024-12-20 19:09:48][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639754136497","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!"}
+[2024-12-20 19:09:49][INFO] API Response (HTTP 200): [{"message_id":237828999,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639754136497","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Single","source":"Api","created_at":"2024-12-20 19:09:49","updated_at":"2024-12-20 19:09:49"}]
+[2024-12-20 19:09:49][INFO] Found 0 players for Team B
+[2024-12-20 19:09:49][INFO] Script completed successfully
+[2024-12-20 12:16:35][INFO] Script started with API Key: fcc19...
+[2024-12-20 12:16:35][INFO] Received POST data - Schedule ID: 80, Team A: 240, Team B: 320
+[2024-12-20 12:16:35][INFO] Sending test message to 639887378278
+[2024-12-20 12:16:35][INFO] Attempting to send SMS to: 639887378278
+[2024-12-20 12:16:35][INFO] Formatted number: 639887378278
+[2024-12-20 12:16:35][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639887378278","message":"IMS Game Alert Test","mode":"OTP"}
+[2024-12-20 12:16:36][INFO] API Response (HTTP 200): [{"message_id":237829304,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639887378278","message":"IMS Game Alert Test\nYour One Time Password is 786981","sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:16:37","updated_at":"2024-12-20 19:16:37"}]
+[2024-12-20 19:16:36][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2024-12-21","schedule_time":"09:00:00","venue":"Gym"}
+[2024-12-20 19:16:36][INFO] Game: Basketball, Team A: BSCS - Basketball, Team B: EDUC - Basketball
+[2024-12-20 19:16:36][INFO] SMS Body prepared: Game: Basketball
+BSCS - Basketball vs EDUC - Basketball
+Date: Dec 21, 2024
+Time: 9:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2024-12-20 19:16:36][INFO] Found player number: Hanes Dizon - +639887378278
+[2024-12-20 19:16:36][INFO] Found player number: Andrew De Guzman - +639754136497
+[2024-12-20 19:16:36][INFO] Found player number: dawd awdwa - +639278913201
+[2024-12-20 19:16:36][INFO] Found player number: Kobe James - +639310057134
+[2024-12-20 19:16:36][INFO] Found 4 players for Team A
+[2024-12-20 19:16:36][INFO] Attempting to send SMS to: +639887378278
+[2024-12-20 19:16:36][INFO] Formatted number: 639887378278
+[2024-12-20 19:16:36][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639887378278","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","mode":"OTP"}
+[2024-12-20 19:16:37][INFO] API Response (HTTP 200): [{"message_id":237829306,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639887378278","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!\nYour One Time Password is 355337","code":355337,"sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:16:37","updated_at":"2024-12-20 19:16:37"}]
+[2024-12-20 19:16:37][INFO] Attempting to send SMS to: +639754136497
+[2024-12-20 19:16:37][INFO] Formatted number: 639754136497
+[2024-12-20 19:16:37][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639754136497","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","mode":"OTP"}
+[2024-12-20 19:16:37][INFO] API Response (HTTP 200): [{"message_id":237829307,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639754136497","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!\nYour One Time Password is 490842","code":490842,"sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:16:38","updated_at":"2024-12-20 19:16:38"}]
+[2024-12-20 19:16:37][INFO] Attempting to send SMS to: +639278913201
+[2024-12-20 19:16:37][INFO] Formatted number: 639278913201
+[2024-12-20 19:16:37][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639278913201","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","mode":"OTP"}
+[2024-12-20 19:16:38][INFO] API Response (HTTP 200): [{"message_id":237829308,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639278913201","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!\nYour One Time Password is 693600","code":693600,"sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:16:38","updated_at":"2024-12-20 19:16:38"}]
+[2024-12-20 19:16:38][INFO] Attempting to send SMS to: +639310057134
+[2024-12-20 19:16:38][INFO] Formatted number: 639310057134
+[2024-12-20 19:16:38][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639310057134","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","mode":"OTP"}
+[2024-12-20 19:16:38][INFO] API Response (HTTP 200): [{"message_id":237829310,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639310057134","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!\nYour One Time Password is 276292","code":276292,"sender_name":"Semaphore","network":"Sun","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:16:39","updated_at":"2024-12-20 19:16:39"}]
+[2024-12-20 19:16:38][INFO] Found 0 players for Team B
+[2024-12-20 19:16:38][INFO] Script completed successfully
+[2024-12-20 12:37:58][INFO] Script started with API Key: fcc19...
+[2024-12-20 12:37:58][INFO] Account Status Check Response: {"apikey":["The apikey field is required."]}
+[2024-12-20 12:37:58][INFO] Received POST data - Schedule ID: 80, Team A: 240, Team B: 320
+[2024-12-20 12:37:58][INFO] Sending test message to 639887378278
+[2024-12-20 12:37:58][INFO] Attempting to send SMS to: 639887378278
+[2024-12-20 12:37:58][INFO] Formatted number: 639887378278
+[2024-12-20 12:37:58][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639887378278","message":"IMS Game Alert Test","mode":"OTP"}
+[2024-12-20 12:37:59][INFO] API Response (HTTP 200): [{"message_id":237830372,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639887378278","message":"IMS Game Alert Test\nYour One Time Password is 343985","sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:37:59","updated_at":"2024-12-20 19:37:59"}]
+[2024-12-20 19:37:59][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2024-12-21","schedule_time":"09:00:00","venue":"Gym"}
+[2024-12-20 19:37:59][INFO] Game: Basketball, Team A: BSCS - Basketball, Team B: EDUC - Basketball
+[2024-12-20 19:37:59][INFO] SMS Body prepared: Game: Basketball
+BSCS - Basketball vs EDUC - Basketball
+Date: Dec 21, 2024
+Time: 9:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2024-12-20 19:37:59][INFO] Found player number: Hanes Dizon - +639887378278
+[2024-12-20 19:37:59][INFO] Found player number: Andrew De Guzman - +639754136497
+[2024-12-20 19:37:59][INFO] Found 2 players for Team A
+[2024-12-20 19:37:59][INFO] Attempting to send SMS to: +639887378278
+[2024-12-20 19:37:59][INFO] Formatted number: 639887378278
+[2024-12-20 19:37:59][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639887378278","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","mode":"OTP"}
+[2024-12-20 19:37:59][INFO] API Response (HTTP 200): [{"message_id":237830373,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639887378278","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!\nYour One Time Password is 987356","code":987356,"sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:38:00","updated_at":"2024-12-20 19:38:00"}]
+[2024-12-20 19:37:59][INFO] Attempting to send SMS to: +639754136497
+[2024-12-20 19:37:59][INFO] Formatted number: 639754136497
+[2024-12-20 19:37:59][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639754136497","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","mode":"OTP"}
+[2024-12-20 19:38:00][INFO] API Response (HTTP 200): [{"message_id":237830374,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639754136497","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!\nYour One Time Password is 176240","code":176240,"sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:38:00","updated_at":"2024-12-20 19:38:00"}]
+[2024-12-20 19:38:00][INFO] Found player number: Charlotte Capistrano - +639261769542
+[2024-12-20 19:38:00][INFO] Found 1 players for Team B
+[2024-12-20 19:38:00][INFO] Attempting to send SMS to: +639261769542
+[2024-12-20 19:38:00][INFO] Formatted number: 639261769542
+[2024-12-20 19:38:00][INFO] API Request parameters: {"apikey":"fcc1970c7f8d7beca0ac40dce0cd4fcc","number":"639261769542","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","mode":"OTP"}
+[2024-12-20 19:38:01][INFO] API Response (HTTP 200): [{"message_id":237830375,"user_id":38190,"user":"shielamarietubera4@gmail.com","account_id":38051,"account":"Semaphore","recipient":"639261769542","message":"Game: Basketball\nBSCS - Basketball vs EDUC - Basketball\nDate: Dec 21, 2024\nTime: 9:00 AM\nVenue: Gym\nThe match is starting soon, get ready!\nYour One Time Password is 581253","code":581253,"sender_name":"Semaphore","network":"Globe","status":"Pending","type":"Otp","source":"Api","created_at":"2024-12-20 19:38:01","updated_at":"2024-12-20 19:38:01"}]
+[2024-12-20 19:38:01][INFO] Script completed successfully
+[2024-12-21 05:03:41][INFO] Script started with ClickSend API Key: D7386...
+[2024-12-21 05:03:41][INFO] Received POST data - Schedule ID: 85, Team A: 240, Team B: 248
+[2024-12-21 05:03:41][INFO] Sending test message to 639887378278
+[2024-12-21 05:03:41][INFO] Attempting to send SMS to: 639887378278
+[2024-12-21 05:03:43][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2301,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1734753823,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1734753823,"message_id":"1EFBF509-1A46-6CDE-A9DD-09829DF0A31E","message_parts":1,"message_price":"0.2301","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2024-12-21 12:03:43][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2024-12-21","schedule_time":"12:30:00","venue":"Court"}
+[2024-12-21 12:03:43][INFO] Game: Basketball, Team A: BSCS - Basketball, Team B: CRIM - Basketball
+[2024-12-21 12:03:43][INFO] SMS Body prepared: Game: Basketball
+BSCS - Basketball vs CRIM - Basketball
+Date: Dec 21, 2024
+Time: 12:30 PM
+Venue: Court
+The match is starting soon, get ready!
+[2024-12-21 12:03:43][INFO] Found player number: Hanes Dizon - +639887378278
+[2024-12-21 12:03:43][INFO] Found player number: Andrew De Guzman - +639754136497
+[2024-12-21 12:03:43][INFO] Found 2 players for Team A
+[2024-12-21 12:03:43][INFO] Attempting to send SMS to: +639887378278
+[2024-12-21 12:03:45][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2301,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1734753825,"to":"+639887378278","body":"Game: Basketball\nBSCS - Basketball vs CRIM - Basketball\nDate: Dec 21, 2024\nTime: 12:30 PM\nVenue: Court\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1734753825,"message_id":"1EFBF509-2B91-6EE4-BBC8-2B56D08D25FC","message_parts":1,"message_price":"0.2301","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2024-12-21 12:03:45][INFO] Attempting to send SMS to: +639754136497
+[2024-12-21 12:03:47][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2301,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1734753826,"to":"+639754136497","body":"Game: Basketball\nBSCS - Basketball vs CRIM - Basketball\nDate: Dec 21, 2024\nTime: 12:30 PM\nVenue: Court\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1734753826,"message_id":"1EFBF509-3AC3-6BA6-AE27-C306F2CD3819","message_parts":1,"message_price":"0.2301","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Globe","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2024-12-21 12:03:47][INFO] Found 0 players for Team B
+[2024-12-21 12:03:47][INFO] Script completed successfully
+[2025-01-07 01:33:57][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 01:33:57][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 01:33:57][INFO] Sending test message to 639887378278
+[2025-01-07 01:33:57][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 01:33:58][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736210038,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736210038,"message_id":"1EFCC8F1-5A1A-6254-968C-214DCCFB4423","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 08:33:58][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 08:33:58][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 08:33:58][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 08:33:58][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 08:33:58][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 08:33:58][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 08:33:58][INFO] Found 3 players for Team A
+[2025-01-07 08:33:58][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 08:34:00][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCC8F1-6554-68B8-B970-AF1E2436A90E","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 08:34:00][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 08:34:01][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736210040,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736210040,"message_id":"1EFCC8F1-6E3B-6EE0-847D-DF0BB3957A05","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 08:34:01][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 08:34:02][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736210041,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736210041,"message_id":"1EFCC8F1-7723-65B2-9000-EDEE6732A61F","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 08:34:02][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 08:34:02][INFO] Found 1 players for Team B
+[2025-01-07 08:34:02][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 08:34:03][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736210042,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736210042,"message_id":"1EFCC8F1-8055-60CC-9C7E-63D54370FA50","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 08:34:03][INFO] Script completed successfully
+[2025-01-07 02:41:45][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 02:41:45][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 02:41:45][INFO] Sending test message to 639887378278
+[2025-01-07 02:41:45][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 02:41:47][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736214106,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736214106,"message_id":"1EFCC988-E3A3-6614-88C6-5D35A08C8F03","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:41:47][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 09:41:47][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 09:41:47][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 09:41:47][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 09:41:47][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 09:41:47][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 09:41:47][INFO] Found 3 players for Team A
+[2025-01-07 09:41:47][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 09:41:47][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCC988-F071-67A6-90CA-53DF7A5E0A46","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:41:47][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 09:41:49][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736214108,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736214108,"message_id":"1EFCC988-F958-620C-B4CE-B1978813492E","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:41:49][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 09:41:50][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736214109,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736214109,"message_id":"1EFCC989-031B-6492-B457-B9C8914809A0","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:41:50][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 09:41:50][INFO] Found 1 players for Team B
+[2025-01-07 09:41:50][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 09:41:51][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736214110,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736214110,"message_id":"1EFCC989-0CE1-6512-8B06-458357ECCCA6","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:41:51][INFO] Script completed successfully
+[2025-01-07 02:44:27][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 02:44:27][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 02:44:27][INFO] Sending test message to 639887378278
+[2025-01-07 02:44:27][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 02:44:28][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736214268,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736214268,"message_id":"1EFCC98E-E845-65E0-8853-91718CE7BB55","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:44:28][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 09:44:28][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 09:44:28][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 09:44:28][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 09:44:28][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 09:44:28][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 09:44:28][INFO] Found 3 players for Team A
+[2025-01-07 09:44:28][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 09:44:29][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCC98E-F375-601E-AF88-6FA1DF4A2BAD","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:44:29][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 09:44:30][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736214270,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736214270,"message_id":"1EFCC98E-FBE9-6AD8-A7E3-4F6986268A80","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:44:30][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 09:44:31][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736214271,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736214271,"message_id":"1EFCC98F-049B-6A28-9242-9BB2EB207460","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:44:31][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 09:44:31][INFO] Found 1 players for Team B
+[2025-01-07 09:44:31][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 09:44:32][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736214272,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736214272,"message_id":"1EFCC98F-0E5A-6F5A-AF6D-43708F217CA8","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 09:44:32][INFO] Script completed successfully
+[2025-01-07 05:26:31][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 05:26:31][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 05:26:31][INFO] Sending test message to 639887378278
+[2025-01-07 05:26:31][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 05:26:34][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736223993,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736223993,"message_id":"1EFCCAF9-3996-6B54-ABBE-FD7B23680F61","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 12:26:34][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 12:26:34][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 12:26:34][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 12:26:34][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 12:26:34][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 12:26:34][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 12:26:34][INFO] Found 3 players for Team A
+[2025-01-07 12:26:34][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 12:26:35][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCAF9-44CC-61A4-ACCA-CBAF0FFD8E8E","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 12:26:35][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 12:26:36][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736223996,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736223996,"message_id":"1EFCCAF9-4DD2-6EE2-95D8-ED22D288407D","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 12:26:36][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 12:26:37][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736223997,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736223997,"message_id":"1EFCCAF9-5AB4-6BCE-9406-81E91A9694AB","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 12:26:37][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 12:26:37][INFO] Found 1 players for Team B
+[2025-01-07 12:26:37][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 12:26:38][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736223998,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736223998,"message_id":"1EFCCAF9-6572-680E-BB66-A757D2989467","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 12:26:38][INFO] Script completed successfully
+[2025-01-07 09:28:25][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 09:28:25][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 09:28:25][INFO] Sending test message to 639887378278
+[2025-01-07 09:28:25][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 09:28:26][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736238506,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736238506,"message_id":"1EFCCD15-DE79-67F2-A78B-8757FC634EFC","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:28:26][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 16:28:26][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 16:28:26][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 16:28:26][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 16:28:26][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 16:28:26][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 16:28:26][INFO] Found 3 players for Team A
+[2025-01-07 16:28:26][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 16:28:27][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCD15-E904-6A0A-BD8B-3554D31F0EA2","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:28:27][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 16:28:29][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736238509,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736238509,"message_id":"1EFCCD15-F371-6786-A33D-816658215807","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:28:29][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 16:28:30][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736238510,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736238510,"message_id":"1EFCCD16-0244-6164-86A0-5F561F47BD39","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:28:30][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 16:28:30][INFO] Found 1 players for Team B
+[2025-01-07 16:28:30][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 16:28:31][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736238511,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736238511,"message_id":"1EFCCD16-0AD2-68EE-8F82-2579BE077BC1","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:28:31][INFO] Script completed successfully
+[2025-01-07 09:55:13][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 09:55:13][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 09:55:13][INFO] Sending test message to 639887378278
+[2025-01-07 09:55:13][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 09:55:15][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240115,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736240115,"message_id":"1EFCCD51-CD17-698C-80F3-5B61E7E5D29D","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:55:15][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 16:55:15][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 16:55:15][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 16:55:15][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 16:55:15][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 16:55:15][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 16:55:15][INFO] Found 3 players for Team A
+[2025-01-07 16:55:15][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 16:55:16][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCD51-D70E-6E72-BB14-31E62792B16B","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:55:16][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 16:55:17][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240117,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240117,"message_id":"1EFCCD51-DEC3-6230-806E-532487F6D808","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:55:17][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 16:55:18][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240118,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240118,"message_id":"1EFCCD51-E914-66BC-AC3C-DF8DE4C25A2A","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:55:18][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 16:55:18][INFO] Found 1 players for Team B
+[2025-01-07 16:55:18][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 16:55:20][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240120,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240120,"message_id":"1EFCCD51-F7D3-6270-A80B-2931552A7C8A","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:55:20][INFO] Script completed successfully
+[2025-01-07 09:57:04][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 09:57:04][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 09:57:04][INFO] Sending test message to 639887378278
+[2025-01-07 09:57:04][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 09:57:05][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240225,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736240225,"message_id":"1EFCCD55-E367-61AC-A084-4FB2FA7835E5","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:05][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 16:57:05][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 16:57:05][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 16:57:05][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 16:57:05][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 16:57:05][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 16:57:05][INFO] Found 3 players for Team A
+[2025-01-07 16:57:05][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 16:57:06][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCD55-ECD5-6270-A872-4BDB4985EBE0","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:06][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 16:57:07][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240227,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240227,"message_id":"1EFCCD55-F547-6854-B1D5-937F06217F7E","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:07][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 16:57:08][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240228,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240228,"message_id":"1EFCCD56-034B-6694-B794-D9B15E5F73BE","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:08][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 16:57:08][INFO] Found 1 players for Team B
+[2025-01-07 16:57:08][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 16:57:09][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240229,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240229,"message_id":"1EFCCD56-0C46-692E-9F6C-C9F938CB4A11","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:09][INFO] Script completed successfully
+[2025-01-07 09:57:17][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 09:57:17][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 09:57:17][INFO] Sending test message to 639887378278
+[2025-01-07 09:57:17][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 09:57:18][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240238,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736240238,"message_id":"1EFCCD56-6047-635C-AD02-8750641E993B","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:18][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 16:57:18][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 16:57:18][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 16:57:18][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 16:57:18][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 16:57:18][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 16:57:18][INFO] Found 3 players for Team A
+[2025-01-07 16:57:18][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 16:57:19][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCD56-6966-66C2-82CD-87F36D631E35","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:19][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 16:57:20][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240240,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240240,"message_id":"1EFCCD56-71C5-62B4-B4E5-1F8AB892B28A","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:20][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 16:57:21][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240241,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240241,"message_id":"1EFCCD56-7AEF-6696-A206-DF268D977ED5","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:21][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 16:57:21][INFO] Found 1 players for Team B
+[2025-01-07 16:57:21][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 16:57:22][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240242,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240242,"message_id":"1EFCCD56-84EB-6884-923C-63600DC180AC","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 16:57:22][INFO] Script completed successfully
+[2025-01-07 10:04:35][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 10:04:35][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 10:04:35][INFO] Sending test message to 639887378278
+[2025-01-07 10:04:35][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 10:04:37][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240676,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736240676,"message_id":"1EFCCD66-B738-6854-8433-31CBA41EF9F9","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:04:37][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 17:04:37][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 17:04:37][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 17:04:37][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 17:04:37][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 17:04:37][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 17:04:37][INFO] Found 3 players for Team A
+[2025-01-07 17:04:37][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 17:04:37][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCD66-C10D-6FF0-9AD1-F72A93433E5F","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:04:37][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 17:04:39][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240679,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240679,"message_id":"1EFCCD66-CA89-63EA-BEA4-35836FCE6743","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:04:39][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 17:04:40][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240680,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240680,"message_id":"1EFCCD66-D6AB-6042-B8A8-85D505C2041A","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:04:40][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 17:04:40][INFO] Found 1 players for Team B
+[2025-01-07 17:04:40][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 17:04:41][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240681,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240681,"message_id":"1EFCCD66-E04F-62F6-9A66-033C3DEDFB5C","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:04:41][INFO] Script completed successfully
+[2025-01-07 10:06:18][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 10:06:18][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 10:06:18][INFO] Sending test message to 639887378278
+[2025-01-07 10:06:18][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 10:06:19][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240779,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736240779,"message_id":"1EFCCD6A-8D42-6CF8-AA78-0D4D00199A73","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:19][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 17:06:20][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 17:06:20][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 17:06:20][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 17:06:20][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 17:06:20][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 17:06:20][INFO] Found 3 players for Team A
+[2025-01-07 17:06:20][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 17:06:21][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCD6A-980A-6EEC-8A96-018F105D023D","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:21][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 17:06:22][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240782,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240782,"message_id":"1EFCCD6A-A1E8-622A-A21F-DD86F3D6FB2B","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:22][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 17:06:23][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240783,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240783,"message_id":"1EFCCD6A-B0CD-61AA-92D4-FF01F6426FF4","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:23][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 17:06:23][INFO] Found 1 players for Team B
+[2025-01-07 17:06:23][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 17:06:25][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240785,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240785,"message_id":"1EFCCD6A-BC49-6A92-B840-9F70452A4C40","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:25][INFO] Script completed successfully
+[2025-01-07 10:06:36][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 10:06:36][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 10:06:36][INFO] Sending test message to 639887378278
+[2025-01-07 10:06:36][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 10:06:37][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240797,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736240797,"message_id":"1EFCCD6B-35EC-6F70-A26D-EDB4300EDFEC","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:37][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 17:06:37][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 17:06:37][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 17:06:37][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 17:06:37][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 17:06:37][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 17:06:37][INFO] Found 3 players for Team A
+[2025-01-07 17:06:37][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 17:06:38][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCD6B-408D-6420-8D73-71D3318ECEBD","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:38][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 17:06:39][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240799,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240799,"message_id":"1EFCCD6B-48D8-6404-A1DA-09F2A6F39E6F","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:39][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 17:06:40][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240800,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240800,"message_id":"1EFCCD6B-52A4-6BF4-97C2-ADC60287A4C8","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:40][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 17:06:40][INFO] Found 1 players for Team B
+[2025-01-07 17:06:40][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 17:06:41][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240801,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240801,"message_id":"1EFCCD6B-5BFD-6A70-901E-73B9A2A039AB","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:06:41][INFO] Script completed successfully
+[2025-01-07 10:07:07][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-07 10:07:07][INFO] Received POST data - Schedule ID: 87, Team A: 256, Team B: 240
+[2025-01-07 10:07:07][INFO] Sending test message to 639887378278
+[2025-01-07 10:07:07][INFO] Attempting to send SMS to: 639887378278
+[2025-01-07 10:07:08][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240828,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736240828,"message_id":"1EFCCD6C-59E4-6B20-99E7-BDE4B6D7755C","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:07:08][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"07:00:00","venue":"Gym"}
+[2025-01-07 17:07:08][INFO] Game: Basketball, Team A: BSA - Basketball, Team B: BSCS - Basketball
+[2025-01-07 17:07:08][INFO] SMS Body prepared: Game: Basketball
+BSA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 7:00 AM
+Venue: Gym
+The match is starting soon, get ready!
+[2025-01-07 17:07:08][INFO] Found player number: Kobe Bryant - +63999999999
+[2025-01-07 17:07:08][INFO] Found player number: Michael Jordan - +63232323232
+[2025-01-07 17:07:08][INFO] Found player number: Lebron James - +63323232323
+[2025-01-07 17:07:08][INFO] Found 3 players for Team A
+[2025-01-07 17:07:08][INFO] Attempting to send SMS to: +63999999999
+[2025-01-07 17:07:09][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0,"total_count":1,"queued_count":0,"messages":[{"to":"+63999999999","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"YourSenderID","schedule":"","message_id":"1EFCCD6C-6507-63E0-BFB1-BDC598787DA6","custom_string":"","is_shared_system_number":true,"status":"INVALID_RECIPIENT"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:07:09][INFO] Attempting to send SMS to: +63232323232
+[2025-01-07 17:07:10][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240830,"to":"+63232323232","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240830,"message_id":"1EFCCD6C-6E02-68F0-B2AF-271E7C10CF9C","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:07:10][INFO] Attempting to send SMS to: +63323232323
+[2025-01-07 17:07:11][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240831,"to":"+63323232323","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240831,"message_id":"1EFCCD6C-776F-64B0-8267-B539D212D8CD","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:07:11][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-07 17:07:11][INFO] Found 1 players for Team B
+[2025-01-07 17:07:11][INFO] Attempting to send SMS to: +639887378278
+[2025-01-07 17:07:12][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736240832,"to":"+639887378278","body":"Game: Basketball\nBSA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 7:00 AM\nVenue: Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736240832,"message_id":"1EFCCD6C-80BB-6898-8AF3-857027370EF1","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-07 17:07:12][INFO] Script completed successfully
+[2025-01-08 15:47:25][INFO] Script started with ClickSend API Key: D7386...
+[2025-01-08 15:47:25][INFO] Received POST data - Schedule ID: 89, Team A: 312, Team B: 240
+[2025-01-08 15:47:25][INFO] Sending test message to 639887378278
+[2025-01-08 15:47:25][INFO] Attempting to send SMS to: 639887378278
+[2025-01-08 15:47:27][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736347648,"to":"+639887378278","body":"IMS Game Alert Test","from":"ClickSend","schedule":1736347648,"message_id":"1EFCDCF7-B236-6FAE-872C-9DC936AB9B08","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-08 22:47:27][INFO] Retrieved schedule details: {"game_id":18,"schedule_date":"2025-01-08","schedule_time":"23:00:00","venue":"Closed Gym"}
+[2025-01-08 22:47:27][INFO] Game: Basketball, Team A: BSBA - Basketball, Team B: BSCS - Basketball
+[2025-01-08 22:47:27][INFO] SMS Body prepared: Game: Basketball
+BSBA - Basketball vs BSCS - Basketball
+Date: Jan 08, 2025
+Time: 11:00 PM
+Venue: Closed Gym
+The match is starting soon, get ready!
+[2025-01-08 22:47:27][INFO] Found 0 players for Team A
+[2025-01-08 22:47:27][INFO] Found player number: Hanes Dizon - +639887378278
+[2025-01-08 22:47:27][INFO] Found 1 players for Team B
+[2025-01-08 22:47:27][INFO] Attempting to send SMS to: +639887378278
+[2025-01-08 22:47:28][INFO] API Response (HTTP 200): {"http_code":200,"response_code":"SUCCESS","response_msg":"Messages queued for delivery.","data":{"total_price":0.2249,"total_count":1,"queued_count":1,"messages":[{"direction":"out","date":1736347649,"to":"+639887378278","body":"Game: Basketball\nBSBA - Basketball vs BSCS - Basketball\nDate: Jan 08, 2025\nTime: 11:00 PM\nVenue: Closed Gym\nThe match is starting soon, get ready!","from":"ClickSend","schedule":1736347649,"message_id":"1EFCDCF7-BD81-61CA-9575-2532596F781B","message_parts":1,"message_price":"0.2249","from_email":null,"list_id":null,"custom_string":"","contact_id":null,"user_id":569225,"subaccount_id":647170,"is_shared_system_number":false,"country":"PH","carrier":"Smart","status":"SUCCESS"}],"_currency":{"currency_name_short":"USD","currency_prefix_d":"$","currency_prefix_c":"\u00a2","currency_name_long":"US Dollars"},"blocked_count":0}}
+[2025-01-08 22:47:28][INFO] Script completed successfully

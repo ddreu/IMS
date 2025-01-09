@@ -1,0 +1,205 @@
+/* Add to brackets.css */
+.tournament-bracket {
+    display: flex;
+    overflow-x: auto;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.round {
+    display: flex;
+    flex-direction: column;
+    margin-right: 25px;
+    min-width: 180px;
+    padding-top: 20px;
+}
+
+.round:last-child {
+    margin-right: 0;
+}
+
+.round h3 {
+    text-align: center;
+    margin-bottom: 12px;
+    color: #495057;
+    font-size: 13px;
+    text-transform: uppercase;
+    font-weight: 600;
+    position: absolute;
+    top: -5px;
+    width: 100%;
+}
+
+.match {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Adjust spacing for each round */
+.round:nth-child(1) .match {
+    margin-bottom: 0;
+}
+
+.round:nth-child(2) .match {
+    margin-top: 30px;
+    margin-bottom: 60px;
+}
+
+.round:nth-child(3) .match {
+    margin-top: 70px;
+    margin-bottom: 140px;
+}
+
+.round:nth-child(4) .match {
+    margin-top: 150px;
+    margin-bottom: 300px;
+}
+
+/* Last match in each round shouldn't have margin bottom */
+.round .match:last-child {
+    margin-bottom: 0;
+}
+
+.match::after {
+    content: '';
+    position: absolute;
+    right: -25px;
+    top: 50%;
+    width: 25px;
+    height: 2px;
+    background: #dee2e6;
+}
+
+.match::before {
+    content: '';
+    position: absolute;
+    right: -25px;
+    height: 100%;
+    width: 2px;
+    background: #dee2e6;
+    top: 50%;
+}
+
+/* Remove vertical line for matches that don't need it */
+.match:nth-child(odd)::before {
+    display: none;
+}
+
+.round:last-child .match::after,
+.round:last-child .match::before {
+    display: none;
+}
+
+.team {
+    padding: 6px 8px;
+    background: white;
+    border: 1px solid #dee2e6;
+    margin: 0;
+    min-width: 180px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 32px;
+}
+
+.team.team-top {
+    border-radius: 3px 3px 0 0;
+    border-bottom: none;
+}
+
+.team.team-bottom {
+    border-radius: 0 0 3px 3px;
+}
+
+.team.winner {
+    background: #e8f5e9;
+    border-color: #a5d6a7;
+    font-weight: 600;
+}
+
+.team.loser {
+    background: #fafafa;
+    color: #757575;
+}
+
+.team .score {
+    font-weight: bold;
+    min-width: 24px;
+    text-align: right;
+    padding-left: 8px;
+    border-left: 1px solid #eee;
+}
+
+.team .name {
+    flex: 1;
+    margin-right: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.match-assignment {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.match-assignment h4 {
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+.team-select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .tournament-bracket {
+        padding: 10px;
+    }
+
+    .round {
+        min-width: 160px;
+        margin-right: 20px;
+    }
+
+    .team {
+        min-width: 160px;
+        font-size: 11px;
+        padding: 4px 6px;
+        height: 28px;
+    }
+
+    .match::after {
+        right: -20px;
+        width: 20px;
+    }
+
+    .match::before {
+        right: -20px;
+    }
+
+    .round:nth-child(2) .match {
+        margin-top: 20px;
+        margin-bottom: 40px;
+    }
+
+    .round:nth-child(3) .match {
+        margin-top: 50px;
+        margin-bottom: 100px;
+    }
+
+    .round:nth-child(4) .match {
+        margin-top: 100px;
+        margin-bottom: 200px;
+    }
+}
