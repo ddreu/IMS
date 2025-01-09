@@ -247,7 +247,7 @@ include 'navbarhome.php';
             </div>
 
             <div id="announcementCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
+            <div class="carousel-inner">
                     <?php
                     $department_id = isset($_GET['department_id']) ? intval($_GET['department_id']) : 0;
                     $school_id = isset($_GET['school_id']) ? intval($_GET['school_id']) : 0;
@@ -377,12 +377,12 @@ include 'navbarhome.php';
                     }
                     ?>
                 </div>
-            </div>
-        </div>
-    </div>
+        
+    
 
 
     <!-- Carousel Controls -->
+
     <button class="carousel-control-prev" type="button" data-bs-target="#announcementCarousel" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
@@ -391,6 +391,10 @@ include 'navbarhome.php';
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
     </button>
+                
+                </div>
+                </div>
+            </div>
 
     <!-- Carousel Indicators -->
     <div class="carousel-indicators">
