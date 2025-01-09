@@ -259,6 +259,12 @@ header {
 .match-body {
     padding: 1.5rem;
 }
+
+.live-indicator {
+    text-align: right; 
+    margin-top: 10px; 
+    font-size: 18px;
+}
 .game-icon {
     background: rgba(255, 255, 255, 0.15);
     width: 32px;
