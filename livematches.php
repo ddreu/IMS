@@ -20,9 +20,7 @@ session_start();
     <!-- jQuery for AJAX -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <style>
 
-    </style>
 </head>
 
 <body>
@@ -125,6 +123,11 @@ session_start();
                     ${formattedDate}
                 </div>
             </div>
+            <div>
+            <div class="live-indicator d-flex justify-content-end">
+                    ${liveIndicator}
+                </div>
+                    </div>
             <div class="match-body">
                 <div class="row align-items-center">
                     <div class="col-md-5">
@@ -157,11 +160,10 @@ session_start();
                                 <div class="timer-status ${match.timer_status}">${match.timer_status}</div>
                             ` : ''}
                         </div>
+                        
                     </div>
+                    
                     <div class="col-md-5">
-                     <div class="live-indicator d-flex justify-content-end">
-                    ${liveIndicator}
-                </div>
                         <div class="team-section">
                             <div class="team-name">${match.teamB_name}</div>
                             <div class="team-score">${match.teamB_score}</div>

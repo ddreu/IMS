@@ -260,11 +260,25 @@ header {
     padding: 1.5rem;
 }
 
-.live-indicator {
-    text-align: right; 
-    margin-top: 10px; 
-    font-size: 18px;
+
+@keyframes flicker {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
+
+
+.live-indicator {
+    text-align: right;
+    margin-right: 15px;
+    margin-top: 15px;
+    font-size: 18px;
+    animation: flicker 1s infinite;
+}
+
 .game-icon {
     background: rgba(255, 255, 255, 0.15);
     width: 32px;

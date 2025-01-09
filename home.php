@@ -824,6 +824,11 @@ include 'navbarhome.php';
                     ${formattedDate}
                 </div>
             </div>
+            <div>
+            <div class="live-indicator d-flex justify-content-end">
+                    ${liveIndicator}
+                </div>
+                    </div>
             <div class="match-body">
                 <div class="row align-items-center">
                     <div class="col-md-5">
@@ -856,11 +861,10 @@ include 'navbarhome.php';
                                 <div class="timer-status ${match.timer_status}">${match.timer_status}</div>
                             ` : ''}
                         </div>
+                        
                     </div>
+                    
                     <div class="col-md-5">
-                     <div class="live-indicator d-flex justify-content-end">
-                    ${liveIndicator}
-                </div>
                         <div class="team-section">
                             <div class="team-name">${match.teamB_name}</div>
                             <div class="team-score">${match.teamB_score}</div>
