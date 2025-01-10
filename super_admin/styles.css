@@ -1,0 +1,124 @@
+/* General Sidebar Styles */
+.sidebar-custom {
+    width: 60px;
+    background-color: #121214;
+    color: #c0c4cc;
+    height: 100vh;
+    transition: width 0.3s ease;
+    position: fixed;
+    z-index: 1000;
+    overflow: hidden;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-custom:hover {
+    width: 280px;
+    border-radius: 0 20px 20px 0;
+}
+
+/* Sidebar Header */
+.sidebar-custom-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #31313f;
+}
+
+.sidebar-custom-logo-icon {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 1.2rem;
+    background-color: #4263eb;
+    border-radius: 50%;
+}
+
+.sidebar-custom-logo-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    display: none;
+}
+
+.sidebar-custom:hover .sidebar-custom-logo-text {
+    display: inline;
+}
+
+/* Search Bar */
+.sidebar-custom-search-bar {
+    padding: 10px 15px;
+    border-bottom: 1px solid #31313f;
+}
+
+.sidebar-custom-search-input {
+    background-color: #252537;
+    border: none;
+    color: #c0c4cc;
+}
+
+.sidebar-custom-search-input::placeholder {
+    color: #6c757d;
+}
+
+.sidebar-custom-search-input:focus {
+    outline: none;
+}
+
+/* Menu Items */
+.sidebar-custom-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: #c0c4cc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.sidebar-custom-nav-link i {
+    font-size: 1.4rem;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.sidebar-custom-link-text {
+    display: none;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.sidebar-custom:hover .sidebar-custom-nav-link .sidebar-custom-link-text {
+    display: inline;
+    opacity: 1;
+}
+
+.sidebar-custom-nav-link.active {
+    background-color: #4263eb;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 12px;  /* Adjust this value to control roundness */
+    padding: 12px 15px;   /* Ensure padding for appropriate spacing */
+    
+}
+
+
+.sidebar-custom-nav-link:hover {
+    background-color: #31313f;
+    color: #fff;
+}
+
+/* Submenu */
+.sidebar-custom-sub-menu .sidebar-custom-nav-link {
+    font-size: 0.8rem;
+    padding-left: 50px;
+}
+
+.sidebar-custom-sub-menu .sidebar-custom-nav-link:hover {
+    background-color: #3c3c4a;
+}
+
+/* Divider */
+.sidebar-custom-divider {
+    border-top: 1px solid #31313f;
+    margin: 15px 0;
+}
