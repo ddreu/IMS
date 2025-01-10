@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 20, 2024 at 01:12 PM
+-- Generation Time: Jan 10, 2025 at 01:21 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,9 +43,9 @@ CREATE TABLE `announcement` (
 
 INSERT INTO `announcement` (`id`, `title`, `message`, `image`, `school_id`, `department_id`, `created_at`) VALUES
 (28, 'Volleyball Tryout', 'Join us for volleyball tryouts. All skill levels welcome! Bring your enthusiasm and gear. Don’t miss your chance to be part of the team!\r\n\r\nSee you on the court! 🏆', '../uploadsBVW-volleyball-tryouts-copy.png', 8, 1, '2024-12-09 05:59:59'),
-(29, 'Announcement', 'Players and Team Registrations are now open!', '../uploadsEye_catching_ways_to_make_announcements.2aee7ba1.5d605628.jpg', 8, 1, '2024-12-09 05:59:59'),
-(33, 'wdas', 'wdawdsa', '../uploads/a11.png', 8, 1, '2024-12-18 13:56:17'),
-(34, 'awda', 'wdsaw', NULL, 8, 1, '2024-12-18 21:22:37');
+(29, 'Announcement!', 'Players and Team Registrations are now open!!', '../uploadsEye_catching_ways_to_make_announcements.2aee7ba1.5d605628.jpg', 8, 1, '2024-12-09 05:59:59'),
+(34, 'awda', 'wdsasss', NULL, NULL, 0, '2024-12-18 21:22:37'),
+(38, 'Urgent!!!', 'System Maintenance', NULL, 0, 0, '2025-01-09 06:10:22');
 
 -- --------------------------------------------------------
 
@@ -70,7 +70,7 @@ CREATE TABLE `brackets` (
 --
 
 INSERT INTO `brackets` (`bracket_id`, `game_id`, `department_id`, `grade_level`, `total_teams`, `rounds`, `status`, `created_at`, `bracket_type`) VALUES
-(82, 18, 1, NULL, 8, 3, 'ongoing', '2024-12-20 08:16:52', 'single');
+(87, 18, 1, NULL, 8, 3, 'ongoing', '2025-01-08 13:35:19', 'single');
 
 -- --------------------------------------------------------
 
@@ -153,7 +153,8 @@ CREATE TABLE `game_scoring_rules` (
 --
 
 INSERT INTO `game_scoring_rules` (`id`, `game_id`, `department_id`, `school_id`, `scoring_unit`, `score_increment_options`, `period_type`, `number_of_periods`, `duration_per_period`, `time_limit`, `point_cap`, `max_fouls`, `timeouts_per_period`) VALUES
-(7, 18, 1, 8, 'Point', '1,2,3', 'Quarter', 4, 10, 1, 0, 5, 4);
+(7, 18, 1, 8, 'Point', '1,2,3', 'Quarter', 4, 10, 1, 0, 5, 4),
+(12, 27, 1, 8, 'Point', '1', 'Set', 4, 5, 1, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -175,7 +176,8 @@ INSERT INTO `game_stats_config` (`config_id`, `game_id`, `stat_name`) VALUES
 (19, 18, 'Assists'),
 (15, 18, 'Fouls'),
 (18, 18, 'Rebounds'),
-(17, 18, 'Scores');
+(17, 18, 'Scores'),
+(22, 27, 'Points');
 
 -- --------------------------------------------------------
 
@@ -263,14 +265,14 @@ CREATE TABLE `matches` (
 --
 
 INSERT INTO `matches` (`match_id`, `match_identifier`, `bracket_id`, `teamA_id`, `teamB_id`, `round`, `match_number`, `next_match_number`, `status`, `match_type`) VALUES
-(336, 'bracket82-round1-match1', 82, 312, 240, 1, 1, 5, 'Finished', 'regular'),
-(337, 'bracket82-round1-match2', 82, 320, -1, 1, 2, 5, 'Finished', 'regular'),
-(338, 'bracket82-round1-match3', 82, 256, 248, 1, 3, 6, 'Finished', 'regular'),
-(339, 'bracket82-round1-match4', 82, 328, -1, 1, 4, 6, 'Finished', 'regular'),
-(340, 'bracket82-round2-match5', 82, 240, 320, 2, 5, 7, 'Upcoming', 'semifinal'),
-(341, 'bracket82-round2-match6', 82, 256, 328, 2, 6, 7, 'Pending', 'semifinal'),
-(342, 'bracket82-round3-match7', 82, -2, -2, 3, 7, 0, 'Pending', 'final'),
-(343, 'bracket82-third-place-match', 82, -2, -2, -1, -1, 0, 'Pending', 'third_place');
+(376, 'bracket87-round1-match1', 87, 320, 248, 1, 1, 5, 'Finished', 'regular'),
+(377, 'bracket87-round1-match2', 87, 256, -1, 1, 2, 5, 'Finished', 'regular'),
+(378, 'bracket87-round1-match3', 87, 312, 240, 1, 3, 6, 'Finished', 'regular'),
+(379, 'bracket87-round1-match4', 87, 328, -1, 1, 4, 6, 'Finished', 'regular'),
+(380, 'bracket87-round2-match5', 87, 248, 256, 2, 5, 7, 'Upcoming', 'semifinal'),
+(381, 'bracket87-round2-match6', 87, 240, 328, 2, 6, 7, 'Pending', 'semifinal'),
+(382, 'bracket87-round3-match7', 87, -2, -2, 3, 7, 0, 'Pending', 'final'),
+(383, 'bracket87-third-place-match', 87, -2, -2, -1, -1, 0, 'Pending', 'third_place');
 
 -- --------------------------------------------------------
 
@@ -295,7 +297,13 @@ INSERT INTO `match_progression_logs` (`log_id`, `match_id`, `team_id`, `update_t
 (1, 333, 312, 'next_match_teamA_update', 'From match 330', '2024-12-20 09:01:37'),
 (2, 332, 240, 'next_match_teamB_update', 'From match 329', '2024-12-20 09:20:07'),
 (3, 340, 240, 'next_match_teamA_update', 'From match 336', '2024-12-20 17:34:59'),
-(4, 341, 256, 'next_match_teamA_update', 'From match 338', '2024-12-20 19:29:31');
+(4, 341, 256, 'next_match_teamA_update', 'From match 338', '2024-12-20 19:29:31'),
+(5, 348, 259, 'next_match_teamA_update', 'From match 344', '2024-12-21 10:29:33'),
+(6, 356, 312, 'next_match_teamA_update', 'From match 352', '2024-12-21 10:31:55'),
+(7, 357, 256, 'next_match_teamA_update', 'From match 354', '2024-12-21 11:21:04'),
+(8, 349, 243, 'next_match_teamA_update', 'From match 346', '2024-12-21 11:24:32'),
+(9, 381, 240, 'next_match_teamA_update', 'From match 378', '2025-01-09 01:00:37'),
+(10, 380, 248, 'next_match_teamA_update', 'From match 376', '2025-01-10 09:30:16');
 
 -- --------------------------------------------------------
 
@@ -321,8 +329,8 @@ CREATE TABLE `match_results` (
 --
 
 INSERT INTO `match_results` (`result_id`, `match_id`, `game_id`, `team_A_id`, `team_B_id`, `score_teamA`, `score_teamB`, `winning_team_id`, `losing_team_id`, `last_updated`) VALUES
-(42, 336, 18, 312, 240, 14, 15, 240, 312, '2024-12-20 09:34:59'),
-(43, 338, 18, 256, 248, 18, 12, 256, 248, '2024-12-20 11:29:31');
+(50, 378, 18, 312, 240, 9, 18, 240, 312, '2025-01-08 17:00:37'),
+(51, 376, 18, 320, 248, 9, 15, 248, 320, '2025-01-10 01:30:16');
 
 -- --------------------------------------------------------
 
@@ -352,7 +360,9 @@ INSERT INTO `players` (`player_id`, `player_lastname`, `player_firstname`, `play
 (230, 'awedwa', 'awdsa', 'wdsa', 259, '2024-11-07 08:16:30', 33),
 (236, 'Dizon', 'Hanes', '', 240, '2024-12-05 12:47:00', 1),
 (237, 'De Guzman', 'Andrew', 'B.', 240, '2024-12-05 12:49:50', 22),
-(249, 'Capistrano', 'Charlotte', '', 320, '2024-12-20 11:28:55', 77);
+(249, 'Capistrano', 'Charlotte', '', 320, '2024-12-20 11:28:55', 77),
+(250, 'Guevarra', 'Jamie', '', 248, '2024-12-21 02:36:48', 4),
+(251, 'Doe', 'John', '', 312, '2025-01-08 14:54:06', 44);
 
 -- --------------------------------------------------------
 
@@ -383,8 +393,10 @@ INSERT INTO `players_info` (`player_info_id`, `player_id`, `email`, `phone_numbe
 (6, 229, 'awdsa@gmail.com', '+63912122121', '2024-11-06', NULL, '', '', ''),
 (7, 230, 'aaa@gmail.com', '+63213212131', '2024-10-29', NULL, '', '', ''),
 (13, 236, 'hanes@gmail.com', '+639887378278', '1990-05-14', '../uploads/players/hanes.jpg', '5\'9', '150lbs', 'Shooting Guard'),
-(14, 237, 'andrewbucedeguzman@gmail.com', '+639754136497', '2002-04-30', NULL, '5\'9', '180lbs', 'Small Forward'),
-(26, 249, 'charlotte@gmail.com', '+639261769542', '2010-02-20', NULL, '', '', '');
+(14, 237, 'andrewbucedeguzman@gmail.com', '', '2002-04-30', NULL, '5&#039;9', '180lbs', 'Small Forward'),
+(26, 249, 'charlotte@gmail.com', '+639261769542', '2010-02-20', NULL, '', '', ''),
+(27, 250, 'jamie@gmail.com', '+639121212121', '2010-02-15', NULL, '', '', ''),
+(28, 251, 'johndoe@gmail.com', '+639754136498', '2005-05-08', NULL, '', '', 'Small Forward');
 
 -- --------------------------------------------------------
 
@@ -407,18 +419,18 @@ CREATE TABLE `player_match_stats` (
 --
 
 INSERT INTO `player_match_stats` (`stat_record_id`, `player_id`, `match_id`, `game_id`, `stat_name`, `stat_value`, `created_at`) VALUES
-(41, 226, 338, 18, 'Scores', '15', '2024-12-20 11:29:11'),
-(42, 228, 338, 18, 'Scores', '7', '2024-12-20 11:29:12'),
-(43, 228, 338, 18, 'Rebounds', '4', '2024-12-20 11:29:13'),
-(44, 228, 338, 18, 'Fouls', '2', '2024-12-20 11:29:14'),
-(45, 228, 338, 18, 'Assists', '4', '2024-12-20 11:29:14'),
-(46, 227, 338, 18, 'Assists', '2', '2024-12-20 11:29:16'),
-(47, 227, 338, 18, 'Fouls', '1', '2024-12-20 11:29:17'),
-(48, 227, 338, 18, 'Rebounds', '1', '2024-12-20 11:29:17'),
-(49, 227, 338, 18, 'Scores', '14', '2024-12-20 11:29:18'),
-(50, 226, 338, 18, 'Fouls', '1', '2024-12-20 11:29:21'),
-(51, 226, 338, 18, 'Assists', '1', '2024-12-20 11:29:21'),
-(52, 226, 338, 18, 'Rebounds', '1', '2024-12-20 11:29:22');
+(57, 251, 378, 18, 'Fouls', '3', '2025-01-08 15:01:10'),
+(58, 251, 378, 18, 'Assists', '3', '2025-01-08 17:00:18'),
+(59, 236, 378, 18, 'Assists', '7', '2025-01-08 17:00:20'),
+(60, 236, 378, 18, 'Fouls', '4', '2025-01-08 17:00:21'),
+(61, 236, 378, 18, 'Rebounds', '3', '2025-01-08 17:00:21'),
+(62, 236, 378, 18, 'Scores', '5', '2025-01-08 17:00:22'),
+(63, 237, 378, 18, 'Scores', '5', '2025-01-08 17:00:26'),
+(64, 237, 378, 18, 'Assists', '1', '2025-01-08 17:00:28'),
+(65, 237, 378, 18, 'Fouls', '1', '2025-01-08 17:00:28'),
+(66, 237, 378, 18, 'Rebounds', '1', '2025-01-08 17:00:28'),
+(67, 251, 378, 18, 'Rebounds', '1', '2025-01-08 17:00:30'),
+(68, 251, 378, 18, 'Scores', '1', '2025-01-08 17:00:30');
 
 -- --------------------------------------------------------
 
@@ -461,9 +473,9 @@ CREATE TABLE `schedules` (
 --
 
 INSERT INTO `schedules` (`schedule_id`, `match_id`, `schedule_date`, `schedule_time`, `venue`) VALUES
-(78, 336, '2024-12-20', '17:30:00', 'Gym'),
-(79, 338, '2024-12-20', '18:00:00', 'Gym'),
-(80, 340, '2024-12-21', '09:00:00', 'Gym');
+(88, 376, '2025-01-10', '06:10:00', 'Gym'),
+(89, 378, '2025-01-08', '23:00:00', 'Closed Gym'),
+(90, 380, '2025-01-08', '23:00:00', 'Open Gym');
 
 -- --------------------------------------------------------
 
@@ -509,7 +521,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`session_id`, `user_id`, `ip_address`, `user_agent`, `created_at`, `expires_at`) VALUES
-(130, 67, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2024-12-20 02:53:53', '2024-12-20 03:53:53');
+(132, 90, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2024-12-20 17:15:24', '2024-12-20 18:15:24'),
+(152, 67, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2025-01-09 22:06:59', '2025-01-09 23:06:59');
 
 -- --------------------------------------------------------
 
@@ -543,7 +556,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (245, 'BSCS - Patintero', 29, '2024-11-02 11:14:51', 67, 0, 0),
 (246, 'BSCS - Word Factory', 30, '2024-11-02 11:14:51', 67, 0, 0),
 (247, 'CRIM - Volleyball', 2, '2024-11-02 11:14:55', 68, 0, 0),
-(248, 'CRIM - Basketball', 18, '2024-11-02 11:14:55', 68, 0, 1),
+(248, 'CRIM - Basketball', 18, '2024-11-02 11:14:55', 68, 1, 0),
 (249, 'CRIM - Dama', 22, '2024-11-02 11:14:55', 68, 0, 0),
 (250, 'CRIM - Dart', 26, '2024-11-02 11:14:55', 68, 0, 0),
 (251, 'CRIM - Chess', 27, '2024-11-02 11:14:55', 68, 0, 0),
@@ -551,7 +564,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (253, 'CRIM - Patintero', 29, '2024-11-02 11:14:55', 68, 0, 0),
 (254, 'CRIM - Word Factory', 30, '2024-11-02 11:14:55', 68, 0, 0),
 (255, 'BSA - Volleyball', 2, '2024-11-02 11:15:21', 69, 0, 0),
-(256, 'BSA - Basketball', 18, '2024-11-02 11:15:21', 69, 1, 0),
+(256, 'BSA - Basketball', 18, '2024-11-02 11:15:21', 69, 0, 0),
 (257, 'BSA - Dama', 22, '2024-11-02 11:15:21', 69, 0, 0),
 (258, 'BSA - Dart', 26, '2024-11-02 11:15:21', 69, 0, 0),
 (259, 'BSA - Chess', 27, '2024-11-02 11:15:21', 69, 0, 0),
@@ -599,7 +612,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (317, 'BSBA - Patintero', 29, '2024-11-09 05:25:00', 76, 0, 0),
 (318, 'BSBA - Word Factory', 30, '2024-11-09 05:25:00', 76, 0, 0),
 (319, 'EDUC - Volleyball', 2, '2024-11-09 05:25:19', 77, 0, 0),
-(320, 'EDUC - Basketball', 18, '2024-11-09 05:25:19', 77, 0, 0),
+(320, 'EDUC - Basketball', 18, '2024-11-09 05:25:19', 77, 0, 1),
 (321, 'EDUC - Dama', 22, '2024-11-09 05:25:19', 77, 0, 0),
 (322, 'EDUC - Dart', 26, '2024-11-09 05:25:19', 77, 0, 0),
 (323, 'EDUC - Chess', 27, '2024-11-09 05:25:19', 77, 0, 0),
@@ -736,7 +749,9 @@ ALTER TABLE `game_stats_config`
 --
 ALTER TABLE `grade_section_course`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `department_id` (`department_id`);
+  ADD KEY `idx_department_id` (`department_id`),
+  ADD KEY `idx_grade_level` (`grade_level`),
+  ADD KEY `idx_department_grade` (`department_id`,`grade_level`);
 
 --
 -- Indexes for table `live_scores`
@@ -854,13 +869,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `announcement`
 --
 ALTER TABLE `announcement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `brackets`
 --
 ALTER TABLE `brackets`
-  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT for table `departments`
@@ -878,13 +893,13 @@ ALTER TABLE `games`
 -- AUTO_INCREMENT for table `game_scoring_rules`
 --
 ALTER TABLE `game_scoring_rules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `game_stats_config`
 --
 ALTER TABLE `game_stats_config`
-  MODIFY `config_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `config_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `grade_section_course`
@@ -896,43 +911,43 @@ ALTER TABLE `grade_section_course`
 -- AUTO_INCREMENT for table `live_scores`
 --
 ALTER TABLE `live_scores`
-  MODIFY `live_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4048;
+  MODIFY `live_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4111;
 
 --
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=344;
+  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=384;
 
 --
 -- AUTO_INCREMENT for table `match_progression_logs`
 --
 ALTER TABLE `match_progression_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `match_results`
 --
 ALTER TABLE `match_results`
-  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=250;
+  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=252;
 
 --
 -- AUTO_INCREMENT for table `players_info`
 --
 ALTER TABLE `players_info`
-  MODIFY `player_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `player_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `player_match_stats`
 --
 ALTER TABLE `player_match_stats`
-  MODIFY `stat_record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `stat_record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `pointing_system`
@@ -944,7 +959,7 @@ ALTER TABLE `pointing_system`
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT for table `schools`
@@ -956,7 +971,7 @@ ALTER TABLE `schools`
 -- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
 
 --
 -- AUTO_INCREMENT for table `teams`
