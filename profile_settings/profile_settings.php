@@ -1,6 +1,7 @@
 <?php
 session_start();
 include_once '../connection/conn.php';
+include '../user_logs/logger.php';
 $conn = con();
 
 // Regenerate session ID for security
@@ -8,7 +9,7 @@ session_regenerate_id(true);
 
 // Check if session variables are set
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: ../login.php');
     exit();
 }
 
@@ -67,6 +68,14 @@ function updateUserProfile($conn, $user_id)
     } elseif (!is_numeric($age) || $age < 0) {
         $_SESSION['error_message'] = "Age must be a valid number.";
     } else {
+        // Fetch current user details for comparison
+        $fetch_sql = "SELECT firstname, lastname, middleinitial, age, gender, email FROM Users WHERE id = ?";
+        $stmt_fetch = $conn->prepare($fetch_sql);
+        $stmt_fetch->bind_param("i", $user_id);
+        $stmt_fetch->execute();
+        $current_data = $stmt_fetch->get_result()->fetch_assoc();
+        $stmt_fetch->close();
+
         // Update user profile details if validation passes
         $update_profile_sql = "UPDATE Users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ? WHERE id = ?";
         $stmt_update_profile = $conn->prepare($update_profile_sql);
@@ -82,6 +91,27 @@ function updateUserProfile($conn, $user_id)
             $_SESSION['email'] = $email;
 
             $_SESSION['success_message'] = "Profile updated successfully.";
+
+            // Prepare data for logging
+            $new_data = [
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'middleinitial' => $middleinitial,
+                'age' => $age,
+                'gender' => $gender,
+                'email' => $email
+            ];
+            $description = "Updated user profile details.";
+
+            // Log the action
+            logUserAction(
+                $conn,
+                $user_id,
+                'Profile',
+                'UPDATE',
+                $user_id,
+                $description
+            );
         } else {
             $_SESSION['error_message'] = "Error updating profile: " . $stmt_update_profile->error;
         }
@@ -130,7 +160,7 @@ $conn->close();
             include '../committee/csidebar.php';
         } elseif ($role == 'superadmin') {
             include '../super_admin/sa_sidebar.php'; // fallback for other roles
-        }  else {
+        } else {
             include '../department_admin/sidebar.php'; // fallback for other roles
         }
         ?>
@@ -139,7 +169,7 @@ $conn->close();
     <div class="main">
         <div class="container mt-4">
             <h1 class="mb-4"><?php echo htmlspecialchars($role); ?> Profile</h1>
-            <form id="updateUserInfoForm" method="POST" action="committeeprofile.php" onsubmit="event.preventDefault(); confirmUpdate('updateUserInfoForm', 'update your profile');">
+            <form id="updateUserInfoForm" method="POST" action="profile_settings.php" onsubmit="event.preventDefault(); confirmUpdate('updateUserInfoForm', 'update your profile');">
                 <input type="hidden" name="update_profile" value="1"> <!-- Add this line -->
 
                 <div class="row mb-3">
@@ -342,18 +372,28 @@ $conn->close();
                     });
                 }
 
-                // Check for success message
-                <?php if (isset($_SESSION['success_message'])): ?>
-                    swal("Success!", "<?php echo addslashes($_SESSION['success_message']); ?>", "success");
-                    <?php unset($_SESSION['success_message']); // Clear message after displaying 
-                    ?>
+                <?php if (isset($_SESSION['success_message']) && !isset($_GET['alert_shown'])): ?>
+
+                    swal("Success!", "<?php echo addslashes($_SESSION['success_message']); ?>", "success")
+                        .then(() => {
+                            // Reload the page and append a query parameter to prevent showing the alert again
+                            const url = new URL(window.location.href);
+                            url.searchParams.set('alert_shown', 'true');
+                            window.location.href = url.toString();
+                        });
+
                 <?php endif; ?>
 
-                // Check for error message
-                <?php if (isset($_SESSION['error_message'])): ?>
-                    swal("Error!", "<?php echo addslashes($_SESSION['error_message']); ?>", "error");
-                    <?php unset($_SESSION['error_message']); // Clear message after displaying 
-                    ?>
+                <?php if (isset($_SESSION['error_message']) && !isset($_GET['alert_shown'])): ?>
+
+                    swal("Error!", "<?php echo addslashes($_SESSION['error_message']); ?>", "error")
+                        .then(() => {
+                            // Reload the page and append a query parameter to prevent showing the alert again
+                            const url = new URL(window.location.href);
+                            url.searchParams.set('alert_shown', 'true');
+                            window.location.href = url.toString();
+                        });
+
                 <?php endif; ?>
             </script>
 </body>

@@ -1,6 +1,7 @@
 <?php
 session_start(); // Start the session at the beginning
 include_once '../connection/conn.php';
+include '../user_logs/logger.php'; // Include the logger file
 $conn = con();
 
 // Check if the user is logged in
@@ -8,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php'); // Adjust the path if needed
     exit();
 }
-
 
 $role = $_SESSION['role'];
 $user_id = $_SESSION['user_id'];
@@ -64,6 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_game'])) {
         mysqli_stmt_bind_param($stmt_insert, "sissi", $game_name, $number_of_players, $category, $environment, $school_id);
 
         if (mysqli_stmt_execute($stmt_insert)) {
+            // Prepare a detailed log description
+            $log_description = "Added a new game: Name = '{$game_name}', Number of Players = {$number_of_players}, Category = '{$category}', Environment = '{$environment}'.";
+
+            // Call the logUserAction function to log the action
+            logUserAction($conn, $user_id, "games", "CREATE", mysqli_insert_id($conn), $log_description);
+
             $_SESSION['success_message'] = "Game added successfully!"; // Success message
         } else {
             $_SESSION['error_message'] = "Error adding game: " . mysqli_error($conn); // Error message on insert failure
@@ -112,6 +118,7 @@ if (count($params) == 1) {
 
 mysqli_stmt_execute($stmt_games);
 $game_result = mysqli_stmt_get_result($stmt_games);
+
 // Fetch departments only if school_id is available
 $departments = [];
 if ($school_id) {
@@ -122,9 +129,10 @@ if ($school_id) {
         $departments = mysqli_fetch_all($department_result, MYSQLI_ASSOC);
     }
 }
-include '../navbar/navbar.php';
 
+include '../navbar/navbar.php';
 ?>
+
 
 
 
@@ -152,7 +160,7 @@ include '../navbar/navbar.php';
 <body>
     <div class="wrapper">
         <?php $current_page = 'games';
-            include '../department_admin/sidebar.php'; ?>
+        include '../department_admin/sidebar.php'; ?>
         <div id="content">
             <?php
             // Display success message
@@ -303,7 +311,7 @@ include '../navbar/navbar.php';
                                                     echo '<td class="px-4">';
                                                     // Add badge for category
                                                     $categoryClass = '';
-                                                    switch($game['category']) {
+                                                    switch ($game['category']) {
                                                         case 'Team Sports':
                                                             $categoryClass = 'bg-primary';
                                                             break;
@@ -325,13 +333,13 @@ include '../navbar/navbar.php';
                                                     if ($user['role'] === 'School Admin') {
                                                         echo '<td class="px-4">';
                                                         echo '<div class="d-flex gap-2 justify-content-center">';
-                                                        
+
                                                         // Edit button
-                                                        echo '<button onclick="openUpdateModal(' . 
-                                                            htmlspecialchars($game['game_id']) . ', \'' . 
-                                                            htmlspecialchars($game['game_name']) . '\', ' . 
-                                                            htmlspecialchars($game['number_of_players']) . ', \'' . 
-                                                            htmlspecialchars($game['category']) . '\', \'' . 
+                                                        echo '<button onclick="openUpdateModal(' .
+                                                            htmlspecialchars($game['game_id']) . ', \'' .
+                                                            htmlspecialchars($game['game_name']) . '\', ' .
+                                                            htmlspecialchars($game['number_of_players']) . ', \'' .
+                                                            htmlspecialchars($game['category']) . '\', \'' .
                                                             htmlspecialchars($game['environment']) . '\')" ' .
                                                             'class="btn btn-primary btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
                                                             '<i class="fas fa-edit"></i></button>';
@@ -340,10 +348,10 @@ include '../navbar/navbar.php';
                                                         echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" class="d-inline">';
                                                         echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
                                                         echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
-                                                             'class="btn btn-danger btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
-                                                             '<i class="fas fa-trash"></i></button>';
+                                                            'class="btn btn-danger btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
+                                                            '<i class="fas fa-trash"></i></button>';
                                                         echo '</form>';
-                                                        
+
                                                         echo '</div>';
                                                         echo '</td>';
                                                     }
@@ -452,7 +460,7 @@ include '../navbar/navbar.php';
             $('#updateGameForm').on('submit', function(e) {
                 e.preventDefault();
                 const form = this;
-                
+
                 Swal.fire({
                     title: 'Confirm Update',
                     text: "Are you sure you want to update this game?",

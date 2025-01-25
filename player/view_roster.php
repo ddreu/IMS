@@ -189,6 +189,21 @@ echo "<!-- Team Info: " . print_r($team, true) . " -->";
             color: #224abe;
         }
 
+        .btn-bulk-upload {
+        background-color: transparent;
+        border: 2px solid #28a745; /* Change the color if needed */
+        color: black;
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        }
+
+        .btn-bulk-upload:hover {
+        background-color: #28a745; /* Match the border color */
+        color: white;
+        }
+
+
         .back-button i {
             margin-right: 0.5rem;
         }
@@ -313,10 +328,14 @@ echo "<!-- Team Info: " . print_r($team, true) . " -->";
                     <!-- Header with Team Name and Add Player Button -->
                     <div class="card">
                         <div class="card-header">
-                            <h5>Player Roster for Team: <?= htmlspecialchars($team['team_name']) ?></h5>
+                        <h5>Player Roster for Team: <?= htmlspecialchars($team['team_name']) ?></h5>
+                            <div>
                             <a href="player_registration.php?team_id=<?= $team_id ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-primary btn-sm">Add Player</a>
+                            <a href="bulk_upload.php?team_id=<?= $team_id ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-primary btn-sm btn-bulk-upload">Bulk Upload</a>
+                            </div> 
                         </div>
                     </div>
+
 
                     <?php 
                     // Fetch players

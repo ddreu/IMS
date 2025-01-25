@@ -21,8 +21,14 @@ try {
     $query = "
         SELECT 
             ls.*,
-            s.schedule_date, 
-            tA.team_name AS teamA_name, tB.team_name AS teamB_name, 
+            s.schedule_id,
+            s.schedule_date,
+            s.venue,
+            m.match_id,
+            m.teamA_id,
+            m.teamB_id,
+            tA.team_name AS teamA_name, 
+            tB.team_name AS teamB_name,
             g.game_name,
             gsr.duration_per_period,
             gsr.number_of_periods,

@@ -139,7 +139,7 @@ $conn->close();
             margin-bottom: 1rem;
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
         }
-        
+
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -148,7 +148,7 @@ $conn->close();
         .card-header {
             padding: 1rem 1.25rem;
             background-color: white;
-            border-bottom: 1px solid rgba(0,0,0,.125);
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -168,8 +168,8 @@ $conn->close();
             font-size: 0.95rem;
             margin-bottom: 0;
         }
-        
-        .table > :not(caption) > * > * {
+
+        .table> :not(caption)>*>* {
             padding: 0.85rem;
         }
 
@@ -350,7 +350,7 @@ $conn->close();
                 margin: 0 -1.25rem;
             }
         }
-        
+
         .editable {
             background-color: #fff3cd;
             padding: 5px;
@@ -410,10 +410,10 @@ $conn->close();
                                                             <a href="../teams/adminteams.php?grade_section_course_id=<?php echo $item['id']; ?>" class="btn btn-primary btn-sm">
                                                                 <i class="fas fa-users"></i> View Teams
                                                             </a>
-                                                            <button class="btn btn-info btn-sm edit-btn" 
-                                                                    data-id="<?php echo $item['id']; ?>"
-                                                                    data-department="<?php echo htmlspecialchars($department_name); ?>"
-                                                                    data-grade="<?php echo htmlspecialchars($grade_level); ?>">
+                                                            <button class="btn btn-info btn-sm edit-btn"
+                                                                data-id="<?php echo $item['id']; ?>"
+                                                                data-department="<?php echo htmlspecialchars($department_name); ?>"
+                                                                data-grade="<?php echo htmlspecialchars($grade_level); ?>">
                                                                 <i class="fas fa-edit"></i> Edit
                                                             </button>
                                                             <button class="btn btn-success btn-sm save-btn" style="display: none;">
@@ -539,7 +539,7 @@ $conn->close();
                     // Confirm delete button click handler
                     document.getElementById('confirmDelete').addEventListener('click', function() {
                         const courseId = document.getElementById('deleteCourseId').value;
-                        
+
                         if (!courseId) {
                             Swal.fire({
                                 icon: 'error',
@@ -556,35 +556,35 @@ $conn->close();
 
                         // Send request using fetch instead of jQuery
                         fetch('deletesection_course.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: 'Course/Section deleted successfully.'
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Deleted!',
+                                        text: 'Course/Section deleted successfully.'
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: data.message || 'Failed to delete course/section.'
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error!',
-                                    text: data.message || 'Failed to delete course/section.'
+                                    text: 'An error occurred while trying to delete the course/section.'
                                 });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: 'An error occurred while trying to delete the course/section.'
                             });
-                        });
                     });
 
                     // Edit functionality
@@ -592,17 +592,17 @@ $conn->close();
                         button.addEventListener('click', function() {
                             const row = this.closest('tr');
                             const department = this.getAttribute('data-department');
-                            
+
                             // Store original values for cancellation
                             row.dataset.originalValues = JSON.stringify({
                                 name: row.querySelector('td:nth-child(' + (department === 'SHS' ? '2' : '1') + ')').textContent.trim(),
                                 strand: department === 'SHS' ? row.querySelector('td:nth-child(1)').textContent.trim() : null
                             });
-                            
+
                             // Hide edit button and show save button
                             this.style.display = 'none';
                             row.querySelector('.save-btn').style.display = 'inline-block';
-                            
+
                             // Make cells editable based on department
                             if (department === 'College') {
                                 const nameCell = row.querySelector('td:nth-child(1)');
@@ -625,25 +625,25 @@ $conn->close();
                             function handleClickOutside(event) {
                                 const editableCells = row.querySelectorAll('.editable');
                                 let clickedInside = false;
-                                
+
                                 editableCells.forEach(cell => {
                                     if (cell.contains(event.target)) {
                                         clickedInside = true;
                                     }
                                 });
-                                
+
                                 // Also check if clicked on save button
                                 const saveBtn = row.querySelector('.save-btn');
                                 if (saveBtn && saveBtn.contains(event.target)) {
                                     clickedInside = true;
                                 }
-                                
+
                                 if (!clickedInside) {
                                     cancelEdit(row);
                                     document.removeEventListener('click', handleClickOutside);
                                 }
                             }
-                            
+
                             // Delay adding the click outside listener to prevent immediate triggering
                             setTimeout(() => {
                                 document.addEventListener('click', handleClickOutside);
@@ -655,7 +655,7 @@ $conn->close();
                     function cancelEdit(row) {
                         const originalValues = JSON.parse(row.dataset.originalValues || '{}');
                         const department = row.querySelector('.edit-btn').getAttribute('data-department');
-                        
+
                         // Restore original values
                         if (department === 'SHS') {
                             row.querySelector('td:nth-child(1)').textContent = originalValues.strand;
@@ -663,14 +663,14 @@ $conn->close();
                         } else {
                             row.querySelector('td:nth-child(' + (department === 'SHS' ? '2' : '1') + ')').textContent = originalValues.name;
                         }
-                        
+
                         // Reset editable state
                         const editableCells = row.querySelectorAll('.editable');
                         editableCells.forEach(cell => {
                             cell.contentEditable = false;
                             cell.classList.remove('editable');
                         });
-                        
+
                         // Reset buttons
                         row.querySelector('.edit-btn').style.display = 'inline-block';
                         row.querySelector('.save-btn').style.display = 'none';
@@ -684,7 +684,7 @@ $conn->close();
                             const id = editBtn.getAttribute('data-id');
                             const department = editBtn.getAttribute('data-department');
                             const grade = editBtn.getAttribute('data-grade');
-                            
+
                             let data = {
                                 id: id,
                                 department: department,
@@ -711,47 +711,47 @@ $conn->close();
                             }).then((result) => {
                                 if (result.isConfirmed) {
                                     fetch('update_section.php', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify(data)
-                                    })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Updated!',
-                                                text: 'The section has been updated successfully.',
-                                                showConfirmButton: true
-                                            }).then((result) => {
-                                                location.reload();
-                                            });
-                                        } else {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify(data)
+                                        })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                Swal.fire({
+                                                    icon: 'success',
+                                                    title: 'Updated!',
+                                                    text: 'The section has been updated successfully.',
+                                                    showConfirmButton: true
+                                                }).then((result) => {
+                                                    location.reload();
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Error!',
+                                                    text: data.message || 'Failed to update the section.',
+                                                    showConfirmButton: true
+                                                }).then(() => {
+                                                    // If error, cancel the edit and restore original values
+                                                    cancelEdit(row);
+                                                });
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
                                             Swal.fire({
                                                 icon: 'error',
                                                 title: 'Error!',
-                                                text: data.message || 'Failed to update the section.',
+                                                text: 'An error occurred while updating the section.',
                                                 showConfirmButton: true
                                             }).then(() => {
                                                 // If error, cancel the edit and restore original values
                                                 cancelEdit(row);
                                             });
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error!',
-                                            text: 'An error occurred while updating the section.',
-                                            showConfirmButton: true
-                                        }).then(() => {
-                                            // If error, cancel the edit and restore original values
-                                            cancelEdit(row);
                                         });
-                                    });
                                 } else {
                                     // If user clicks Cancel on the confirmation dialog
                                     cancelEdit(row);
@@ -764,4 +764,5 @@ $conn->close();
         </div>
     </div>
 </body>
+
 </html>

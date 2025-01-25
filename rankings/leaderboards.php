@@ -547,7 +547,7 @@ include '../navbar/navbar.php';
                                                         });
 
                                                         // Make the reset request
-                                                        fetch('reset_leaderboards.php', {
+                                                        fetch('reset_specific.php', {
                                                                 method: 'POST',
                                                                 headers: {
                                                                     'Content-Type': 'application/json'

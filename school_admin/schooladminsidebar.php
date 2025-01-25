@@ -12,6 +12,13 @@
             </a>
         </li>
 
+        <!-- Logs Link -->
+        <li class="sidebar-admin-item <?php echo ($current_page == 'Logs') ? 'active' : ''; ?>">
+            <a href="../user_logs/user_logs.php" class="sidebar-admin-item-link">
+                <i class="fas fa-bullhorn sidebar-admin-item-link-icon"></i><span> Logs</span>
+            </a>
+        </li>
+
         <!-- Announcement Link -->
         <li class="sidebar-admin-item <?php echo ($current_page == 'adminannouncement') ? 'active' : ''; ?>">
             <a href="../announcements/adminannouncement.php" class="sidebar-admin-item-link">

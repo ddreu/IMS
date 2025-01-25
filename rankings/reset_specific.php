@@ -1,7 +1,10 @@
 <?php
 session_start();
 include_once '../connection/conn.php';
+include '../user_logs/logger.php';
 $conn = con();
+
+header('Content-Type: application/json'); // Ensure the response is JSON
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $jsonData = file_get_contents('php://input');
@@ -16,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $department_id = $data['department'] ?? null;
     $grade_level = $data['gradeLevel'] ?? null;
     $game_id = $data['game'] ?? null;
+    $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session
 
     try {
         $conn->begin_transaction();
@@ -120,10 +124,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare(
             "UPDATE teams t
              INNER JOIN grade_section_course gsc ON t.grade_section_course_id = gsc.id
+             INNER JOIN departments d ON gsc.department_id = d.id
              SET t.wins = 0, 
                  t.losses = 0
-             WHERE t.game_id = ?
-             AND gsc.department_id = ?
+             WHERE t.game_id = ? 
+             AND d.id = ?  -- Corrected here to use d.id, not d.department_id
              AND gsc.grade_level = ?"
         );
         $stmt->bind_param("iis", $game_id, $department_id, $grade_level);
@@ -137,7 +142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "DELETE FROM brackets 
              WHERE game_id = ? 
              AND department_id = ? 
-             AND grade_level = ?
+             AND grade_level = ? 
              AND status = 'Completed'"
         );
         $stmt->bind_param("iis", $game_id, $department_id, $grade_level);
@@ -146,15 +151,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Failed to delete brackets.");
         }
 
+        // Log the action with a dynamic description
+        $log_description = "Resets the ";
+
+        // Add game to the description if present
+        if ($game_id) {
+            $stmt = $conn->prepare("SELECT game_name FROM games WHERE game_id = ?");
+            $stmt->bind_param("i", $game_id);
+            $stmt->execute();
+            $gameResult = $stmt->get_result()->fetch_assoc();
+            $game_name = $gameResult['game_name'];
+            $log_description .= $game_name . " ";
+        }
+
+        // Add department to the description if present
+        if ($department_id) {
+            $stmt = $conn->prepare("SELECT department_name FROM departments WHERE id = ?");
+            $stmt->bind_param("i", $department_id);
+            $stmt->execute();
+            $departmentResult = $stmt->get_result()->fetch_assoc();
+            $department_name = $departmentResult['department_name'];
+            $log_description .= $department_name . " department";
+        }
+
+        // If grade level is present, add it to the description
+        if ($grade_level) {
+            $log_description .= " at " . $grade_level;
+        }
+
+        // Log the action using your custom function
+        logUserAction($conn, $user_id, "brackets", "RESET", null, $log_description);
+
         $conn->commit();
 
-        echo json_encode([
+        echo json_encode([ // Final JSON response
             'status' => 'success',
             'message' => "Successfully reset leaderboards and team statistics for the selected game and division."
         ]);
     } catch (Exception $e) {
         $conn->rollBack();
-        echo json_encode([
+        echo json_encode([ // Error handling in JSON format
             'status' => 'error',
             'message' => 'Failed to reset leaderboards: ' . $e->getMessage()
         ]);
@@ -163,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->close();
     }
 } else {
-    echo json_encode([
+    echo json_encode([ // Invalid request method response
         'status' => 'error',
         'message' => 'Invalid request method.'
     ]);

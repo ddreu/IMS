@@ -1,6 +1,8 @@
 <?php
 session_start();
 include_once '../connection/conn.php';
+include_once '../user_logs/logger.php';  // Include the logger
+
 $conn = con();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -11,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $school_id = $_SESSION['school_id'];
+    $user_id = $_SESSION['user_id'];  // Assuming user ID is stored in session
 
     try {
         // Begin transaction
@@ -54,18 +57,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Failed to delete brackets and associated data.");
         }
 
+        // Combine description for all actions
+        $description = 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.';
+
+        // Log the action with combined description
+        logUserAction($conn, $user_id, 'leaderboard', 'RESET', null, $description, null, null);
+
         // Commit transaction
         $conn->commit();
 
         echo json_encode([
-            'status' => 'success', 
+            'status' => 'success',
             'message' => 'Leaderboards and related data have been reset successfully.'
         ]);
     } catch (Exception $e) {
         // Rollback transaction on error
         $conn->rollBack();
         echo json_encode([
-            'status' => 'error', 
+            'status' => 'error',
             'message' => 'Failed to reset leaderboards: ' . $e->getMessage()
         ]);
     } finally {
@@ -76,8 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } else {
     echo json_encode([
-        'status' => 'error', 
+        'status' => 'error',
         'message' => 'Invalid request method.'
     ]);
 }
-?>

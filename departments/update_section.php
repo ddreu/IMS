@@ -1,6 +1,7 @@
 <?php
 session_start();
 include_once '../connection/conn.php';
+include_once '../user_logs/logger.php'; // Include the logging function
 $conn = con();
 
 // Check if user is logged in
@@ -32,44 +33,78 @@ try {
     $get_current->execute();
     $result = $get_current->get_result();
     $current_data = $result->fetch_assoc();
-    
+
     if (!$current_data) {
         throw new Exception("Record not found");
     }
 
     $department_id = $current_data['department_id'];
 
+    // Track previous data
+    $previousData = json_encode($current_data); // Encoding current data as JSON
+
+    $description = ""; // Initialize description for logging
+    $new_data = [];
+
     // Update grade_section_course table
     if ($department === 'College') {
         $course_name = $data['course_name'];
-        
+
         // Check for duplicate course name
         $check_stmt = $conn->prepare("SELECT id FROM grade_section_course WHERE course_name = ? AND id != ? AND department_id = ?");
         $check_stmt->bind_param("sis", $course_name, $grade_section_course_id, $department_id);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
-        
+
         if ($check_result->num_rows > 0) {
             throw new Exception("A course with this name already exists.");
         }
-        
+
+        // Build the description if course_name is updated
+        if ($course_name !== $current_data['course_name']) {
+            $description .= "Course name changed from '{$current_data['course_name']}' to '{$course_name}'. ";
+        }
+
         $stmt = $conn->prepare("UPDATE grade_section_course SET course_name = ? WHERE id = ?");
         $stmt->bind_param("si", $course_name, $grade_section_course_id);
+        $new_data['course_name'] = $course_name;
     } else {
         $section_name = $data['section_name'];
         $grade_level = $data['grade_level'];
         $strand = isset($data['strand']) ? $data['strand'] : null;
-        
+
         // Check for duplicate section
         $check_stmt = $conn->prepare("SELECT id FROM grade_section_course WHERE grade_level = ? AND section_name = ? AND id != ? AND department_id = ? AND (strand = ? OR (strand IS NULL AND ? IS NULL))");
         $check_stmt->bind_param("ssiiss", $grade_level, $section_name, $grade_section_course_id, $department_id, $strand, $strand);
         $check_stmt->execute();
         $check_result = $check_stmt->get_result();
-        
+
         if ($check_result->num_rows > 0) {
             throw new Exception("A section with this name and grade level already exists.");
         }
-        
+
+        // Build the description for section_name change
+        if ($section_name !== $current_data['section_name']) {
+            $description .= "Section name changed from '{$current_data['section_name']}' to '{$section_name}'. ";
+        }
+
+        // Build description for strand change (for SHS department)
+        if ($department === 'SHS' && $strand !== $current_data['strand']) {
+            $description .= "Strand changed from '{$current_data['strand']}' to '{$strand}'. ";
+        }
+
+        // If the grade level changes
+        if ($grade_level !== $current_data['grade_level']) {
+            $description .= "Grade level changed from '{$current_data['grade_level']}' to '{$grade_level}'. ";
+        }
+
+        // Set the new data
+        $new_data = [
+            'section_name' => $section_name,
+            'grade_level' => $grade_level,
+            'strand' => $strand
+        ];
+
         if ($department === 'SHS') {
             $stmt = $conn->prepare("UPDATE grade_section_course SET section_name = ?, strand = ? WHERE id = ?");
             $stmt->bind_param("ssi", $section_name, $strand, $grade_section_course_id);
@@ -82,6 +117,12 @@ try {
     if (!$stmt->execute()) {
         throw new Exception("Failed to update section/course details.");
     }
+
+    // Track new data (after update)
+    $newData = json_encode($new_data); // Encoding updated data as JSON
+
+    // Log user action (UPDATE)
+    logUserAction($conn, $_SESSION['user_id'], 'grade_section_course', 'UPDATE', $grade_section_course_id, $description, $previousData, $newData);
 
     // Get games for the school
     $get_games = $conn->prepare("SELECT game_id, game_name FROM games WHERE school_id = (SELECT school_id FROM departments WHERE id = ?)");
@@ -101,7 +142,7 @@ try {
 
     while ($team = $teams_result->fetch_assoc()) {
         $game_name = $games[$team['game_id']];
-        
+
         // Create the team name based on department type
         if ($department === 'College') {
             $new_team_name = "$course_name - $game_name";
@@ -121,7 +162,6 @@ try {
     // Commit transaction
     $conn->commit();
     echo json_encode(['success' => true]);
-
 } catch (Exception $e) {
     // Rollback transaction on error
     $conn->rollback();

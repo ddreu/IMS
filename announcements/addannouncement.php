@@ -2,6 +2,7 @@
 session_start();
 include_once '../connection/conn.php';
 $conn = con();
+include "../user_logs/logger.php"; // Include the logger at the top
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -14,12 +15,15 @@ $user_id = $_SESSION['user_id'];
 $department_id = $_SESSION['department_id'];
 $school_id = $_SESSION['school_id'];
 
+// Initialize error array
+$error = [];
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $title = trim($_POST['title']);
     $message = trim($_POST['message']);
     $school_id = $_SESSION['school_id'];
-    
+
     // Set department_id based on user role
     if ($_SESSION['role'] === 'School Admin') {
         $department_id = isset($_POST['department_id']) ? intval($_POST['department_id']) : null;
@@ -33,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $image = $_FILES['image']['name'];
         $target_dir = "../uploads/";
         $target_file = $target_dir . basename($image);
-        $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         $uploadOk = 1;
 
         // Check if image file is a valid image
@@ -87,7 +91,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             die('mysqli_prepare() failed: ' . htmlspecialchars(mysqli_error($conn)));
         }
 
+        // LOGS
         if (mysqli_stmt_execute($stmt_insert)) {
+            // Detect if it was an INSERT operation
+            $operation = 'CREATE'; // INSERT corresponds to CREATE in the logs
+
+            // Log the action
+            logUserAction(
+                $conn,
+                $user_id,                            // ID of the user performing the action
+                'announcements',                     // Table name
+                $operation,                          // Operation type
+                mysqli_insert_id($conn),             // Record ID (last inserted ID)
+                'Added Announcement titled "' . $title . '"'
+
+            );
+
+
+            // Set the success message for the announcement addition
             $_SESSION['success_message'] = "Announcement added successfully!";
             header('Location: adminannouncement.php'); // Redirect after success
             exit();

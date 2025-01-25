@@ -3,6 +3,7 @@ session_start();
 ob_start();
 include '../connection/conn.php';
 include '../includes/password_utils.php';
+include '../user_logs/logger.php'; // Include the logger at the top
 $conn = con();
 
 if ($conn->connect_error) {
@@ -97,7 +98,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $conn->commit();
 
-        // After user is successfully added to the database
+        // Fetch department name based on department ID
+        $department_name = null;
+        $fetch_department_sql = "SELECT department_name FROM departments WHERE id = ?";
+        $stmt_fetch_department = executeQuery($conn, $fetch_department_sql, [$department], "i");
+        $result_department = $stmt_fetch_department->get_result();
+
+        if ($result_department->num_rows > 0) {
+            $department_data = $result_department->fetch_assoc();
+            $department_name = $department_data['department_name'];
+        } else {
+            echo json_encode(["status" => "error", "message" => "Department not found."]);
+            exit();
+        }
+
+        // Fetch game name if the role is Committee and game_id is provided
+        $game_name = null;
+        if ($role === 'Committee' && !empty($assign_game)) {
+            $fetch_game_sql = "SELECT game_name FROM games WHERE game_id = ?";
+            $stmt_fetch_game = executeQuery($conn, $fetch_game_sql, [$assign_game], "i");
+            $result_game = $stmt_fetch_game->get_result();
+
+            if ($result_game->num_rows > 0) {
+                $game_data = $result_game->fetch_assoc();
+                $game_name = $game_data['game_name'];
+            } else {
+                echo json_encode(["status" => "error", "message" => "Game not found."]);
+                exit();
+            }
+        }
+
+        // Generate dynamic description for logging
+        $fullName = $firstname . ' ' . $lastname;
+        $description = "";
+
+        if (strtolower($role) === 'committee') {
+            $description = "Registered \"$fullName\" as a committee member for \"$game_name\" in the \"$department_name\" department.";
+        } elseif (strtolower($role) === 'department admin') {
+            $description = "Registered \"$fullName\" as a department admin for the \"$department_name\" department.";
+        } else {
+            $description = "Registered \"$fullName\" as a \"$role\".";
+        }
+        // Log user action
+        logUserAction($conn, $_SESSION['user_id'], 'users', 'CREATE', null, $description);
+
+        // Send registration email
         require_once __DIR__ . "/../send-registration-email.php";
 
         // Get school name for email
@@ -106,9 +151,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $school_result = $stmt_school->get_result();
         $school_name = $school_result->fetch_assoc()['school_name'];
 
-        // Send registration email with credentials
         $emailResult = sendUserRegistrationEmail($email, $firstname, $password_to_use, $role, $school_name);
-        
+
         if ($emailResult['success']) {
             echo json_encode([
                 "status" => "success",

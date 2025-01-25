@@ -1,5 +1,6 @@
 <?php
 include_once '../connection/conn.php';
+include '../user_logs/logger.php';
 session_start();
 $conn = con();
 header('Content-Type: application/json');
@@ -19,16 +20,16 @@ try {
     $departmentId = isset($_SESSION['department_id']) ? $_SESSION['department_id'] : $data['department_id'];
     $gameId = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : $data['game_id'];
     $gradeLevel = isset($data['grade_level']) ? $data['grade_level'] : null;
-    
+
     // System team IDs - using negative numbers for system teams
     $tbdTeamId = -2;  // "To Be Determined" team (team_id = -2)
     $byeTeamId = -1;  // "BYE" team (team_id = -1)
 
     // Calculate total teams from first round matches
-    $totalTeams = count(array_filter($matches[0], function($match) {
+    $totalTeams = count(array_filter($matches[0], function ($match) {
         return $match['teamA_id'] !== null || $match['teamB_id'] !== null;
     })) * 2;
-    
+
     // Calculate total rounds
     $rounds = count($matches);
     if (isset($matches['third-place'])) {
@@ -57,7 +58,7 @@ try {
             $bracketType = $data['bracket_type'] ?? 'single';
             $stmt->bind_param("iiiis", $gameId, $departmentId, $totalTeams, $rounds, $bracketType);
         }
-        
+
         if (!$stmt->execute()) {
             throw new Exception("Execute failed: " . $stmt->error);
         }
@@ -65,7 +66,7 @@ try {
 
         // Prepare statement for matches
         $stmt = $conn->prepare("INSERT INTO matches (match_identifier, bracket_id, teamA_id, teamB_id, round, match_number, next_match_number, status, match_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        
+
         // Process each round
         foreach ($matches as $round => $roundMatches) {
             // Skip the third-place match as it's handled separately
@@ -88,7 +89,7 @@ try {
                 // Handle team assignments with correct system team IDs
                 $teamA = $match['teamA_id'];
                 $teamB = $match['teamB_id'];
-                
+
                 // First, convert any string/null values to proper IDs
                 if ($teamA === null || $teamA === '' || $teamA === 'TBD' || $teamA === 0 || $teamA === '0') {
                     // In first round (round index 0), empty slot means BYE, otherwise it's TBD
@@ -113,28 +114,28 @@ try {
                         $teamB = ($round === 0 && $match['match_type'] === 'regular') ? $byeTeamId : $tbdTeamId;
                     }
                 }
-                
+
                 // Handle BYE matches - set status to Finished and advance the non-BYE team
                 $status = 'Pending';
                 if ($teamA === $byeTeamId || $teamB === $byeTeamId) {
                     $status = 'Finished';
                     // Get the advancing team (the non-BYE team)
                     $advancingTeam = ($teamA === $byeTeamId) ? $teamB : $teamA;
-                    
+
                     // Update the next match if it exists
                     if ($nextMatchNumber > 0) {
                         // Odd numbered matches advance to teamA position, even to teamB
                         $isTeamAPosition = ($matchNumber % 2) === 0;
-                        $updateQuery = $isTeamAPosition ? 
+                        $updateQuery = $isTeamAPosition ?
                             "UPDATE matches SET teamA_id = ? WHERE bracket_id = ? AND match_number = ?" :
                             "UPDATE matches SET teamB_id = ? WHERE bracket_id = ? AND match_number = ?";
-                        
+
                         $updateStmt = $conn->prepare($updateQuery);
                         $updateStmt->bind_param("iii", $advancingTeam, $bracketId, $nextMatchNumber);
                         $updateStmt->execute();
                     }
                 }
-                
+
                 // Calculate continuous match number and actual round number
                 if ($match['match_type'] === 'final') {
                     $continuousMatchNumber = 7; // Final match is always 7 in an 8-team bracket
@@ -146,22 +147,23 @@ try {
                     $continuousMatchNumber = $matchNumber + 1; // First round matches are 1,2,3,4
                     $actualRound = 1;  // First matches are round 1
                 }
-                
+
                 $matchIdentifier = "bracket{$bracketId}-round{$actualRound}-match{$continuousMatchNumber}";
                 $matchType = $match['match_type'];
-                
-                $stmt->bind_param("siiiiisss", 
+
+                $stmt->bind_param(
+                    "siiiiisss",
                     $matchIdentifier,
                     $bracketId,
                     $teamA,
-                    $teamB, 
+                    $teamB,
                     $actualRound,
                     $continuousMatchNumber,
                     $nextMatchNumber,
                     $status,
                     $matchType
                 );
-                
+
                 if (!$stmt->execute()) {
                     throw new Exception("Execute failed: " . $stmt->error);
                 }
@@ -171,7 +173,7 @@ try {
         // Handle third place match separately
         $thirdPlaceMatch = $matches['third-place'];
         $matchIdentifier = "bracket{$bracketId}-third-place-match";
-        
+
         // Use existing system teams for empty slots
         $teamA = $thirdPlaceMatch['teamA_id'] ?? $tbdTeamId;
         $teamB = $thirdPlaceMatch['teamB_id'] ?? $tbdTeamId;
@@ -180,8 +182,9 @@ try {
         $nextMatchNum = 0; // No next match to advance to
         $matchType = 'third_place';
         $status = 'Pending';
-        
-        $stmt->bind_param("siiiiisss", 
+
+        $stmt->bind_param(
+            "siiiiisss",
             $matchIdentifier,
             $bracketId,
             $teamA,
@@ -199,24 +202,47 @@ try {
         // Commit transaction
         $conn->commit();
 
+        // Fetch the department name
+        $deptQuery = "SELECT department_name FROM departments WHERE id = ?";
+        $deptStmt = $conn->prepare($deptQuery);
+        $deptStmt->bind_param("i", $departmentId);
+        $deptStmt->execute();
+        $deptResult = $deptStmt->get_result();
+        $departmentName = $deptResult->fetch_assoc()['department_name'];
+
+        // Fetch the game name
+        $gameQuery = "SELECT game_name FROM games WHERE game_id = ?";
+        $gameStmt = $conn->prepare($gameQuery);
+        $gameStmt->bind_param("i", $gameId);
+        $gameStmt->execute();
+        $gameResult = $gameStmt->get_result();
+        $gameName = $gameResult->fetch_assoc()['game_name'];
+
+        $totalTeamsMinusOne = $totalTeams - 1;
+        // Log the creation of the bracket with department and game names
+        $description = "Created a bracket for Game: $gameName, Department: $departmentName" .
+            ($gradeLevel ? ", Grade Level: $gradeLevel" : "") .
+            ", Total Teams: $totalTeamsMinusOne.";
+
+        logUserAction($conn, $_SESSION['user_id'], 'Brackets', 'CREATE', $bracketId, $description);
+
+
         echo json_encode([
             'success' => true,
             'message' => 'Bracket saved successfully',
             'bracket_id' => $bracketId
         ]);
-
     } catch (Exception $e) {
         // Roll back the transaction if something failed
         if (isset($conn)) {
             $conn->rollback();
         }
-        
+
         echo json_encode([
             'success' => false,
             'message' => $e->getMessage()
         ]);
     }
-
 } catch (Exception $e) {
     echo json_encode([
         'success' => false,

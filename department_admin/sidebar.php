@@ -49,6 +49,12 @@ $stmt->close();
                 <span>Dashboard</span>
             </a>
         </li>
+        <li class="<?php echo ($current_page == 'Logs') ? 'active' : ''; ?>">
+            <a href="../user_logs/user_logs.php">
+                <i class="fas fa-history"></i>
+                <span>Logs</span>
+            </a>
+        </li>
         <li class="<?php echo ($current_page == 'adminannouncement') ? 'active' : ''; ?>">
             <a href="../announcements/adminannouncement.php">
                 <i class="fas fa-bullhorn"></i>
@@ -125,18 +131,18 @@ $stmt->close();
             </a>
         </li>
         <li class="nav-item">
-    <a href="../brackets/admin_brackets.php" class="<?php echo ($current_page == 'Brackets') ? 'active' : ''; ?>">
-        <i class="fas fa-sitemap"></i>
-        <span>Brackets</span>
-    </a>
-</li>
+            <a href="../brackets/admin_brackets.php" class="<?php echo ($current_page == 'Brackets') ? 'active' : ''; ?>">
+                <i class="fas fa-sitemap"></i>
+                <span>Brackets</span>
+            </a>
+        </li>
 
         <li class="nav-item">
-    <a href="../schedule/schedule.php" class="<?php echo ($current_page == 'schedule') ? 'active' : ''; ?>">
-        <i class="fas fa-calendar"></i>
-        <span>Schedules</span>
-    </a>
-</li>
+            <a href="../schedule/schedule.php" class="<?php echo ($current_page == 'schedule') ? 'active' : ''; ?>">
+                <i class="fas fa-calendar"></i>
+                <span>Schedules</span>
+            </a>
+        </li>
 
         <li class="nav-item">
             <a href="#matchlistSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle <?php echo ($current_page == 'matchlist') ? 'active' : ''; ?>">

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 10, 2025 at 01:21 PM
+-- Generation Time: Jan 25, 2025 at 02:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,7 @@ CREATE TABLE `announcement` (
 
 INSERT INTO `announcement` (`id`, `title`, `message`, `image`, `school_id`, `department_id`, `created_at`) VALUES
 (28, 'Volleyball Tryout', 'Join us for volleyball tryouts. All skill levels welcome! Bring your enthusiasm and gear. Don’t miss your chance to be part of the team!\r\n\r\nSee you on the court! 🏆', '../uploadsBVW-volleyball-tryouts-copy.png', 8, 1, '2024-12-09 05:59:59'),
-(29, 'Announcement!', 'Players and Team Registrations are now open!!', '../uploadsEye_catching_ways_to_make_announcements.2aee7ba1.5d605628.jpg', 8, 1, '2024-12-09 05:59:59'),
+(29, 'Announcement!', 'Players and Team Registrations are now open!!!', '../uploadsEye_catching_ways_to_make_announcements.2aee7ba1.5d605628.jpg', 8, 1, '2024-12-09 05:59:59'),
 (34, 'awda', 'wdsasss', NULL, NULL, 0, '2024-12-18 21:22:37'),
 (38, 'Urgent!!!', 'System Maintenance', NULL, 0, 0, '2025-01-09 06:10:22');
 
@@ -70,7 +70,7 @@ CREATE TABLE `brackets` (
 --
 
 INSERT INTO `brackets` (`bracket_id`, `game_id`, `department_id`, `grade_level`, `total_teams`, `rounds`, `status`, `created_at`, `bracket_type`) VALUES
-(87, 18, 1, NULL, 8, 3, 'ongoing', '2025-01-08 13:35:19', 'single');
+(95, 18, 1, NULL, 8, 3, 'ongoing', '2025-01-25 02:28:15', 'single');
 
 -- --------------------------------------------------------
 
@@ -204,17 +204,21 @@ INSERT INTO `grade_section_course` (`id`, `department_id`, `grade_level`, `stran
 (67, 1, NULL, NULL, NULL, 'BSCS', 0),
 (68, 1, NULL, NULL, NULL, 'CRIM', 0),
 (69, 1, NULL, NULL, NULL, 'BSA', 0),
-(70, 2, 'Grade 11', 'STEM', '11-A', NULL, 0),
+(70, 2, 'Grade 11', 'STEMss', '11-Aa', NULL, 0),
 (71, 2, 'Grade 12', 'ABM', '12-A', NULL, 0),
 (72, 3, 'Grade 8', NULL, 'Obedience', NULL, 0),
-(73, 3, 'Grade 9', NULL, 'Nickel', NULL, 0),
 (76, 1, NULL, NULL, NULL, 'BSBA', 0),
 (77, 1, NULL, NULL, NULL, 'EDUC', 0),
 (78, 1, NULL, NULL, NULL, 'BSHM', 0),
 (79, 2, 'Grade 11', 'STEM', '11-B', NULL, 0),
 (84, 2, 'Grade 11', 'STEM', 'C', NULL, 0),
 (85, 2, 'Grade 11', 'ABM', 'D', NULL, 0),
-(86, 2, 'Grade 11', 'HUMSS', 'A', NULL, 0);
+(86, 2, 'Grade 11', 'HUMSS', 'A', NULL, 0),
+(99, 1, NULL, NULL, NULL, 'testtest', 0),
+(100, 2, 'Grade 11', 'STEM', 'mm', NULL, 0),
+(101, 3, 'Grade 8', NULL, 'nickel', NULL, 0),
+(105, 3, 'Grade 8', NULL, 'johndoes', NULL, 0),
+(107, 3, 'Grade 9', NULL, 'asas', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -244,6 +248,154 @@ CREATE TABLE `live_scores` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `logs`
+--
+
+CREATE TABLE `logs` (
+  `log_id` int(11) NOT NULL,
+  `table_name` varchar(100) NOT NULL,
+  `operation` varchar(155) NOT NULL,
+  `record_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `timestamp` datetime DEFAULT current_timestamp(),
+  `description` text DEFAULT NULL,
+  `previous_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`previous_data`)),
+  `new_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`new_data`))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `logs`
+--
+
+INSERT INTO `logs` (`log_id`, `table_name`, `operation`, `record_id`, `user_id`, `timestamp`, `description`, `previous_data`, `new_data`) VALUES
+(4, 'announcements', 'CREATE', 46, 56, '2025-01-24 02:09:24', 'Added Announcement titled \"test\"', NULL, '{\"title\":\"test\",\"message\":\"test\"}'),
+(5, 'announcements', 'DELETE', 46, 56, '2025-01-24 02:29:41', 'Deleted Announcement titled \"\"', '{\"id\":46,\"title\":\"\"}', NULL),
+(6, 'announcements', 'CREATE', 47, 56, '2025-01-24 02:31:13', 'Added Announcement titled \"qq\"', NULL, '{\"title\":\"qq\",\"message\":\"qq\"}'),
+(7, 'announcements', 'DELETE', 47, 56, '2025-01-24 02:31:16', 'Deleted Announcement titled \"qq\"', '{\"id\":47,\"title\":\"qq\"}', NULL),
+(8, 'announcements', 'CREATE', 48, 56, '2025-01-24 02:33:12', 'Added Announcement titled \"ss\"', NULL, '{\"title\":\"ss\",\"message\":\"ss\"}'),
+(9, 'announcements', 'UPDATE', 48, 56, '2025-01-24 02:34:56', 'Edited title from \"ss\" to \"sssss\". ', '{\"title\":\"ss\",\"message\":\"ss\",\"image\":null}', '{\"title\":\"sssss\",\"message\":\"ss\",\"image\":null}'),
+(10, 'announcements', 'UPDATE', 48, 56, '2025-01-24 02:35:06', 'Edited content. ', '{\"title\":\"sssss\",\"message\":\"ss\",\"image\":null}', '{\"title\":\"sssss\",\"message\":\"ssaaaa\",\"image\":null}'),
+(11, 'announcements', 'UPDATE', 48, 56, '2025-01-24 02:35:19', '', '{\"title\":\"sssss\",\"message\":\"ssaaaa\",\"image\":null}', '{\"title\":\"sssss\",\"message\":\"ssaaaa\",\"image\":null}'),
+(12, 'announcements', 'UPDATE', 48, 56, '2025-01-24 02:36:17', 'Changed department from \"2\" to \"3\". ', '{\"title\":\"sssss\",\"message\":\"ssaaaa\",\"department_id\":2,\"image\":null}', '{\"title\":\"sssss\",\"message\":\"ssaaaa\",\"department_id\":3,\"image\":null}'),
+(13, 'announcements', 'UPDATE', 48, 56, '2025-01-24 02:37:25', 'Changed department from \"JHS\" to \"College\". ', '{\"title\":\"sssss\",\"message\":\"ssaaaa\",\"department_id\":3,\"image\":null}', '{\"title\":\"sssss\",\"message\":\"ssaaaa\",\"department_id\":1,\"image\":null}'),
+(14, 'announcements', 'DELETE', 48, 56, '2025-01-24 02:37:33', 'Deleted Announcement titled \"sssss\"', '{\"id\":48,\"title\":\"sssss\"}', NULL),
+(15, 'pointing_system', 'UPDATE', 8, 56, '2025-01-24 02:45:50', 'Updated first_place_points from 10 to 11. ', '{\"first_place_points\":10,\"second_place_points\":5,\"third_place_points\":3}', '{\"first_place_points\":\"11\",\"second_place_points\":\"5\",\"third_place_points\":\"3\"}'),
+(16, 'pointing_system', 'UPDATE', 8, 56, '2025-01-24 02:46:01', 'Updated second_place_points from 5 to 6. ', '{\"first_place_points\":11,\"second_place_points\":5,\"third_place_points\":3}', '{\"first_place_points\":\"11\",\"second_place_points\":\"6\",\"third_place_points\":\"3\"}'),
+(17, 'pointing_system', 'UPDATE', 8, 56, '2025-01-24 02:46:14', 'Updated second_place_points from 6 to 7. Updated third_place_points from 3 to 2. ', '{\"first_place_points\":11,\"second_place_points\":6,\"third_place_points\":3}', '{\"first_place_points\":\"11\",\"second_place_points\":\"7\",\"third_place_points\":\"2\"}'),
+(18, 'Pointing System', 'UPDATE', 8, 56, '2025-01-24 02:48:07', 'Updated first_place_points from 11 to 10. ', '{\"first_place_points\":11,\"second_place_points\":7,\"third_place_points\":2}', '{\"first_place_points\":\"10\",\"second_place_points\":\"7\",\"third_place_points\":\"2\"}'),
+(19, 'users', 'CREATE', 104, 56, '2025-01-24 03:05:31', 'User registration', NULL, '{\"firstname\":\"Andrae\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M\",\"age\":22,\"gender\":\"Male\",\"email\":\"andrae@gmail.com\",\"role\":\"Committee\",\"department\":\"2\",\"game_id\":\"26\",\"school_id\":8}'),
+(20, 'Users', 'DELETE', 104, 56, '2025-01-24 03:16:21', 'Deleted \"Andrae De Guzman\" (Committee) from the \"2\" department.', '{\"firstname\":\"Andrae\",\"lastname\":\"De Guzman\",\"role\":\"Committee\",\"department\":2}', NULL),
+(21, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:22:44', 'Updated user details for \"Jb De Guzman\" (Committee): Game ID: 29 → 18', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M\",\"age\":24,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":4,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":29,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M\",\"age\":\"24\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"18\",\"department\":\"4\"}'),
+(22, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:28:05', 'Updated user details for \"Jb De Guzman\" (Committee): Game: Word Factory → Word Factory', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M\",\"age\":24,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":4,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":18,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M\",\"age\":\"24\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"30\",\"department\":\"4\"}'),
+(23, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:28:18', 'Updated user details for \"Jb De Guzman\" (Committee): Game: Basketball → Basketball, Department: 4 → College', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M\",\"age\":24,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":4,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":30,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M\",\"age\":\"24\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"18\",\"department\":\"1\"}'),
+(24, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:28:54', 'Updated user details for \"Jb De Guzman\" (Committee): Department: 1 → SHS', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M\",\"age\":24,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":18,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M\",\"age\":\"24\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"18\",\"department\":\"2\"}'),
+(25, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:29:27', 'Updated user details for \"Jb De Guzman\" (Committee): Middle Initial: M → M., Age: 24 → 25, Department: 2 → College', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M\",\"age\":24,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":2,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":18,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"JB\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M.\",\"age\":\"25\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"18\",\"department\":\"1\"}'),
+(26, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:30:06', 'Updated user details for \"Jb De Guzman\" (Committee): Department: 1 → SHS', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M.\",\"age\":25,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":18,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M.\",\"age\":\"25\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"18\",\"department\":\"2\"}'),
+(27, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:31:10', 'Updated user details for \"Jb De Guzman\" (Committee): Department: 2 → College', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M.\",\"age\":25,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":2,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":18,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M.\",\"age\":\"25\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"18\",\"department\":\"1\"}'),
+(28, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:32:21', 'Updated user details for \"Jb De Guzman\" (Committee): Game: Badminton → Badminton, Department: 1 → College', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M.\",\"age\":25,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":18,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M.\",\"age\":\"25\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"28\",\"department\":\"1\"}'),
+(29, 'Users', 'UPDATE', 103, 56, '2025-01-24 03:33:18', 'Updated user details for \"Jb De Guzman\" (Committee): Department: College → SHS', '{\"id\":103,\"lastname\":\"De Guzman\",\"firstname\":\"Jb\",\"middleinitial\":\"M.\",\"age\":25,\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"password\":\"$2y$10$bfsZID8.gLJRh\\/LBQMJ3Z.Y0KXnzeX4RH3byt96ywl9JGNT3bQkuG\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":28,\"school_id\":8}', '{\"user_id\":\"103\",\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"middleinitial\":\"M.\",\"age\":\"25\",\"gender\":\"Male\",\"email\":\"jb@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"28\",\"department\":\"2\"}'),
+(30, 'users', 'CREATE', NULL, 56, '2025-01-24 03:33:54', 'Registered \"Andrae De Guzman\" as a department admin for the \"1\" department.', NULL, NULL),
+(31, 'Users', 'DELETE', 105, 56, '2025-01-24 03:42:51', 'Deleted \"Andrae De Guzman\" (Department Admin) from the \"1\" department.', '{\"firstname\":\"Andrae\",\"lastname\":\"De Guzman\",\"role\":\"Department Admin\",\"department\":1}', NULL),
+(32, 'users', 'CREATE', NULL, 56, '2025-01-24 03:47:46', 'Registered \"Andrae De Guzman\" as a department admin for the \"1\" department.', NULL, NULL),
+(33, 'Users', 'DELETE', 106, 56, '2025-01-24 03:50:06', 'Deleted \"Andrae De Guzman\" (Department Admin) from the \"College\" department.', '{\"firstname\":\"Andrae\",\"lastname\":\"De Guzman\",\"role\":\"Department Admin\",\"department\":1,\"game_id\":null,\"department_name\":\"College\",\"game_name\":null}', NULL),
+(34, 'Users', 'DELETE', 107, 56, '2025-01-24 03:53:06', 'Deleted \"Andrae De Guzman\" (Department Admin) from the \"College\" department.', '{\"firstname\":\"Andrae\",\"lastname\":\"De Guzman\",\"role\":\"Department Admin\",\"department\":1,\"game_id\":null,\"department_name\":\"College\",\"game_name\":null}', NULL),
+(35, 'users', 'CREATE', NULL, 56, '2025-01-24 03:53:23', 'Registered \"Andrae De Guzman\" as a department admin for the \"College\" department.', NULL, NULL),
+(36, 'Users', 'UPDATE', 108, 56, '2025-01-24 03:53:41', 'Updated user details for \"Andrae De Guzman\" (Committee): Role: Department Admin → Committee, Game: Word Factory → Word Factory', '{\"id\":108,\"lastname\":\"De Guzman\",\"firstname\":\"Andrae\",\"middleinitial\":\"N\",\"age\":22,\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"password\":\"$2y$10$2EI9mdJS6j1.cJzIWHekA.RIvSu39NKJtaBtpRRv1J7uXS.Ed4XDi\",\"role\":\"Department Admin\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":null,\"school_id\":8}', '{\"user_id\":\"108\",\"firstname\":\"Andrae\",\"lastname\":\"De Guzman\",\"middleinitial\":\"N\",\"age\":\"22\",\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"30\",\"department\":\"1\"}'),
+(37, 'Users', 'DELETE', 108, 56, '2025-01-24 03:53:49', 'Deleted \"Andrae De Guzman\" (Committee) from the \"College\" department for the \"Word Factory\" game.', '{\"firstname\":\"Andrae\",\"lastname\":\"De Guzman\",\"role\":\"Committee\",\"department\":1,\"game_id\":30,\"department_name\":\"College\",\"game_name\":\"Word Factory\"}', NULL),
+(38, 'users', 'CREATE', NULL, 56, '2025-01-24 03:54:07', 'Registered \"Andre De Guzman\" as a committee member for \"\" in the \"College\" department.', NULL, NULL),
+(39, 'Users', 'UPDATE', 109, 56, '2025-01-24 03:55:00', 'Updated user details for \"Andre De Guzman\" (Committee): Game: Badminton → Badminton', '{\"id\":109,\"lastname\":\"De Guzman\",\"firstname\":\"Andre\",\"middleinitial\":\"N\",\"age\":22,\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"password\":\"$2y$10$BGjTYc4YXMEqPLIuqqA9rOmvdv\\/QcL0miLcpc.0sukHWanMQpSMIy\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":30,\"school_id\":8}', '{\"user_id\":\"109\",\"firstname\":\"Andre\",\"lastname\":\"De Guzman\",\"middleinitial\":\"N\",\"age\":\"22\",\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"28\",\"department\":\"1\"}'),
+(40, 'Users', 'UPDATE', 109, 56, '2025-01-24 03:57:01', 'Updated user details for \"Andre De Guzman\" (Committee): Game: Dart → Dart', '{\"id\":109,\"lastname\":\"De Guzman\",\"firstname\":\"Andre\",\"middleinitial\":\"N\",\"age\":22,\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"password\":\"$2y$10$BGjTYc4YXMEqPLIuqqA9rOmvdv\\/QcL0miLcpc.0sukHWanMQpSMIy\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":28,\"school_id\":8}', '{\"user_id\":\"109\",\"firstname\":\"Andre\",\"lastname\":\"De Guzman\",\"middleinitial\":\"N\",\"age\":\"22\",\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"26\",\"department\":\"1\"}'),
+(41, 'Users', 'UPDATE', 109, 56, '2025-01-24 04:01:18', 'Updated user details for \"Andre De Guzman\" (Committee): Game: Word Factory → Word Factory', '{\"id\":109,\"lastname\":\"De Guzman\",\"firstname\":\"Andre\",\"middleinitial\":\"N\",\"age\":22,\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"password\":\"$2y$10$BGjTYc4YXMEqPLIuqqA9rOmvdv\\/QcL0miLcpc.0sukHWanMQpSMIy\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":26,\"school_id\":8}', '{\"user_id\":\"109\",\"firstname\":\"Andre\",\"lastname\":\"De Guzman\",\"middleinitial\":\"N\",\"age\":\"22\",\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"30\",\"department\":\"1\"}'),
+(42, 'Users', 'UPDATE', 109, 56, '2025-01-24 04:06:47', 'Updated user details for \"Andre De Guzman\" (Committee): Game: Word Factory → Badminton', '{\"id\":109,\"lastname\":\"De Guzman\",\"firstname\":\"Andre\",\"middleinitial\":\"N\",\"age\":22,\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"password\":\"$2y$10$BGjTYc4YXMEqPLIuqqA9rOmvdv\\/QcL0miLcpc.0sukHWanMQpSMIy\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":30,\"school_id\":8}', '{\"user_id\":\"109\",\"firstname\":\"Andre\",\"lastname\":\"De Guzman\",\"middleinitial\":\"N\",\"age\":\"22\",\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"28\",\"department\":\"1\"}'),
+(43, 'Users', 'UPDATE', 109, 56, '2025-01-24 04:06:57', 'Updated user details for \"Andre De Guzman\" (Committee): Department: College → SHS', '{\"id\":109,\"lastname\":\"De Guzman\",\"firstname\":\"Andre\",\"middleinitial\":\"N\",\"age\":22,\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"password\":\"$2y$10$BGjTYc4YXMEqPLIuqqA9rOmvdv\\/QcL0miLcpc.0sukHWanMQpSMIy\",\"role\":\"Committee\",\"department\":1,\"reset_token_hash\":null,\"reset_token_expires_at\":null,\"game_id\":28,\"school_id\":8}', '{\"user_id\":\"109\",\"firstname\":\"Andre\",\"lastname\":\"De Guzman\",\"middleinitial\":\"N\",\"age\":\"22\",\"gender\":\"Male\",\"email\":\"an@gmail.com\",\"role\":\"Committee\",\"assign_game\":\"28\",\"department\":\"2\"}'),
+(44, 'Users', 'DELETE', 103, 56, '2025-01-24 04:07:06', 'Deleted \"Jb De Guzman\" (Committee) from the \"SHS\" department for the \"Badminton\" game.', '{\"firstname\":\"Jb\",\"lastname\":\"De Guzman\",\"role\":\"Committee\",\"department\":2,\"game_id\":28,\"department_name\":\"SHS\",\"game_name\":\"Badminton\"}', NULL),
+(45, 'Users', 'DELETE', 109, 56, '2025-01-24 04:07:08', 'Deleted \"Andre De Guzman\" (Committee) from the \"SHS\" department for the \"Badminton\" game.', '{\"firstname\":\"Andre\",\"lastname\":\"De Guzman\",\"role\":\"Committee\",\"department\":2,\"game_id\":28,\"department_name\":\"SHS\",\"game_name\":\"Badminton\"}', NULL),
+(46, 'leaderboard', 'RESET', NULL, 56, '2025-01-24 04:13:40', 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.', NULL, NULL),
+(47, 'leaderboard', 'RESET', NULL, 56, '2025-01-24 04:18:38', 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.', NULL, NULL),
+(48, 'leaderboard', 'RESET', NULL, 56, '2025-01-24 04:19:54', 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.', NULL, NULL),
+(49, 'leaderboard', 'RESET', NULL, 56, '2025-01-24 04:21:47', 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.', NULL, NULL),
+(50, 'leaderboard', 'RESET', NULL, 56, '2025-01-24 04:24:24', 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.', NULL, NULL),
+(51, 'leaderboard', 'RESET', NULL, 56, '2025-01-24 04:27:28', 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.', NULL, NULL),
+(52, 'leaderboard', 'RESET', NULL, 56, '2025-01-24 04:32:02', 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.', NULL, NULL),
+(53, 'brackets', 'UPDATE', NULL, 56, '2025-01-24 04:58:49', 'Resets the Badminton College department', NULL, NULL),
+(54, 'brackets', 'RESET', NULL, 56, '2025-01-24 04:59:36', 'Resets the Word Factory SHS department at grade level Grade 11', NULL, NULL),
+(55, 'departments', 'CREATE', 99, 56, '2025-01-24 05:24:48', 'Added College Department: Course Name = test', NULL, NULL),
+(56, 'departments', 'CREATE', 100, 56, '2025-01-24 05:25:06', 'Added SHS Department: Grade Level = Grade 11, Section = mm, Strand = STEM', NULL, NULL),
+(57, 'departments', 'CREATE', 101, 56, '2025-01-24 05:27:13', 'Added JHS Department: Grade Level = Grade 8, Section = ss - Teams have been automatically created for all existing games.', NULL, NULL),
+(58, 'departments', 'CREATE', 102, 56, '2025-01-24 05:43:49', ' - Teams have been automatically created for all existing games.', NULL, NULL),
+(59, 'departments', 'CREATE', 103, 56, '2025-01-24 05:46:45', 'Added JHS Department: Grade Level = Grade 8, Section = ddd - Teams have been automatically created for all existing games.', NULL, NULL),
+(60, 'grade_section_course', 'DELETE', 103, NULL, '2025-01-24 06:03:05', 'Attempting to delete course/section with ID: 103', NULL, NULL),
+(61, 'grade_section_course', 'DELETE', 103, NULL, '2025-01-24 06:03:05', 'Successfully deleted course/section with ID: 103', NULL, NULL),
+(62, 'grade_section_course', 'DELETE', 102, NULL, '2025-01-24 06:04:24', 'Attempting to delete course/section with ID: 102', NULL, NULL),
+(63, 'grade_section_course', 'DELETE', 102, NULL, '2025-01-24 06:04:24', 'Successfully deleted course/section with ID: 102', NULL, NULL),
+(64, 'departments', 'CREATE', 104, 56, '2025-01-24 06:09:38', 'Added JHS Department: Grade Level = Grade 9, Section = testing - Teams have been automatically created for all existing games.', NULL, NULL),
+(65, 'departments', 'DELETE', 104, NULL, '2025-01-24 06:09:47', 'Deleted JHS Department: Grade Level = Grade 9, Section = testing', NULL, NULL),
+(66, 'departments', 'CREATE', 105, 56, '2025-01-24 06:10:12', 'Added JHS Department: Grade Level = Grade 8, Section = awd - Teams have been automatically created for all existing games.', NULL, NULL),
+(67, 'departments', 'DELETE', 73, NULL, '2025-01-24 06:10:15', 'Deleted JHS Department: Grade Level = Grade 9, Section = Nickel', NULL, NULL),
+(68, 'departments', 'CREATE', 106, 56, '2025-01-24 06:11:29', 'Added JHS Department: Grade Level = Grade 9, Section = sdawda - Teams have been automatically created for all existing games.', NULL, NULL),
+(69, 'departments', 'DELETE', 106, 56, '2025-01-24 06:11:45', 'Deleted JHS Department: Grade Level = Grade 9, Section = sdawda', NULL, NULL),
+(70, 'departments', 'CREATE', 107, 56, '2025-01-24 06:53:48', 'Added JHS Department: Grade Level = Grade 9, Section = asas - Teams have been automatically created for all existing games.', NULL, NULL),
+(73, 'grade_section_course', 'UPDATE', 105, 56, '2025-01-24 07:04:07', 'Updated grade section/course', '{\"department_id\":3,\"grade_level\":\"Grade 8\",\"section_name\":\"aaaaa\",\"course_name\":null,\"strand\":null}', '{\"department_id\":3,\"grade_level\":\"Grade 8\",\"section_name\":\"aaa\",\"course_name\":null,\"strand\":null}'),
+(74, 'grade_section_course', 'UPDATE', 105, 56, '2025-01-24 07:07:33', 'Updated grade section/course', '{\"department_id\":3,\"grade_level\":\"Grade 8\",\"section_name\":\"aaaa\",\"course_name\":null,\"strand\":null}', '{\"department_id\":3,\"grade_level\":\"Grade 8\",\"section_name\":\"aaa\",\"course_name\":null,\"strand\":null}'),
+(75, 'grade_section_course', 'UPDATE', 105, 56, '2025-01-24 07:08:14', 'Updated grade section/course', '{\"department_id\":3,\"grade_level\":\"Grade 8\",\"section_name\":\"aaa\",\"course_name\":null,\"strand\":null}', '{\"department_id\":3,\"grade_level\":\"Grade 8\",\"section_name\":\"johndoe\",\"course_name\":null,\"strand\":null}'),
+(76, 'grade_section_course', 'UPDATE', 105, 56, '2025-01-24 07:10:27', 'Section name changed from \'johndoe\' to \'johndoes\'. ', '{\"department_id\":3,\"grade_level\":\"Grade 8\",\"section_name\":\"johndoe\",\"course_name\":null,\"strand\":null}', '{\"section_name\":\"johndoes\",\"grade_level\":\"Grade 8\",\"strand\":null}'),
+(77, 'grade_section_course', 'UPDATE', 77, 56, '2025-01-24 07:10:53', 'Course name changed from \'EDUC?\' to \'EDUC\'. ', '{\"department_id\":1,\"grade_level\":null,\"section_name\":null,\"course_name\":\"EDUC?\",\"strand\":null}', '{\"course_name\":\"EDUC\"}'),
+(78, 'grade_section_course', 'UPDATE', 70, 56, '2025-01-24 07:11:13', 'Strand changed from \'STEM\' to \'STEMs\'. ', '{\"department_id\":2,\"grade_level\":\"Grade 11\",\"section_name\":\"11-A\",\"course_name\":null,\"strand\":\"STEM\"}', '{\"section_name\":\"11-A\",\"grade_level\":\"Grade 11\",\"strand\":\"STEMs\"}'),
+(79, 'grade_section_course', 'UPDATE', 70, 56, '2025-01-24 07:11:43', 'Section name changed from \'11-A\' to \'11-Aa\'. Strand changed from \'STEMs\' to \'STEMss\'. ', '{\"department_id\":2,\"grade_level\":\"Grade 11\",\"section_name\":\"11-A\",\"course_name\":null,\"strand\":\"STEMs\"}', '{\"section_name\":\"11-Aa\",\"grade_level\":\"Grade 11\",\"strand\":\"STEMss\"}'),
+(80, 'games', 'CREATE', 38, 56, '2025-01-24 07:46:33', 'Added a new game: Name = \'test\', Number of Players = 2, Category = \'Team Sports\', Environment = \'Indoor\', School ID = 8.', NULL, NULL),
+(81, 'games', 'CREATE', 39, 56, '2025-01-24 07:47:31', 'Added a new game: Name = \'testt\', Number of Players = 3, Category = \'Team Sports\', Environment = \'Indoor\'.', NULL, NULL),
+(82, 'games', 'DELETE', 39, 56, '2025-01-24 07:48:39', 'Deleted game: Name = \'testt\', Number of Players = 3, Category = \'Team Sports\', Environment = \'Indoor\', School ID = 8.', NULL, NULL),
+(83, 'games', 'UPDATE', 38, 56, '2025-01-24 07:50:50', 'Updated game (ID: 38): Number of Players: \'2\' → \'3\'', NULL, NULL),
+(84, 'games', 'UPDATE', 38, 56, '2025-01-24 07:52:23', 'Updated game \'test\': Number of Players: \'3\' → \'2\'', NULL, NULL),
+(85, 'games', 'UPDATE', 38, 56, '2025-01-24 07:52:32', 'Updated game \'test\': Game Name: \'test\' → \'tests\'', NULL, NULL),
+(86, 'games', 'UPDATE', 38, 56, '2025-01-24 07:52:42', 'Updated game \'tests\': Number of Players: \'2\' → \'3\', Category: \'Team Sports\' → \'Individual Sports\'', NULL, NULL),
+(87, 'games', 'DELETE', 38, 56, '2025-01-24 07:52:53', 'Deleted game: Name = \'tests\', Number of Players = 3, Category = \'Individual Sports\', Environment = \'Indoor\'.', NULL, NULL),
+(88, 'schedules', 'CREATE', 420, 67, '2025-01-25 05:25:00', 'To Be Determined vs BSCS - Basketball - Basketball | Scheduled on 2025-01-28 at 01:00:00, Venue: Open Gym', NULL, '{\"match_id\":\"420\",\"schedule_date\":\"2025-01-28\",\"schedule_time\":\"01:00:00\",\"venue\":\"Open Gym\"}'),
+(89, 'schedules', 'CREATE', 421, 67, '2025-01-25 05:29:20', 'To Be Determined vs To Be Determined - System | Scheduled on 2025-01-25 at 07:00:00, Venue: Open Gym', NULL, NULL),
+(90, 'schedules', 'UPDATE', 98, 67, '2025-01-25 05:32:09', 'Modified the schedule for To Be Determined vs To Be Determined - System \n                            from 2025-01-25 at 07:00:00, Venue: School Gym \n                            to 2025-01-25 at 08:00, Venue: School Gym', NULL, NULL),
+(91, 'schedules', 'DELETE', 93, 67, '2025-01-25 05:35:52', 'Canceled schedule for Match #416: BSA - Basketball vs BSBA - Basketball (Basketball) scheduled on 2025-01-25 at 8:00 AM, Venue: Closed Gym', NULL, NULL),
+(92, 'schedules', 'SEND_SMS', 94, NULL, '2025-01-25 06:51:16', 'Notified players for match BSHM - Basketball vs CRIM - Basketball. Total number of players notified is 1.', NULL, NULL),
+(93, 'schedules', 'Player Notification', 94, NULL, '2025-01-25 06:51:51', 'Notified players for match BSHM - Basketball vs CRIM - Basketball. Total number of players notified is 1.', NULL, NULL),
+(94, 'schedules', 'UPDATE', 98, 67, '2025-01-25 06:53:02', 'Modified the schedule for To Be Determined vs To Be Determined - System \n                            from 2025-01-25 at 08:00:00, Venue: School Gym \n                            to 2025-01-25 at 04:00, Venue: School Gym', NULL, NULL),
+(95, 'schedules', 'Player Notification', 95, 67, '2025-01-25 06:57:05', 'Notified players for match EDUC - Basketball vs testtest - Basketball. Total number of players notified is 1.', NULL, NULL),
+(96, 'announcements', 'UPDATE', 29, 56, '2025-01-25 07:01:54', 'Edited content. ', NULL, NULL),
+(97, 'announcements', 'CREATE', 49, 56, '2025-01-25 07:02:13', 'Added Announcement titled \"awd\"', NULL, NULL),
+(98, 'announcements', 'DELETE', 49, 56, '2025-01-25 07:02:45', 'Deleted Announcement titled \"awd\"', NULL, NULL),
+(99, 'Users', 'UPDATE', 67, 67, '2025-01-25 07:53:29', 'Updated user profile details.', NULL, NULL),
+(100, 'Users', 'UPDATE', 67, 67, '2025-01-25 07:53:34', 'Updated user profile details.', NULL, NULL),
+(101, 'Users', 'UPDATE', 67, 67, '2025-01-25 07:53:42', 'Updated user profile details.', NULL, NULL),
+(102, 'Users', 'UPDATE', 67, 67, '2025-01-25 07:53:52', 'Updated user profile details.', NULL, NULL),
+(103, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:55:54', 'Updated user profile details.', NULL, NULL),
+(104, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:56:00', 'Updated user profile details.', NULL, NULL),
+(105, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:56:10', 'Updated user profile details.', NULL, NULL),
+(106, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:57:48', 'Updated user profile details.', NULL, NULL),
+(107, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:57:49', 'Updated user profile details.', NULL, NULL),
+(108, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:57:51', 'Updated user profile details.', NULL, NULL),
+(109, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:57:52', 'Updated user profile details.', NULL, NULL),
+(110, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:57:53', 'Updated user profile details.', NULL, NULL),
+(111, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:57:54', 'Updated user profile details.', NULL, NULL),
+(112, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:58:02', 'Updated user profile details.', NULL, NULL),
+(113, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:58:11', 'Updated user profile details.', NULL, NULL),
+(114, 'Profile', 'UPDATE', 67, 67, '2025-01-25 07:58:14', 'Updated user profile details.', NULL, NULL),
+(115, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:01:32', 'Updated user profile details.', NULL, NULL),
+(116, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:01:52', 'Updated user profile details.', NULL, NULL),
+(117, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:01:57', 'Updated user profile details.', NULL, NULL),
+(118, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:01:57', 'Updated user profile details.', NULL, NULL),
+(119, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:01:58', 'Updated user profile details.', NULL, NULL),
+(120, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:01:59', 'Updated user profile details.', NULL, NULL),
+(121, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:01:59', 'Updated user profile details.', NULL, NULL),
+(122, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:03:37', 'Updated user profile details.', NULL, NULL),
+(123, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:05:21', 'Updated user profile details.', NULL, NULL),
+(124, 'Profile', 'UPDATE', 67, 67, '2025-01-25 08:05:30', 'Updated user profile details.', NULL, NULL),
+(125, 'brackets', 'CREATE', 93, 67, '2025-01-25 10:24:01', 'Created a bracket for Game ID: 18, Department ID: 1, Bracket Type: single, Total Teams: 8, Rounds: 3.', NULL, NULL),
+(126, 'brackets', 'CREATE', 95, 67, '2025-01-25 10:28:15', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 8.', NULL, NULL),
+(127, 'Brackets', 'DELETE', 93, 67, '2025-01-25 10:39:54', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(128, 'Brackets', 'DELETE', 94, 67, '2025-01-25 10:41:08', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(129, 'Team', 'CREATE', 99, 67, '2025-01-25 12:02:00', 'Registered team \'aa\'', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `matches`
 --
 
@@ -265,14 +417,14 @@ CREATE TABLE `matches` (
 --
 
 INSERT INTO `matches` (`match_id`, `match_identifier`, `bracket_id`, `teamA_id`, `teamB_id`, `round`, `match_number`, `next_match_number`, `status`, `match_type`) VALUES
-(376, 'bracket87-round1-match1', 87, 320, 248, 1, 1, 5, 'Finished', 'regular'),
-(377, 'bracket87-round1-match2', 87, 256, -1, 1, 2, 5, 'Finished', 'regular'),
-(378, 'bracket87-round1-match3', 87, 312, 240, 1, 3, 6, 'Finished', 'regular'),
-(379, 'bracket87-round1-match4', 87, 328, -1, 1, 4, 6, 'Finished', 'regular'),
-(380, 'bracket87-round2-match5', 87, 248, 256, 2, 5, 7, 'Upcoming', 'semifinal'),
-(381, 'bracket87-round2-match6', 87, 240, 328, 2, 6, 7, 'Pending', 'semifinal'),
-(382, 'bracket87-round3-match7', 87, -2, -2, 3, 7, 0, 'Pending', 'final'),
-(383, 'bracket87-third-place-match', 87, -2, -2, -1, -1, 0, 'Pending', 'third_place');
+(440, 'bracket95-round1-match1', 95, 320, -1, 1, 1, 5, 'Finished', 'regular'),
+(441, 'bracket95-round1-match2', 95, 240, 312, 1, 2, 5, 'Pending', 'regular'),
+(442, 'bracket95-round1-match3', 95, 256, 248, 1, 3, 6, 'Pending', 'regular'),
+(443, 'bracket95-round1-match4', 95, 328, 460, 1, 4, 6, 'Pending', 'regular'),
+(444, 'bracket95-round2-match5', 95, 320, -2, 2, 5, 7, 'Pending', 'semifinal'),
+(445, 'bracket95-round2-match6', 95, -2, -2, 2, 6, 7, 'Pending', 'semifinal'),
+(446, 'bracket95-round3-match7', 95, -2, -2, 3, 7, 0, 'Pending', 'final'),
+(447, 'bracket95-third-place-match', 95, -2, -2, -1, -1, 0, 'Pending', 'third_place');
 
 -- --------------------------------------------------------
 
@@ -324,14 +476,6 @@ CREATE TABLE `match_results` (
   `last_updated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `match_results`
---
-
-INSERT INTO `match_results` (`result_id`, `match_id`, `game_id`, `team_A_id`, `team_B_id`, `score_teamA`, `score_teamB`, `winning_team_id`, `losing_team_id`, `last_updated`) VALUES
-(50, 378, 18, 312, 240, 9, 18, 240, 312, '2025-01-08 17:00:37'),
-(51, 376, 18, 320, 248, 9, 15, 248, 320, '2025-01-10 01:30:16');
-
 -- --------------------------------------------------------
 
 --
@@ -362,7 +506,9 @@ INSERT INTO `players` (`player_id`, `player_lastname`, `player_firstname`, `play
 (237, 'De Guzman', 'Andrew', 'B.', 240, '2024-12-05 12:49:50', 22),
 (249, 'Capistrano', 'Charlotte', '', 320, '2024-12-20 11:28:55', 77),
 (250, 'Guevarra', 'Jamie', '', 248, '2024-12-21 02:36:48', 4),
-(251, 'Doe', 'John', '', 312, '2025-01-08 14:54:06', 44);
+(251, 'Doe', 'John', '', 312, '2025-01-08 14:54:06', 44),
+(252, 'Smith', 'John', 'A', 256, '2025-01-23 12:30:24', 10),
+(253, 'Doe', 'Jane', 'B', 256, '2025-01-23 12:30:24', 15);
 
 -- --------------------------------------------------------
 
@@ -396,7 +542,9 @@ INSERT INTO `players_info` (`player_info_id`, `player_id`, `email`, `phone_numbe
 (14, 237, 'andrewbucedeguzman@gmail.com', '', '2002-04-30', NULL, '5&#039;9', '180lbs', 'Small Forward'),
 (26, 249, 'charlotte@gmail.com', '+639261769542', '2010-02-20', NULL, '', '', ''),
 (27, 250, 'jamie@gmail.com', '+639121212121', '2010-02-15', NULL, '', '', ''),
-(28, 251, 'johndoe@gmail.com', '+639754136498', '2005-05-08', NULL, '', '', 'Small Forward');
+(28, 251, 'johndoe@gmail.com', '+639754136498', '2005-05-08', NULL, '', '', 'Small Forward'),
+(29, 252, 'john.smith@test.com', '9876543210', '2000-01-01', NULL, '6\"0', '160 lbs', 'Guard'),
+(30, 253, 'jane.doe@test.com', '9123456789', '1998-05-10', NULL, '5\"8', '140 lbs', 'Forward');
 
 -- --------------------------------------------------------
 
@@ -413,24 +561,6 @@ CREATE TABLE `player_match_stats` (
   `stat_value` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `player_match_stats`
---
-
-INSERT INTO `player_match_stats` (`stat_record_id`, `player_id`, `match_id`, `game_id`, `stat_name`, `stat_value`, `created_at`) VALUES
-(57, 251, 378, 18, 'Fouls', '3', '2025-01-08 15:01:10'),
-(58, 251, 378, 18, 'Assists', '3', '2025-01-08 17:00:18'),
-(59, 236, 378, 18, 'Assists', '7', '2025-01-08 17:00:20'),
-(60, 236, 378, 18, 'Fouls', '4', '2025-01-08 17:00:21'),
-(61, 236, 378, 18, 'Rebounds', '3', '2025-01-08 17:00:21'),
-(62, 236, 378, 18, 'Scores', '5', '2025-01-08 17:00:22'),
-(63, 237, 378, 18, 'Scores', '5', '2025-01-08 17:00:26'),
-(64, 237, 378, 18, 'Assists', '1', '2025-01-08 17:00:28'),
-(65, 237, 378, 18, 'Fouls', '1', '2025-01-08 17:00:28'),
-(66, 237, 378, 18, 'Rebounds', '1', '2025-01-08 17:00:28'),
-(67, 251, 378, 18, 'Rebounds', '1', '2025-01-08 17:00:30'),
-(68, 251, 378, 18, 'Scores', '1', '2025-01-08 17:00:30');
 
 -- --------------------------------------------------------
 
@@ -452,7 +582,7 @@ CREATE TABLE `pointing_system` (
 --
 
 INSERT INTO `pointing_system` (`id`, `school_id`, `first_place_points`, `second_place_points`, `third_place_points`, `created_at`) VALUES
-(1, 8, 10, 5, 3, '2024-12-17 01:13:48');
+(1, 8, 10, 7, 2, '2024-12-17 01:13:48');
 
 -- --------------------------------------------------------
 
@@ -467,15 +597,6 @@ CREATE TABLE `schedules` (
   `schedule_time` time NOT NULL,
   `venue` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `schedules`
---
-
-INSERT INTO `schedules` (`schedule_id`, `match_id`, `schedule_date`, `schedule_time`, `venue`) VALUES
-(88, 376, '2025-01-10', '06:10:00', 'Gym'),
-(89, 378, '2025-01-08', '23:00:00', 'Closed Gym'),
-(90, 380, '2025-01-08', '23:00:00', 'Open Gym');
 
 -- --------------------------------------------------------
 
@@ -522,7 +643,8 @@ CREATE TABLE `sessions` (
 
 INSERT INTO `sessions` (`session_id`, `user_id`, `ip_address`, `user_agent`, `created_at`, `expires_at`) VALUES
 (132, 90, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2024-12-20 17:15:24', '2024-12-20 18:15:24'),
-(152, 67, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2025-01-09 22:06:59', '2025-01-09 23:06:59');
+(167, 56, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2025-01-23 15:54:02', '2025-01-23 16:54:02'),
+(168, 67, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2025-01-23 23:53:45', '2025-01-24 00:53:45');
 
 -- --------------------------------------------------------
 
@@ -548,7 +670,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (-2, 'To Be Determined', 0, '2024-12-01 00:29:16', 0, 0, 0),
 (-1, 'BYE', 0, '2024-12-01 19:26:39', 0, 0, 0),
 (239, 'BSCS - Volleyball', 2, '2024-11-02 11:14:51', 67, 0, 0),
-(240, 'BSCS - Basketball', 18, '2024-11-02 11:14:51', 67, 1, 0),
+(240, 'BSCS - Basketball', 18, '2024-11-02 11:14:51', 67, 0, 0),
 (241, 'BSCS - Dama', 22, '2024-11-02 11:14:51', 67, 0, 0),
 (242, 'BSCS - Dart', 26, '2024-11-02 11:14:51', 67, 0, 0),
 (243, 'BSCS - Chess', 27, '2024-11-02 11:14:51', 67, 0, 0),
@@ -556,7 +678,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (245, 'BSCS - Patintero', 29, '2024-11-02 11:14:51', 67, 0, 0),
 (246, 'BSCS - Word Factory', 30, '2024-11-02 11:14:51', 67, 0, 0),
 (247, 'CRIM - Volleyball', 2, '2024-11-02 11:14:55', 68, 0, 0),
-(248, 'CRIM - Basketball', 18, '2024-11-02 11:14:55', 68, 1, 0),
+(248, 'CRIM - Basketball', 18, '2024-11-02 11:14:55', 68, 0, 0),
 (249, 'CRIM - Dama', 22, '2024-11-02 11:14:55', 68, 0, 0),
 (250, 'CRIM - Dart', 26, '2024-11-02 11:14:55', 68, 0, 0),
 (251, 'CRIM - Chess', 27, '2024-11-02 11:14:55', 68, 0, 0),
@@ -571,14 +693,14 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (260, 'BSA - Badminton', 28, '2024-11-02 11:15:21', 69, 0, 0),
 (261, 'BSA - Patintero', 29, '2024-11-02 11:15:21', 69, 0, 0),
 (262, 'BSA - Word Factory', 30, '2024-11-02 11:15:21', 69, 0, 0),
-(263, '11-A - STEM - Volleyball', 2, '2024-11-02 14:25:54', 70, 0, 0),
-(264, '11-A - STEM - Basketball', 18, '2024-11-02 14:25:54', 70, 0, 0),
-(265, '11-A - STEM - Dama', 22, '2024-11-02 14:25:54', 70, 0, 0),
-(266, '11-A - STEM - Dart', 26, '2024-11-02 14:25:54', 70, 0, 0),
-(267, '11-A - STEM - Chess', 27, '2024-11-02 14:25:54', 70, 0, 0),
-(268, '11-A - STEM - Badminton', 28, '2024-11-02 14:25:54', 70, 0, 0),
-(269, '11-A - STEM - Patintero', 29, '2024-11-02 14:25:54', 70, 0, 0),
-(270, '11-A - STEM - Word Factory', 30, '2024-11-02 14:25:54', 70, 0, 0),
+(263, '11-Aa - STEMss - Volleyball', 2, '2024-11-02 14:25:54', 70, 0, 0),
+(264, '11-Aa - STEMss - Basketball', 18, '2024-11-02 14:25:54', 70, 0, 0),
+(265, '11-Aa - STEMss - Dama', 22, '2024-11-02 14:25:54', 70, 0, 0),
+(266, '11-Aa - STEMss - Dart', 26, '2024-11-02 14:25:54', 70, 0, 0),
+(267, '11-Aa - STEMss - Chess', 27, '2024-11-02 14:25:54', 70, 0, 0),
+(268, '11-Aa - STEMss - Badminton', 28, '2024-11-02 14:25:54', 70, 0, 0),
+(269, '11-Aa - STEMss - Patintero', 29, '2024-11-02 14:25:54', 70, 0, 0),
+(270, '11-Aa - STEMss - Word Factory', 30, '2024-11-02 14:25:54', 70, 0, 0),
 (271, '12-A - ABM - Volleyball', 2, '2024-11-02 14:26:05', 71, 0, 0),
 (272, '12-A - ABM - Basketball', 18, '2024-11-02 14:26:05', 71, 0, 0),
 (273, '12-A - ABM - Dama', 22, '2024-11-02 14:26:05', 71, 0, 0),
@@ -595,16 +717,8 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (284, 'Obedience - Badminton', 28, '2024-11-02 14:26:20', 72, 0, 0),
 (285, 'Obedience - Patintero', 29, '2024-11-02 14:26:20', 72, 0, 0),
 (286, 'Obedience - Word Factory', 30, '2024-11-02 14:26:20', 72, 0, 0),
-(287, 'Nickel - Volleyball', 2, '2024-11-02 14:26:33', 73, 0, 0),
-(288, 'Nickel - Basketball', 18, '2024-11-02 14:26:33', 73, 0, 0),
-(289, 'Nickel - Dama', 22, '2024-11-02 14:26:33', 73, 0, 0),
-(290, 'Nickel - Dart', 26, '2024-11-02 14:26:33', 73, 0, 0),
-(291, 'Nickel - Chess', 27, '2024-11-02 14:26:33', 73, 0, 0),
-(292, 'Nickel - Badminton', 28, '2024-11-02 14:26:33', 73, 0, 0),
-(293, 'Nickel - Patintero', 29, '2024-11-02 14:26:33', 73, 0, 0),
-(294, 'Nickel - Word Factory', 30, '2024-11-02 14:26:33', 73, 0, 0),
 (311, 'BSBA - Volleyball', 2, '2024-11-09 05:25:00', 76, 0, 0),
-(312, 'BSBA - Basketball', 18, '2024-11-09 05:25:00', 76, 0, 1),
+(312, 'BSBA - Basketball', 18, '2024-11-09 05:25:00', 76, 0, 0),
 (313, 'BSBA - Dama', 22, '2024-11-09 05:25:00', 76, 0, 0),
 (314, 'BSBA - Dart', 26, '2024-11-09 05:25:00', 76, 0, 0),
 (315, 'BSBA - Chess', 27, '2024-11-09 05:25:00', 76, 0, 0),
@@ -612,7 +726,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (317, 'BSBA - Patintero', 29, '2024-11-09 05:25:00', 76, 0, 0),
 (318, 'BSBA - Word Factory', 30, '2024-11-09 05:25:00', 76, 0, 0),
 (319, 'EDUC - Volleyball', 2, '2024-11-09 05:25:19', 77, 0, 0),
-(320, 'EDUC - Basketball', 18, '2024-11-09 05:25:19', 77, 0, 1),
+(320, 'EDUC - Basketball', 18, '2024-11-09 05:25:19', 77, 0, 0),
 (321, 'EDUC - Dama', 22, '2024-11-09 05:25:19', 77, 0, 0),
 (322, 'EDUC - Dart', 26, '2024-11-09 05:25:19', 77, 0, 0),
 (323, 'EDUC - Chess', 27, '2024-11-09 05:25:19', 77, 0, 0),
@@ -658,7 +772,49 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (366, 'A - HUMSS - Chess', 27, '2024-12-02 18:19:21', 86, 0, 0),
 (367, 'A - HUMSS - Badminton', 28, '2024-12-02 18:19:21', 86, 0, 0),
 (368, 'A - HUMSS - Patintero', 29, '2024-12-02 18:19:21', 86, 0, 0),
-(369, 'A - HUMSS - Word Factory', 30, '2024-12-02 18:19:21', 86, 0, 0);
+(369, 'A - HUMSS - Word Factory', 30, '2024-12-02 18:19:21', 86, 0, 0),
+(459, 'testtest - Volleyball', 2, '2025-01-23 21:24:48', 99, 0, 0),
+(460, 'testtest - Basketball', 18, '2025-01-23 21:24:48', 99, 0, 0),
+(461, 'testtest - Dama', 22, '2025-01-23 21:24:48', 99, 0, 0),
+(462, 'testtest - Dart', 26, '2025-01-23 21:24:48', 99, 0, 0),
+(463, 'testtest - Chess', 27, '2025-01-23 21:24:48', 99, 0, 0),
+(464, 'testtest - Badminton', 28, '2025-01-23 21:24:48', 99, 0, 0),
+(465, 'testtest - Patintero', 29, '2025-01-23 21:24:48', 99, 0, 0),
+(466, 'testtest - Word Factory', 30, '2025-01-23 21:24:48', 99, 0, 0),
+(467, 'mm - STEM - Volleyball', 2, '2025-01-23 21:25:06', 100, 0, 0),
+(468, 'mm - STEM - Basketball', 18, '2025-01-23 21:25:06', 100, 0, 0),
+(469, 'mm - STEM - Dama', 22, '2025-01-23 21:25:06', 100, 0, 0),
+(470, 'mm - STEM - Dart', 26, '2025-01-23 21:25:06', 100, 0, 0),
+(471, 'mm - STEM - Chess', 27, '2025-01-23 21:25:06', 100, 0, 0),
+(472, 'mm - STEM - Badminton', 28, '2025-01-23 21:25:06', 100, 0, 0),
+(473, 'mm - STEM - Patintero', 29, '2025-01-23 21:25:06', 100, 0, 0),
+(474, 'mm - STEM - Word Factory', 30, '2025-01-23 21:25:06', 100, 0, 0),
+(475, 'nickel - Volleyball', 2, '2025-01-23 21:27:13', 101, 0, 0),
+(476, 'nickel - Basketball', 18, '2025-01-23 21:27:13', 101, 0, 0),
+(477, 'nickel - Dama', 22, '2025-01-23 21:27:13', 101, 0, 0),
+(478, 'nickel - Dart', 26, '2025-01-23 21:27:13', 101, 0, 0),
+(479, 'nickel - Chess', 27, '2025-01-23 21:27:13', 101, 0, 0),
+(480, 'nickel - Badminton', 28, '2025-01-23 21:27:13', 101, 0, 0),
+(481, 'nickel - Patintero', 29, '2025-01-23 21:27:13', 101, 0, 0),
+(482, 'nickel - Word Factory', 30, '2025-01-23 21:27:13', 101, 0, 0),
+(507, 'johndoes - Volleyball', 2, '2025-01-23 22:10:12', 105, 0, 0),
+(508, 'johndoes - Basketball', 18, '2025-01-23 22:10:12', 105, 0, 0),
+(509, 'johndoes - Dama', 22, '2025-01-23 22:10:12', 105, 0, 0),
+(510, 'johndoes - Dart', 26, '2025-01-23 22:10:12', 105, 0, 0),
+(511, 'johndoes - Chess', 27, '2025-01-23 22:10:12', 105, 0, 0),
+(512, 'johndoes - Badminton', 28, '2025-01-23 22:10:12', 105, 0, 0),
+(513, 'johndoes - Patintero', 29, '2025-01-23 22:10:12', 105, 0, 0),
+(514, 'johndoes - Word Factory', 30, '2025-01-23 22:10:12', 105, 0, 0),
+(523, 'asas - Volleyball', 2, '2025-01-23 22:53:48', 107, 0, 0),
+(524, 'asas - Basketball', 18, '2025-01-23 22:53:48', 107, 0, 0),
+(525, 'asas - Dama', 22, '2025-01-23 22:53:48', 107, 0, 0),
+(526, 'asas - Dart', 26, '2025-01-23 22:53:48', 107, 0, 0),
+(527, 'asas - Chess', 27, '2025-01-23 22:53:48', 107, 0, 0),
+(528, 'asas - Badminton', 28, '2025-01-23 22:53:48', 107, 0, 0),
+(529, 'asas - Patintero', 29, '2025-01-23 22:53:48', 107, 0, 0),
+(530, 'asas - Word Factory', 30, '2025-01-23 22:53:48', 107, 0, 0),
+(536, 'dd', 18, '2025-01-24 21:00:38', 99, 0, 0),
+(537, 'aa', 18, '2025-01-24 21:02:00', 99, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -765,6 +921,13 @@ ALTER TABLE `live_scores`
   ADD KEY `idx_timer_status` (`timer_status`);
 
 --
+-- Indexes for table `logs`
+--
+ALTER TABLE `logs`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `fk_user_id` (`user_id`);
+
+--
 -- Indexes for table `matches`
 --
 ALTER TABLE `matches`
@@ -869,13 +1032,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `announcement`
 --
 ALTER TABLE `announcement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `brackets`
 --
 ALTER TABLE `brackets`
-  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
 
 --
 -- AUTO_INCREMENT for table `departments`
@@ -887,7 +1050,7 @@ ALTER TABLE `departments`
 -- AUTO_INCREMENT for table `games`
 --
 ALTER TABLE `games`
-  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `game_scoring_rules`
@@ -905,19 +1068,25 @@ ALTER TABLE `game_stats_config`
 -- AUTO_INCREMENT for table `grade_section_course`
 --
 ALTER TABLE `grade_section_course`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
 -- AUTO_INCREMENT for table `live_scores`
 --
 ALTER TABLE `live_scores`
-  MODIFY `live_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4111;
+  MODIFY `live_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4113;
+
+--
+-- AUTO_INCREMENT for table `logs`
+--
+ALTER TABLE `logs`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=130;
 
 --
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=384;
+  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=448;
 
 --
 -- AUTO_INCREMENT for table `match_progression_logs`
@@ -935,13 +1104,13 @@ ALTER TABLE `match_results`
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=252;
+  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=254;
 
 --
 -- AUTO_INCREMENT for table `players_info`
 --
 ALTER TABLE `players_info`
-  MODIFY `player_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `player_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `player_match_stats`
@@ -959,7 +1128,7 @@ ALTER TABLE `pointing_system`
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
 
 --
 -- AUTO_INCREMENT for table `schools`
@@ -971,19 +1140,19 @@ ALTER TABLE `schools`
 -- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=169;
 
 --
 -- AUTO_INCREMENT for table `teams`
 --
 ALTER TABLE `teams`
-  MODIFY `team_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=458;
+  MODIFY `team_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=538;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- Constraints for dumped tables
@@ -1043,6 +1212,12 @@ ALTER TABLE `live_scores`
   ADD CONSTRAINT `fk_teamB_id` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`),
   ADD CONSTRAINT `live_scores_ibfk_1` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`schedule_id`),
   ADD CONSTRAINT `live_scores_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+
+--
+-- Constraints for table `logs`
+--
+ALTER TABLE `logs`
+  ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `matches`

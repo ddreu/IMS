@@ -6,7 +6,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Helper functions for badge classes
-function getRoleBadgeClass($role) {
+function getRoleBadgeClass($role)
+{
     switch ($role) {
         case 'School Admin':
             return 'bg-primary';
@@ -325,7 +326,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                     echo '<td class="px-4"><span class="badge ' . getRoleBadgeClass($row['role']) . '">' . $roleDisplay . '</span></td>';
                                                     echo '<td class="px-4">';
                                                     echo '<div class="d-flex gap-2 justify-content-center">';
-                                                    
+
                                                     // Edit button
                                                     echo '<button type="button" 
                                                             class="btn btn-primary btn-sm shadow-sm " style="width: 38px; height: 32px; padding: 6px 0;"
@@ -352,7 +353,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                             title="Delete">';
                                                     echo '<i class="fas fa-trash"></i>';
                                                     echo '</button>';
-                                                    
+
                                                     echo '</div>';
                                                     echo '</td>';
                                                     echo '</tr>';
@@ -453,56 +454,74 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                 function handleFormSubmit(form, actionUrl) {
                     const formData = new FormData(form);
 
+                    // Show SweetAlert loading indicator
+                    Swal.fire({
+                        title: 'Submitting...',
+                        text: 'Please wait while we process your request.',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
                     // Send the data via AJAX
                     fetch(actionUrl, {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                text: data.message,
-                                showConfirmButton: true
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    // Close any open modals
-                                    const modals = document.querySelectorAll('.modal');
-                                    modals.forEach(modal => {
-                                        const modalInstance = bootstrap.Modal.getInstance(modal);
-                                        if (modalInstance) {
-                                            modalInstance.hide();
-                                        }
-                                    });
-                                    
-                                    // Reset the form
-                                    form.reset();
-                                    
-                                    // Reload the page to show updated data
-                                    window.location.reload();
-                                }
-                            });
-                        } else {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Close the loading SweetAlert
+                            Swal.close();
+
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: data.message,
+                                    showConfirmButton: true
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        // Close any open modals
+                                        const modals = document.querySelectorAll('.modal');
+                                        modals.forEach(modal => {
+                                            const modalInstance = bootstrap.Modal.getInstance(modal);
+                                            if (modalInstance) {
+                                                modalInstance.hide();
+                                            }
+                                        });
+
+                                        // Reset the form
+                                        form.reset();
+
+                                        // Reload the page to show updated data
+                                        window.location.reload();
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: data.message || 'An error occurred',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            // Close the loading SweetAlert
+                            Swal.close();
+
+                            console.error('Error:', error);
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error!',
-                                text: data.message || 'An error occurred',
+                                text: 'An unexpected error occurred. Please try again.',
                                 confirmButtonText: 'OK'
                             });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'An unexpected error occurred. Please try again.',
-                            confirmButtonText: 'OK'
                         });
-                    });
                 }
+
 
                 function toggleAssignGameFieldForAddUser(role) {
                     const assignGameDiv = document.getElementById('add_assignGameDiv');
@@ -539,37 +558,37 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                             formData.append('user_id', userId);
 
                             fetch('delete_user.php', {
-                                method: 'POST',
-                                body: formData
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.status === 'success') {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Deleted!',
-                                        text: data.message,
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    }).then(() => {
-                                        // Reload the page after successful deletion
-                                        window.location.reload();
-                                    });
-                                } else {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.status === 'success') {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Deleted!',
+                                            text: data.message,
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        }).then(() => {
+                                            // Reload the page after successful deletion
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error!',
+                                            text: data.message
+                                        });
+                                    }
+                                })
+                                .catch(error => {
                                     Swal.fire({
                                         icon: 'error',
                                         title: 'Error!',
-                                        text: data.message
+                                        text: 'An error occurred while deleting the user.'
                                     });
-                                }
-                            })
-                            .catch(error => {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error!',
-                                    text: 'An error occurred while deleting the user.'
                                 });
-                            });
                         } else {
                             Swal.fire('Cancelled', 'User data is safe!', 'info');
                         }

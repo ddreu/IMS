@@ -273,9 +273,12 @@ $conn->close();
                     <?php foreach ($teams_by_grade as $grade_level => $teams): ?>
                         <div class="card shadow mt-3">
                             
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <!--<h4 class="m-0 font-weight-bold text-primary"><?= htmlspecialchars($grade_level) ?></h4>-->
+                                <div class="row mt-3">
+                                    <div class="col text-end">
+                                        
+                                    <button type="button" class="btn btn-success btn-sm me-3" data-bs-toggle="modal" data-bs-target="#addTeamModal">
+    Add Team
+</button>                                    <!--<h4 class="m-0 font-weight-bold text-primary"><?= htmlspecialchars($grade_level) ?></h4>-->
                                     </div>
                                 </div>
                             
@@ -332,6 +335,8 @@ $conn->close();
             </section>
         </div>
     </div>
+   
+    <?php include "addteam_modal.php"; ?>
 
     <script>
         // Populate the modal with team ID when button is clicked
@@ -341,6 +346,69 @@ $conn->close();
                 document.getElementById('modalTeamId').value = teamId;
             });
         });
+
+        document.addEventListener("DOMContentLoaded", () => {
+        const departmentId = <?= $_SESSION['department_id']; ?>; // Replace with actual session variable
+        const gscDropdown = document.getElementById("gscDropdown");
+
+        // Fetch data from the server
+        fetch(`fetch_gsc.php?department_id=${departmentId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const option = document.createElement("option");
+                        option.value = item.id; // Use the appropriate ID field
+                        option.textContent = `${item.grade_level || ''} ${item.strand || ''} ${item.section_name || ''} ${item.course_name || ''}`.trim();
+                        gscDropdown.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement("option");
+                    option.value = "";
+                    option.textContent = "No entries available";
+                    gscDropdown.appendChild(option);
+                }
+            })
+            .catch(error => console.error("Error fetching GSC data:", error));
+    });
+
+    document.getElementById("saveTeamBtn").addEventListener("click", function() {
+    const formData = new FormData(document.getElementById("addTeamForm"));
+
+    fetch('team_op.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                // Optionally, reload the page or update the UI
+                location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: data.message,
+                showConfirmButton: true
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'An unexpected error occurred.',
+            showConfirmButton: true
+        });
+    });
+});
+
     </script>
 </body>
 

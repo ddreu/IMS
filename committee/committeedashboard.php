@@ -635,6 +635,8 @@ include '../navbar/navbar.php';
                 font-size: 1.5rem;
             }
         }
+
+
     </style>
 </head>
 
@@ -645,13 +647,27 @@ include '../navbar/navbar.php';
         include 'csidebar.php';
         ?>
     </nav>
-    <div class="mt-4">
-        <div class="container-fluid">
-            <section class="main">
-                <div class="dashboard-header">
-                    <h1 class="dashboard-title"><?php echo htmlspecialchars($assigned_game); ?> Dashboard</h1>
-                    <p class="dashboard-subtitle"><?php echo htmlspecialchars($_SESSION['department_name']); ?> Department</p>
+<div class="mt-4">
+    <div class="container-fluid">
+        <section class="main">
+            <div class="dashboard-header d-flex align-items-center justify-content-between">
+                <!-- Dashboard Title and Subtitle -->
+                <div>
+                    <h1 class="dashboard-title mb-0">
+                        <?php echo htmlspecialchars($assigned_game); ?> Dashboard
+                    </h1>
+                    <p class="dashboard-subtitle mb-0">
+                        <?php echo htmlspecialchars($_SESSION['department_name']); ?> Department
+                    </p>
                 </div>
+                
+                <!-- Info Button -->
+                <button type="button" class="btn btn-info btn-circle" data-bs-toggle="modal" data-bs-target="#manualModal" title="Read Manual">
+                    <i class="fas fa-info-circle"> Manual</i>
+                </button>
+            </div>
+        
+<?php include "committee_manual.php"; ?>
 
                 <div class="stats-container">
                     <div class="stat-card">

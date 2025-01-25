@@ -84,6 +84,15 @@ if (!$rules) {
                 <h2 class="text-center mb-4"><?= htmlspecialchars($match['game_name']) ?></h2>
             </div>
 
+            <!-- Live Stream Button -->
+<div class="position-fixed top-0 start-0 m-3">
+    <button class="btn btn-success rounded-circle" type="button" data-bs-toggle="modal" data-bs-target="#liveStreamSettingsModal">
+        <i class="fas fa-video"></i>
+    </button>
+</div>
+
+
+
             <!-- Toggle Button -->
             <div class="position-fixed top-0 end-0 m-3">
                 <button class="btn btn-primary rounded-circle" type="button" data-bs-toggle="collapse" data-bs-target="#matchInfo" aria-expanded="false" aria-controls="matchInfo">
@@ -230,6 +239,47 @@ if (!$rules) {
             </div>
         </div>
     </div>
+
+   <!-- Live Stream Settings Modal -->
+<div class="modal fade" id="liveStreamSettingsModal" tabindex="-1" aria-labelledby="liveStreamSettingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="liveStreamSettingsModalLabel">Start Live Stream</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Stream Options -->
+                <div class="list-group">
+                    <div class="mb-3">
+                        <button class="list-group-item list-group-item-action btn-lg text-center">
+                            Use Computer Webcam
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <button class="list-group-item list-group-item-action btn-lg text-center">
+                            Use Phone Camera
+                        </button>
+                    </div>
+                    <div class="mb-3">
+                        <button class="list-group-item list-group-item-action btn-lg text-center">
+                            Share Screen
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Facebook Streaming Option -->
+                <div class="d-grid gap-2 mt-4">
+    <button class="btn btn-lg btn-outline-primary" onclick="startFacebookStream()">
+        Facebook
+    </button>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
     <?php include 'player_stats.php'; ?>
 

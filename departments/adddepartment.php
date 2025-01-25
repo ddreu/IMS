@@ -1,5 +1,6 @@
 <?php
 include_once '../connection/conn.php';
+include '../user_logs/logger.php';
 $conn = con();
 
 session_start();
@@ -106,8 +107,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Proceed with team creation if no duplicate found
-    if (!$is_duplicate && $stmt->execute()) {
+    if (!$is_duplicate && isset($stmt) && $stmt->execute()) {
         $grade_section_course_id = $stmt->insert_id;
+
+        // Log the department creation action
+        $log_description = "";
+        if ($department_name === 'College') {
+            // For College, log the course name
+            $log_description = "Added College Department: Course Name = $course_name";
+        } elseif ($department_name === 'SHS' || $department_name === 'JHS' || $department_name === 'Elementary') {
+            // For other departments, log the grade level, section name, and strand (if applicable)
+            $log_description = "Added $department_name Department: Grade Level = $grade_level, Section = $section_name";
+            if ($strand) {
+                $log_description .= ", Strand = $strand";
+            }
+        }
 
         // Fetch associated game IDs and names for the logged-in user's school
         $game_ids_query = "SELECT game_id, game_name FROM games WHERE school_id = ?";
@@ -122,6 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $game_ids_stmt->close();
 
+        // Create teams for all existing games
         foreach ($game_ids as $game) {
             // Create the team name based on department type
             if ($department_name === 'College') {
@@ -141,6 +156,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $insert_team_stmt->close();
         }
 
+        // Update the log description to reflect team creation for all games
+        $log_description .= " - Teams have been automatically created for all existing games.";
+
+        // Log user action for department and team creation
+        logUserAction($conn, $admin_user_id, "departments", "CREATE", $grade_section_course_id, $log_description);
+
         $_SESSION['success_message'] = "Success: Teams have been created for the section!";
         header("Location: departments.php?alert=sweetalert&selected_department_id=" . $department_id);
         exit();
@@ -149,7 +170,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         header("Location: departments.php");
         exit();
     }
-    $stmt->close();
+
+    if (isset($stmt)) {
+        $stmt->close();
+    }
 }
 
 $conn->close();

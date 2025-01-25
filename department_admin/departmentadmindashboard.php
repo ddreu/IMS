@@ -220,9 +220,19 @@ if (isset($_SESSION['success_message'])) {
         <div id="content">
             <div class="container-fluid p-4">
                 <!-- Department Info Section -->
-                <div class="department-info">
+                 
+                <div class="department-info d-flex justify-content-between align-items-center">
+                    <div>
                     <h1 class="department-name"><?php echo htmlspecialchars($department_info['department_name']); ?> Department</h1>
                     <div class="school-name"><?php echo htmlspecialchars($department_info['school_name']); ?></div>
+                    </div>
+            <!-- Info Button -->
+    <button type="button" class="btn btn-info btn-circle" data-bs-toggle="modal" data-bs-target="#manualModal" title="Read Manual">
+        <i class="fas fa-info-circle"> Manual</i>
+    </button>
+
+    <?php include 'department_admin_manual.php'; ?>
+                    
                 </div>
 
                 <!-- Statistics Cards -->

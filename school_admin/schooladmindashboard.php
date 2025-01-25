@@ -204,10 +204,19 @@ if (isset($_SESSION['success_message'])) {
     <div class="main-content">
         <div class="container-fluid p-4">
             <!-- School Info Section -->
-            <div class="school-info">
-                <h1 class="school-name"><?php echo htmlspecialchars($school_info['school_name']); ?></h1>
-                <div class="school-code">School Code: <?php echo htmlspecialchars($school_info['school_code']); ?></div>
-            </div>
+<div class="school-info d-flex justify-content-between align-items-center">
+    <!-- School Details -->
+    <div>
+        <h1 class="school-name"><?php echo htmlspecialchars($school_info['school_name']); ?></h1>
+        <div class="school-code">School Code: <?php echo htmlspecialchars($school_info['school_code']); ?></div>
+    </div>
+
+    <!-- Info Button -->
+    <button type="button" class="btn btn-info btn-circle" data-bs-toggle="modal" data-bs-target="#manualModal" title="Read Manual">
+        <i class="fas fa-info-circle"> Manual</i>
+    </button>
+</div>
+ <?php include'school_admin_manual.php'; ?>
 
             <!-- Statistics Cards -->
             <div class="row g-4 mb-4">

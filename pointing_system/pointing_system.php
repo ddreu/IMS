@@ -1,7 +1,9 @@
 <?php
 session_start();
 include_once '../connection/conn.php';
+include "../user_logs/logger.php"; // Include the logger at the top
 $conn = con();
+
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php'); // Redirect to login page if not logged in
@@ -10,8 +12,6 @@ if (!isset($_SESSION['user_id'])) {
 
 // Fetch the logged-in user's information
 $user_id = $_SESSION['user_id'];
-$email = $_SESSION['email'];
-$role = $_SESSION['role'];
 $school_id = $_SESSION['school_id'] ?? null;
 
 include '../navbar/navbar.php';
@@ -24,15 +24,36 @@ $conn = con();
 $stmt = $conn->prepare("SELECT first_place_points, second_place_points, third_place_points FROM pointing_system WHERE school_id = ?");
 $stmt->bind_param("i", $school_id);
 $stmt->execute();
-$stmt->bind_result($first_place_points, $second_place_points, $third_place_points);
+$stmt->bind_result($old_first_place_points, $old_second_place_points, $old_third_place_points);
 $stmt->fetch();
 $stmt->close();
-$conn->close();
 
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get new values from the form
     $first_place_points = $_POST['first_place_points'];
     $second_place_points = $_POST['second_place_points'];
     $third_place_points = $_POST['third_place_points'];
+
+    // Initialize description and change tracking
+    $log_description = '';
+    $changes = [];
+
+    if ($first_place_points != $old_first_place_points) {
+        $changes['first_place_points'] = ['old' => $old_first_place_points, 'new' => $first_place_points];
+    }
+    if ($second_place_points != $old_second_place_points) {
+        $changes['second_place_points'] = ['old' => $old_second_place_points, 'new' => $second_place_points];
+    }
+    if ($third_place_points != $old_third_place_points) {
+        $changes['third_place_points'] = ['old' => $old_third_place_points, 'new' => $third_place_points];
+    }
+
+    if (!empty($changes)) {
+        foreach ($changes as $field => $value) {
+            $log_description .= "Updated $field from {$value['old']} to {$value['new']}. ";
+        }
+    }
 
     // Check if a record already exists for the school_id
     $conn = con();
@@ -49,6 +70,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("iiii", $first_place_points, $second_place_points, $third_place_points, $school_id);
         if ($stmt->execute()) {
             $success = true; // Set success to true
+            // Log the update operation
+            logUserAction(
+                $conn,
+                $user_id,
+                'Pointing System',
+                'UPDATE',
+                $school_id,
+                $log_description,
+                json_encode([
+                    'first_place_points' => $old_first_place_points,
+                    'second_place_points' => $old_second_place_points,
+                    'third_place_points' => $old_third_place_points
+                ]),
+                json_encode([
+                    'first_place_points' => $first_place_points,
+                    'second_place_points' => $second_place_points,
+                    'third_place_points' => $third_place_points
+                ])
+            );
         } else {
             $error = $stmt->error; // Capture error message
         }
@@ -58,6 +98,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("iiii", $school_id, $first_place_points, $second_place_points, $third_place_points);
         if ($stmt->execute()) {
             $success = true; // Set success to true
+            // Log the insert operation
+            logUserAction(
+                $conn,
+                $user_id,
+                'pointing_system',
+                'INSERT',
+                $school_id,
+                "Inserted new pointing system values.",
+                null,
+                json_encode([
+                    'first_place_points' => $first_place_points,
+                    'second_place_points' => $second_place_points,
+                    'third_place_points' => $third_place_points
+                ])
+            );
         } else {
             $error = $stmt->error; // Capture error message
         }
@@ -68,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->close();
 }
 
-// Fetch existing data
+// Fetch existing data after any changes
 $conn = con();
 $stmt = $conn->prepare("SELECT first_place_points, second_place_points, third_place_points FROM pointing_system WHERE school_id = ?");
 $stmt->bind_param("i", $school_id);
@@ -81,6 +136,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -117,6 +173,7 @@ $conn->close();
         });
     </script>
 </head>
+
 <body>
     <div class="wrapper">
         <?php
@@ -148,4 +205,5 @@ $conn->close();
         </div>
     </div>
 </body>
+
 </html>
