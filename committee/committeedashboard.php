@@ -157,6 +157,7 @@ include '../navbar/navbar.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -182,6 +183,7 @@ include '../navbar/navbar.php';
             background-color: var(--bg-light);
             color: var(--text-primary);
         }
+
         .main {
             padding: 2rem;
             position: relative;
@@ -272,7 +274,7 @@ include '../navbar/navbar.php';
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -505,7 +507,7 @@ include '../navbar/navbar.php';
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+            background: linear-gradient(45deg, var(--primary-color), #dbdcde);
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 0;
@@ -593,6 +595,7 @@ include '../navbar/navbar.php';
             transition: width 0.4s ease;
         }
 
+
         @media (max-width: 768px) {
             .main {
                 padding: 1rem;
@@ -635,8 +638,6 @@ include '../navbar/navbar.php';
                 font-size: 1.5rem;
             }
         }
-
-
     </style>
 </head>
 
@@ -647,27 +648,27 @@ include '../navbar/navbar.php';
         include 'csidebar.php';
         ?>
     </nav>
-<div class="mt-4">
-    <div class="container-fluid">
-        <section class="main">
-            <div class="dashboard-header d-flex align-items-center justify-content-between">
-                <!-- Dashboard Title and Subtitle -->
-                <div>
-                    <h1 class="dashboard-title mb-0">
-                        <?php echo htmlspecialchars($assigned_game); ?> Dashboard
-                    </h1>
-                    <p class="dashboard-subtitle mb-0">
-                        <?php echo htmlspecialchars($_SESSION['department_name']); ?> Department
-                    </p>
+    <div class="mt-4">
+        <div class="container-fluid">
+            <section class="main">
+                <div class="dashboard-header d-flex align-items-center justify-content-between">
+                    <!-- Dashboard Title and Subtitle -->
+                    <div>
+                        <h1 class="dashboard-title mb-0">
+                            <?php echo htmlspecialchars($assigned_game); ?> Dashboard
+                        </h1>
+                        <p class="dashboard-subtitle mb-0">
+                            <?php echo htmlspecialchars($_SESSION['department_name']); ?> Department
+                        </p>
+                    </div>
+
+                    <!-- Info Button -->
+                    <button type="button" class="btn btn-info btn-circle" data-bs-toggle="modal" data-bs-target="#manualModal" title="Read Manual">
+                        <i class="fas fa-info-circle"> Manual</i>
+                    </button>
                 </div>
-                
-                <!-- Info Button -->
-                <button type="button" class="btn btn-info btn-circle" data-bs-toggle="modal" data-bs-target="#manualModal" title="Read Manual">
-                    <i class="fas fa-info-circle"> Manual</i>
-                </button>
-            </div>
-        
-<?php include "committee_manual.php"; ?>
+
+                <?php include "committee_manual.php"; ?>
 
                 <div class="stats-container">
                     <div class="stat-card">
@@ -724,7 +725,7 @@ include '../navbar/navbar.php';
                                             </p>
                                         </div>-->
                                     </li>
-                                  <li class="activity-item">
+                                    <li class="activity-item">
                                         <!--<div class="activity-icon">
                                             <i class="fas fa-calendar-alt"></i>
                                         </div>
@@ -773,17 +774,17 @@ include '../navbar/navbar.php';
                                     <span class="status-label">Current Phase</span>
                                     <span class="badge <?= $badge_class[$current_status] ?? 'badge-secondary' ?>"><?= htmlspecialchars($current_status) ?></span>
                                 </div>
-                               <!-- <div class="status-item">
+                                <!-- <div class="status-item">
                                     <span class="status-label">Status</span>
                                     <span class="status-value"><?= $current_status === 'Completed' ? 'Tournament Complete' : 'In Progress' ?></span>
                                 </div>-->
                                 <div class="progress-container">
                                     <div class="progress">
-                                        <div class="progress-bar" role="progressbar" 
-                                             style="width: <?= $current_status === 'Completed' ? '100' : '50' ?>%" 
-                                             aria-valuenow="<?= $current_status === 'Completed' ? '100' : '50' ?>" 
-                                             aria-valuemin="0" 
-                                             aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar"
+                                            style="width: <?= $current_status === 'Completed' ? '100' : '50' ?>%"
+                                            aria-valuenow="<?= $current_status === 'Completed' ? '100' : '50' ?>"
+                                            aria-valuemin="0"
+                                            aria-valuemax="100"></div>
                                     </div>
                                 </div>
                             </div>
@@ -795,20 +796,21 @@ include '../navbar/navbar.php';
     </div>
 
     <?php if (!empty($successMessage)): ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '<?php echo htmlspecialchars($successMessage); ?>',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#3085d6',
-                timer: 3000
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '<?php echo htmlspecialchars($successMessage); ?>',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3085d6',
+                    timer: 3000
+                });
             });
-        });
-    </script>
+        </script>
     <?php endif; ?>
 </body>
+
 </html>
 
 <?php $conn->close(); ?>

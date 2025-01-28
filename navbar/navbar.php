@@ -7,7 +7,7 @@
             class="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
+            data-bs-target="#sidebar"
             aria-controls="navbarSupportedContent"
             aria-expanded="false"
             aria-label="Toggle navigation">
@@ -17,10 +17,10 @@
         <!-- Collapsible wrapper -->
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Navbar brand with space on the left -->
-            <a class="navbar-brand fw-bold text-primary ms-md-2">
+            <a class="navbar-brand fw-bold text-primary ms-md-5">
                 IMS
             </a>
-            
+
             <!-- Navigation Links -->
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -56,32 +56,32 @@
             </div>-->
 
 
-            <!-- User Avatar Dropdown -->
-            <div class="dropdown me-md-5">
-                <a
-                    class="dropdown-toggle d-flex align-items-center hidden-arrow"
+        <!-- User Avatar Dropdown -->
+        <div class="dropdown me-md-5">
+            <a
+                class="dropdown-toggle d-flex align-items-center hidden-arrow"
 
-                    id="navbarDropdownMenuAvatar"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="bottom"
-                    title="User Menu"
-                    style="text-decoration: none;">
-                    <i class="fas fa-user-circle text-secondary" style="font-size: 30px;"></i>
-                </a>
-                <ul
-                    class="dropdown-menu dropdown-menu-end shadow-sm"
-                    aria-labelledby="navbarDropdownMenuAvatar">
-                    <li>
-                        <a class="dropdown-item" href="../profile_settings/profile_settings.php"><i class="fas fa-cog me-2 text-secondary"></i> Settings</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" id="logoutBtn" href="#"><i class="fas fa-sign-out-alt me-2 text-secondary"></i> Logout</a>
-                    </li>
-                </ul>
-            </div>
+                id="navbarDropdownMenuAvatar"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                title="User Menu"
+                style="text-decoration: none;">
+                <i class="fas fa-user-circle text-secondary" style="font-size: 30px;"></i>
+            </a>
+            <ul
+                class="dropdown-menu dropdown-menu-end shadow-sm"
+                aria-labelledby="navbarDropdownMenuAvatar">
+                <li>
+                    <a class="dropdown-item" href="../profile_settings/profile_settings.php"><i class="fas fa-cog me-2 text-secondary"></i> Settings</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" id="logoutBtn" href="#"><i class="fas fa-sign-out-alt me-2 text-secondary"></i> Logout</a>
+                </li>
+            </ul>
+        </div>
 
 </nav>
 <script>
@@ -114,41 +114,41 @@
             });
         });
 
-       /* // Games dropdown functionality
-        const dropdown = document.getElementById('gamesDropdown');
-        fetch('../rankings/fetch_games.php')
-            .then(response => response.json())
-            .then(games => {
-                dropdown.innerHTML = ''; // Clear the "Loading..." message
+        /* // Games dropdown functionality
+         const dropdown = document.getElementById('gamesDropdown');
+         fetch('../rankings/fetch_games.php')
+             .then(response => response.json())
+             .then(games => {
+                 dropdown.innerHTML = ''; // Clear the "Loading..." message
 
-                // Add a "Clear Selection" option
-                const clearOption = document.createElement('li');
-                clearOption.innerHTML = `<a class="dropdown-item" href="#" id="clearSelection">Clear Selection</a>`;
-                dropdown.appendChild(clearOption);
+                 // Add a "Clear Selection" option
+                 const clearOption = document.createElement('li');
+                 clearOption.innerHTML = `<a class="dropdown-item" href="#" id="clearSelection">Clear Selection</a>`;
+                 dropdown.appendChild(clearOption);
 
-                // Add event listener for the "Clear Selection" option
-                document.getElementById('clearSelection').addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const url = new URL(window.location.href);
-                    url.searchParams.delete('game_id'); // Remove 'game_id' parameter
-                    window.location.href = url.toString(); // Redirect with updated URL
-                });
+                 // Add event listener for the "Clear Selection" option
+                 document.getElementById('clearSelection').addEventListener('click', function(e) {
+                     e.preventDefault();
+                     const url = new URL(window.location.href);
+                     url.searchParams.delete('game_id'); // Remove 'game_id' parameter
+                     window.location.href = url.toString(); // Redirect with updated URL
+                 });
 
-                if (games.length === 0) {
-                    dropdown.innerHTML += '<li class="dropdown-item text-center text-muted">No games available</li>';
-                    return;
-                }
+                 if (games.length === 0) {
+                     dropdown.innerHTML += '<li class="dropdown-item text-center text-muted">No games available</li>';
+                     return;
+                 }
 
-                // Populate the dropdown with games
-                games.forEach(game => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `<a class="dropdown-item" href="?game_id=${game.game_id}">${game.game_name}</a>`;
-                    dropdown.appendChild(listItem);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching games:', error);
-                dropdown.innerHTML = '<li class="dropdown-item text-center text-danger">Error loading games</li>';
-            }); */
+                 // Populate the dropdown with games
+                 games.forEach(game => {
+                     const listItem = document.createElement('li');
+                     listItem.innerHTML = `<a class="dropdown-item" href="?game_id=${game.game_id}">${game.game_name}</a>`;
+                     dropdown.appendChild(listItem);
+                 });
+             })
+             .catch(error => {
+                 console.error('Error fetching games:', error);
+                 dropdown.innerHTML = '<li class="dropdown-item text-center text-danger">Error loading games</li>';
+             }); */
     });
 </script>

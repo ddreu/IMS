@@ -19,6 +19,26 @@ if ($conn->connect_error) {
 // Function to add a team
 function addTeam($teamName, $gameId, $gradeSectionCourseId, $conn)
 {
+    // Check if a team is already registered for this grade section course and game
+    $checkSql = "SELECT team_id FROM teams WHERE grade_section_course_id = ? AND game_id = ?";
+    $checkStmt = $conn->prepare($checkSql);
+
+    if ($checkStmt === false) {
+        return ['success' => false, 'message' => 'Error preparing the check statement.'];
+    }
+
+    $checkStmt->bind_param("ii", $gradeSectionCourseId, $gameId);
+    $checkStmt->execute();
+    $checkStmt->store_result();
+
+    if ($checkStmt->num_rows > 0) {
+        $checkStmt->close();
+        return ['success' => false, 'message' => 'A team is already registered for this grade section and game.'];
+    }
+
+    $checkStmt->close();
+
+    // If no team exists, proceed to add the team
     $wins = 0;
     $losses = 0;
     $createdAt = date('Y-m-d H:i:s');
@@ -38,10 +58,10 @@ function addTeam($teamName, $gameId, $gradeSectionCourseId, $conn)
         $description = "Registered team '$teamName'";
         logUserAction($conn, $_SESSION['user_id'], 'Team', 'CREATE', $gradeSectionCourseId, $description);
 
-        $stmt->close(); // Close statement here after execution
+        $stmt->close();
         return ['success' => true, 'message' => 'Team added successfully!'];
     } else {
-        $stmt->close(); // Close statement here after error
+        $stmt->close();
         return ['success' => false, 'message' => 'Error adding team: ' . $stmt->error];
     }
 }

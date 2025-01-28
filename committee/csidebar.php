@@ -26,7 +26,9 @@
     <li class="custom-navbar__item">
       <a href="../rankings/leaderboards.php" class="custom-navbar__link"><i data-feather="bar-chart-2"></i><span>Rankings</span></a>
     </li>
-   
+    <li class="custom-navbar__item">
+      <a href="../user_logs/user_logs.php" class="custom-navbar__link"><i class="fas fa-history"></i><span>User Logs</span></a>
+    </li>
   </ul>
 </nav>
 
@@ -35,6 +37,5 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 <script>
-  
   feather.replace()
 </script>

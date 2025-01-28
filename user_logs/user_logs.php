@@ -1,6 +1,7 @@
 <?php
-
-include "fetch_logs.php";
+session_start();
+include_once '../connection/conn.php';
+$conn = con();
 ?>
 
 <!DOCTYPE html>
@@ -24,85 +25,72 @@ include "fetch_logs.php";
 </head>
 
 <body>
-
-
     <?php
-    $current_page = 'leaderboards';
-
     include '../navbar/navbar.php';
-    if ($role == 'Committee') {
+    if ($_SESSION['role'] === 'Committee') {
         include '../committee/csidebar.php';
     } else {
-        //include '../department_admin/sidebar.php';
+        include '../department_admin/sidebar.php';
     }
     ?>
 
-    <div class="container mt-5 margin">
+    <div class="container mt-5 margin mb-5">
         <h2 class="mb-4">User Logs</h2>
 
-        <!-- Search bar -->
-        <div class="mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Search logs...">
+        <!-- Search and Sort Controls -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search logs...">
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex gap-2">
+                    <select id="sortColumn" class="form-select">
+                        <option value="timestamp">Timestamp</option>
+                        <option value="full_name">User</option>
+                        <option value="log_action">Action</option>
+                        <option value="log_record_id">Record ID</option>
+                        <option value="log_description">Description</option>
+                    </select>
+                    <select id="sortOrder" class="form-select">
+                        <option value="DESC">Descending</option>
+                        <option value="ASC">Ascending</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- Logs Table -->
         <table class="table table-striped table-bordered">
             <thead class="thead-dark">
                 <tr>
-                    <th><i class="fas fa-user"></i> User</th>
-                    <!-- <th><i class="fas fa-id-badge"></i> Log ID</th> -->
-                    <th><i class="fas fa-table"></i> Action</th>
-                    <th><i class="fas fa-tasks"></i> Operation</th>
-                    <th><i class="fas fa-hashtag"></i> Record ID</th>
-                    <th><i class="fas fa-info-circle"></i> Description</th>
-                    <!--<th><i class="fas fa-history"></i> Previous Data</th>
-                    <th><i class="fas fa-database"></i> New Data</th>-->
-
-                    <th><i class="fas fa-clock"></i> Timestamp</th>
-                    <th><i class="fas fa-cogs"></i> Details</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Operation</th>
+                    <th>Record ID</th>
+                    <th>Description</th>
+                    <th>Timestamp</th>
+                    <th>Details</th>
                 </tr>
             </thead>
             <tbody id="logsTable">
-                <?php if ($result->num_rows > 0): ?>
-                    <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['full_name']); ?></td>
-                            <!--<td><?php echo htmlspecialchars($row['log_id']); ?></td> -->
-                            <td><?php echo htmlspecialchars($row['table_name']); ?></td>
-                            <td><?php echo htmlspecialchars($row['log_action']); ?></td>
-                            <td><?php echo htmlspecialchars($row['log_record_id']); ?></td>
-                            <td><?php echo htmlspecialchars($row['log_description']); ?></td>
-                            <!-- <td><?php echo htmlspecialchars($row['previous_data']); ?></td>
-                            <td><?php echo htmlspecialchars($row['new_data']); ?></td> -->
-
-                            <td><?php echo htmlspecialchars(date('M d, Y h:i A', strtotime($row['log_time']))); ?></td>
-                            <td>
-                                <button class="btn btn-info btn-sm"
-                                    data-toggle="modal"
-                                    data-target="#detailsModal"
-                                    data-fullname="<?php echo htmlspecialchars($row['full_name']); ?>"
-                                    data-logid="<?php echo htmlspecialchars($row['log_id']); ?>"
-                                    data-tablename="<?php echo htmlspecialchars($row['table_name']); ?>"
-                                    data-operation="<?php echo htmlspecialchars($row['log_action']); ?>"
-                                    data-recordid="<?php echo htmlspecialchars($row['log_record_id']); ?>"
-                                    data-description="<?php echo htmlspecialchars($row['log_description']); ?>"
-                                    data-previousdata="<?php echo htmlspecialchars($row['previous_data']); ?>"
-                                    data-newdata="<?php echo htmlspecialchars($row['new_data']); ?>"
-
-                                    data-logtime="<?php echo htmlspecialchars(date('M d, Y h:i A', strtotime($row['log_time']))); ?>">
-                                    View Details
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="10" class="text-center">No logs found.</td>
-                    </tr>
-                <?php endif; ?>
+                <tr>
+                    <td colspan="7" class="text-center">Loading logs...</td>
+                </tr>
             </tbody>
         </table>
+    
+
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="text-muted">
+            Showing <span id="currentPage">1</span> of <span id="totalPages">1</span> pages
+        </div>
+        <div class="btn-group">
+            <button id="prevBtn" class="btn btn-outline-primary" disabled>&laquo; Previous</button>
+            <button id="nextBtn" class="btn btn-outline-primary" disabled>Next &raquo;</button>
+        </div>
     </div>
+</div>
 
     <!-- Modal for displaying log details -->
     <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
@@ -110,9 +98,7 @@ include "fetch_logs.php";
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="detailsModalLabel">Log Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p><strong>Log ID:</strong> <span id="modalLogId"></span></p>
@@ -120,47 +106,114 @@ include "fetch_logs.php";
                     <p><strong>Operation:</strong> <span id="modalOperation"></span></p>
                     <p><strong>Record ID:</strong> <span id="modalRecordId"></span></p>
                     <p><strong>Description:</strong> <span id="modalDescription"></span></p>
-
                     <p><strong>User:</strong> <span id="modalFullName"></span></p>
                     <p><strong>Timestamp:</strong> <span id="modalLogTime"></span></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const filter = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#logsTable tr');
+        let currentPage = 1;
+        let totalPages = 1;
 
+        async function fetchLogs() {
+            try {
+                const sortColumn = document.getElementById('sortColumn').value;
+                const sortOrder = document.getElementById('sortOrder').value;
+                const response = await fetch(`fetch_logs.php?page=${currentPage}&sort=${sortColumn}&order=${sortOrder}`);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    const logsTable = document.getElementById('logsTable');
+                    logsTable.innerHTML = '';
+
+                    // Update pagination info
+                    totalPages = result.pagination.total_pages;
+                    document.getElementById('currentPage').textContent = result.pagination.current_page;
+                    document.getElementById('totalPages').textContent = totalPages;
+
+                    // Update pagination buttons
+                    document.getElementById('prevBtn').disabled = currentPage <= 1;
+                    document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+
+                    result.data.forEach(log => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${log.full_name}</td>
+                            <td>${log.log_action}</td>
+                            <td>${log.table_name}</td>
+                            <td>${log.log_record_id}</td>
+                            <td>${log.log_description}</td>
+                            <td>${new Date(log.log_time).toLocaleString()}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">
+                                    View Details
+                                </button>
+                            </td>
+                        `;
+                        logsTable.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+            }
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#logsTable tr');
+            
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
+                row.style.display = text.includes(searchText) ? '' : 'none';
             });
         });
 
-        // Populate modal with log details
-        $('#detailsModal').on('show.bs.modal', function(event) {
-            const button = $(event.relatedTarget); // Button that triggered the modal
-            const modal = $(this);
+        function showDetails(log) {
+            document.getElementById('modalLogId').textContent = log.log_id;
+            document.getElementById('modalTableName').textContent = log.table_name;
+            document.getElementById('modalOperation').textContent = log.log_action;
+            document.getElementById('modalRecordId').textContent = log.log_record_id;
+            document.getElementById('modalDescription').textContent = log.log_description;
+            document.getElementById('modalFullName').textContent = log.full_name;
+            document.getElementById('modalLogTime').textContent = new Date(log.log_time).toLocaleString();
+            var myModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+            myModal.show();
+        }
 
-            // Populate modal fields with button data
-            modal.find('#modalLogId').text(button.data('logid'));
-            modal.find('#modalTableName').text(button.data('tablename'));
-            modal.find('#modalOperation').text(button.data('operation'));
-            modal.find('#modalRecordId').text(button.data('recordid'));
-            modal.find('#modalDescription').text(button.data('description'));
-            modal.find('#modalPreviousData').text(button.data('previousdata'));
-            modal.find('#modalNewData').text(button.data('newdata'));
-            modal.find('#modalFullName').text(button.data('fullname'));
-            modal.find('#modalLogTime').text(button.data('logtime'));
+        // Pagination event listeners
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchLogs();
+            }
         });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                fetchLogs();
+            }
+        });
+
+        // Sort event listeners
+        document.getElementById('sortColumn').addEventListener('change', () => {
+            currentPage = 1;
+            fetchLogs();
+        });
+
+        document.getElementById('sortOrder').addEventListener('change', () => {
+            currentPage = 1;
+            fetchLogs();
+        });
+
+        // Initial fetch
+        fetchLogs();
     </script>
 </body>
 

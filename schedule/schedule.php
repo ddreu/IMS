@@ -787,7 +787,7 @@ include '../navbar/navbar.php';
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'timeGridWeek,timeGridDay'
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
                 // Commenting out time restrictions
                 // slotMinTime: '07:00:00', // Start time at 7 AM
