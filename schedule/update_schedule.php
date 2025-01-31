@@ -37,6 +37,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('All fields are required.');
         }
 
+        // Get school_id from session
+        $school_id = $_SESSION['school_id'];
+
+        // Format venue (trim whitespace, capitalize words)
+        $venue = ucwords(trim($_POST['venue']));
+
+        // First, check for existing schedule with same date, time, and venue for the same school
+        $check_schedule_query = "
+            SELECT s.* 
+            FROM schedules s
+            JOIN matches m ON s.match_id = m.match_id
+            JOIN brackets b ON m.bracket_id = b.bracket_id
+            JOIN departments d ON b.department_id = d.id
+            WHERE d.school_id = ?
+            AND s.schedule_date = ?
+            AND s.schedule_time = ?
+            AND s.venue = ?
+            AND s.schedule_id != ?
+        ";
+
+        $check_stmt = $conn->prepare($check_schedule_query);
+        $check_stmt->bind_param("isssi", $school_id, $_POST['schedule_date'], $_POST['schedule_time'], $venue, $schedule_id);
+        $check_stmt->execute();
+        $result = $check_stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // Schedule conflict exists
+            echo json_encode(['success' => false, 'message' => 'A match is already scheduled at this venue for the selected date and time.']);
+            exit();
+        }
+
         // Fetch the current schedule details
         $select_stmt = $conn->prepare("SELECT s.match_id, s.schedule_date, s.schedule_time, s.venue, 
                                               m.teamA_id, m.teamB_id, t1.team_name AS teamA_name, t2.team_name AS teamB_name, 
@@ -79,17 +110,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($update_stmt->affected_rows > 0) {
-            // Log the changes
+            // Format date and time for logging in 12-hour format
+            $log_date_time = new DateTime($_POST['schedule_date'] . ' ' . $_POST['schedule_time']);
+            $formatted_log_date = $log_date_time->format('F d, Y'); // Month DD, YYYY
+            $formatted_log_time = $log_date_time->format('g:i A'); // 12-hour format with AM/PM
+
             $description = "Modified the schedule for $teamA_name vs $teamB_name - $game_name 
-                            from $old_date at $old_time, Venue: $old_venue 
-                            to $schedule_date at $schedule_time, Venue: $venue";
+                            from $old_date at " . date('g:i A', strtotime($old_time)) . ", Venue: $old_venue 
+                            to $formatted_log_date at $formatted_log_time, Venue: $venue";
             logUserAction($conn, $_SESSION['user_id'], 'schedules', 'UPDATE', $schedule_id, $description, json_encode([
                 'old_date' => $old_date,
-                'old_time' => $old_time,
+                'old_time' => date('g:i A', strtotime($old_time)),
                 'old_venue' => $old_venue
             ]), json_encode([
-                'new_date' => $schedule_date,
-                'new_time' => $schedule_time,
+                'new_date' => $formatted_log_date,
+                'new_time' => $formatted_log_time,
                 'new_venue' => $venue
             ]));
 

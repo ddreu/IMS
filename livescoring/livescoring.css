@@ -21,7 +21,10 @@
     --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);
     --transition: all 0.3s ease;
 }
-
+@font-face {
+    font-family: 'Digital7';
+    src: url('fonts/digital-7.ttf') format('truetype');
+}
 /* Reset & Base Styles */
 * {
     margin: 0;
@@ -135,6 +138,7 @@ body {
     background: var(--background-white);
     color: var(--primary-color);
     transition: var(--transition);
+    font-family: 'Digital7';
 }
 
 .score-input:focus {
@@ -234,6 +238,7 @@ body {
     background: white;
     color: var(--primary-color);
     transition: var(--transition);
+    font-family: 'Digital7'
 }
 
 .period-input:focus {
@@ -424,7 +429,7 @@ body {
     font-size: 3rem;
     font-weight: 700;
     color: var(--primary-color);
-    font-family: 'Roboto Mono', monospace;
+    font-family: 'Digital7', 'Roboto Mono', monospace;
     text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: var(--spacing-sm);
 }

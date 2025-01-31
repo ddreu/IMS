@@ -1,9 +1,9 @@
 <?php
 session_start();
 include_once '../connection/conn.php';
+include '../user_logs/logger.php';
 $conn = con();
 
-// Check if POST request contains required data
 if (isset($_POST['schedule_id'], $_POST['teamA_id'], $_POST['teamB_id'], $_POST['game_id'])) {
     $schedule_id = $_POST['schedule_id'];
     $game_id = $_POST['game_id'];
@@ -51,6 +51,23 @@ if (isset($_POST['schedule_id'], $_POST['teamA_id'], $_POST['teamB_id'], $_POST[
             exit();
         }
 
+        // Fetch team names for logging
+        $team_names_stmt = $conn->prepare("SELECT team_name FROM teams WHERE team_id IN (?, ?)");
+        $team_names_stmt->bind_param("ii", $teamA_id, $teamB_id);
+        $team_names_stmt->execute();
+        $team_names_result = $team_names_stmt->get_result();
+        $team_names = [];
+        while ($row = $team_names_result->fetch_assoc()) {
+            $team_names[] = $row['team_name'];
+        }
+        $team_names_stmt->close();
+
+        // Ensure both team names were fetched
+        if (count($team_names) < 2) {
+            echo json_encode(['success' => false, 'message' => 'Failed to fetch team names.']);
+            exit();
+        }
+
         // Check for existing entry in the live_scores table
         $check_live_scores_stmt = $conn->prepare("SELECT COUNT(*) as count FROM live_scores WHERE schedule_id = ?");
         $check_live_scores_stmt->bind_param("i", $schedule_id);
@@ -69,21 +86,21 @@ if (isset($_POST['schedule_id'], $_POST['teamA_id'], $_POST['teamB_id'], $_POST[
 
         // Update the match status to "Ongoing"
         $update_stmt = $conn->prepare("UPDATE matches SET status = 'Ongoing' WHERE match_id = ?");
-        if (!$update_stmt) {
-            throw new Exception('Failed to prepare update statement');
-        }
         $update_stmt->bind_param("i", $match_data['match_id']);
         $update_stmt->execute();
         $update_stmt->close();
 
         // Insert the match data into the live_scores table
         $insert_stmt = $conn->prepare("INSERT INTO live_scores (schedule_id, game_id, teamA_id, teamB_id, teamA_score, teamB_score, timeout_teamA, timeout_teamB, foul_teamA, foul_teamB, period, timestamp) VALUES (?, ?, ?, ?, 0, 0, 0, 0, 0, 0, 1, NOW())");
-        if (!$insert_stmt) {
-            throw new Exception('Failed to prepare insert statement');
-        }
         $insert_stmt->bind_param("iiii", $schedule_id, $game_id, $teamA_id, $teamB_id);
-        
+
         if ($insert_stmt->execute()) {
+            // Log the action
+            $teamA_name = $team_names[0];
+            $teamB_name = $team_names[1];
+            $description = "Started the match between $teamA_name vs $teamB_name";
+            logUserAction($conn, $_SESSION['user_id'], 'Matches', 'Match Start', $schedule_id, $description);
+
             echo json_encode(['success' => true]);
         } else {
             throw new Exception('Failed to insert live scores data');
@@ -93,7 +110,6 @@ if (isset($_POST['schedule_id'], $_POST['teamA_id'], $_POST['teamB_id'], $_POST[
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
-
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request.']);
 }

@@ -331,7 +331,7 @@ echo "<!-- Team Info: " . print_r($team, true) . " -->";
                         <h5>Player Roster for Team: <?= htmlspecialchars($team['team_name']) ?></h5>
                             <div>
                             <a href="player_registration.php?team_id=<?= $team_id ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-primary btn-sm">Add Player</a>
-                            <a href="bulk_upload.php?team_id=<?= $team_id ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-primary btn-sm btn-bulk-upload">Bulk Upload</a>
+                            <a href="#" class="btn btn-primary btn-sm btn-bulk-upload" data-bs-toggle="modal" data-bs-target="#bulkUploadModal">Bulk Upload</a>
                             </div> 
                         </div>
                     </div>
@@ -488,6 +488,117 @@ echo "<!-- Team Info: " . print_r($team, true) . " -->";
             </div>
         </div>
     </div>
+
+    <!-- Bulk Upload Modal -->
+<div class="modal fade" id="bulkUploadModal" tabindex="-1" aria-labelledby="bulkUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="bulkUploadModalLabel">Bulk Upload Players</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <!-- Upload Form -->
+            <form id="bulkUploadForm" method="POST" action="bulk_register_process.php" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <!-- Success and Error Messages -->
+                    <?php if (!empty($_SESSION['success_message'])): ?>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: '<?= addslashes($_SESSION['success_message']) ?>',
+                                    confirmButtonText: 'OK'
+                                });
+                            });
+                        </script>
+                        <?php unset($_SESSION['success_message']); ?>
+                    <?php endif; ?>
+
+                    <?php if (!empty($_SESSION['error_messages'])): ?>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    html: '<ul><?= implode("", array_map(fn($err) => "<li>" . addslashes($err) . "</li>", $_SESSION['error_messages'])) ?></ul>',
+                                    confirmButtonText: 'OK'
+                                });
+                            });
+                        </script>
+                        <?php unset($_SESSION['error_messages']); ?>
+                    <?php endif; ?>
+
+                    <?php if (!empty($_SESSION['error_message'])): ?>
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: '<?= addslashes($_SESSION['error_message']) ?>',
+                                    confirmButtonText: 'OK'
+                                });
+                            });
+                        </script>
+                        <?php unset($_SESSION['error_message']); ?>
+                    <?php endif; ?>
+
+                    <!-- Hidden Input -->
+                    <input type="hidden" name="team_id" value="<?= htmlspecialchars($_GET['team_id'] ?? 0) ?>">
+
+                    <!-- Collapsible Instructions Section -->
+                    <div class="collapse mb-3" id="instructionsCollapse">
+                        <div class="alert alert-info">
+                            <h6>Instructions for Upload:</h6>
+                            <ul>
+                                <li>The file must be in <strong>CSV</strong> or <strong>Excel</strong> format (.csv, .xls, .xlsx).</li>
+                                <li>Follow this format of the file:</li>
+                                <li>Row 1 must strictly follow this text format:</li>
+                                <ul>
+                                    <li><strong>player_lastname</strong></li>
+                                    <li><strong>player_firstname</strong></li>
+                                    <li><strong>email</strong></li>
+                                    <li><strong>phone_number</strong></li>
+                                    <li><strong>jersey_number</strong></li>
+                                    <li><strong>player_middlename</strong></li>
+                                    <li><strong>date_of_birth</strong> (YYYY-MM-DD format)</li>
+                                    <li><strong>picture</strong> (leave this empty)</li>
+                                    <li><strong>height</strong> (in cm)</li>
+                                    <li><strong>weight</strong> (in kg)</li>
+                                    <li><strong>position</strong></li>
+                                </ul>
+                                <li>Ensure no column headers are missing or misspelled.</li>
+                                <li>Make sure no players have the same jersey number.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Input -->
+                    <div class="mb-3">
+                        <label for="bulk_file" class="form-label">Bulk Upload (CSV or Excel):</label>
+                        <input type="file" class="form-control" id="bulk_file" name="bulk_file" accept=".csv, .xls, .xlsx" required>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label> *Please click and read this first</label>
+                        <a href="javascript:void(0);" class="btn btn-info" data-bs-toggle="collapse" data-bs-target="#instructionsCollapse" aria-expanded="false" aria-controls="instructionsCollapse">
+                            <i class="fas fa-info-circle"> Instructions </i>
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary btn-sm btn-bulk-upload">Upload Players</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {

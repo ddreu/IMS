@@ -9,10 +9,11 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $role = $_SESSION['role'];
+$school_id = $_SESSION['school_id'];
 
 // Get pagination parameters
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$limit = 10;
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
 $offset = ($page - 1) * $limit;
 
 // Get sorting parameters
@@ -56,6 +57,14 @@ $query = "
         schools ON users.school_id = schools.school_id
     LEFT JOIN 
         departments ON users.department = departments.id
+";
+
+// Add WHERE clause for non-superadmin users
+if ($role !== 'superadmin') {
+    $query .= " WHERE users.school_id = " . (int)$school_id;
+}
+
+$query .= "
     ORDER BY 
         $sort_column $sort_order
     LIMIT $offset, $limit
@@ -73,7 +82,17 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Get total count for pagination
-$count_query = "SELECT COUNT(*) as total FROM logs";
+$count_query = "
+    SELECT COUNT(*) as total 
+    FROM logs 
+    JOIN users ON logs.user_id = users.id
+";
+
+// Add WHERE clause for non-superadmin users in count query
+if ($role !== 'superadmin') {
+    $count_query .= " WHERE users.school_id = " . (int)$school_id;
+}
+
 $count_result = $conn->query($count_query);
 $total_rows = $count_result->fetch_assoc()['total'];
 $total_pages = ceil($total_rows / $limit);

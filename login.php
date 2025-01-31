@@ -159,7 +159,7 @@ if (!empty($error)) {
                 <button type="submit" name="submit">Login</button>
             </form>
             <div class="extra-options">
-                <p>Don't have an account? <a href="register.php" style="color: #007bff;">Sign up</a></p>
+                <!-- <p>Don't have an account? <a href="register.php" style="color: #007bff;">Sign up</a></p>-->
                 <a href="forgot-password.php">Forgot password?</a>
             </div>
         </div>

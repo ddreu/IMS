@@ -101,7 +101,7 @@ $sql = "
     FROM 
         users u
     LEFT JOIN 
-        Games g ON u.game_id = g.game_id 
+        games g ON u.game_id = g.game_id 
     LEFT JOIN 
         departments d ON u.department = d.id  
     WHERE 
@@ -230,6 +230,222 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles/dashboard.css"> <!-- Adjust the path if needed -->
+
+    <style>
+        /* Base styles */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            padding: 15px;
+            border: none;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: #eef2f7;
+        }
+
+        .card.box {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .wrapper {
+                padding: 10px;
+            }
+
+            #content {
+                margin-left: 0;
+                padding: 10px;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            /* Header and Search Section */
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .btn-primary {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            /* Table Responsive */
+            .table-responsive {
+                border: 0;
+            }
+
+            .table thead {
+                display: none;
+            }
+
+            .table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .table tbody td {
+                display: flex;
+                text-align: left;
+                padding: 1rem;
+                position: relative;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+                align-items: center;
+            }
+
+            .table tbody td[data-label="Name"] {
+                display: block;
+            }
+
+            .table tbody td[data-label="Name"] .d-flex.align-items-center.gap-3 {
+                display: flex !important;
+                align-items: center !important;
+                gap: 1rem !important;
+            }
+
+            .table tbody td[data-label="Email"],
+            .table tbody td[data-label="Role"],
+            .table tbody td[data-label="Department"] {
+                justify-content: space-between;
+            }
+
+            .table tbody td[data-label="Actions"] {
+                justify-content: flex-start;
+                padding-left: 1rem;
+                border-bottom: none;
+            }
+
+            .table tbody td[data-label="Actions"]:before {
+                display: none;
+            }
+
+            .table tbody td[data-label="Actions"] .d-flex.gap-2 {
+                display: flex !important;
+                gap: 0.5rem !important;
+                width: 100%;
+                justify-content: flex-start !important;
+            }
+
+            /* Make buttons equal width */
+            .table tbody td[data-label="Actions"] .btn {
+                flex: 1;
+                max-width: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                padding: 0.625rem;
+            }
+
+            .table tbody td[data-label="Actions"] .btn i {
+                margin: 0;
+            }
+
+            /* Adjust spacing for the action buttons container */
+            .d-flex.gap-2.justify-content-center {
+                margin: 0;
+                padding: 0;
+            }
+
+            .table tbody td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #2c3e50;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                min-width: 100px;
+            }
+
+            .table tbody td[data-label="Name"]:before {
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+
+            /* User Info Layout */
+            .d-flex.align-items-center.gap-3 {
+                width: 100%;
+            }
+
+            .rounded-circle {
+                width: 48px !important;
+                height: 48px !important;
+                flex-shrink: 0;
+            }
+
+            /* Badge Adjustments */
+            .badge {
+                margin-left: auto;
+                padding: 0.5rem 0.75rem;
+            }
+
+            /* Action Buttons */
+            .btn-group {
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .btn-sm {
+                padding: 0.5rem 0.75rem;
+            }
+
+            /* Card Adjustments */
+            .card.box {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            /* Empty State */
+            .text-center.py-5 {
+                padding: 2rem 1rem !important;
+            }
+
+            .text-center.py-5 i {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table tbody td {
+                padding: 0.875rem;
+            }
+
+            .btn-sm {
+                padding: 0.4rem 0.6rem;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -275,15 +491,103 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                 }
                 ?>
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="mb-0">User List</h4>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCommitteeModal">
-                            <i class="fas fa-plus"></i> Add User
-                        </button>
+                    <div class="w-100">
+                        <h4 class="mb-3">User List</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6 col-12">
+                            <form id="searchForm" method="POST" action="userlist.php">
+    <div class="input-group">
+        <span class="input-group-text bg-light border-end-0">
+            <i class="fas fa-search text-muted"></i>
+        </span>
+        <input type="text" class="form-control border-start-0" name="search" id="searchInput" placeholder="Search users..." value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>">
+    </div>
+</form>
+                
+                            </div>
+                            <div class="col-md-6 col-12">
+                                <div class="d-flex gap-2">
+                                    <!--<?php if ($role === 'School Admin'): ?>
+                                    <select class="form-select" id="departmentFilter">
+                                        <option value="">All Departments</option>
+                                        <?php foreach ($departments as $dept): ?>
+                                            <option value="<?= htmlspecialchars($dept['id']) ?>" 
+                                                <?= ($selected_department_id == $dept['id']) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($dept['department_name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <?php endif; ?> -->
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCommitteeModal">
+                                        <i class="fas fa-plus"></i> Add User
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <style>
+                    @media (max-width: 768px) {
+                        .d-flex.justify-content-between {
+                            flex-direction: column;
+                            gap: 1rem;
+                        }
+
+                        .input-group {
+                            margin-bottom: 1rem;
+                        }
+
+                        .form-select {
+                            margin-bottom: 1rem;
+                        }
+
+                        .btn-primary {
+                            width: 100%;
+                            margin-left: 0 !important;
+                        }
+
+                        .row.g-3 {
+                            margin: 0;
+                        }
+
+                        .col-md-6 {
+                            padding: 0;
+                        }
+
+                        .d-flex.gap-2 {
+                            flex-direction: column;
+                            gap: 0.5rem !important;
+                        }
+
+                        h4 {
+                            font-size: 1.25rem;
+                            margin-bottom: 1rem !important;
+                        }
+
+                        .input-group .form-control {
+                            height: 42px;
+                        }
+
+                        .input-group-text {
+                            background-color: #f8f9fa;
+                            border-right: none;
+                        }
+
+                        .form-control {
+                            border-left: none;
+                        }
+
+                        .form-control:focus {
+                            box-shadow: none;
+                            border-color: #dee2e6;
+                        }
+
+                        .form-select {
+                            height: 42px;
+                        }
+                    }
+                </style>
             </div>
 
             <div class="card box">
@@ -298,6 +602,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                 <th class="px-4 py-3">Name</th>
                                                 <th class="px-4 py-3">Email</th>
                                                 <th class="px-4 py-3">Role</th>
+                                                <th class="px-4 py-3">Department</th>
                                                 <th class="px-4 py-3 text-center">Actions</th>
                                             </tr>
                                         </thead>
@@ -306,25 +611,22 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                             if ($users_result && mysqli_num_rows($users_result) > 0) {
                                                 while ($row = mysqli_fetch_assoc($users_result)) {
                                                     echo '<tr>';
-                                                    echo '<td class="px-4">';
+                                                    echo '<td class="px-4" data-label="Name">';
                                                     echo '<div class="d-flex align-items-center gap-3">';
                                                     echo '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">';
                                                     echo '<i class="fas fa-user text-white"></i>';
                                                     echo '</div>';
                                                     echo '<div>';
                                                     echo '<div class="fw-medium">' . htmlspecialchars($row['firstname'] . ' ' . $row['middleinitial'] . ' ' . $row['lastname']) . '</div>';
-                                                    echo '<small class="text-muted">' . htmlspecialchars($row['department_name'] ?? 'No Department') . '</small>';
                                                     echo '</div>';
                                                     echo '</div>';
                                                     echo '</td>';
-                                                    echo '<td class="px-4">' . htmlspecialchars($row['email']) . '</td>';
-                                                    // Display role with game name for committee members
-                                                    $roleDisplay = $row['role'];
-                                                    if ($row['role'] === 'Committee' && !empty($row['game_name'])) {
-                                                        $roleDisplay = htmlspecialchars($row['game_name']) . ' ' . $roleDisplay;
-                                                    }
-                                                    echo '<td class="px-4"><span class="badge ' . getRoleBadgeClass($row['role']) . '">' . $roleDisplay . '</span></td>';
-                                                    echo '<td class="px-4">';
+                                                    echo '<td class="px-4" data-label="Email">' . htmlspecialchars($row['email']) . '</td>';
+                                                    echo '<td class="px-4" data-label="Role">';
+                                                    echo '<span class="badge ' . getRoleBadgeClass($row['role']) . '">' . htmlspecialchars($row['role']) . '</span>';
+                                                    echo '</td>';
+                                                    echo '<td class="px-4" data-label="Department">' . htmlspecialchars($row['department_name'] ?? 'N/A') . '</td>';
+                                                    echo '<td class="px-4" data-label="Actions">';
                                                     echo '<div class="d-flex gap-2 justify-content-center">';
 
                                                     // Edit button
@@ -360,7 +662,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                 }
                                             } else {
                                                 echo '<tr>';
-                                                echo '<td colspan="4" class="text-center py-5">';
+                                                echo '<td colspan="5" class="text-center py-5">';
                                                 echo '<div class="text-muted">';
                                                 echo '<i class="fas fa-users fa-3x mb-3 d-block"></i>';
                                                 echo '<p class="mb-0">No users found</p>';
@@ -645,6 +947,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                     event.preventDefault(); // Prevent the default form submission
                     confirmUpdate(); // Call the SweetAlert confirmation function
                 });
+
             </script>
 
 </body>

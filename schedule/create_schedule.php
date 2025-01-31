@@ -36,6 +36,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $formatted_schedule_date = $date_time->format('Y-m-d');
         $formatted_schedule_time = $date_time->format('H:i:s');
 
+        // Get school_id from session
+        $school_id = $_SESSION['school_id'];
+
+        // Format venue (trim whitespace, capitalize words)
+        $venue = ucwords(trim($_POST['venue']));
+
+        // First, check for existing schedule with same date, time, and venue for the same school
+        $check_schedule_query = "
+            SELECT s.* 
+            FROM schedules s
+            JOIN matches m ON s.match_id = m.match_id
+            JOIN brackets b ON m.bracket_id = b.bracket_id
+            JOIN departments d ON b.department_id = d.id
+            WHERE d.school_id = ?
+            AND s.schedule_date = ?
+            AND s.schedule_time = ?
+            AND s.venue = ?
+        ";
+
+        $check_stmt = $conn->prepare($check_schedule_query);
+        $check_stmt->bind_param("isss", $school_id, $formatted_schedule_date, $formatted_schedule_time, $venue);
+        $check_stmt->execute();
+        $result = $check_stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // Schedule conflict exists
+            throw new Exception('A match is already scheduled at this venue for the selected date and time.');
+        }
+
         // Check for existing match schedule
         $check_stmt = $conn->prepare("SELECT schedule_id FROM schedules WHERE match_id = ?");
         $check_stmt->bind_param("s", $match_id);
@@ -101,8 +130,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $game_name = $game['game_name'];
 
+        // Format date and time for logging in 12-hour format
+        $log_date_time = new DateTime($formatted_schedule_date . ' ' . $formatted_schedule_time);
+        $formatted_log_date = $log_date_time->format('F d, Y'); // Month DD, YYYY
+        $formatted_log_time = $log_date_time->format('g:i A'); // 12-hour format with AM/PM
+
         // Log the action
-        $description = "$teamA_name vs $teamB_name - $game_name | Scheduled on $formatted_schedule_date at $formatted_schedule_time, Venue: $venue";
+        $description = "$teamA_name vs $teamB_name - $game_name | Scheduled on $formatted_log_date at $formatted_log_time, Venue: $venue";
         logUserAction($conn, $user_id, 'schedules', 'CREATE', $match_id, $description, null, json_encode([
             'match_id' => $match_id,
             'schedule_date' => $formatted_schedule_date,

@@ -276,9 +276,7 @@ $conn->close();
                                 <div class="row mt-3">
                                     <div class="col text-end">
                                         
-                                    <button type="button" class="btn btn-success btn-sm me-3" data-bs-toggle="modal" data-bs-target="#addTeamModal">
-    Add Team
-</button>                                    <!--<h4 class="m-0 font-weight-bold text-primary"><?= htmlspecialchars($grade_level) ?></h4>-->
+                                    <button type="button" class="btn btn-success btn-sm me-3" data-bs-toggle="modal" data-bs-target="#addTeamModal">Add Team</button>                                    <!--<h4 class="m-0 font-weight-bold text-primary"><?= htmlspecialchars($grade_level) ?></h4>-->
                                     </div>
                                 </div>
                             
@@ -321,7 +319,14 @@ $conn->close();
                                                 <td>
                                                     <a href="../player/view_roster.php?team_id=<?= htmlspecialchars($row['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-info btn-sm">View Roster</a>
                                                     <a href="../player/player_registration.php?team_id=<?= htmlspecialchars($row['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-primary btn-sm">Register Player</a>
-                                                </td>
+                                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editTeamModal" 
+                                                    data-team-id="<?= htmlspecialchars($row['team_id']) ?>" 
+                                                    data-team-name="<?= htmlspecialchars($row['team_name']) ?>">
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDeletion(<?= htmlspecialchars($row['team_id']) ?>)">Delete</button>
+                                                    </td>
+
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -337,7 +342,7 @@ $conn->close();
     </div>
    
     <?php include "addteam_modal.php"; ?>
-
+    <?php include "edit_team_modal.php"; ?>
     <script>
         // Populate the modal with team ID when button is clicked
         document.querySelectorAll('[data-bs-target="#registerPlayerModal"]').forEach(button => {
@@ -410,6 +415,95 @@ $conn->close();
 });
 
     </script>
+    <script>
+function confirmDeletion(teamId) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `delete_team.php?team_id=${teamId}`;
+        }
+    });
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    <?php if (isset($_SESSION['success_message'])): ?>
+        Swal.fire({
+            icon: 'success',
+            title: '<?= $_SESSION['success_message'] ?>',
+            showConfirmButton: false,
+            timer: 1500
+        });
+        <?php unset($_SESSION['success_message']); // Clear the session message ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error_message'])): ?>
+        Swal.fire({
+            icon: 'error',
+            title: '<?= $_SESSION['error_message'] ?>',
+            showConfirmButton: true
+        });
+        <?php unset($_SESSION['error_message']); // Clear the session message ?>
+    <?php endif; ?>
+});
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    // Populate modal with the current team name
+    document.querySelectorAll("[data-bs-target='#editTeamModal']").forEach(button => {
+        button.addEventListener("click", function() {
+            document.getElementById("editTeamId").value = this.getAttribute("data-team-id");
+            document.getElementById("editTeamName").value = this.getAttribute("data-team-name");
+        });
+    });
+
+    // Handle form submission for renaming the team
+    document.getElementById("editTeamForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        fetch('edit_team.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: data.message,
+                    showConfirmButton: true
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'An unexpected error occurred.',
+                showConfirmButton: true
+            });
+        });
+    });
+});
+
+</script>    
 </body>
 
 </html>

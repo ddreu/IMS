@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 25, 2025 at 02:49 PM
+-- Generation Time: Jan 31, 2025 at 04:54 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -70,7 +70,7 @@ CREATE TABLE `brackets` (
 --
 
 INSERT INTO `brackets` (`bracket_id`, `game_id`, `department_id`, `grade_level`, `total_teams`, `rounds`, `status`, `created_at`, `bracket_type`) VALUES
-(95, 18, 1, NULL, 8, 3, 'ongoing', '2025-01-25 02:28:15', 'single');
+(294, 18, 1, NULL, 12, 4, 'ongoing', '2025-01-30 19:03:52', 'single');
 
 -- --------------------------------------------------------
 
@@ -116,7 +116,7 @@ CREATE TABLE `games` (
 --
 
 INSERT INTO `games` (`game_id`, `game_name`, `number_of_players`, `category`, `environment`, `created_at`, `school_id`) VALUES
-(0, 'System', NULL, NULL, 'Indoor', '2024-12-01 00:28:11', 0),
+(0, 'System', 0, 'System', 'Indoor', '2024-12-01 00:28:11', 0),
 (2, 'Volleyball', 15, 'Team Sports', 'Outdoor', '2024-10-04 16:02:54', 8),
 (18, 'Basketball', 15, 'Team Sports', 'Outdoor', '2024-10-15 06:47:47', 8),
 (22, 'Dama', 2, 'Individual Sports', 'Indoor', '2024-10-15 10:48:18', 8),
@@ -173,10 +173,9 @@ CREATE TABLE `game_stats_config` (
 --
 
 INSERT INTO `game_stats_config` (`config_id`, `game_id`, `stat_name`) VALUES
-(19, 18, 'Assists'),
+(23, 18, 'Assists'),
 (15, 18, 'Fouls'),
 (18, 18, 'Rebounds'),
-(17, 18, 'Scores'),
 (22, 27, 'Points');
 
 -- --------------------------------------------------------
@@ -214,11 +213,16 @@ INSERT INTO `grade_section_course` (`id`, `department_id`, `grade_level`, `stran
 (84, 2, 'Grade 11', 'STEM', 'C', NULL, 0),
 (85, 2, 'Grade 11', 'ABM', 'D', NULL, 0),
 (86, 2, 'Grade 11', 'HUMSS', 'A', NULL, 0),
-(99, 1, NULL, NULL, NULL, 'testtest', 0),
 (100, 2, 'Grade 11', 'STEM', 'mm', NULL, 0),
 (101, 3, 'Grade 8', NULL, 'nickel', NULL, 0),
 (105, 3, 'Grade 8', NULL, 'johndoes', NULL, 0),
-(107, 3, 'Grade 9', NULL, 'asas', NULL, 0);
+(107, 3, 'Grade 9', NULL, 'asas', NULL, 0),
+(114, 1, NULL, NULL, NULL, 'ff', 0),
+(115, 1, NULL, NULL, NULL, 'll', 0),
+(121, 1, NULL, NULL, NULL, 'asasa', 0),
+(122, 1, NULL, NULL, NULL, 'wda', 0),
+(123, 1, NULL, NULL, NULL, 'adwawd', 0),
+(124, 1, NULL, NULL, NULL, 'awdawda', 0);
 
 -- --------------------------------------------------------
 
@@ -391,7 +395,202 @@ INSERT INTO `logs` (`log_id`, `table_name`, `operation`, `record_id`, `user_id`,
 (126, 'brackets', 'CREATE', 95, 67, '2025-01-25 10:28:15', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 8.', NULL, NULL),
 (127, 'Brackets', 'DELETE', 93, 67, '2025-01-25 10:39:54', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
 (128, 'Brackets', 'DELETE', 94, 67, '2025-01-25 10:41:08', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
-(129, 'Team', 'CREATE', 99, 67, '2025-01-25 12:02:00', 'Registered team \'aa\'', NULL, NULL);
+(129, 'Team', 'CREATE', 99, 67, '2025-01-25 12:02:00', 'Registered team \'aa\'', NULL, NULL),
+(130, 'Brackets', 'CREATE', 98, 67, '2025-01-26 05:57:36', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(131, 'Team', 'CREATE', 99, 67, '2025-01-26 05:58:10', 'Registered team \'9th\'', NULL, NULL),
+(132, 'Brackets', 'DELETE', 98, 67, '2025-01-27 14:46:12', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(133, 'Brackets', 'DELETE', 95, 67, '2025-01-27 14:46:17', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(134, 'Players', 'Register', 256, 67, '2025-01-27 15:02:31', 'Registered player Doe, John to team 256', NULL, NULL),
+(135, 'Players', 'Register', 256, 67, '2025-01-27 15:13:39', 'Registered player Doe, Jane to team \'BSA - Basketball\'', NULL, NULL),
+(136, 'Players', 'Register', 256, 67, '2025-01-27 15:21:02', 'Removed player ,  from team \'\'', NULL, NULL),
+(137, 'Players', 'Delete', 256, 67, '2025-01-27 15:22:44', 'Removed player Doe, John from team \'BSA - Basketball\'', NULL, NULL),
+(138, 'Players', 'Update', 226, NULL, '2025-01-27 15:34:02', 'Updated player details for Bryant, Kobe. Changes: {\"Old Data\":{\"player_id\":226,\"player_lastname\":\"Bryant\",\"player_firstname\":\"Kobe\",\"player_middlename\":\"B.\",\"team_id\":256,\"created_at\":\"2024-11-03 04:10:00\",\"jersey_number\":22,\"player_info_id\":3,\"email\":\"Kobe@gmail.com\",\"phone_number\":\"+63999999999\",\"date_of_birth\":\"2024-10-24\",\"picture\":\"..\\/uploads\\/players\\/kobe.jpg\",\"height\":\"6&#039;6\",\"weight\":\"250lbs\",\"position\":\"Shooting Guard\"},\"New Data\":{\"player_lastname\":\"Bryant\",\"player_firstname\":\"Kobe\",\"player_middlename\":\"D.\",\"jersey_number\":22,\"email\":\"Kobe@gmail.com\",\"phone_number\":\"+63999999999\",\"date_of_birth\":\"2024-10-24\",\"height\":\"6&#039;6\",\"weight\":\"250lbs\",\"position\":\"Shooting Guard\",\"picture\":\"..\\/uploads\\/players\\/kobe.jpg\"}}', NULL, NULL),
+(139, 'Players', 'Update', 226, NULL, '2025-01-27 15:41:09', 'Updated player details for Bryant, Kobe. Changes: {\"player_middlename\":{\"old\":\"D.\",\"new\":\"b\"}}', NULL, NULL),
+(140, 'Players', 'Update', 226, NULL, '2025-01-27 15:42:01', 'Updated player details for Bryant, Kobe. Changes: {\"player_middlename\":{\"old\":\"b\",\"new\":\"D.\"}}', NULL, NULL),
+(141, 'Players', 'Update', 226, 67, '2025-01-27 15:43:21', 'Updated player details for Bryant, Kobe. Changes: {\"player_middlename\":{\"old\":\"D.\",\"new\":\"B.\"}}', NULL, NULL),
+(142, 'Brackets', 'CREATE', 99, 67, '2025-01-27 16:01:05', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(143, 'Brackets', 'DELETE', 99, 67, '2025-01-28 05:56:35', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(144, 'departments', 'CREATE', 108, 56, '2025-01-28 05:57:35', 'Added College Department: Course Name = test1 - Teams have been automatically created for all existing games.', NULL, NULL),
+(145, 'departments', 'CREATE', 109, 56, '2025-01-28 05:57:46', 'Added College Department: Course Name = test2 - Teams have been automatically created for all existing games.', NULL, NULL),
+(146, 'departments', 'DELETE', 108, 56, '2025-01-28 05:58:40', 'Deleted College Department: Course Name = test1', NULL, NULL),
+(147, 'departments', 'CREATE', 110, 56, '2025-01-28 05:58:57', 'Added College Department: Course Name = testing - Teams have been automatically created for all existing games.', NULL, NULL),
+(148, 'departments', 'CREATE', 111, 56, '2025-01-28 05:59:08', 'Added College Department: Course Name = testn - Teams have been automatically created for all existing games.', NULL, NULL),
+(149, 'Game Stats', 'DELETE', NULL, 67, '2025-01-28 11:25:33', 'Removed Game Stat \'Scores\' (ID: 17) for Game ID: ', NULL, NULL),
+(150, 'Game Stats', 'DELETE', 19, 67, '2025-01-28 11:30:24', 'Removed Game Stat \'Assists\' for Game: \'Basketball\' (Game ID: 18)', NULL, NULL),
+(151, 'Game Stats', 'CREATE', 23, 67, '2025-01-28 11:43:28', 'Added Game Stat \'Assists\' for Game: \'Basketball\'', NULL, NULL),
+(152, 'departments', 'DELETE', 99, 56, '2025-01-29 02:10:13', 'Deleted College Department: Course Name = testtest', NULL, NULL),
+(153, 'departments', 'DELETE', 111, 56, '2025-01-29 02:10:17', 'Deleted College Department: Course Name = testn', NULL, NULL),
+(154, 'Brackets', 'CREATE', 100, 67, '2025-01-29 02:10:33', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(155, 'schedules', 'CREATE', 482, 67, '2025-01-29 02:13:18', 'EDUC - Basketball vs BSA - Basketball - Basketball | Scheduled on 2025-01-29 at 02:20:00, Venue: Gym', NULL, NULL),
+(156, 'schedules', 'CREATE', 483, 67, '2025-01-29 02:14:17', 'BSBA - Basketball vs BSCS - Basketball - Basketball | Scheduled on 2025-01-29 at 02:20:00, Venue: School Gym', NULL, NULL),
+(157, 'departments', 'CREATE', 112, 56, '2025-01-29 03:51:06', 'Added College Department: Course Name = 1th - Teams have been automatically created for all existing games.', NULL, NULL),
+(158, 'departments', 'CREATE', 113, 56, '2025-01-29 03:51:14', 'Added College Department: Course Name = nnn - Teams have been automatically created for all existing games.', NULL, NULL),
+(159, 'departments', 'CREATE', 114, 56, '2025-01-29 03:51:33', 'Added College Department: Course Name = ff - Teams have been automatically created for all existing games.', NULL, NULL),
+(160, 'departments', 'CREATE', 115, 56, '2025-01-29 03:52:32', 'Added College Department: Course Name = ll - Teams have been automatically created for all existing games.', NULL, NULL),
+(161, 'departments', 'CREATE', 116, 56, '2025-01-29 04:09:43', 'Added College Department: Course Name = was - Teams have been automatically created for all existing games.', NULL, NULL),
+(162, 'departments', 'CREATE', 117, 56, '2025-01-29 04:09:55', 'Added College Department: Course Name = adwada - Teams have been automatically created for all existing games.', NULL, NULL),
+(163, 'departments', 'CREATE', 118, 56, '2025-01-29 04:10:06', 'Added College Department: Course Name = awd - Teams have been automatically created for all existing games.', NULL, NULL),
+(164, 'departments', 'CREATE', 119, 56, '2025-01-29 04:10:28', 'Added College Department: Course Name = wdawd - Teams have been automatically created for all existing games.', NULL, NULL),
+(165, 'departments', 'CREATE', 120, 56, '2025-01-29 04:10:36', 'Added College Department: Course Name = wdadwad - Teams have been automatically created for all existing games.', NULL, NULL),
+(166, 'schedules', 'UPDATE', 99, 67, '2025-01-29 05:21:35', 'Modified the schedule for EDUC - Basketball vs BSA - Basketball - Basketball \n                            from 2025-01-29 at 02:20:00, Venue: Gym \n                            to 2025-01-29 at 05:30, Venue: Gym', NULL, NULL),
+(167, 'Live Scores', 'CREATE', 99, 67, '2025-01-29 05:21:43', 'Started the match between BSA - Basketball vs EDUC - Basketball', NULL, NULL),
+(168, 'departments', 'DELETE', 112, 56, '2025-01-29 17:04:38', 'Deleted College Department: Course Name = 1th', NULL, NULL),
+(169, 'Brackets', 'DELETE', 100, 67, '2025-01-29 17:11:44', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(170, 'departments', 'DELETE', 117, 56, '2025-01-29 17:19:52', 'Deleted College Department: Course Name = adwada', NULL, NULL),
+(171, 'departments', 'DELETE', 118, 56, '2025-01-29 17:20:08', 'Deleted College Department: Course Name = awd', NULL, NULL),
+(172, 'departments', 'DELETE', 119, 56, '2025-01-29 17:20:22', 'Deleted College Department: Course Name = wdawd', NULL, NULL),
+(173, 'departments', 'DELETE', 120, 56, '2025-01-29 17:20:34', 'Deleted College Department: Course Name = wdadwad', NULL, NULL),
+(174, 'departments', 'DELETE', 116, 56, '2025-01-29 17:20:43', 'Deleted College Department: Course Name = was', NULL, NULL),
+(175, 'departments', 'DELETE', 110, 56, '2025-01-29 17:20:52', 'Deleted College Department: Course Name = testing', NULL, NULL),
+(176, 'departments', 'DELETE', 109, 56, '2025-01-29 17:21:10', 'Deleted College Department: Course Name = test2', NULL, NULL),
+(177, 'departments', 'DELETE', 113, 56, '2025-01-29 17:21:18', 'Deleted College Department: Course Name = nnn', NULL, NULL),
+(178, 'Brackets', 'CREATE', 115, 67, '2025-01-29 17:21:23', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(179, 'Brackets', 'CREATE', 116, 67, '2025-01-29 17:30:28', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(180, 'Brackets', 'DELETE', 116, 67, '2025-01-29 17:30:32', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(181, 'Brackets', 'DELETE', 115, 67, '2025-01-29 17:30:38', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(182, 'Brackets', 'CREATE', 117, 67, '2025-01-29 17:30:41', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(183, 'Brackets', 'DELETE', 117, 67, '2025-01-29 17:31:08', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(184, 'Brackets', 'CREATE', 118, 67, '2025-01-29 17:31:12', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(185, 'Brackets', 'DELETE', 118, 67, '2025-01-29 17:32:03', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(186, 'Brackets', 'CREATE', 119, 67, '2025-01-29 17:32:06', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(187, 'Brackets', 'CREATE', 120, 67, '2025-01-29 17:35:39', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 7.', NULL, NULL),
+(188, 'departments', 'CREATE', 121, 56, '2025-01-29 17:35:57', 'Added College Department: Course Name = asasa - Teams have been automatically created for all existing games.', NULL, NULL),
+(189, 'Brackets', 'DELETE', 119, 67, '2025-01-29 17:37:11', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(190, 'departments', 'CREATE', 122, 56, '2025-01-29 17:42:01', 'Added College Department: Course Name = wda - Teams have been automatically created for all existing games.', NULL, NULL),
+(191, 'Brackets', 'CREATE', 131, 67, '2025-01-29 18:15:10', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(192, 'Brackets', 'DELETE', 120, 67, '2025-01-29 18:15:46', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(193, 'Brackets', 'CREATE', 136, 67, '2025-01-29 18:29:51', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(194, 'Brackets', 'DELETE', 131, 67, '2025-01-29 18:31:42', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(195, 'schedules', 'CREATE', 708, 67, '2025-01-29 18:32:05', 'BSA - Basketball vs wda - Basketball - Basketball | Scheduled on 2025-01-29 at 18:38:00, Venue: Open Gym', NULL, NULL),
+(196, 'Matches', 'Match Start', 101, 67, '2025-01-29 18:32:11', 'Started the match between BSA - Basketball vs wda - Basketball', NULL, NULL),
+(197, 'Brackets', 'DELETE', 136, 67, '2025-01-29 18:41:53', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(198, 'Brackets', 'CREATE', 137, 67, '2025-01-29 18:41:56', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(199, 'schedules', 'CREATE', 725, 67, '2025-01-29 18:43:14', 'll - Basketball vs asasa - Basketball - Basketball | Scheduled on 2025-01-29 at 19:00:00, Venue: gym', NULL, NULL),
+(200, 'Matches', 'Match Start', 102, 67, '2025-01-29 18:43:20', 'Started the match between ll - Basketball vs asasa - Basketball', NULL, NULL),
+(201, 'Brackets', 'DELETE', 137, 67, '2025-01-29 18:48:45', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(202, 'Brackets', 'CREATE', 138, 67, '2025-01-29 18:48:52', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(203, 'Brackets', 'DELETE', 138, 67, '2025-01-29 18:51:00', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(204, 'Brackets', 'CREATE', 139, 67, '2025-01-29 18:51:04', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(205, 'Brackets', 'DELETE', 139, 67, '2025-01-29 18:52:30', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(206, 'Brackets', 'CREATE', 140, 67, '2025-01-29 18:52:33', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(207, 'Brackets', 'DELETE', 140, 67, '2025-01-29 18:56:22', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(208, 'Brackets', 'CREATE', 141, 67, '2025-01-29 18:56:40', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(209, 'Brackets', 'DELETE', 141, 67, '2025-01-29 18:57:22', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(210, 'Brackets', 'CREATE', 142, 67, '2025-01-29 18:57:31', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(211, 'Brackets', 'DELETE', 142, 67, '2025-01-29 19:01:01', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(212, 'Brackets', 'CREATE', 143, 67, '2025-01-29 19:01:10', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(213, 'Brackets', 'DELETE', 143, 67, '2025-01-29 19:06:06', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(214, 'Brackets', 'CREATE', 144, 67, '2025-01-29 19:06:10', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(215, 'Brackets', 'CREATE', 153, 67, '2025-01-29 22:05:09', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(216, 'Brackets', 'CREATE', 154, 67, '2025-01-29 22:13:06', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(217, 'Brackets', 'CREATE', 155, 67, '2025-01-29 22:14:31', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(218, 'Brackets', 'CREATE', 156, 67, '2025-01-29 22:21:44', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(219, 'Brackets', 'CREATE', 157, 67, '2025-01-29 22:24:56', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(220, 'Brackets', 'CREATE', 158, 67, '2025-01-29 22:26:43', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(221, 'Brackets', 'CREATE', 159, 67, '2025-01-29 22:27:04', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(222, 'Brackets', 'CREATE', 160, 67, '2025-01-29 22:29:28', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(223, 'Brackets', 'CREATE', 161, 67, '2025-01-29 22:29:49', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(224, 'Brackets', 'CREATE', 162, 67, '2025-01-29 22:36:46', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(225, 'Brackets', 'CREATE', 163, 67, '2025-01-29 22:39:16', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(226, 'Brackets', 'CREATE', 164, 67, '2025-01-29 22:39:58', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(227, 'Brackets', 'CREATE', 165, 67, '2025-01-29 22:42:41', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(228, 'Brackets', 'CREATE', 166, 67, '2025-01-29 22:53:12', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(229, 'Brackets', 'CREATE', 167, 67, '2025-01-29 22:53:14', 'Created a bracket for Game: Basketball, Department: College, Total Teams: -1.', NULL, NULL),
+(230, 'departments', 'CREATE', 123, 56, '2025-01-29 23:02:22', 'Added College Department: Course Name = adwawd - Teams have been automatically created for all existing games.', NULL, NULL),
+(231, 'departments', 'CREATE', 124, 56, '2025-01-29 23:02:50', 'Added College Department: Course Name = awdawda - Teams have been automatically created for all existing games.', NULL, NULL),
+(232, 'Brackets', 'DELETE', 178, 67, '2025-01-30 01:24:21', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(233, 'Brackets', 'DELETE', 177, 67, '2025-01-30 01:24:25', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(234, 'Brackets', 'DELETE', 176, 67, '2025-01-30 01:24:27', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(235, 'Brackets', 'DELETE', 183, 67, '2025-01-30 02:26:28', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(236, 'Brackets', 'DELETE', 184, 67, '2025-01-30 02:26:30', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(237, 'Brackets', 'DELETE', 185, 67, '2025-01-30 02:26:33', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(238, 'Brackets', 'DELETE', 186, 67, '2025-01-30 02:26:57', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(239, 'Brackets', 'DELETE', 187, 67, '2025-01-30 02:27:00', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(240, 'Brackets', 'Create', 0, 67, '2025-01-30 02:29:27', NULL, NULL, NULL),
+(241, 'Brackets', 'Create', 190, 67, '2025-01-30 02:31:11', 'Created new bracket', NULL, NULL),
+(242, 'Brackets', 'DELETE', 190, 67, '2025-01-30 02:31:26', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(243, 'Brackets', 'DELETE', 189, 67, '2025-01-30 02:31:29', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(244, 'Brackets', 'DELETE', 188, 67, '2025-01-30 02:31:31', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(245, 'Brackets', 'Create', 191, 67, '2025-01-30 02:31:35', 'Created new bracket', NULL, NULL),
+(246, 'Brackets', 'Create', 192, 67, '2025-01-30 02:35:43', 'Created new bracket', NULL, NULL),
+(247, 'Brackets', 'DELETE', 191, 67, '2025-01-30 02:36:06', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(248, 'Brackets', 'DELETE', 192, 67, '2025-01-30 02:37:11', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(249, 'Brackets', 'Create', 193, 67, '2025-01-30 02:37:14', 'Created new bracket', NULL, NULL),
+(250, 'Brackets', 'DELETE', 193, 67, '2025-01-30 02:38:45', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(251, 'Brackets', 'Create', 194, 67, '2025-01-30 02:38:50', 'Created new bracket', NULL, NULL),
+(252, 'Brackets', 'DELETE', 194, 67, '2025-01-30 02:43:25', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(253, 'Brackets', 'Create', 195, 67, '2025-01-30 02:43:30', 'Created new bracket', NULL, NULL),
+(254, 'Brackets', 'DELETE', 195, 67, '2025-01-30 02:49:34', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(255, 'Brackets', 'Create', 200, 67, '2025-01-30 02:51:30', 'Created new bracket', NULL, NULL),
+(256, 'Brackets', 'DELETE', 200, 67, '2025-01-30 02:54:12', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(257, 'Brackets', 'Create', 201, 67, '2025-01-30 02:54:16', 'Created new bracket', NULL, NULL),
+(258, 'Brackets', 'DELETE', 201, 67, '2025-01-30 02:57:36', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL);
+INSERT INTO `logs` (`log_id`, `table_name`, `operation`, `record_id`, `user_id`, `timestamp`, `description`, `previous_data`, `new_data`) VALUES
+(259, 'Brackets', 'Create', 202, 67, '2025-01-30 02:57:39', 'Created new bracket', NULL, NULL),
+(260, 'Brackets', 'DELETE', 202, 67, '2025-01-30 02:59:32', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(261, 'Brackets', 'Create', 203, 67, '2025-01-30 02:59:34', 'Created new bracket', NULL, NULL),
+(262, 'Brackets', 'DELETE', 203, 67, '2025-01-30 03:01:19', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(263, 'Brackets', 'Create', 204, 67, '2025-01-30 03:08:51', 'Created new bracket', NULL, NULL),
+(264, 'Brackets', 'DELETE', 204, 67, '2025-01-30 03:09:16', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(265, 'Brackets', 'Create', 205, 67, '2025-01-30 03:09:45', 'Created new bracket', NULL, NULL),
+(266, 'Brackets', 'Create', 206, 67, '2025-01-30 03:14:32', 'Created new bracket', NULL, NULL),
+(267, 'Brackets', 'CREATE', 207, 67, '2025-01-30 03:38:20', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(268, 'Brackets', 'DELETE', 205, 67, '2025-01-30 03:38:57', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(269, 'Brackets', 'DELETE', 206, 67, '2025-01-30 03:39:00', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(270, 'Brackets', 'DELETE', 207, 67, '2025-01-30 03:45:36', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(271, 'Brackets', 'DELETE', 210, 67, '2025-01-30 03:48:53', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(272, 'Brackets', 'CREATE', 222, 67, '2025-01-30 04:32:20', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(273, 'Brackets', 'DELETE', 222, 67, '2025-01-30 04:33:55', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(274, 'Brackets', 'CREATE', 223, 67, '2025-01-30 04:34:03', 'Created a bracket for Game: Basketball, Department: College, Total Teams: 15.', NULL, NULL),
+(275, 'Brackets', 'DELETE', 223, 67, '2025-01-30 04:39:45', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(276, 'Brackets', 'DELETE', 226, 67, '2025-01-30 05:10:04', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(277, 'Brackets', 'DELETE', 228, 67, '2025-01-30 06:27:24', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(278, 'Brackets', 'DELETE', 229, 67, '2025-01-30 06:51:01', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(279, 'Brackets', 'DELETE', 243, 67, '2025-01-30 07:14:09', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(280, 'Brackets', 'DELETE', 242, 67, '2025-01-30 07:14:15', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(281, 'Brackets', 'DELETE', 244, 67, '2025-01-30 07:22:32', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(282, 'Brackets', 'DELETE', 245, 67, '2025-01-30 07:36:26', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(283, 'Brackets', 'DELETE', 246, 67, '2025-01-30 07:42:29', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(284, 'Brackets', 'DELETE', 247, 67, '2025-01-30 07:42:44', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(285, 'Brackets', 'DELETE', 248, 67, '2025-01-30 08:53:53', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(286, 'Brackets', 'DELETE', 249, 67, '2025-01-30 08:56:07', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(287, 'Brackets', 'DELETE', 250, 67, '2025-01-30 08:59:05', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(288, 'Brackets', 'DELETE', 251, 67, '2025-01-30 09:01:14', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(289, 'Brackets', 'DELETE', 252, 67, '2025-01-30 09:03:12', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(290, 'Brackets', 'DELETE', 253, 67, '2025-01-30 09:03:46', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(291, 'Brackets', 'DELETE', 256, 67, '2025-01-30 09:04:07', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(292, 'Brackets', 'DELETE', 257, 67, '2025-01-30 09:06:30', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(293, 'Brackets', 'DELETE', 258, 67, '2025-01-30 09:10:14', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(294, 'Brackets', 'DELETE', 259, 67, '2025-01-30 09:13:21', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(295, 'Brackets', 'DELETE', 260, 67, '2025-01-30 09:16:04', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(296, 'Brackets', 'DELETE', 261, 67, '2025-01-30 09:19:55', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(297, 'Brackets', 'DELETE', 262, 67, '2025-01-30 09:23:33', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(298, 'Brackets', 'DELETE', 263, 67, '2025-01-30 09:26:47', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(299, 'Brackets', 'DELETE', 264, 67, '2025-01-30 09:29:21', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(300, 'Brackets', 'DELETE', 265, 67, '2025-01-30 09:33:05', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(301, 'Brackets', 'DELETE', 266, 67, '2025-01-30 09:34:08', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(302, 'Brackets', 'DELETE', 267, 67, '2025-01-30 09:39:23', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(303, 'Brackets', 'DELETE', 268, 67, '2025-01-30 09:42:28', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(304, 'Brackets', 'DELETE', 269, 67, '2025-01-30 09:55:26', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(305, 'Brackets', 'DELETE', 270, 67, '2025-01-30 09:56:04', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(306, 'Brackets', 'DELETE', 276, 67, '2025-01-30 12:58:41', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(307, 'Brackets', 'DELETE', 277, 67, '2025-01-30 12:59:04', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(308, 'Brackets', 'DELETE', 278, 67, '2025-01-30 13:00:59', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(309, 'Brackets', 'DELETE', 279, 67, '2025-01-30 13:02:00', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(310, 'Brackets', 'DELETE', 280, 67, '2025-01-30 13:02:24', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(311, 'Brackets', 'DELETE', 281, 67, '2025-01-30 13:05:13', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(312, 'Brackets', 'DELETE', 282, 67, '2025-01-30 13:13:16', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(313, 'Brackets', 'DELETE', 283, 67, '2025-01-30 13:16:37', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(314, 'Brackets', 'DELETE', 284, 67, '2025-01-30 13:18:37', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(315, 'Brackets', 'DELETE', 285, 67, '2025-01-30 13:21:21', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(316, 'Brackets', 'DELETE', 286, 67, '2025-01-30 13:23:25', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(317, 'schedules', 'CREATE', 2042, 67, '2025-01-31 02:08:50', 'BSCS - Basketball vs ff - Basketball - Basketball | Scheduled on 2025-01-31 at 02:00:00, Venue: Gym', NULL, NULL),
+(318, 'Brackets', 'DELETE', 287, 67, '2025-01-31 03:02:43', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(319, 'Brackets', 'CREATE', 292, NULL, '2025-01-31 03:02:48', 'Created a bracket', NULL, NULL),
+(320, 'Brackets', 'DELETE', 292, 67, '2025-01-31 03:03:06', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(321, 'Brackets', 'DELETE', 293, 67, '2025-01-31 03:03:50', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(322, 'schedules', 'CREATE', 2094, 67, '2025-01-31 04:50:11', 'CRIM - Basketball vs BSCS - Basketball - Basketball | Scheduled on 2025-01-31 at 07:00:00, Venue: gym', NULL, NULL),
+(323, 'schedules', 'UPDATE', 104, 67, '2025-01-31 05:00:10', 'Modified the schedule for CRIM - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 07:00:00, Venue: gym \n                            to 2025-01-31 at 05:00, Venue: gym', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -417,14 +616,22 @@ CREATE TABLE `matches` (
 --
 
 INSERT INTO `matches` (`match_id`, `match_identifier`, `bracket_id`, `teamA_id`, `teamB_id`, `round`, `match_number`, `next_match_number`, `status`, `match_type`) VALUES
-(440, 'bracket95-round1-match1', 95, 320, -1, 1, 1, 5, 'Finished', 'regular'),
-(441, 'bracket95-round1-match2', 95, 240, 312, 1, 2, 5, 'Pending', 'regular'),
-(442, 'bracket95-round1-match3', 95, 256, 248, 1, 3, 6, 'Pending', 'regular'),
-(443, 'bracket95-round1-match4', 95, 328, 460, 1, 4, 6, 'Pending', 'regular'),
-(444, 'bracket95-round2-match5', 95, 320, -2, 2, 5, 7, 'Pending', 'semifinal'),
-(445, 'bracket95-round2-match6', 95, -2, -2, 2, 6, 7, 'Pending', 'semifinal'),
-(446, 'bracket95-round3-match7', 95, -2, -2, 3, 7, 0, 'Pending', 'final'),
-(447, 'bracket95-third-place-match', 95, -2, -2, -1, -1, 0, 'Pending', 'third_place');
+(2092, 'M18-R1-1', 294, 660, -1, 1, 1, 9, 'Finished', 'regular'),
+(2093, 'M18-R1-2', 294, 256, -1, 1, 2, 9, 'Finished', 'regular'),
+(2094, 'M18-R1-3', 294, 248, 240, 1, 3, 10, 'Upcoming', 'regular'),
+(2095, 'M18-R1-4', 294, 652, 588, 1, 4, 10, 'Pending', 'regular'),
+(2096, 'M18-R1-5', 294, 668, 328, 1, 5, 11, 'Pending', 'regular'),
+(2097, 'M18-R1-6', 294, 312, 596, 1, 6, 11, 'Pending', 'regular'),
+(2098, 'M18-R1-7', 294, -1, 320, 1, 7, 12, 'Finished', 'regular'),
+(2099, 'M18-R1-8', 294, -1, 644, 1, 8, 12, 'Finished', 'regular'),
+(2100, 'M18-R2-9', 294, 660, 256, 2, 9, 13, 'Pending', 'regular'),
+(2101, 'M18-R2-10', 294, -2, -2, 2, 10, 13, 'Pending', 'regular'),
+(2102, 'M18-R2-11', 294, -2, 644, 2, 11, 14, 'Pending', 'regular'),
+(2103, 'M18-R2-12', 294, 320, 644, 2, 12, 14, 'Pending', 'regular'),
+(2104, 'M18-R3-13', 294, -2, -2, 3, 13, 15, 'Pending', 'semifinal'),
+(2105, 'M18-R3-14', 294, -2, -2, 3, 14, 15, 'Pending', 'semifinal'),
+(2106, 'M18-R4-15', 294, -2, -2, 4, 15, 0, 'Pending', 'final'),
+(2107, 'M18-R4-16', 294, -2, -2, 4, 16, 0, 'Pending', 'third_place');
 
 -- --------------------------------------------------------
 
@@ -455,7 +662,9 @@ INSERT INTO `match_progression_logs` (`log_id`, `match_id`, `team_id`, `update_t
 (7, 357, 256, 'next_match_teamA_update', 'From match 354', '2024-12-21 11:21:04'),
 (8, 349, 243, 'next_match_teamA_update', 'From match 346', '2024-12-21 11:24:32'),
 (9, 381, 240, 'next_match_teamA_update', 'From match 378', '2025-01-09 01:00:37'),
-(10, 380, 248, 'next_match_teamA_update', 'From match 376', '2025-01-10 09:30:16');
+(10, 380, 248, 'next_match_teamA_update', 'From match 376', '2025-01-10 09:30:16'),
+(11, 486, 240, 'next_match_teamB_update', 'From match 483', '2025-01-29 02:17:14'),
+(12, 486, 320, 'next_match_teamA_update', 'From match 482', '2025-01-29 17:11:37');
 
 -- --------------------------------------------------------
 
@@ -507,8 +716,7 @@ INSERT INTO `players` (`player_id`, `player_lastname`, `player_firstname`, `play
 (249, 'Capistrano', 'Charlotte', '', 320, '2024-12-20 11:28:55', 77),
 (250, 'Guevarra', 'Jamie', '', 248, '2024-12-21 02:36:48', 4),
 (251, 'Doe', 'John', '', 312, '2025-01-08 14:54:06', 44),
-(252, 'Smith', 'John', 'A', 256, '2025-01-23 12:30:24', 10),
-(253, 'Doe', 'Jane', 'B', 256, '2025-01-23 12:30:24', 15);
+(252, 'Smith', 'John', 'A', 256, '2025-01-23 12:30:24', 10);
 
 -- --------------------------------------------------------
 
@@ -543,8 +751,7 @@ INSERT INTO `players_info` (`player_info_id`, `player_id`, `email`, `phone_numbe
 (26, 249, 'charlotte@gmail.com', '+639261769542', '2010-02-20', NULL, '', '', ''),
 (27, 250, 'jamie@gmail.com', '+639121212121', '2010-02-15', NULL, '', '', ''),
 (28, 251, 'johndoe@gmail.com', '+639754136498', '2005-05-08', NULL, '', '', 'Small Forward'),
-(29, 252, 'john.smith@test.com', '9876543210', '2000-01-01', NULL, '6\"0', '160 lbs', 'Guard'),
-(30, 253, 'jane.doe@test.com', '9123456789', '1998-05-10', NULL, '5\"8', '140 lbs', 'Forward');
+(29, 252, 'john.smith@test.com', '9876543210', '2000-01-01', NULL, '6\"0', '160 lbs', 'Guard');
 
 -- --------------------------------------------------------
 
@@ -598,6 +805,13 @@ CREATE TABLE `schedules` (
   `venue` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `schedules`
+--
+
+INSERT INTO `schedules` (`schedule_id`, `match_id`, `schedule_date`, `schedule_time`, `venue`) VALUES
+(104, 2094, '2025-01-31', '05:00:00', 'gym');
+
 -- --------------------------------------------------------
 
 --
@@ -642,9 +856,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`session_id`, `user_id`, `ip_address`, `user_agent`, `created_at`, `expires_at`) VALUES
-(132, 90, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2024-12-20 17:15:24', '2024-12-20 18:15:24'),
-(167, 56, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2025-01-23 15:54:02', '2025-01-23 16:54:02'),
-(168, 67, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2025-01-23 23:53:45', '2025-01-24 00:53:45');
+(189, 67, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2025-01-31 01:25:00', '2025-01-31 02:25:00');
 
 -- --------------------------------------------------------
 
@@ -670,7 +882,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (-2, 'To Be Determined', 0, '2024-12-01 00:29:16', 0, 0, 0),
 (-1, 'BYE', 0, '2024-12-01 19:26:39', 0, 0, 0),
 (239, 'BSCS - Volleyball', 2, '2024-11-02 11:14:51', 67, 0, 0),
-(240, 'BSCS - Basketball', 18, '2024-11-02 11:14:51', 67, 0, 0),
+(240, 'BSCS - Basketball', 18, '2024-11-02 11:14:51', 67, 1, 0),
 (241, 'BSCS - Dama', 22, '2024-11-02 11:14:51', 67, 0, 0),
 (242, 'BSCS - Dart', 26, '2024-11-02 11:14:51', 67, 0, 0),
 (243, 'BSCS - Chess', 27, '2024-11-02 11:14:51', 67, 0, 0),
@@ -686,7 +898,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (253, 'CRIM - Patintero', 29, '2024-11-02 11:14:55', 68, 0, 0),
 (254, 'CRIM - Word Factory', 30, '2024-11-02 11:14:55', 68, 0, 0),
 (255, 'BSA - Volleyball', 2, '2024-11-02 11:15:21', 69, 0, 0),
-(256, 'BSA - Basketball', 18, '2024-11-02 11:15:21', 69, 0, 0),
+(256, 'BSA - Basketball', 18, '2024-11-02 11:15:21', 69, 0, 2),
 (257, 'BSA - Dama', 22, '2024-11-02 11:15:21', 69, 0, 0),
 (258, 'BSA - Dart', 26, '2024-11-02 11:15:21', 69, 0, 0),
 (259, 'BSA - Chess', 27, '2024-11-02 11:15:21', 69, 0, 0),
@@ -718,7 +930,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (285, 'Obedience - Patintero', 29, '2024-11-02 14:26:20', 72, 0, 0),
 (286, 'Obedience - Word Factory', 30, '2024-11-02 14:26:20', 72, 0, 0),
 (311, 'BSBA - Volleyball', 2, '2024-11-09 05:25:00', 76, 0, 0),
-(312, 'BSBA - Basketball', 18, '2024-11-09 05:25:00', 76, 0, 0),
+(312, 'BSBA - Basketball', 18, '2024-11-09 05:25:00', 76, 0, 1),
 (313, 'BSBA - Dama', 22, '2024-11-09 05:25:00', 76, 0, 0),
 (314, 'BSBA - Dart', 26, '2024-11-09 05:25:00', 76, 0, 0),
 (315, 'BSBA - Chess', 27, '2024-11-09 05:25:00', 76, 0, 0),
@@ -726,7 +938,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (317, 'BSBA - Patintero', 29, '2024-11-09 05:25:00', 76, 0, 0),
 (318, 'BSBA - Word Factory', 30, '2024-11-09 05:25:00', 76, 0, 0),
 (319, 'EDUC - Volleyball', 2, '2024-11-09 05:25:19', 77, 0, 0),
-(320, 'EDUC - Basketball', 18, '2024-11-09 05:25:19', 77, 0, 0),
+(320, 'EDUC - Basketball', 18, '2024-11-09 05:25:19', 77, 1, 0),
 (321, 'EDUC - Dama', 22, '2024-11-09 05:25:19', 77, 0, 0),
 (322, 'EDUC - Dart', 26, '2024-11-09 05:25:19', 77, 0, 0),
 (323, 'EDUC - Chess', 27, '2024-11-09 05:25:19', 77, 0, 0),
@@ -773,14 +985,6 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (367, 'A - HUMSS - Badminton', 28, '2024-12-02 18:19:21', 86, 0, 0),
 (368, 'A - HUMSS - Patintero', 29, '2024-12-02 18:19:21', 86, 0, 0),
 (369, 'A - HUMSS - Word Factory', 30, '2024-12-02 18:19:21', 86, 0, 0),
-(459, 'testtest - Volleyball', 2, '2025-01-23 21:24:48', 99, 0, 0),
-(460, 'testtest - Basketball', 18, '2025-01-23 21:24:48', 99, 0, 0),
-(461, 'testtest - Dama', 22, '2025-01-23 21:24:48', 99, 0, 0),
-(462, 'testtest - Dart', 26, '2025-01-23 21:24:48', 99, 0, 0),
-(463, 'testtest - Chess', 27, '2025-01-23 21:24:48', 99, 0, 0),
-(464, 'testtest - Badminton', 28, '2025-01-23 21:24:48', 99, 0, 0),
-(465, 'testtest - Patintero', 29, '2025-01-23 21:24:48', 99, 0, 0),
-(466, 'testtest - Word Factory', 30, '2025-01-23 21:24:48', 99, 0, 0),
 (467, 'mm - STEM - Volleyball', 2, '2025-01-23 21:25:06', 100, 0, 0),
 (468, 'mm - STEM - Basketball', 18, '2025-01-23 21:25:06', 100, 0, 0),
 (469, 'mm - STEM - Dama', 22, '2025-01-23 21:25:06', 100, 0, 0),
@@ -813,8 +1017,54 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (528, 'asas - Badminton', 28, '2025-01-23 22:53:48', 107, 0, 0),
 (529, 'asas - Patintero', 29, '2025-01-23 22:53:48', 107, 0, 0),
 (530, 'asas - Word Factory', 30, '2025-01-23 22:53:48', 107, 0, 0),
-(536, 'dd', 18, '2025-01-24 21:00:38', 99, 0, 0),
-(537, 'aa', 18, '2025-01-24 21:02:00', 99, 0, 0);
+(587, 'ff - Volleyball', 2, '2025-01-28 19:51:33', 114, 0, 0),
+(588, 'ff - Basketball', 18, '2025-01-28 19:51:33', 114, 0, 0),
+(589, 'ff - Dama', 22, '2025-01-28 19:51:33', 114, 0, 0),
+(590, 'ff - Dart', 26, '2025-01-28 19:51:33', 114, 0, 0),
+(591, 'ff - Chess', 27, '2025-01-28 19:51:33', 114, 0, 0),
+(592, 'ff - Badminton', 28, '2025-01-28 19:51:33', 114, 0, 0),
+(593, 'ff - Patintero', 29, '2025-01-28 19:51:33', 114, 0, 0),
+(594, 'ff - Word Factory', 30, '2025-01-28 19:51:33', 114, 0, 0),
+(595, 'll - Volleyball', 2, '2025-01-28 19:52:32', 115, 0, 0),
+(596, 'll - Basketball', 18, '2025-01-28 19:52:32', 115, 1, 0),
+(597, 'll - Dama', 22, '2025-01-28 19:52:32', 115, 0, 0),
+(598, 'll - Dart', 26, '2025-01-28 19:52:32', 115, 0, 0),
+(599, 'll - Chess', 27, '2025-01-28 19:52:32', 115, 0, 0),
+(600, 'll - Badminton', 28, '2025-01-28 19:52:32', 115, 0, 0),
+(601, 'll - Patintero', 29, '2025-01-28 19:52:32', 115, 0, 0),
+(602, 'll - Word Factory', 30, '2025-01-28 19:52:32', 115, 0, 0),
+(643, 'asasa - Volleyball', 2, '2025-01-29 09:35:57', 121, 0, 0),
+(644, 'asasa - Basketball', 18, '2025-01-29 09:35:57', 121, 0, 1),
+(645, 'asasa - Dama', 22, '2025-01-29 09:35:57', 121, 0, 0),
+(646, 'asasa - Dart', 26, '2025-01-29 09:35:57', 121, 0, 0),
+(647, 'asasa - Chess', 27, '2025-01-29 09:35:57', 121, 0, 0),
+(648, 'asasa - Badminton', 28, '2025-01-29 09:35:57', 121, 0, 0),
+(649, 'asasa - Patintero', 29, '2025-01-29 09:35:57', 121, 0, 0),
+(650, 'asasa - Word Factory', 30, '2025-01-29 09:35:57', 121, 0, 0),
+(651, 'wda - Volleyball', 2, '2025-01-29 09:42:01', 122, 0, 0),
+(652, 'wda - Basketball', 18, '2025-01-29 09:42:01', 122, 1, 0),
+(653, 'wda - Dama', 22, '2025-01-29 09:42:01', 122, 0, 0),
+(654, 'wda - Dart', 26, '2025-01-29 09:42:01', 122, 0, 0),
+(655, 'wda - Chess', 27, '2025-01-29 09:42:01', 122, 0, 0),
+(656, 'wda - Badminton', 28, '2025-01-29 09:42:01', 122, 0, 0),
+(657, 'wda - Patintero', 29, '2025-01-29 09:42:01', 122, 0, 0),
+(658, 'wda - Word Factory', 30, '2025-01-29 09:42:01', 122, 0, 0),
+(659, 'adwawd - Volleyball', 2, '2025-01-29 15:02:22', 123, 0, 0),
+(660, 'adwawd - Basketball', 18, '2025-01-29 15:02:22', 123, 0, 0),
+(661, 'adwawd - Dama', 22, '2025-01-29 15:02:22', 123, 0, 0),
+(662, 'adwawd - Dart', 26, '2025-01-29 15:02:22', 123, 0, 0),
+(663, 'adwawd - Chess', 27, '2025-01-29 15:02:22', 123, 0, 0),
+(664, 'adwawd - Badminton', 28, '2025-01-29 15:02:22', 123, 0, 0),
+(665, 'adwawd - Patintero', 29, '2025-01-29 15:02:22', 123, 0, 0),
+(666, 'adwawd - Word Factory', 30, '2025-01-29 15:02:22', 123, 0, 0),
+(667, 'awdawda - Volleyball', 2, '2025-01-29 15:02:50', 124, 0, 0),
+(668, 'awdawda - Basketball', 18, '2025-01-29 15:02:50', 124, 0, 0),
+(669, 'awdawda - Dama', 22, '2025-01-29 15:02:50', 124, 0, 0),
+(670, 'awdawda - Dart', 26, '2025-01-29 15:02:50', 124, 0, 0),
+(671, 'awdawda - Chess', 27, '2025-01-29 15:02:50', 124, 0, 0),
+(672, 'awdawda - Badminton', 28, '2025-01-29 15:02:50', 124, 0, 0),
+(673, 'awdawda - Patintero', 29, '2025-01-29 15:02:50', 124, 0, 0),
+(674, 'awdawda - Word Factory', 30, '2025-01-29 15:02:50', 124, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -844,11 +1094,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `lastname`, `firstname`, `middleinitial`, `age`, `gender`, `email`, `password`, `role`, `department`, `reset_token_hash`, `reset_token_expires_at`, `game_id`, `school_id`) VALUES
-(1, '', '', '', 0, '', 'admin@gmail.com', '$2y$10$DW/oDAXMGiG462kSEGgDjuxW260hugHr9agzALTrnduNJJxt0pioS', 'superadmin', NULL, 'ed4f4c6f286cd0d91c1056bac7f3237186fcdedce090002e9342e81f0e54be3f', '2024-10-06 02:51:55', NULL, NULL),
+(1, 'De Guzman', 'Andrew', 'B.', 22, 'Male', 'andrewbucedeguzman@gmail.com', '$2y$10$DW/oDAXMGiG462kSEGgDjuxW260hugHr9agzALTrnduNJJxt0pioS', 'superadmin', NULL, 'ed4f4c6f286cd0d91c1056bac7f3237186fcdedce090002e9342e81f0e54be3f', '2024-10-06 02:51:55', NULL, NULL),
 (56, '', '', '', 0, '', 'hcc@gmail.com', '$2y$10$8R6T3bdAyXwloo098OB6suCHoHXniSeZhqgD6mtstPJXzX8jgfISO', 'School Admin', NULL, NULL, NULL, NULL, 8),
-(67, 'Buce', 'Andrew', 'B', 22, '0', 'committee@gmail.com', '$2y$10$g1ZaROoolXsxtimnfv5mA.z3y/PpL4IlO1nT02pf0z7VrwfV/mGKK', 'Committee', 1, NULL, NULL, 18, 8),
-(68, 'De Guzman', 'Andrew', 'B', 22, 'Male', 'aaa@gmail.com', '$2y$10$g/T3J0JGHACYXUPlCxA6x.ZhaBfWvPobfl47Au1Qp8Ohi3nZtoohK', 'Department Admin', 1, NULL, NULL, NULL, 8),
-(90, 'Buce', 'Drew', '', 22, 'Male', 'a@gmail.com', '$2y$10$VB9qD42kB4TDXYgRUu38weWuVjItTi424oygdgdPyBdMbXCuRcDI.', 'Committee', 1, NULL, NULL, 27, 8);
+(67, 'Doe', 'John', 'B', 22, '', 'committee@gmail.com', '$2y$10$g1ZaROoolXsxtimnfv5mA.z3y/PpL4IlO1nT02pf0z7VrwfV/mGKK', 'Committee', 1, NULL, NULL, 18, 8),
+(68, 'Smith', 'John', 'B', 22, 'Male', 'aaa@gmail.com', '$2y$10$g/T3J0JGHACYXUPlCxA6x.ZhaBfWvPobfl47Au1Qp8Ohi3nZtoohK', 'Department Admin', 1, NULL, NULL, NULL, 8);
 
 --
 -- Indexes for dumped tables
@@ -1038,7 +1287,7 @@ ALTER TABLE `announcement`
 -- AUTO_INCREMENT for table `brackets`
 --
 ALTER TABLE `brackets`
-  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=295;
 
 --
 -- AUTO_INCREMENT for table `departments`
@@ -1062,61 +1311,61 @@ ALTER TABLE `game_scoring_rules`
 -- AUTO_INCREMENT for table `game_stats_config`
 --
 ALTER TABLE `game_stats_config`
-  MODIFY `config_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `config_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `grade_section_course`
 --
 ALTER TABLE `grade_section_course`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=125;
 
 --
 -- AUTO_INCREMENT for table `live_scores`
 --
 ALTER TABLE `live_scores`
-  MODIFY `live_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4113;
+  MODIFY `live_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4117;
 
 --
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=130;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=324;
 
 --
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=448;
+  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2108;
 
 --
 -- AUTO_INCREMENT for table `match_progression_logs`
 --
 ALTER TABLE `match_progression_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `match_results`
 --
 ALTER TABLE `match_results`
-  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=254;
+  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
 
 --
 -- AUTO_INCREMENT for table `players_info`
 --
 ALTER TABLE `players_info`
-  MODIFY `player_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `player_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `player_match_stats`
 --
 ALTER TABLE `player_match_stats`
-  MODIFY `stat_record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `stat_record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- AUTO_INCREMENT for table `pointing_system`
@@ -1128,7 +1377,7 @@ ALTER TABLE `pointing_system`
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=99;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT for table `schools`
@@ -1140,13 +1389,13 @@ ALTER TABLE `schools`
 -- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=169;
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=192;
 
 --
 -- AUTO_INCREMENT for table `teams`
 --
 ALTER TABLE `teams`
-  MODIFY `team_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=538;
+  MODIFY `team_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=675;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1223,8 +1472,8 @@ ALTER TABLE `logs`
 -- Constraints for table `matches`
 --
 ALTER TABLE `matches`
-  ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `matches_ibfk_3` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `matches_ibfk_3` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `matches_ibfk_4` FOREIGN KEY (`bracket_id`) REFERENCES `brackets` (`bracket_id`) ON DELETE CASCADE;
 
 --
@@ -1278,8 +1527,8 @@ ALTER TABLE `sessions`
 -- Constraints for table `teams`
 --
 ALTER TABLE `teams`
-  ADD CONSTRAINT `fk_teams_grade_section_course` FOREIGN KEY (`grade_section_course_id`) REFERENCES `grade_section_course` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `teams_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_teams_grade_section_course` FOREIGN KEY (`grade_section_course_id`) REFERENCES `grade_section_course` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `teams_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `users`

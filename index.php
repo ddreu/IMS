@@ -216,22 +216,40 @@ body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 87, 34, 0.8);
 }
 
+
 /* Responsive Design */
 @media (max-width: 768px) {
+    .navbar {
+        padding: 1rem;
+    }
+
+    .hero-section {
+        padding: 4rem 1rem;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .hero-content p {
+        font-size: 0.9rem;
+    }
+
     .schools-section {
-        right: 1rem;
+        bottom: 1rem;
         left: 1rem;
-        padding: 1.5rem;
+        right: 1rem;
+        padding: 0.8rem;
     }
 
     .school-cards-container {
-        grid-template-columns: 1fr;
-    }
-
-    .school-card {
-        padding: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     }
 }
+
+
+
 
 /* Fade-in Animation */
 @keyframes fadeIn {

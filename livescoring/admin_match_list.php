@@ -27,26 +27,15 @@ include '../navbar/navbar.php';
 $selected_department_id = isset($_GET['selected_department_id']) ? $_GET['selected_department_id'] : $department_id;
 
 // Get filter values
-$searchTerm = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '%';
+$searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
 $selected_game_id = isset($_GET['game_id']) ? $_GET['game_id'] : '';
 $selected_grade_level = isset($_GET['grade_level']) ? $_GET['grade_level'] : '';
 
-// Debug output for filter values
-if (isset($_GET['debug'])) {
-    echo "<div style='background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 5px;'>";
-    echo "<h5>Input Values:</h5>";
-    echo "<pre>";
-    echo "Department ID (from URL): " . $selected_department_id . "\n";
-    echo "Game ID (from dropdown): " . $selected_game_id . "\n";
-    echo "Grade Level (from dropdown): " . $selected_grade_level . "\n";
-    echo "Status Filter: " . $status_filter . "\n";
-    echo "Search Term: " . $searchTerm . "\n";
-    echo "</pre>";
-    echo "</div>";
-}
+// Prepare search terms for SQL
+$searchTermWithWildcards = !empty($searchTerm) ? '%' . $searchTerm . '%' : '%';
 
-// Initialize the SQL query and prepare statement
+// Initialize the SQL query with more precise search conditions
 $sql = "
     SELECT DISTINCT
         s.schedule_id, 
@@ -75,14 +64,24 @@ $sql = "
     JOIN teams tA ON m.teamA_id = tA.team_id
     JOIN teams tB ON m.teamB_id = tB.team_id
     LEFT JOIN match_results mr ON m.match_id = mr.match_id
-    WHERE (g.game_name LIKE ? OR tA.team_name LIKE ? OR tB.team_name LIKE ? OR s.venue LIKE ?)
+    WHERE (
+        CASE 
+            WHEN ? = '' THEN 1
+            ELSE (
+                g.game_name LIKE ? OR 
+                tA.team_name LIKE ? OR 
+                tB.team_name LIKE ? OR 
+                s.venue LIKE ?
+            )
+        END
+    )
     AND tA.team_name NOT IN ('TBD', 'To Be Determined')
     AND tB.team_name NOT IN ('TBD', 'To Be Determined')
 ";
 
-// Initialize parameters array
-$params = array($searchTerm, $searchTerm, $searchTerm, $searchTerm);
-$types = "ssss";
+// Initialize parameters array with search parameters
+$params = array($searchTerm, $searchTermWithWildcards, $searchTermWithWildcards, $searchTermWithWildcards, $searchTermWithWildcards);
+$types = "sssss";
 
 // Add department filter from URL
 if (!empty($selected_department_id)) {
@@ -197,39 +196,209 @@ if ($selected_department_id) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="../styles/committee.css">
     <link rel="stylesheet" href="../styles/dashboard.css">
-    <script>
-        function startMatch(schedule_id, teamA_id, teamB_id, game_id) {
-            Swal.fire({
-                title: 'Start Match?',
-                text: "Are you sure you want to start this match?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, start it!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Make an AJAX request to start_match.php
-                    fetch('start_match.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `schedule_id=${schedule_id}&teamA_id=${teamA_id}&teamB_id=${teamB_id}&game_id=${game_id}`
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Redirect to live scoring page
-                                window.location.href = `live_scoring.php?schedule_id=${schedule_id}&teamA_id=${teamA_id}&teamB_id=${teamBId}`;
-                            } else {
-                                Swal.fire('Error', data.message, 'error');
-                            }
-                        })
-                        .catch(error => Swal.fire('Error', 'An unexpected error occurred', 'error'));
-                }
-            });
+    <style>
+        /* Base styles */
+        .match-list-container {
+            padding: 15px;
         }
-    </script>
+
+        .filter-section {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .filter-select,
+        .filter-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background-color: #fff;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Table styles */
+        .match-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .match-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .match-table td {
+            padding: 12px;
+            vertical-align: middle;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-upcoming {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .status-finished {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .match-list-container {
+                padding: 10px;
+            }
+
+            .filter-section {
+                padding: 10px;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-group {
+                min-width: 100%;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .filter-buttons .btn {
+                width: 100%;
+            }
+
+            /* Hide table on mobile */
+            .match-table {
+                display: none;
+            }
+
+            /* Show cards on mobile */
+            .match-cards {
+                display: block;
+            }
+
+            .match-card {
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                margin-bottom: 15px;
+                padding: 15px;
+            }
+
+            .match-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .match-card-title {
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            .match-card-type {
+                font-size: 0.875rem;
+                color: #6c757d;
+            }
+
+            .match-card-teams {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 15px 0;
+                gap: 10px;
+            }
+
+            .team-name {
+                flex: 1;
+                text-align: center;
+                font-weight: 500;
+            }
+
+            .vs-badge {
+                padding: 4px 8px;
+                background: #f8f9fa;
+                border-radius: 4px;
+                font-weight: 600;
+                color: #6c757d;
+            }
+
+            .match-card-details {
+                display: grid;
+                gap: 8px;
+                margin: 15px 0;
+                font-size: 0.9rem;
+            }
+
+            .detail-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 4px 0;
+                border-bottom: 1px solid #eee;
+            }
+
+            .detail-label {
+                color: #6c757d;
+            }
+
+            .detail-value {
+                font-weight: 500;
+                color: #2c3e50;
+            }
+
+            .match-card-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 15px;
+            }
+
+            .match-card-actions .btn {
+                flex: 1;
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -244,42 +413,50 @@ if ($selected_department_id) {
             <h1>Match Schedule List</h1>
 
             <!-- Filter Form -->
-            <div class="row mb-3">
-                <div class="col-md-3">
-                    <select id="game_filter" name="game_id" class="form-select" onchange="applyFilters()">
-                        <option value="">All Games</option>
-                        <?php while ($game = $games_result->fetch_assoc()): ?>
-                            <option value="<?= $game['game_id']; ?>" <?= ($selected_game_id == $game['game_id']) ? 'selected' : ''; ?>>
-                                <?= htmlspecialchars($game['game_name']); ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select id="grade_filter" name="grade_level" class="form-select" onchange="applyFilters()">
-                        <option value="">All Grade Levels</option>
-                        <?php while ($grade = $grade_result->fetch_assoc()): ?>
-                            <option value="<?= $grade['grade_level']; ?>" <?= ($selected_grade_level == $grade['grade_level']) ? 'selected' : ''; ?>>
-                                <?= htmlspecialchars($grade['grade_level']); ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select id="status_filter" name="status" class="form-select" onchange="applyFilters()">
-                        <option value="">All Status</option>
-                        <option value="upcoming" <?= ($status_filter === 'upcoming') ? 'selected' : ''; ?>>Upcoming</option>
-                        <option value="finished" <?= ($status_filter === 'finished') ? 'selected' : ''; ?>>Finished</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" id="search_input" class="form-control" name="search"
-                            placeholder="Search by game, team, or venue"
-                            value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
-                            oninput="applyFilters()">
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label" for="searchInput">Search</label>
+                        <input type="text" id="searchInput" class="filter-input" placeholder="Search matches...">
                     </div>
+                    <div class="filter-group">
+                        <label class="filter-label" for="filterGame">Game</label>
+                        <select id="filterGame" class="filter-select">
+                            <option value="">All Games</option>
+                            <?php while ($game = $games_result->fetch_assoc()): ?>
+                                <option value="<?= $game['game_id'] ?>" <?= $selected_game_id == $game['game_id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($game['game_name']) ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    <!--<div class="filter-group">
+                        <label class="filter-label" for="filterGradeLevel">Grade Level</label>
+                        <select id="filterGradeLevel" class="filter-select">
+                            <option value="">All Grade Levels</option>
+                            <?php while ($grade = $grade_result->fetch_assoc()): ?>
+                                <option value="<?= $grade['grade_level'] ?>" <?= $selected_grade_level == $grade['grade_level'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($grade['grade_level']) ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>-->
+                    <div class="filter-group">
+                        <label class="filter-label" for="filterStatus">Status</label>
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="upcoming" <?= $status_filter == 'upcoming' ? 'selected' : '' ?>>Upcoming</option>
+                            <option value="finished" <?= $status_filter == 'finished' ? 'selected' : '' ?>>Finished</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-buttons">
+                    <button id="applyFilters" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                    <button id="resetFilters" class="btn btn-secondary">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
                 </div>
             </div>
 
@@ -302,105 +479,246 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
                 </div>
             <?php endif; ?>
 
-            <!-- Table to Display Matches -->
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card shadow mt-3">
-                            <div class="card-header bg-white py-3">
-                                <div class="row align-items-center">
-                                    <div class="col">
-                                        <h4 class="m-0 font-weight-bold text-primary">Matches</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body p-4">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Game Name</th>
-                                            <th>Match Type</th>
-                                            <th>Team A Name</th>
-                                            <th>Team B Name</th>
-                                            <th>Schedule Date & Time</th>
-                                            <th>Venue</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php while ($row = $result->fetch_assoc()): ?>
-                                            <tr>
-                                                <td><?= htmlspecialchars($row['game_name']); ?></td>
-                                                <td>
-                                                    <?php
-                                                    switch ($row['match_type']) {
-                                                        case 'semifinal':
-                                                            echo 'Semifinals';
-                                                            break;
-                                                        case 'final':
-                                                            echo 'Finals';
-                                                            break;
-                                                        case 'third_place':
-                                                            echo 'Battle for Third';
-                                                            break;
-                                                        default:
-                                                            echo "Round {$row['round']}";
-                                                    }
-                                                    ?>
-                                                </td>
-                                                <td><?= htmlspecialchars($row['teamA_name']); ?></td>
-                                                <td><?= htmlspecialchars($row['teamB_name']); ?></td>
-                                                <td>
-                                                    <?= htmlspecialchars(date("M d, Y", strtotime($row['schedule_date'])) . ', ' . date("g:i A", strtotime($row['schedule_time']))); ?>
-                                                </td>
-                                                <td><?= htmlspecialchars($row['venue']); ?></td>
-                                                <td><?= htmlspecialchars($row['status']); ?></td>
-                                                <td>
-                                                    <?php if (!empty($row['schedule_id'])): ?>
-                                                        <!-- Dropdown Menu -->
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton<?= $row['schedule_id']; ?>"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                                Actions
-                                                            </button>
-                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?= $row['schedule_id']; ?>">
-                                                                <?php if ($row['status'] === 'Upcoming'): ?>
-                                                                    <!-- Notify Players action -->
-                                                                    <li>
-                                                                        <button class="dropdown-item" onclick="notifyPlayers(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>)">
-                                                                            Notify Players
-                                                                        </button>
-                                                                    </li>
-                                                                    <!-- Start Match action -->
-                                                                    <!-- <li>
-                                                                        <button class="dropdown-item" onclick="startMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
-                                                                            Start Match
-                                                                        </button>
-                                                                    </li>-->
-                                                                <?php elseif ($row['status'] === 'Finished'): ?>
-                                                                    <!-- View Summary action -->
-                                                                    <li>
-                                                                        <a class="dropdown-item" href="match_summary.php?match_id=<?= $row['match_id']; ?>">
-                                                                            <i class="fas fa-eye"></i> View Summary
-                                                                        </a>
-                                                                    </li>
-                                                                <?php endif; ?>
-                                                            </ul>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    </tbody>
-                                </table>
+            <!-- Desktop Table View -->
+            <div class="table-responsive d-none d-md-block">
+                <table class="match-table table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Game Name</th>
+                            <th>Match Type</th>
+                            <th>Team A Name</th>
+                            <th>Team B Name</th>
+                            <th>Schedule Date & Time</th>
+                            <th>Venue</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['game_name']); ?></td>
+                                <td>
+                                    <?php
+                                    switch ($row['match_type']) {
+                                        case 'semifinal':
+                                            echo 'Semifinals';
+                                            break;
+                                        case 'final':
+                                            echo 'Finals';
+                                            break;
+                                        case 'third_place':
+                                            echo 'Battle for Third';
+                                            break;
+                                        default:
+                                            echo "Round {$row['round']}";
+                                    }
+                                    ?>
+                                </td>
+                                <td><?= htmlspecialchars($row['teamA_name']); ?></td>
+                                <td><?= htmlspecialchars($row['teamB_name']); ?></td>
+                                <td>
+                                    <?= htmlspecialchars(date("M d, Y", strtotime($row['schedule_date'])) . ', ' . date("g:i A", strtotime($row['schedule_time']))); ?>
+                                </td>
+                                <td><?= htmlspecialchars($row['venue']); ?></td>
+                                <td><?= htmlspecialchars($row['status']); ?></td>
+                                <td>
+                                    <?php if (!empty($row['schedule_id'])): ?>
+                                        <!-- Dropdown Menu -->
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton<?= $row['schedule_id']; ?>"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?= $row['schedule_id']; ?>">
+                                                <?php if ($row['status'] === 'Upcoming'): ?>
+                                                    <!-- Notify Players action -->
+                                                    <li>
+                                                        <button class="dropdown-item" onclick="notifyPlayers(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>)">
+                                                            Notify Players
+                                                        </button>
+                                                    </li>
+                                                    <!-- Start Match action -->
+                                                    <!-- <li>
+                                                        <button class="dropdown-item" onclick="startMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
+                                                            Start Match
+                                                        </button>
+                                                    </li>-->
+                                                <?php elseif ($row['status'] === 'Finished'): ?>
+                                                    <!-- View Summary action -->
+                                                    <li>
+                                                        <a class="dropdown-item" href="match_summary.php?match_id=<?= $row['match_id']; ?>">
+                                                            <i class="fas fa-eye"></i> View Summary
+                                                        </a>
+                                                    </li>
+                                                <?php endif; ?>
+                                            </ul>
+                                        </div>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="match-cards d-md-none">
+                <?php 
+                // Reset result pointer
+                $result->data_seek(0);
+                while ($row = $result->fetch_assoc()): 
+                ?>
+                    <div class="match-card">
+                        <div class="match-card-header">
+                            <div class="match-card-title"><?= htmlspecialchars($row['game_name']) ?></div>
+                            <div class="match-card-type">
+                                <?php
+                                switch ($row['match_type']) {
+                                    case 'Finals':
+                                        echo '<span class="badge bg-warning">Finals</span>';
+                                        break;
+                                    case 'Semi-Finals':
+                                        echo '<span class="badge bg-info">Semi-Finals</span>';
+                                        break;
+                                    case 'Third Place':
+                                        echo '<span class="badge bg-secondary">Third Place</span>';
+                                        break;
+                                    default:
+                                        echo '<span class="badge bg-primary">Round ' . htmlspecialchars($row['round']) . '</span>';
+                                }
+                                ?>
                             </div>
                         </div>
+                        
+                        <div class="match-card-teams">
+                            <div class="team-name"><?= htmlspecialchars($row['teamA_name']) ?></div>
+                            <div class="vs-badge">VS</div>
+                            <div class="team-name"><?= htmlspecialchars($row['teamB_name']) ?></div>
+                        </div>
+
+                        <div class="match-card-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Date</span>
+                                <span class="detail-value"><?= date('F j, Y', strtotime($row['schedule_date'])) ?></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Time</span>
+                                <span class="detail-value"><?= date('g:i A', strtotime($row['schedule_time'])) ?></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Venue</span>
+                                <span class="detail-value"><?= htmlspecialchars($row['venue']) ?></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value">
+                                    <span class="status-badge <?= $row['status'] == 'Upcoming' ? 'status-upcoming' : 'status-finished' ?>">
+                                        <?= $row['status'] ?>
+                                    </span>
+                                </span>
+                            </div>
+                            <?php if ($row['status'] == 'Finished'): ?>
+                                <div class="detail-item">
+                                    <span class="detail-label">Score</span>
+                                    <span class="detail-value">
+                                        <?= $row['teamA_score'] ?? '0' ?> - <?= $row['teamB_score'] ?? '0' ?>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="match-card-actions">
+                            <?php if ($row['status'] == 'Upcoming'): ?>
+                                <button class="btn btn-primary" onclick="startMatch(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>, <?= $row['game_id'] ?>)">
+                                    <i class="fas fa-play"></i> Start Match
+                                </button>
+                                <button class="btn btn-info" onclick="notifyPlayers(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>)">
+                                    <i class="fas fa-bell"></i> Notify
+                                </button>
+                            <?php else: ?>
+                                <button class="btn btn-secondary" onclick="viewMatchDetails(<?= $row['match_id'] ?>)">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                </div>
+                <?php endwhile; ?>
             </div>
             <script>
+                function startMatch(schedule_id, teamA_id, teamB_id, game_id) {
+                    Swal.fire({
+                        title: 'Start Match?',
+                        text: "Are you sure you want to start this match?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, start it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `start_match.php?schedule_id=${schedule_id}&teamA_id=${teamA_id}&teamB_id=${teamB_id}&game_id=${game_id}`;
+                        }
+                    });
+                }
+            </script>
+
+            <script>
+                function notifyPlayers(scheduleId, teamAId, teamBId) {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Do you want to notify the players?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, notify them!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Send notification
+                            fetch('notify_players.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    schedule_id: scheduleId,
+                                    teamA_id: teamAId,
+                                    teamB_id: teamBId
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire(
+                                        'Success!',
+                                        'Players have been notified.',
+                                        'success'
+                                    );
+                                } else {
+                                    Swal.fire(
+                                        'Error!',
+                                        data.message || 'Failed to notify players.',
+                                        'error'
+                                    );
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire(
+                                    'Error!',
+                                    'Failed to notify players.',
+                                    'error'
+                                );
+                            });
+                        }
+                    });
+                }
+            </script>
+
+            <script>
                 let filterTimeout;
+                let lastSearchValue = '';
 
                 function applyFilters() {
                     // Clear any existing timeout
@@ -408,10 +726,16 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
 
                     // Set a new timeout
                     filterTimeout = setTimeout(() => {
-                        const gameId = document.getElementById('game_filter').value;
-                        const gradeLevel = document.getElementById('grade_filter').value;
-                        const status = document.getElementById('status_filter').value;
-                        const search = document.getElementById('search_input').value;
+                        const gameId = document.getElementById('filterGame').value;
+                        const gradeLevel = document.getElementById('filterGradeLevel').value;
+                        const status = document.getElementById('filterStatus').value;
+                        const search = document.getElementById('searchInput').value;
+
+                        // Check if search value has changed
+                        if (search === lastSearchValue && search.length > 0) {
+                            return; // Don't submit if the search value hasn't changed
+                        }
+                        lastSearchValue = search;
 
                         // Get the current URL without query parameters
                         let url = window.location.href.split('?')[0];
@@ -428,73 +752,72 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
                         const deptId = urlParams.get('selected_department_id');
                         if (deptId) params.append('selected_department_id', deptId);
 
-                        // Redirect to the new URL
-                        window.location.href = url + (params.toString() ? '?' + params.toString() : '');
-                    }, 500); // Wait for 500ms after the last change before applying filters
+                        // Only redirect if we have actual filter values
+                        if (gameId || gradeLevel || status || search || deptId) {
+                            window.location.href = url + '?' + params.toString();
+                        }
+                    }, 1000); // Increased timeout to 1 second
                 }
-            </script>
 
-            <script>
-                function notifyPlayers(scheduleId, teamAId, teamBId) {
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: 'Do you want to notify the players?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Yes, notify!',
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Sending Notifications',
-                                html: 'Please wait while we notify the players...',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                didOpen: () => {
-                                    Swal.showLoading();
-                                }
-                            });
+                // Add event listeners when document is ready
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Add change event listeners for dropdowns
+                    const filterInputs = [
+                        'filterGame',
+                        'filterGradeLevel',
+                        'filterStatus'
+                    ];
 
-                            fetch('notify_players.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded'
-                                    },
-                                    body: `schedule_id=${scheduleId}&teamA_id=${teamAId}&teamB_id=${teamBId}`
-                                })
-                                .then(response => response.text())
-                                .then(data => {
-                                    // Check for success or error from the response
-                                    if (data.includes("success")) {
-                                        Swal.fire({
-                                            title: 'Success!',
-                                            text: 'SMS notifications sent successfully!',
-                                            icon: 'success',
-                                            confirmButtonText: 'OK',
-                                            timer: 3000, // Automatically close after 3 seconds (3000ms)
-                                            timerProgressBar: true // Shows a timer progress bar
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Error!',
-                                            text: 'Failed to send notifications.',
-                                            icon: 'error',
-                                            confirmButtonText: 'OK'
-                                        });
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    Swal.fire({
-                                        title: 'Error!',
-                                        text: 'Failed to send notifications.',
-                                        icon: 'error',
-                                        confirmButtonText: 'OK'
-                                    });
-                                });
+                    filterInputs.forEach(id => {
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.addEventListener('change', applyFilters);
                         }
                     });
-                }
+
+                    // Add input event for search with minimum length
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) {
+                        searchInput.addEventListener('input', function(e) {
+                            const value = e.target.value.trim();
+                            if (value.length === 0 || value.length >= 2) {
+                                applyFilters();
+                            }
+                        });
+                    }
+
+                    // Add click event for apply filters button
+                    const applyButton = document.getElementById('applyFilters');
+                    if (applyButton) {
+                        applyButton.addEventListener('click', function() {
+                            // Force immediate application of filters
+                            clearTimeout(filterTimeout);
+                            applyFilters();
+                        });
+                    }
+
+                    // Add click event for reset filters button
+                    const resetButton = document.getElementById('resetFilters');
+                    if (resetButton) {
+                        resetButton.addEventListener('click', function() {
+                            // Reset all filter inputs
+                            filterInputs.forEach(id => {
+                                const element = document.getElementById(id);
+                                if (element) {
+                                    element.value = '';
+                                }
+                            });
+                            // Reset search input
+                            if (searchInput) {
+                                searchInput.value = '';
+                            }
+                            // Clear the last search value
+                            lastSearchValue = '';
+                            // Redirect to base URL
+                            window.location.href = window.location.href.split('?')[0];
+                        });
+                    }
+                });
             </script>
 
 </body>

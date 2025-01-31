@@ -28,7 +28,7 @@ session_start();
             background: #3949ab;
             color: white;
             padding: 1.5rem 0;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             position: relative;
             overflow: hidden;
         }
@@ -155,6 +155,10 @@ session_start();
             }
             .letter-header {
                 font-size: 1.75rem;
+                
+            }
+            .page-header {
+                margin-top: -1.7rem;
             }
         }
     </style>

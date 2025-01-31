@@ -21,6 +21,76 @@ $conn = con();
         .margin {
             margin-left: 130px;
         }
+
+        @media screen and (max-width: 768px) {
+            .margin {
+                margin-left: 0;
+                padding: 10px;
+            }
+
+            /* Stack table cells on mobile */
+            .table-responsive-mobile tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                background: #fff;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                border-radius: 4px;
+            }
+
+            .table-responsive-mobile thead {
+                display: none;
+            }
+
+            .table-responsive-mobile tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+
+            .table-responsive-mobile tbody td:last-child {
+                border-bottom: none;
+            }
+
+            .table-responsive-mobile tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                margin-right: 1rem;
+            }
+
+            /* Adjust search and filters for mobile */
+            .row.mb-3 {
+                margin: 0;
+            }
+
+            .col-md-6 {
+                padding: 0;
+                margin-bottom: 1rem;
+            }
+
+            .d-flex.gap-2 {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            /* Adjust pagination for mobile */
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .btn-group {
+                display: flex;
+                width: 100%;
+            }
+
+            .btn-group .btn {
+                flex: 1;
+            }
+        }
     </style>
 </head>
 
@@ -60,37 +130,38 @@ $conn = con();
         </div>
 
         <!-- Logs Table -->
-        <table class="table table-striped table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th>User</th>
-                    <th>Action</th>
-                    <th>Operation</th>
-                    <th>Record ID</th>
-                    <th>Description</th>
-                    <th>Timestamp</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-            <tbody id="logsTable">
-                <tr>
-                    <td colspan="7" class="text-center">Loading logs...</td>
-                </tr>
-            </tbody>
-        </table>
-    
-
-    <!-- Pagination Controls -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-        <div class="text-muted">
-            Showing <span id="currentPage">1</span> of <span id="totalPages">1</span> pages
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-responsive-mobile">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Operation</th>
+                        <th>Record ID</th>
+                        <th>Description</th>
+                        <th>Timestamp</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="logsTable">
+                    <tr>
+                        <td colspan="7" class="text-center">Loading logs...</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="btn-group">
-            <button id="prevBtn" class="btn btn-outline-primary" disabled>&laquo; Previous</button>
-            <button id="nextBtn" class="btn btn-outline-primary" disabled>Next &raquo;</button>
+
+        <!-- Pagination Controls -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted">
+                Showing <span id="currentPage">1</span> of <span id="totalPages">1</span> pages
+            </div>
+            <div class="btn-group">
+                <button id="prevBtn" class="btn btn-outline-primary" disabled>&laquo; Previous</button>
+                <button id="nextBtn" class="btn btn-outline-primary" disabled>Next &raquo;</button>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Modal for displaying log details -->
     <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
@@ -143,13 +214,13 @@ $conn = con();
                     result.data.forEach(log => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${log.full_name}</td>
-                            <td>${log.log_action}</td>
-                            <td>${log.table_name}</td>
-                            <td>${log.log_record_id}</td>
-                            <td>${log.log_description}</td>
-                            <td>${new Date(log.log_time).toLocaleString()}</td>
-                            <td>
+                            <td data-label="User">${log.full_name}</td>
+                            <td data-label="Action">${log.log_action}</td>
+                            <td data-label="Operation">${log.table_name}</td>
+                            <td data-label="Record ID">${log.log_record_id}</td>
+                            <td data-label="Description">${log.log_description}</td>
+                            <td data-label="Timestamp">${new Date(log.log_time).toLocaleString()}</td>
+                            <td data-label="Details">
                                 <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">
                                     View Details
                                 </button>

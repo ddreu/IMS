@@ -181,21 +181,7 @@ include '../navbar/navbar.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schedule</title>
     <style>
-        /* Custom styles for calendar events */
-        .fc-event {
-            cursor: pointer !important;
-        }
-
-        .fc-event:hover {
-            cursor: pointer !important;
-        }
-
-        /* Calendar event cursor styles */
-        .fc .fc-daygrid-event,
-        .fc .fc-timegrid-event,
-        .fc-event-main {
-            cursor: pointer !important;
-        }
+       
     </style>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -209,6 +195,7 @@ include '../navbar/navbar.php';
 </head>
 
 <body>
+    
 
     <?php
     $current_page = 'schedule';
@@ -249,51 +236,49 @@ include '../navbar/navbar.php';
 
                         <div class="card-body p-4">
                             <!-- Add filter controls -->
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <label for="filterDepartment" class="form-label">Department</label>
-                                    <select id="filterDepartment" class="form-select">
-                                        <option value="">All Departments</option>
-                                        <?php foreach ($departments as $dept): ?>
-                                            <option value="<?php echo htmlspecialchars($dept['id']); ?>"
-                                                data-is-college="<?php echo strtolower($dept['department_name']) === 'college' ? '1' : '0'; ?>"
-                                                <?php echo ($selected_department_id == $dept['id']) ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($dept['department_name']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3" id="filterGradeLevelContainer" <?php echo ($selected_department_id && strtolower($departments[array_search($selected_department_id, array_column($departments, 'id'))]['department_name']) === 'college') ? 'style="display: none;"' : ''; ?>>
-                                    <label for="filterGradeLevel" class="form-label">Grade Level</label>
-                                    <select id="filterGradeLevel" class="form-select" <?php echo empty($selected_department_id) ? 'disabled' : ''; ?>>
-                                        <option value="">Select Department First</option>
-                                        <?php if ($selected_department_id): ?>
-                                            <?php foreach ($grade_levels as $grade): ?>
-                                                <?php if (!empty($grade)): ?>
-                                                    <option value="<?php echo htmlspecialchars($grade); ?>"
-                                                        <?php echo ($selected_grade_level == $grade) ? 'selected' : ''; ?>>
-                                                        <?php echo htmlspecialchars($grade); ?>
-                                                    </option>
-                                                <?php endif; ?>
+                            <div class="filter-container">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label class="filter-label" for="filterDepartment">Department</label>
+                                        <select class="filter-select" id="filterDepartment">
+                                            <option value="">All Departments</option>
+                                            <?php foreach ($departments as $dept): ?>
+                                                <option value="<?= $dept['id'] ?>" <?= $selected_department_id == $dept['id'] ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($dept['department_name']) ?>
+                                                </option>
                                             <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </select>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label" for="filterGradeLevel">Grade Level</label>
+                                        <select class="filter-select" id="filterGradeLevel" <?= empty($grade_levels) ? 'disabled' : '' ?>>
+                                            <option value="">All Grade Levels</option>
+                                            <?php foreach ($grade_levels as $grade): ?>
+                                                <option value="<?= $grade ?>" <?= $selected_grade_level == $grade ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($grade) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label class="filter-label" for="filterGame">Game</label>
+                                        <select class="filter-select" id="filterGame">
+                                            <option value="">All Games</option>
+                                            <?php foreach ($games as $game): ?>
+                                                <option value="<?= $game['game_id'] ?>" <?= $selected_game_id == $game['game_id'] ? 'selected' : '' ?>>
+                                                    <?= htmlspecialchars($game['game_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <label for="filterGame" class="form-label">Game</label>
-                                    <select id="filterGame" class="form-select">
-                                        <option value="">All Games</option>
-                                        <?php foreach ($games as $game): ?>
-                                            <option value="<?php echo $game['game_id']; ?>"
-                                                <?php echo ($selected_game_id == $game['game_id']) ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($game['game_name']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 d-flex align-items-end">
-                                    <button id="applyFilters" class="btn btn-primary">Apply Filters</button>
-                                    <button id="resetFilters" class="btn btn-secondary ms-2">Reset</button>
+                                <div class="filter-buttons">
+                                    <button id="applyFilters" class="btn btn-primary">
+                                        <i class="fas fa-filter"></i> Apply Filters
+                                    </button>
+                                    <button id="resetFilters" class="btn btn-secondary">
+                                        <i class="fas fa-undo"></i> Reset
+                                    </button>
                                 </div>
                             </div>
                             <div id="calendar"></div>
@@ -782,7 +767,7 @@ include '../navbar/navbar.php';
             // Calendar setup
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridWeek',
+                initialView: window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek',
                 events: <?php echo json_encode($schedules); ?>,
                 headerToolbar: {
                     left: 'prev,next today',
@@ -1188,3 +1173,92 @@ include '../navbar/navbar.php';
 </body>
 
 </html>
+
+<div class="modal event-details-modal fade" id="eventDetailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Match Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="event-info">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Match Type</div>
+                            <div class="info-value" id="eventMatchType">-</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Game</div>
+                            <div class="info-value" id="eventGame">-</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Teams</div>
+                            <div class="info-value" id="eventTeams">-</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Date & Time</div>
+                            <div class="info-value" id="eventDateTime">-</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Venue</div>
+                            <div class="info-value" id="eventVenue">-</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Department</div>
+                            <div class="info-value" id="eventDepartment">-</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Grade Level</div>
+                            <div class="info-value" id="eventGradeLevel">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <?php if ($role !== 'Committee'): ?>
+                    <button type="button" class="btn btn-primary" id="editEventBtn">
+                        <i class="fas fa-edit"></i> Edit Schedule
+                    </button>
+                    <button type="button" class="btn btn-danger" id="cancelEventBtn">
+                        <i class="fas fa-times"></i> Cancel Match
+                    </button>
+                <?php endif; ?>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -6,7 +6,15 @@
     <title>Forgot Password</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <style>
+input {
+    width: 40%;
+}
 
+@media only screen and (max-width: 600px) {
+    input {
+        width: 80%;
+    }
+}
     </style>
 </head>
 <body>

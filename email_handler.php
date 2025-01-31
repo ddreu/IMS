@@ -5,7 +5,14 @@ function sendPasswordResetEmail($email, $token) {
     $mail->addAddress($email);
 
     $mail->Subject = "Password Reset Request";
-    $resetUrl = "http://localhost/IMS/reset-password.php?token=" . urlencode($token);
+    // Get the protocol (http or https)
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+
+    // Get the domain (e.g., intrasports.com)
+    $host = $_SERVER['HTTP_HOST']; 
+
+    // Construct the reset URL dynamically
+    $resetUrl = "$protocol://$host/reset-password.php?token=" . urlencode($token);
     
     // Create a professional HTML email body
     $mail->Body = "

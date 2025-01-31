@@ -1,61 +1,73 @@
 <?php
 session_start();
 include_once '../connection/conn.php';
+$conn = con();
 
-header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../login.php');
     exit();
 }
 
-$conn = con();
+// Check database connection
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
+}
+
+// Ensure team_id is provided
+if (!isset($_GET['team_id'])) {
+    $_SESSION['error_message'] = "No team ID provided.";
+    header("Location: teams.php"); // Redirect to the teams page
+    exit();
+}
+
+$team_id = $_GET['team_id'];
+
+$conn->begin_transaction(); // Start transaction
 
 try {
-    // Get JSON data
-    $json = file_get_contents('php://input');
-    $data = json_decode($json, true);
-    
-    if (!isset($data['team_id'])) {
-        throw new Exception('Team ID is required');
+    // Step 1: Check if the team is linked in matches
+    $check_sql = "SELECT COUNT(*) FROM matches WHERE teamB_id = ? OR teamA_id = ?";
+    $check_stmt = $conn->prepare($check_sql);
+    $check_stmt->bind_param("ii", $team_id, $team_id);
+    $check_stmt->execute();
+    $check_stmt->bind_result($count);
+    $check_stmt->fetch();
+    $check_stmt->close();
+
+    if ($count > 0) {
+        // Optionally delete related matches
+        $delete_matches_sql = "DELETE FROM matches WHERE teamB_id = ? OR teamA_id = ?";
+        $delete_matches_stmt = $conn->prepare($delete_matches_sql);
+        $delete_matches_stmt->bind_param("ii", $team_id, $team_id);
+        $delete_matches_stmt->execute();
+        $delete_matches_stmt->close();
     }
-    
-    $team_id = intval($data['team_id']);
 
-    // Start transaction
-    $conn->begin_transaction();
-
-    // Delete team players first (if any)
-    $delete_players_sql = "DELETE FROM players WHERE team_id = ?";
-    $delete_players_stmt = $conn->prepare($delete_players_sql);
-    $delete_players_stmt->bind_param("i", $team_id);
-    $delete_players_stmt->execute();
-
-    // Delete the team
+    // Step 2: Delete the team from the teams table
     $delete_team_sql = "DELETE FROM teams WHERE team_id = ?";
     $delete_team_stmt = $conn->prepare($delete_team_sql);
+
+    if (!$delete_team_stmt) {
+        throw new Exception("Failed to prepare delete query.");
+    }
+
     $delete_team_stmt->bind_param("i", $team_id);
     
     if ($delete_team_stmt->execute()) {
-        $conn->commit();
-        echo json_encode([
-            'success' => true,
-            'message' => 'Team deleted successfully!'
-        ]);
+        $conn->commit(); // Commit transaction
+        $_SESSION['success_message'] = "Team deleted successfully!";
     } else {
-        throw new Exception('Failed to delete team');
+        throw new Exception("Failed to delete team.");
     }
 
+    $delete_team_stmt->close();
 } catch (Exception $e) {
-    if ($conn->connect_errno) {
-        $conn->rollback();
-    }
-    error_log("Error in delete_team.php: " . $e->getMessage());
-    echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-    ]);
+    $conn->rollback(); // Rollback on error
+    $_SESSION['error_message'] = "Error: " . $e->getMessage();
 }
 
-$conn->close();
+// Redirect to the teams page
+header("Location: teams.php"); // Change this to your actual teams page
+exit();
 ?>

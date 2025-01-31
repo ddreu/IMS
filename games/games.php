@@ -133,9 +133,6 @@ if ($school_id) {
 include '../navbar/navbar.php';
 ?>
 
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -154,6 +151,192 @@ include '../navbar/navbar.php';
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles/dashboard.css">
     <style>
+        /* Base styles */
+        .card.box {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .table thead th {
+            background-color: #2c3e50;
+            color: white;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        /* Filter section styles */
+        .filter-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box .form-control {
+            padding-left: 2.5rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .wrapper {
+                padding: 0;
+            }
+
+            #content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            /* Header Section */
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+
+            /* Filter Section */
+            .row.mb-4 {
+                margin: 0;
+            }
+
+            .btn-group {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .btn-group .btn {
+                flex: 1;
+                white-space: nowrap;
+                padding: 0.5rem;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            /* Table Responsive */
+            .card.box {
+                border-radius: 0;
+                margin: 0 -15px;
+            }
+
+            .card-body {
+                padding: 0;
+            }
+
+            .table-responsive {
+                margin: 0;
+            }
+
+            .table {
+                margin: 0;
+            }
+
+            .table thead {
+                display: none;
+            }
+
+            .table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+            }
+
+            .table tbody td {
+                display: flex;
+                text-align: left;
+                padding: 0.5rem 0;
+                border: none;
+                align-items: center;
+            }
+
+            .table tbody td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                width: 140px;
+                min-width: 140px;
+                color: #2c3e50;
+            }
+
+            /* Action buttons in table */
+            .table .btn-group {
+                width: auto;
+                margin: 0;
+            }
+
+            .table .btn {
+                padding: 0.4rem 0.8rem;
+            }
+
+            /* Modal Adjustments */
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+
+            .modal-content {
+                border-radius: 8px;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            /* Empty State */
+            .text-center.py-4 {
+                padding: 2rem 1rem !important;
+            }
+
+            .text-center.py-4 i {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Small Mobile Adjustments */
+        @media (max-width: 576px) {
+            #content {
+                padding: 10px;
+            }
+
+            .table tbody td:before {
+                width: 120px;
+                min-width: 120px;
+            }
+
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
     </style>
 </head>
 
@@ -194,22 +377,112 @@ include '../navbar/navbar.php';
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2>List of Games</h2>
                     <?php if ($user['role'] === 'School Admin') : ?>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGameModal"><i class="fas fa-plus"></i> Add Game</button>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGameModal">
+                            <i class="fas fa-plus"></i> Add Game
+                        </button>
                     <?php endif; ?>
                 </div>
-            </div>
 
-            <!--<form method="GET" action="games.php" class="mb-3">
-                <div class="d-flex">
-                    <input type="text" name="search" class="form-control me-2" placeholder="Search for games..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
-                    <button type="submit" class="btn btn-primary">Search</button>
+                <div class="filter-section">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="btn-group w-100" role="group">
+                                <a href="?filter=all<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"
+                                    class="btn btn-outline-primary <?= $filter === 'all' ? 'active' : '' ?>">
+                                    All Games
+                                </a>
+                                <a href="?filter=indoor<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"
+                                    class="btn btn-outline-primary <?= $filter === 'indoor' ? 'active' : '' ?>">
+                                    Indoor
+                                </a>
+                                <a href="?filter=outdoor<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"
+                                    class="btn btn-outline-primary <?= $filter === 'outdoor' ? 'active' : '' ?>">
+                                    Outdoor
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                                    <form method="GET" action="games.php" class="d-flex gap-2">
+                                        <input type="text" name="search" class="form-control" placeholder="Search games..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                    </div>
                 </div>
-            </form>-->
+
+                <div class="card box">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="px-4 py-3">Game Name</th>
+                                        <th class="px-4 py-3">Players per Team</th>
+                                        <th class="px-4 py-3">Category</th>
+                                        <th class="px-4 py-3">Environment</th>
+                                        <?php if ($user['role'] === 'School Admin'): ?>
+                                            <th class="px-4 py-3 text-center">Actions</th>
+                                        <?php endif; ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    if ($game_result && mysqli_num_rows($game_result) > 0) {
+                                        while ($game = mysqli_fetch_assoc($game_result)) {
+                                            echo '<tr>';
+                                            echo '<td data-label="Game Name" class="px-4">' . htmlspecialchars($game['game_name']) . '</td>';
+                                            echo '<td data-label="Players" class="px-4">' . htmlspecialchars($game['number_of_players']) . '</td>';
+                                            echo '<td data-label="Category" class="px-4">' . htmlspecialchars($game['category']) . '</td>';
+                                            echo '<td data-label="Environment" class="px-4">' . htmlspecialchars($game['environment']) . '</td>';
 
 
+                                            if ($user['role'] === 'School Admin') {
+                                                echo '<td data-label="Actions" class="px-4 text-center">';
+                                                echo '<div class="btn-group">';
+// Edit button
+echo '<button onclick="openUpdateModal(' .
+htmlspecialchars($game['game_id']) . ', \'' .
+htmlspecialchars($game['game_name']) . '\', ' .
+htmlspecialchars($game['number_of_players']) . ', \'' .
+htmlspecialchars($game['category']) . '\', \'' .
+htmlspecialchars($game['environment']) . '\')" ' .
+'class="btn btn-primary btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
+'<i class="fas fa-edit"></i></button>';                                                        // Delete button and form
+                                                        echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" class="d-inline">';
+                                                        echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
+                                                        echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
+                                                            'class="btn btn-danger btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
+                                                            '<i class="fas fa-trash"></i></button>';
+                                                        echo '</form>';
+                                               
+                                               
+                                                echo '</div>';
+                                                echo '</td>';
+                                            }
+                                            echo '</tr>';
+                                        }
+                                    } else {
+                                        echo '<tr><td colspan="' . ($user['role'] === 'School Admin' ? '5' : '4') . '" class="text-center py-4">';
+                                        echo '<div class="text-muted">';
+                                        echo '<i class="fas fa-gamepad fa-3x mb-3"></i>';
+                                        echo '<p class="mb-0">No games found</p>';
+                                        echo '</div>';
+                                        echo '</td></tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <!-- Update Game Modal -->
-            <div class="modal fade" id="updateGameModal" tabindex="-1" aria-labelledby="updateGameModalLabel" aria-hidden="true">
+<!-- Update Game Modal -->
+<div class="modal fade" id="updateGameModal" tabindex="-1" aria-labelledby="updateGameModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -255,171 +528,48 @@ include '../navbar/navbar.php';
                     </div>
                 </div>
             </div>
+        </div>
 
-
-            <div class="card box">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <div class="container-fluid p-0">
-                            <!-- Filter Buttons -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="btn-group" role="group">
-                                        <a href="games.php?filter=all" class="btn <?php echo $filter === 'all' || !isset($filter) ? 'btn-primary' : 'btn-outline-primary'; ?>">
-                                            <i class="fas fa-list me-2"></i>All
-                                        </a>
-                                        <a href="games.php?filter=indoor" class="btn <?php echo $filter === 'indoor' ? 'btn-primary' : 'btn-outline-primary'; ?>">
-                                            <i class="fas fa-home me-2"></i>Indoor
-                                        </a>
-                                        <a href="games.php?filter=outdoor" class="btn <?php echo $filter === 'outdoor' ? 'btn-primary' : 'btn-outline-primary'; ?>">
-                                            <i class="fas fa-sun me-2"></i>Outdoor
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <form method="GET" action="games.php" class="d-flex gap-2">
-                                        <input type="text" name="search" class="form-control" placeholder="Search games..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <!-- Games Table -->
-                            <div class="card shadow-sm">
-                                <div class="card-body p-0">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="bg-light">
-                                            <tr>
-                                                <th class="px-4 py-3">Game Name</th>
-                                                <th class="px-4 py-3">Players per Team</th>
-                                                <th class="px-4 py-3">Category</th>
-                                                <th class="px-4 py-3">Environment</th>
-                                                <?php if ($user['role'] === 'School Admin') : ?>
-                                                    <th class="px-4 py-3 text-center">Actions</th>
-                                                <?php endif; ?>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            if ($game_result && mysqli_num_rows($game_result) > 0) {
-                                                while ($game = mysqli_fetch_assoc($game_result)) {
-                                                    echo '<tr>';
-                                                    echo '<td class="px-4">' . htmlspecialchars($game['game_name']) . '</td>';
-                                                    echo '<td class="px-4">' . htmlspecialchars($game['number_of_players']) . '</td>';
-                                                    echo '<td class="px-4">';
-                                                    // Add badge for category
-                                                    $categoryClass = '';
-                                                    switch ($game['category']) {
-                                                        case 'Team Sports':
-                                                            $categoryClass = 'bg-primary';
-                                                            break;
-                                                        case 'Individual Sports':
-                                                            $categoryClass = 'bg-success';
-                                                            break;
-                                                        case 'Dual Sports':
-                                                            $categoryClass = 'bg-info';
-                                                            break;
-                                                    }
-                                                    echo '<span class="badge ' . $categoryClass . '">' . htmlspecialchars($game['category']) . '</span>';
-                                                    echo '</td>';
-                                                    echo '<td class="px-4">';
-                                                    // Add badge for environment
-                                                    $envClass = $game['environment'] === 'Indoor' ? 'bg-secondary' : 'bg-success';
-                                                    echo '<span class="badge ' . $envClass . '">' . htmlspecialchars($game['environment']) . '</span>';
-                                                    echo '</td>';
-
-                                                    if ($user['role'] === 'School Admin') {
-                                                        echo '<td class="px-4">';
-                                                        echo '<div class="d-flex gap-2 justify-content-center">';
-
-                                                        // Edit button
-                                                        echo '<button onclick="openUpdateModal(' .
-                                                            htmlspecialchars($game['game_id']) . ', \'' .
-                                                            htmlspecialchars($game['game_name']) . '\', ' .
-                                                            htmlspecialchars($game['number_of_players']) . ', \'' .
-                                                            htmlspecialchars($game['category']) . '\', \'' .
-                                                            htmlspecialchars($game['environment']) . '\')" ' .
-                                                            'class="btn btn-primary btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
-                                                            '<i class="fas fa-edit"></i></button>';
-
-                                                        // Delete button and form
-                                                        echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" class="d-inline">';
-                                                        echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
-                                                        echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
-                                                            'class="btn btn-danger btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
-                                                            '<i class="fas fa-trash"></i></button>';
-                                                        echo '</form>';
-
-                                                        echo '</div>';
-                                                        echo '</td>';
-                                                    }
-                                                    echo '</tr>';
-                                                }
-                                            } else {
-                                                echo '<tr><td colspan="' . ($user['role'] === 'School Admin' ? '5' : '4') . '" class="text-center py-4">';
-                                                echo '<div class="text-muted">';
-                                                echo '<i class="fas fa-gamepad fa-3x mb-3"></i>';
-                                                echo '<p class="mb-0">No games found</p>';
-                                                echo '</div>';
-                                                echo '</td></tr>';
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+    <!-- Add Game Modal -->
+    <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addGameModalLabel">Add New Game</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post" action="games.php">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="game_name" class="form-label">Game Name:</label>
+                            <input type="text" class="form-control" name="game_name" id="game_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="number_of_players" class="form-label">Number of Players per Team:</label>
+                            <input type="number" class="form-control" name="number_of_players" id="number_of_players" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category:</label>
+                            <select name="category" id="category" class="form-select" required>
+                                <option value="Team Sports">Team Sports</option>
+                                <option value="Individual Sports">Individual Sports</option>
+                                <option value="Dual Sports">Dual Sports</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="environment" class="form-label">Environment:</label>
+                            <select name="environment" id="environment" class="form-select" required>
+                                <option value="Indoor">Indoor</option>
+                                <option value="Outdoor">Outdoor</option>
+                            </select>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Add Game Modal -->
-            <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addGameModalLabel">Add New Game</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form method="post" action="games.php">
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="game_name" class="form-label">Game Name:</label>
-                                    <input type="text" class="form-control" name="game_name" id="game_name" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="number_of_players" class="form-label">Number of Players per Team:</label>
-                                    <input type="number" class="form-control" name="number_of_players" id="number_of_players" min="1" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="category" class="form-label">Category:</label>
-                                    <select name="category" id="category" class="form-select" required>
-                                        <option value="Team Sports">Team Sports</option>
-                                        <option value="Individual Sports">Individual Sports</option>
-                                        <option value="Dual Sports">Dual Sports</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="environment" class="form-label">Environment:</label>
-                                    <select name="environment" id="environment" class="form-select" required>
-                                        <option value="Indoor">Indoor</option>
-                                        <option value="Outdoor">Outdoor</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" name="add_game" class="btn btn-primary">Add Game</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            </div>
-                        </form>
+                    <div class="modal-footer">
+                        <button type="submit" name="add_game" class="btn btn-primary">Add Game</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     </div>
-                </div>
+                </form>
             </div>
-
-
-
         </div>
     </div>
 

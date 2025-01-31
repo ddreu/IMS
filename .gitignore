@@ -32,7 +32,7 @@ vendor/
 # TypeScript build files (if applicable)
 *.tsbuildinfo
 *.d.ts
-*.js
+#*.js
 *.js.map
 
 # Log files

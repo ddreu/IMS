@@ -2,15 +2,65 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+   /* outline: 1px solid red; */
 }
 
 body {
     background-color: #f5f7fa;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    width: 100vw;
+    overflow-x: hidden;
 }
 
 
-/* Fix navbar expansion */
+/* Fix navbar expansion */@media screen and (max-width: 768px) {
+    .nav__links, .cta {
+        display: none;
+    }
+    .menu {
+        display: block;
+    }
+}@media screen and (max-width: 768px) {
+    .welcome-hero {
+        height: auto;
+        min-height: 400px;
+    }
+    
+    .hero-content {
+        max-width: 100%;
+        text-align: center;
+        padding: 20px 15px;
+    }
+    
+    .hero-content h1 {
+        font-size: 28px;
+    }
+    
+    .hero-content p {
+        font-size: 14px;
+        text-align: center;
+    }
+}@media screen and (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+    
+    h1 { font-size: 24px; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 20px; }
+}@media screen and (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .row {
+        margin: 0 -10px;
+    }
+    
+    .col-12 {
+        padding: 0 10px;
+    }
+}
 .navbar.navbar-dark.bg-dark {
     width: 100%;
     max-width: 100%;
@@ -126,26 +176,6 @@ header {
     color: #edf0f1;
 }
 
-@media screen and (max-height: 450px) {
-    .overlay a {
-        font-size: 20px;
-    }
-    .overlay .close {
-        font-size: 40px;
-        top: 15px;
-        right: 35px;
-    }
-}
-
-@media only screen and (max-width: 800px) {
-    .nav__links,
-    .cta {
-        display: none;
-    }
-    .menu {
-        display: initial;
-    }
-}
 
  /* welcome hero */
 .welcome-hero {
@@ -199,21 +229,6 @@ header {
     text-align: justify;
 }
 
-@media (max-width: 768px) {
-    .hero-content {
-        max-width: 100%; 
-        text-align: center; 
-        padding-left: 0; 
-    }
-
-    .hero-content h1 {
-        font-size: 36px; 
-    }
-
-    .hero-content p {
-        font-size: 16px; 
-}
-}
 
 
 
@@ -380,17 +395,6 @@ header {
 .timer-status.ended {
     color: #dc2626;
 }
-@media (max-width: 768px) {
-    .score-divider {
-        display: none;
-    }
-    .team-section {
-        display: inline-flex;
-    }
-    .team-score {
-        font-size: 2.5rem;
-    }
-}
 
 /* event */
 
@@ -517,14 +521,8 @@ header {
     color: #64748b;
     margin-bottom: 1rem;
 }
-@media (max-width: 768px) {
-    .event-date {
-        position: static;
-        transform: none;
-        margin-top: 0.5rem;
-        display: inline-flex;
-    }
-}
+
+
 
 /* rankings */
 
@@ -688,17 +686,7 @@ header {
     text-align: center;
     margin-top: 1rem;
 }
-@media (max-width: 768px) {
-    .rankings-body {
-        padding: 1rem;
-    }
-    #rankTable td, #rankTable th {
-        padding: 0.75rem;
-    }
-    #rankTable td:first-child i {
-        font-size: 1.2rem;
-    }
-}
+
 
 /* match results */
 
@@ -840,15 +828,7 @@ header {
     color: #1a237e;
     margin: 0;
 }
-@media (max-width: 768px) {
-    .team-info {
-        max-width: 120px;
-    }
-    .score-display {
-        min-width: 90px;
-        font-size: 1.5rem;
-    }
-}
+
 
 
 
@@ -869,16 +849,19 @@ footer {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .footer__links {
     list-style: none;
     display: flex;
-    
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
 }
 
 .footer__links li {
-    padding: 0px 20px;
+    padding: 5px 15px;
 }
 
 .footer__links li a {
@@ -886,7 +869,7 @@ footer {
     font-weight: 500;
     color: #edf0f1;
     text-decoration: none;
-    transition: color 0.3s ease 0s;
+    transition: color 0.3s ease;
 }
 
 .footer__links li a:hover {
@@ -897,8 +880,8 @@ footer {
     margin-top: 20px;
     text-align: center;
     font-size: 14px;
+    width: 100%;
 }
-
 
 .logo {
     cursor: pointer;
@@ -911,15 +894,258 @@ footer {
     transition: color 0.3s ease;
     text-decoration: none;
 }
+
 .cta {
     padding: 9px 25px;
     background-color: #2a2d54;
     border: none;
     border-radius: 50px;
     cursor: pointer;
-    transition: background-color 0.3s ease 0s;
+    transition: background-color 0.3s ease;
 }
 
 .cta:hover {
     opacity: 1;
 }
+
+.cta i {
+    color: #edf0f1;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .footer__content {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 768px) {
+    footer {
+        padding: 20px 5%;
+    }
+
+    .footer__links {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer__links li {
+        padding: 5px 0;
+    }
+
+    .logo {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer__bottom {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .team-info {
+        max-width: 120px;
+    }
+    .score-display {
+        min-width: 90px;
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .rankings-body {
+        padding: 1rem;
+    }
+    #rankTable td, #rankTable th {
+        padding: 0.75rem;
+    }
+    #rankTable td:first-child i {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .event-date {
+        position: static;
+        transform: none;
+        margin-top: 0.5rem;
+        display: inline-flex;
+    }
+}
+
+@media (max-width: 768px) {
+    .score-divider {
+        display: none;
+    }
+    .team-section {
+        display: inline-flex;
+    }
+    .team-score {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content {
+        max-width: 100%; 
+        text-align: center; 
+        padding-left: 0; 
+    }
+
+    .hero-content h1 {
+        font-size: 36px; 
+    }
+
+    .hero-content p {
+        font-size: 16px; 
+}
+}
+
+@media screen and (max-height: 450px) {
+    .overlay a {
+        font-size: 20px;
+    }
+    .overlay .close {
+        font-size: 40px;
+        top: 15px;
+        right: 35px;
+    }
+}
+
+@media only screen and (max-width: 800px) {
+    .nav__links,
+    .cta {
+        display: none;
+    }
+    .menu {
+        display: initial;
+    }
+}
+
+
+@media (max-width: 576px) {
+    .dropdown-menu {
+        min-width: 100% !important; /* Make it fit inside screen */
+        max-width: 280px; /* Prevent it from being too large */
+        right: 0 !important; /* Ensure it stays within viewport */
+        left: auto !important;
+    }
+    
+    .dropdown button {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-nav .nav-item {
+        width: auto !important;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.3rem 0.6rem !important;
+        font-size: 0.85rem !important;
+        white-space: nowrap;
+    }
+}
+@media (max-width: 576px) {
+    .navbar-collapse {
+        max-width: 90% !important;
+        margin: auto;
+    }
+
+    .navbar-nav {
+        align-items: center;
+    }
+
+    .nav-item {
+        width: auto !important;
+        text-align: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .dropdown button {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    .dropdown-menu {
+        min-width: 100% !important;
+        right: 0 !important;
+        left: auto !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer__links {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer__links li {
+        padding: 5px 0 !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .dropdown-menu {
+        width: 90% !important;  /* Prevents overflow */
+        max-width: 280px !important;
+        right: auto !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important; /* Centers it */
+    }
+
+    .dropdown button {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-nav .nav-item {
+        width: auto !important;
+        text-align: center !important;
+    }
+
+    .navbar-collapse {
+        max-width: 90%;
+        margin: auto;
+    }
+}
+@media (max-width: 576px) {
+    .dropdown-menu {
+        font-size: 0.85rem !important;
+        padding: 0.5rem !important;
+        
+    }
+
+    .dropdown-item {
+        padding: 0.4rem 0.8rem !important;
+    }
+}
+@media (max-width: 576px) {
+    .navbar-toggler {
+        padding: 0.5rem !important;
+    }
+
+    .navbar-toggler-icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dropdown-menu {
+        position: relative !important;
+    }
+    .page-header-live {
+        margin-top: -1.7rem;
+    }
+}
+

@@ -4,6 +4,18 @@
 
         <!-- Toggle button -->
         <button
+        id="committeeSidebarToggle"
+            class="navbar-toggler"
+            type="button"
+            data-bs-target="#csidebar"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <button
+        id="sidebarToggle"
             class="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
@@ -85,70 +97,107 @@
 
 </nav>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Logout functionality
-        document.getElementById('logoutBtn').addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent the default anchor action
-            // Show SweetAlert2 confirmation dialog
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You will be logged out of your account.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, logout!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show success message
-                    Swal.fire({
-                        icon: "success",
-                        title: "Successfully logged out!",
-                        showConfirmButton: false,
-                        timer: 1000
-                    }).then(() => {
-                        // After 1 second, redirect to logout.php
-                        window.location.href = '../logout.php';
-                    });
-                }
+    // Handle button visibility based on role
+    document.addEventListener("DOMContentLoaded", function() {
+        const userRole = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : ''; ?>";
+        const committeeSidebarToggle = document.getElementById('committeeSidebarToggle');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        // Initially hide both buttons
+        if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'none';
+        if (sidebarToggle) sidebarToggle.style.display = 'none';
+
+        // Show appropriate button based on role
+        if (userRole === 'Committee') {
+            if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'block';
+        } else {
+            if (sidebarToggle) sidebarToggle.style.display = 'block';
+        }
+    });
+
+    // Your existing toggle functionality
+    document.addEventListener("DOMContentLoaded", function() {
+        const userRole = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : ''; ?>";
+        console.log(userRole);
+
+        // Determine the correct sidebar ID based on user role
+        const sidebarId = (userRole === 'Committee') ? '#csidebar' : '#sidebar';
+        const sidebar = document.querySelector(sidebarId);
+        const togglerButton = document.querySelector('.navbar-toggler');
+
+        // If the button is found, update the 'data-bs-target' to the correct sidebar ID
+        if (togglerButton) {
+            togglerButton.setAttribute('data-bs-target', sidebarId);
+        }
+
+        // Add click event listener to the toggler button to manually handle sidebar toggle
+        if (togglerButton && sidebar) {
+            togglerButton.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default Bootstrap behavior
+                event.stopPropagation(); // Prevent event from bubbling
+                
+                // Toggle the 'active' class on the sidebar
+                sidebar.classList.toggle('active');
+                
+                // Add/remove 'sidebar-active' class to body for overlay
+                document.body.classList.toggle('sidebar-active');
+
+                // Update aria-expanded attribute
+                const isExpanded = sidebar.classList.contains('active');
+                togglerButton.setAttribute('aria-expanded', isExpanded);
+            });
+        }
+    });
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default anchor action
+        // Show SweetAlert2 confirmation dialog
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out of your account.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, logout!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show success message
+                Swal.fire({
+                    icon: "success",
+                    title: "Successfully logged out!",
+                    showConfirmButton: false,
+                    timer: 1000
+                }).then(() => {
+                    // After 1 second, redirect to logout.php
+                    window.location.href = '../logout.php';
+                });
+            }
+        });
+    });
+
+    // Add click event to close sidebar when clicking outside or on overlay
+    document.addEventListener('click', function(event) {
+        // Check if sidebar exists and is currently active
+        if (sidebar && sidebar.classList.contains('active')) {
+            // Check if the click is outside the sidebar and not on the toggler button
+            if (!sidebar.contains(event.target) && 
+                !togglerButton.contains(event.target)) {
+                sidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-active');
+                togglerButton.setAttribute('aria-expanded', 'false');
+            }
+        }
+    });
+
+    // Prevent sidebar links from closing the sidebar when clicked
+    if (sidebar) {
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevent click from propagating to document
             });
         });
-
-        /* // Games dropdown functionality
-         const dropdown = document.getElementById('gamesDropdown');
-         fetch('../rankings/fetch_games.php')
-             .then(response => response.json())
-             .then(games => {
-                 dropdown.innerHTML = ''; // Clear the "Loading..." message
-
-                 // Add a "Clear Selection" option
-                 const clearOption = document.createElement('li');
-                 clearOption.innerHTML = `<a class="dropdown-item" href="#" id="clearSelection">Clear Selection</a>`;
-                 dropdown.appendChild(clearOption);
-
-                 // Add event listener for the "Clear Selection" option
-                 document.getElementById('clearSelection').addEventListener('click', function(e) {
-                     e.preventDefault();
-                     const url = new URL(window.location.href);
-                     url.searchParams.delete('game_id'); // Remove 'game_id' parameter
-                     window.location.href = url.toString(); // Redirect with updated URL
-                 });
-
-                 if (games.length === 0) {
-                     dropdown.innerHTML += '<li class="dropdown-item text-center text-muted">No games available</li>';
-                     return;
-                 }
-
-                 // Populate the dropdown with games
-                 games.forEach(game => {
-                     const listItem = document.createElement('li');
-                     listItem.innerHTML = `<a class="dropdown-item" href="?game_id=${game.game_id}">${game.game_name}</a>`;
-                     dropdown.appendChild(listItem);
-                 });
-             })
-             .catch(error => {
-                 console.error('Error fetching games:', error);
-                 dropdown.innerHTML = '<li class="dropdown-item text-center text-danger">Error loading games</li>';
-             }); */
-    });
+    }
 </script>

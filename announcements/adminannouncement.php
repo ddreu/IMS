@@ -149,40 +149,6 @@ include '../navbar/navbar.php';
             transition: all 0.3s ease;
         }
         
-        .announcement-table .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .announcement-table .btn-info {
-            background-color: #3498db;
-            border-color: #3498db;
-            color: white;
-        }
-        
-        .announcement-table .btn-warning {
-            background-color: #f1c40f;
-            border-color: #f1c40f;
-            color: white;
-        }
-        
-        .announcement-table .btn-danger {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-        
-        .announcement-table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .announcement-table .title-cell {
-            font-weight: 500;
-            color: #2c3e50;
-            max-width: 400px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
         .card.box {
             border: none;
             border-radius: 15px;
@@ -191,6 +157,133 @@ include '../navbar/navbar.php';
         
         .card-body {
             padding: 1.5rem;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .wrapper {
+                padding: 10px;
+            }
+
+            #content {
+                margin-left: 0;
+                padding: 10px;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+
+            /* Table Responsive */
+            .table-responsive {
+                border: 0;
+            }
+
+            .table thead {
+                display: none;
+            }
+
+            .table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                border-bottom: 2px solid #dee2e6;
+            }
+
+            .table tbody td {
+                display: flex;
+                text-align: left;
+                padding: 1rem;
+                position: relative;
+                border-bottom: 1px solid rgba(0,0,0,0.1);
+                align-items: center;
+            }
+
+            .table tbody td[data-label="Title"] {
+                display: block;
+            }
+
+            .table tbody td[data-label="Title"] .d-flex.align-items-center.gap-3 {
+                display: flex !important;
+                align-items: center !important;
+                gap: 1rem !important;
+            }
+
+            .table tbody td[data-label="Department"] {
+                justify-content: space-between;
+            }
+
+            .table tbody td[data-label="Actions"] {
+                justify-content: flex-end;
+                gap: 0.5rem;
+            }
+
+            .table tbody td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #2c3e50;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                min-width: 100px;
+            }
+
+            .table tbody td[data-label="Title"]:before {
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+
+            .table tbody td[data-label="Department"]:before,
+            .table tbody td[data-label="Actions"]:before {
+                margin-bottom: 0;
+            }
+
+            /* Action buttons container */
+            .d-flex.gap-2.justify-content-center {
+                display: flex !important;
+                gap: 0.5rem !important;
+                margin: 0;
+            }
+
+            /* Title section adjustments */
+            .d-flex.align-items-center.gap-3 {
+                width: 100%;
+            }
+
+            .fw-medium {
+                margin: 0;
+            }
+
+            /* Hide original labels if needed */
+            .hidden-mobile {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table tbody td {
+                padding-left: 40%;
+            }
+
+            .btn-sm {
+                padding: 0.4rem 0.6rem;
+            }
+
+            .fw-medium {
+                font-size: 0.9rem;
+            }
+
+            .text-muted {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -226,16 +319,16 @@ include '../navbar/navbar.php';
                                     <table class="table table-hover align-middle mb-0">
                                         <thead class="bg-light">
                                             <tr>
-                                                <th class="px-4 py-3" style="width: 50%">Title</th>
-                                                <th class="px-4 py-3" style="width: 20%">Department</th>
-                                                <th class="px-4 py-3 text-center" style="width: 30%">Actions</th>
+                                                <th class="px-4 py-3">Title</th>
+                                                <th class="px-4 py-3">Department</th>
+                                                <th class="px-4 py-3 text-center">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php if (mysqli_num_rows($announcements_result) > 0): ?>
                                                 <?php while ($row = mysqli_fetch_assoc($announcements_result)): ?>
                                                     <tr>
-                                                        <td class="px-4 text-break">
+                                                        <td class="px-4 text-break" data-label="Title">
                                                             <div class="d-flex align-items-center gap-3">
                                                                 <?php if (!empty($row["image"])): ?>
                                                                     <div style="width: 40px; height: 40px; overflow: hidden;" class="rounded-circle bg-light d-flex align-items-center justify-content-center">
@@ -252,10 +345,10 @@ include '../navbar/navbar.php';
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td class="px-4">
+                                                        <td class="px-4" data-label="Department">
                                                             <?= htmlspecialchars($row["department_name"] ?? 'All Departments') ?>
                                                         </td>
-                                                        <td class="px-4">
+                                                        <td class="px-4" data-label="Actions">
                                                             <div class="d-flex gap-2 justify-content-center">
                                                                 <button class="btn btn-info btn-sm text-white shadow-sm view-btn" 
                                                                     data-id="<?= htmlspecialchars($row['id']) ?>" 

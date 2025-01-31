@@ -1,133 +1,548 @@
        /* Main Content Styles */
-       .main-content {
-        margin-left: 250px;
-        /* Same as the sidebar's width */
-        padding: 20px;
-        width: calc(100% - 250px);
+.main-content {
+    margin-left: 250px;
+    /* Same as the sidebar's width */
+    padding: 20px;
+    width: calc(100% - 250px);
+}
+
+/* Calendar Styles */
+#calendar {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 10px;
+    height: 800px;
+    /* Ensure the calendar has height */
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1001;
+    /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Form Styles */
+#scheduleForm label {
+    display: block;
+    margin-top: 10px;
+}
+
+#scheduleForm input,
+#scheduleForm select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+#scheduleForm button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+#scheduleForm button:hover {
+    background-color: #45a049;
+}
+
+/* Create Schedule Button */
+#createScheduleBtn {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 4px;
+}
+
+#createScheduleBtn:hover {
+    background-color: #0056b3;
+}
+
+/* Align Teams A and B */
+.team-selection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.team-selection select {
+    width: 45%;
+}
+
+.vs {
+    margin: 0 10px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Error Message */
+#error-message {
+    color: red;
+    display: none;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Root Variables */
+:root {
+    --fc-button-bg-color: #0d6efd;
+    --fc-button-border-color: #0d6efd;
+    --fc-button-hover-bg-color: #0b5ed7;
+    --fc-button-hover-border-color: #0a58ca;
+    --fc-today-bg-color: #e8f0fe;
+    --modal-border-radius: 12px;
+    --modal-padding: 1.5rem;
+}
+
+/* Base Modal Styles */
+.modal-content {
+    border: none;
+    width: 100vw;
+    border-radius: var(--modal-border-radius);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: var(--modal-padding);
+}
+
+.modal-body {
+    padding: var(--modal-padding);
+}
+
+.modal-footer {
+    border-top: 1px solid #eee;
+    padding: var(--modal-padding);
+    gap: 0.5rem;
+}
+
+/* Calendar Container */
+.main {
+    padding: 15px;
+    margin-left: 0;
+}
+
+#calendar {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Filter Section */
+.filter-container {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-label {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Event Base Styles */
+.fc .fc-timegrid-event,
+.fc .fc-daygrid-event,
+.fc-event.fc-event-start.fc-event-end {
+    background-color: var(--fc-event-bg-color, #3788d8) !important;
+    border: none !important;
+    border-left: 4px solid rgba(0, 0, 0, 0.2) !important;
+    color: #fff !important;
+    padding: 4px 6px !important;
+    margin: 2px 0 !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+}
+
+/* Event Content Styles */
+.fc .fc-timegrid-event .fc-event-main,
+.fc .fc-daygrid-event .fc-event-main {
+    padding: 2px 4px !important;
+    color: #fff !important;
+}
+
+.fc .fc-timegrid-event .fc-event-title,
+.fc .fc-daygrid-event .fc-event-title {
+    color: #fff !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+}
+
+.fc .fc-timegrid-event .fc-event-time,
+.fc .fc-daygrid-event .fc-event-time {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 0.8rem !important;
+}
+
+/* Event States */
+.fc .fc-event-today {
+    background-color: var(--fc-event-bg-color, #3788d8) !important;
+}
+
+.fc .fc-event-past {
+    opacity: 0.85;
+}
+
+.fc .fc-event-future {
+    opacity: 1;
+}
+
+/* Event Types */
+.fc .fc-event.match-final {
+    --fc-event-bg-color: #28a745;
+    background-color: #28a745 !important;
+    border-left-color: #1e7e34 !important;
+}
+
+.fc .fc-event.match-semifinal {
+    --fc-event-bg-color: #fd7e14;
+    background-color: #fd7e14 !important;
+    border-left-color: #dc6502 !important;
+}
+
+.fc .fc-event.match-third-place {
+    --fc-event-bg-color: #6f42c1;
+    background-color: #6f42c1 !important;
+    border-left-color: #59339d !important;
+}
+
+/* Event Interactions */
+.fc .fc-event:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+.fc .fc-event:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .fc .fc-timegrid-event,
+    .fc .fc-daygrid-event {
+        padding: 2px 4px !important;
     }
 
-    /* Calendar Styles */
-    #calendar {
-        max-width: 1000px;
-        margin: 40px auto;
-        padding: 0 10px;
-        height: 800px;
-        /* Ensure the calendar has height */
+    .fc .fc-timegrid-event .fc-event-title,
+    .fc .fc-daygrid-event .fc-event-title {
+        font-size: 0.8rem !important;
     }
 
-    /* Modal Styles */
-    .modal {
-        display: none;
-        /* Hidden by default */
-        position: fixed;
-        /* Stay in place */
-        z-index: 1001;
-        /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%;
-        /* Full width */
-        height: 100%;
-        /* Full height */
-        overflow: auto;
-        /* Enable scroll if needed */
-        background-color: rgba(0, 0, 0, 0.4);
-        /* Black w/ opacity */
+    .fc .fc-timegrid-event .fc-event-time,
+    .fc .fc-daygrid-event .fc-event-time {
+        font-size: 0.75rem !important;
     }
+}
 
-    /* Modal Content */
-    .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto;
-        /* 5% from the top and centered */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 50%;
-        /* Could be more or less, depending on screen size */
-        border-radius: 5px;
-    }
+/* Event Styles */
+.fc-event {
+    border-radius: 6px;
+    padding: 4px 6px;
+    margin: 2px 0;
+    border: none;
+    background: #f8f9fa;
+    border-left: 4px solid var(--fc-event-bg-color, #3788d8);
+    cursor: pointer !important;
+}
 
-    /* The Close Button */
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+.fc-event-title {
+    font-weight: 500;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-    }
+.fc-event-time {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
 
-    /* Form Styles */
-    #scheduleForm label {
-        display: block;
-        margin-top: 10px;
-    }
+/* Event Details Modal */
+.event-details-modal .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
 
-    #scheduleForm input,
-    #scheduleForm select {
-        width: 100%;
+.event-info {
+    display: grid;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.info-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border-radius: 50%;
+    color: #0d6efd;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+/* Mobile Styles (≤768px) */
+@media (max-width: 768px) {
+    /* Calendar Layout */
+    .main { padding: 8px; }
+    #calendar { 
         padding: 8px;
-        margin-top: 5px;
-        box-sizing: border-box;
+        font-size: 0.9em;
     }
-
-    #scheduleForm button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-        margin-top: 15px;
-        padding: 10px;
-        font-size: 16px;
-        border-radius: 4px;
+    
+    /* Calendar Header */
+    .fc-header-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
     }
-
-    #scheduleForm button:hover {
-        background-color: #45a049;
-    }
-
-    /* Create Schedule Button */
-    #createScheduleBtn {
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        border: none;
-        background-color: #007BFF;
-        color: white;
-        border-radius: 4px;
-    }
-
-    #createScheduleBtn:hover {
-        background-color: #0056b3;
-    }
-
-    /* Align Teams A and B */
-    .team-selection {
+    
+    .fc .fc-toolbar {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 10px;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
     }
 
-    .team-selection select {
-        width: 45%;
-    }
-
-    .vs {
-        margin: 0 10px;
-        font-weight: bold;
-        font-size: 18px;
-    }
-
-    /* Error Message */
-    #error-message {
-        color: red;
-        display: none;
-        margin-top: 10px;
+    .fc .fc-toolbar-title {
+        font-size: 1.2rem !important;
         text-align: center;
+        order: 1;
     }
+
+    .fc .fc-toolbar-chunk:first-child {
+        order: 2;
+        width: 100%;
+    }
+
+    .fc .fc-toolbar-chunk:last-child {
+        order: 3;
+        width: 100%;
+    }
+
+    /* Calendar Navigation */
+    .fc .fc-button-group {
+        width: 100%;
+        display: flex !important;
+    }
+
+    .fc .fc-button {
+        flex: 1;
+        padding: 8px 4px !important;
+        font-size: 12px !important;
+    }
+
+    /* Calendar Grid */
+    .fc .fc-timegrid-axis { width: 45px !important; }
+    .fc .fc-timegrid-slot { height: 40px !important; }
+    .fc .fc-timegrid-slot-label { font-size: 12px; }
+
+    /* Filter Section */
+    .filter-container {
+        padding: 10px;
+        margin: 0 0 15px 0;
+        border-radius: 0;
+    }
+
+    .filter-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .filter-group { min-width: 100%; }
+
+    .filter-buttons {
+        flex-direction: column;
+    }
+
+    /* Modal Improvements */
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: 95% !important;
+        width: 95% !important;
+    }
+
+    .modal-header,
+    .modal-footer {
+        padding: 0.75rem 1rem;
+    }
+
+    .modal-body { padding: 1rem; }
+
+    .modal-footer {
+        flex-wrap: wrap;
+    }
+
+    .modal-footer .btn {
+        flex: 1;
+        min-width: 120px;
+        margin: 0 !important;
+    }
+
+    /* Form controls inside modals */
+    .modal .form-group { margin-bottom: 1rem; }
+
+    .modal .form-control,
+    .modal .form-select {
+        font-size: 16px;
+        padding: 0.5rem;
+    }
+
+    .modal label {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    /* Event Styles */
+    .fc-event {
+        padding: 2px 4px;
+        font-size: 0.75rem !important;
+    }
+
+    .fc-event-title { font-size: 0.8rem; }
+    .fc-event-time { font-size: 0.75rem; }
+    
+    .fc-event:active { transform: scale(0.98); }
+
+    /* Event Colors */
+    .fc-event.match-final { border-left-color: #28a745; }
+    .fc-event.match-semifinal { border-left-color: #fd7e14; }
+    .fc-event.match-third-place { border-left-color: #6f42c1; }
+}
+
+/* Small Mobile Styles (≤576px) */
+@media (max-width: 576px) {
+    .main { padding: 5px; }
+    
+    .fc .fc-toolbar-title { font-size: 1rem !important; }
+    
+    .fc .fc-button {
+        padding: 6px 2px !important;
+        font-size: 11px !important;
+    }
+    
+    .fc .fc-timegrid-axis { width: 35px !important; }
+    
+    .filter-label { font-size: 14px; }
+    
+    .filter-select {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+
+    /* Modal Adjustments */
+    .event-details-modal .modal-dialog { margin: 0; }
+    
+    .event-details-modal .modal-content {
+        border-radius: 0;
+        min-height: 100vh;
+    }
+
+    .info-item { padding: 0.5rem; }
+    
+    .info-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8rem;
+    }
+    
+    .info-value { font-size: 0.9rem; }
+}
+
+/* Loading Message */
+#loading {
+    display: none;
+    margin-top: 10px;
+    text-align: center;
+}

@@ -140,11 +140,12 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
                     }
                 ?>
                     <div class="dropdown">
-                        <button class="btn d-flex align-items-center gap-2 border-0 px-2 py-1"
-                            type="button"
-                            id="userDropdown"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false">
+                    <button class="btn d-flex align-items-center gap-2 border-0 px-2 py-1"
+    type="button"
+    id="userDropdown"
+    data-bs-toggle="dropdown"
+    data-bs-display="static" 
+    aria-expanded="false">
                             <div class=" border-primary p-2" style="background-color: transparent;">
                                 <i class="fas fa-user text-light fa-lg"></i>
                             </div>
@@ -186,14 +187,14 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
                 } else {
                     // Show login button for non-logged in users
                     echo '<a href="login.php?' . http_build_query(array_filter($current_params)) . '" 
-                          class="btn btn-outline-primary d-flex align-items-center gap-2 px-4 py-2 fw-bold rounded-pill"> 
+                          class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 fw-bold rounded-pill"> 
                           <span class="text-white">Login</span>
                           </a>';
                 }
                 ?>
             </div>
 
-            <style>
+           <!-- <style>
                 /* Custom styles for the user section */
                 .dropdown-menu {
                     margin-top: 10px !important;
@@ -221,7 +222,7 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
                 .bg-primary.bg-opacity-25 {
                     background-color: rgba(13, 110, 253, 0.25) !important;
                 }
-            </style>
+            </style>-->
         </div>
     </div>
 </nav>

@@ -56,120 +56,135 @@ include '../navbar/navbar.php';
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="../styles/dashboard.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.css" rel="stylesheet">
 
 <style>
-        .tournament-bracket {
-            position: relative;
-            display: flex;
-            padding: 20px;
-            overflow-x: auto;
-            min-height: 500px;
+    /* Bracket Container Styles */
+    #bracket-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin: 20px auto;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Force minimum dimensions to maintain structure */
+    .jQBracket {
+        min-width: 1000px !important; /* Ensure minimum width */
+        min-height: 500px !important; /* Ensure minimum height */
+        padding: 40px 20px !important;
+        font-size: 14px !important;
+    }
+
+    .jQBracket .tools {
+        display: none !important; /* Hide tools to prevent structure breaking */
+    }
+
+    /* Maintain round spacing */
+    .jQBracket .round {
+        margin-right: 50px !important;
+        min-width: 150px !important;
+    }
+
+    .jQBracket .round:last-child {
+        margin-right: 20px !important;
+    }
+
+    /* Team and match box sizing */
+    .jQBracket .team {
+        width: 200px !important;
+        height: 35px !important;
+        background-color: #ffffff !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 4px !important;
+        margin: 2px 0 !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    /* Maintain connector lines */
+    .jQBracket .connector {
+        border-color: #ccc !important;
+        border-width: 2px !important;
+    }
+
+    .jQBracket .connector.filled {
+        border-color: #666 !important;
+    }
+
+    .jQBracket .connector div.connector {
+        border-width: 2px !important;
+    }
+
+    /* Score styles */
+    .jQBracket .score {
+        min-width: 40px !important;
+        padding: 3px 5px !important;
+        background-color: #f8f9fa !important;
+        border-left: 1px solid #e0e0e0 !important;
+        text-align: center !important;
+    }
+
+    /* Team label styles */
+    .jQBracket .label {
+        width: calc(100% - 45px) !important; /* Account for score width */
+        padding: 5px 10px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* Container wrapper to force scrolling */
+    .bracket-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 20px; /* Space for scrollbar */
+    }
+
+    /* Mobile specific adjustments */
+    @media (max-width: 768px) {
+        #bracket-container {
+            padding: 10px 5px;
+            margin: 10px 0;
         }
 
-        .round {
-            flex: 0 0 220px;
-            margin: 0 15px;
-            position: relative;
+        .jQBracket {
+            font-size: 12px !important;
+            padding: 20px 10px !important;
         }
 
-        .round-header {
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #495057;
-            font-size: 0.9em;
+        /* Maintain minimum dimensions even on mobile */
+        .jQBracket .team {
+            min-width: 180px !important;
+            height: 30px !important;
         }
 
-        .matches-wrapper {
-            position: relative;
+        .jQBracket .label {
+            padding: 3px 8px !important;
         }
 
-        .match {
-            position: absolute;
-            width: 200px;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        .jQBracket .score {
+            min-width: 35px !important;
+            padding: 3px !important;
         }
+    }
 
-        .team {
-            padding: 8px 12px;
-            border-bottom: 1px solid #dee2e6;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-        }
-
-        .team:last-child {
-            border-bottom: none;
-        }
-
-        .team.winner {
-            background: #e8f5e9;
-            font-weight: bold;
-        }
-
-        .team-name {
-            flex-grow: 1;
-            margin-right: 8px;
-            font-size: 0.9em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .team-score {
-            font-weight: bold;
-            margin-right: 4px;
-            font-size: 0.9em;
-        }
-
-        .winner-check {
-            color: #4caf50;
-            font-size: 0.9em;
-        }
-
-        .third-place-match {
-            position: absolute;
-            right: 40px;
-            bottom: 40px;
-            width: 200px;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .match-label {
-            text-align: center;
-            font-size: 0.8em;
-            color: #6c757d;
-            padding: 4px;
-            border-top: 1px solid #dee2e6;
-            background: #f8f9fa;
-        }
-
-        .bracket-empty {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-            background: #f8f9fa;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
-
-        .bracket-empty i {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #dee2e6;
-        }
-
-        .bracket-empty p {
-            margin: 0;
-            font-size: 1.1em;
-        }
-    </style>
+    /* Loading and error states */
+    .bracket-loading, .bracket-error {
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+    }
+</style>
 </head>
 
 <body>
@@ -252,23 +267,7 @@ include '../navbar/navbar.php';
             </div>
 
             <!-- Bracket Display Section -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">Tournament Bracket</h3>
-                    <button id="backToBrackets" class="btn btn-secondary" onclick="showBracketList()" style="display: none;">
-                        <i class="fas fa-times"></i> Close
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div id="bracket-container">
-                        <!-- Bracket will be displayed here -->
-                        <div class="bracket-empty">
-                            <i class="fas fa-trophy"></i>
-                            <p>Select a bracket from the table to view it.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div id="bracket-container" class="mt-4"></div>
         </div>
     </div>
 
@@ -338,137 +337,179 @@ include '../navbar/navbar.php';
         function viewBracket(bracketId) {
             // Hide the empty bracket message if it exists
             $('.bracket-empty').hide();
-
+            
             // Show loading state
-            $('#bracket-container').html(`
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading bracket...</p>
-                </div>
-            `);
+            $('#bracket-container').html('<div class="text-center"><div class="spinner-border" role="status"></div><div>Loading bracket...</div></div>');
+            
+            // Fetch bracket data
+            fetch('fetch_bracket.php?bracket_id=' + bracketId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Clear existing bracket
+                        $('#bracket-container').empty();
+                        
+                        // Convert matches data to teams array and results
+                        let teams = [];
+                        let results = [];
+                        let matchData = {}; // Store match data for reference
+                        
+                        if (data.matches[1]) { // First round matches
+                            teams = data.matches[1].map(match => {
+                                // Store match data for later reference
+                                matchData[`${match.round}-${match.match_number}`] = match;
+                                return [
+                                    match.teamA_id === -1 ? null : (match.teamA_id === -2 ? 'TBD' : match.teamA_name),
+                                    match.teamB_id === -1 ? null : (match.teamB_id === -2 ? 'TBD' : match.teamB_name)
+                                ];
+                            });
+                        }
 
-            // Show back button
-            $('#backToBrackets').show();
-
-            // Load bracket data
-            $.ajax({
-                url: 'fetch_bracket.php',
-                method: 'POST',
-                data: {
-                    bracket_id: bracketId
-                },
-                success: function(response) {
-                    if (response.success) {
-                        const rounds = response.matches;
-                        let bracketHTML = '<div class="tournament-bracket">';
-
-                        // Calculate total rounds for spacing
-                        const numRounds = Object.keys(rounds).filter(key => !isNaN(key)).length;
-                        const firstRoundMatches = rounds[1] ? rounds[1].length : 0;
-                        const totalHeight = firstRoundMatches * 100;
-
-                        // Create rounds
-                        Object.keys(rounds).forEach((roundIndex, index) => {
-                            if (roundIndex !== 'third-place') {
-                                bracketHTML += `
-                                    <div class="round">
-                                        <div class="round-header">${getRoundName(index, numRounds - 1)}</div>
-                                        <div class="matches-wrapper" style="height: ${totalHeight}px">
-                                `;
-
-                                const matchesInRound = rounds[roundIndex].length;
-                                const spacing = totalHeight / matchesInRound;
-
-                                rounds[roundIndex].forEach((match, matchIndex) => {
-                                    const position = (spacing * matchIndex) + (spacing - 80) / 2;
-                                    bracketHTML += createMatchHTML(match, roundIndex, matchIndex, position);
+                        // Process all rounds for results
+                        const rounds = Math.max(...Object.keys(data.matches));
+                        for (let round = 1; round <= rounds; round++) {
+                            if (data.matches[round]) {
+                                const roundResults = data.matches[round].map(match => {
+                                    // Store match data
+                                    matchData[`${match.round}-${match.match_number}`] = match;
+                                    
+                                    // If match is finished, show actual scores
+                                    if (match.status === 'finished') {
+                                        return [
+                                            parseInt(match.score_teamA) || 0,
+                                            parseInt(match.score_teamB) || 0
+                                        ];
+                                    }
+                                    // For unfinished matches, show empty scores
+                                    return [0, 0];
                                 });
+                                results.push(roundResults);
+                            }
+                        }
 
-                                bracketHTML += '</div></div>';
+                        // Initialize bracket with loaded data
+                        $('#bracket-container').bracket({
+                            teamWidth: 150,
+                            scoreWidth: 40,
+                            matchMargin: 50,
+                            roundMargin: 50,
+                            centerConnectors: true,
+                            init: {
+                                teams: teams,
+                                results: results
+                            },
+                            decorator: {
+                                edit: function() {}, // Empty edit function for read-only teams
+                                render: function(container, team, score, state) {
+                                    container.css({
+                                        'cursor': 'default',
+                                        'background-color': '#f8f9fa'
+                                    });
+                                    
+                                    // Clear the container first
+                                    container.empty();
+                                    
+                                    if (team === null) {
+                                        container.addClass('bye-team bye');
+                                        container.append('BYE');
+                                    } else {
+                                        container.append(team);
+                                    }
+                                    
+                                    // Get match data for this position
+                                    const match = matchData[`${state.round + 1}-${state.match + 1}`];
+                                    
+                                    if (match && match.status !== 'finished' && team !== null) {
+                                        // Create score input for unfinished matches
+                                        const scoreInput = $('<input>')
+                                            .addClass('score-input form-control form-control-sm')
+                                            .attr('type', 'number')
+                                            .attr('min', '0')
+                                            .attr('data-match-id', match.match_id)
+                                            .attr('data-team', state.pos === 0 ? 'A' : 'B')
+                                            .val(score || 0)
+                                            .css({
+                                                'width': '40px',
+                                                'display': 'inline-block',
+                                                'padding': '2px',
+                                                'height': 'auto'
+                                            });
+                                        
+                                        container.append(scoreInput);
+                                        
+                                        // Add save button if both teams are present
+                                        if (match.teamA_id && match.teamB_id && 
+                                            state.pos === 1) { // Only add button once per match
+                                            const saveBtn = $('<button>')
+                                                .addClass('btn btn-sm btn-primary save-score')
+                                                .attr('data-match-id', match.match_id)
+                                                .text('Save')
+                                                .css({
+                                                    'margin-left': '5px',
+                                                    'padding': '2px 5px'
+                                                });
+                                            container.append(saveBtn);
+                                        }
+                                    } else if (score !== undefined) {
+                                        container.append('<div class="score">' + score + '</div>');
+                                    }
+                                }
                             }
                         });
 
-                        // Add third place match if it exists
-                        if (rounds['third-place']) {
-                            bracketHTML += createMatchHTML(rounds['third-place'], 'third-place', 0, null, true);
-                        }
-
-                        bracketHTML += '</div>';
-                        $('#bracket-container').html(bracketHTML);
-
-                        // Scroll to the bracket
-                        $('html, body').animate({
-                            scrollTop: $('#bracket-container').offset().top - 20
-                        }, 500);
+                        // Handle score saving
+                        $(document).on('click', '.save-score', function() {
+                            const matchId = $(this).data('match-id');
+                            const scoreA = $(`input[data-match-id="${matchId}"][data-team="A"]`).val();
+                            const scoreB = $(`input[data-match-id="${matchId}"][data-team="B"]`).val();
+                            
+                            // Validate scores
+                            if (scoreA === scoreB) {
+                                alert('Scores cannot be equal. There must be a winner.');
+                                return;
+                            }
+                            
+                            fetch('update_match.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    match_id: matchId,
+                                    score_teamA: parseInt(scoreA),
+                                    score_teamB: parseInt(scoreB)
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Reload the bracket to show updated scores
+                                    viewBracket(bracketId);
+                                } else {
+                                    alert('Failed to update scores: ' + data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Failed to update scores. Please try again.');
+                            });
+                        });
                     } else {
-                        $('#bracket-container').html(`
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-circle"></i>
-                                ${response.message || 'Failed to load bracket'}
-                            </div>
-                        `);
+                        console.error('Error loading bracket:', data.message);
+                        $('#bracket-container').html('<div class="alert alert-danger">Error loading bracket</div>');
                     }
-                },
-                error: function() {
-                    $('#bracket-container').html(`
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle"></i>
-                            Failed to load bracket. Please try again.
-                        </div>
-                    `);
-                }
-            });
-        }
-
-        function showBracketList() {
-            // Hide back button
-            $('#backToBrackets').hide();
-
-            // Clear the bracket container and show the empty message
-            $('#bracket-container').html(`
-                <div class="bracket-empty">
-                    <i class="fas fa-trophy"></i>
-                    <p>Select a bracket from the table to view it.</p>
-                </div>
-            `);
-        }
-
-        function getRoundName(index, totalRounds) {
-            if (index === totalRounds) return 'Finals';
-            if (index === totalRounds - 1) return 'Semifinals';
-            if (index === totalRounds - 2) return 'Quarterfinals';
-            return `Round ${index + 1}`;
-        }
-
-        function createMatchHTML(match, roundIndex, matchIndex, position, isThirdPlace = false) {
-            const matchClass = isThirdPlace ? 'third-place-match' : 'match';
-            const style = position !== null ? `style="top: ${position}px"` : '';
-
-            // Check if match is finished and has a winner
-            const isFinished = match.status === 'Finished';
-            const teamAWinner = isFinished && parseInt(match.winning_team_id) === parseInt(match.teamA_id);
-            const teamBWinner = isFinished && parseInt(match.winning_team_id) === parseInt(match.teamB_id);
-
-            return `
-                <div class="${matchClass}" ${style} data-match-id="${match.match_id}">
-                    <div class="team ${match.teamA_id === 0 ? 'team-tbd' : ''} ${teamAWinner ? 'winner' : ''} team-top">
-                        <span class="team-name">${match.teamA_name || '---'}</span>
-                        ${isFinished ? `<span class="team-score">${match.score_teamA || '0'}</span>` : ''}
-                        ${teamAWinner ? '<span class="winner-check">✓</span>' : ''}
-                    </div>
-                    <div class="team ${match.teamB_id === 0 ? 'team-tbd' : ''} ${teamBWinner ? 'winner' : ''} team-bottom">
-                        <span class="team-name">${match.teamB_name || '---'}</span>
-                        ${isFinished ? `<span class="team-score">${match.score_teamB || '0'}</span>` : ''}
-                        ${teamBWinner ? '<span class="winner-check">✓</span>' : ''}
-                    </div>
-                    ${isThirdPlace ? '<div class="match-label">Third Place Match</div>' : ''}
-                </div>
-            `;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    $('#bracket-container').html('<div class="alert alert-danger">Error loading bracket</div>');
+                });
         }
 
         // Load brackets when page loads
         $(document).ready(function() {
             loadBrackets();
+            // Wrap bracket container with wrapper div
+            $('#bracket-container').wrap('<div class="bracket-wrapper"></div>');
         });
     </script>
 </body>

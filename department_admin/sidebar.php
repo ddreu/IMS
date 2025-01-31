@@ -163,3 +163,15 @@ $stmt->close();
         </li>
     </ul>
 </nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleButton = document.querySelector('.navbar-toggler');
+
+        // Toggle sidebar visibility
+        toggleButton.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+    });
+</script>

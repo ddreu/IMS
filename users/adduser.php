@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     try {
-        $check_email_sql = "SELECT * FROM Users WHERE email = ?";
+        $check_email_sql = "SELECT * FROM users WHERE email = ?";
         $stmt = executeQuery($conn, $check_email_sql, [$email], "s");
         $result = $stmt->get_result();
 

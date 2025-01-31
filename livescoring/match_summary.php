@@ -26,13 +26,17 @@ $match_query = "
         tA.team_id as teamA_id,
         tB.team_id as teamB_id,
         b.game_id,
-        g.game_name
+        g.game_name,
+        s.schedule_date,
+        s.schedule_time,
+        s.venue
     FROM matches m
     JOIN match_results mr ON m.match_id = mr.match_id
     JOIN teams tA ON mr.team_A_id = tA.team_id
     JOIN teams tB ON mr.team_B_id = tB.team_id
     JOIN brackets b ON m.bracket_id = b.bracket_id
     JOIN games g ON b.game_id = g.game_id
+    LEFT JOIN schedules s ON m.match_id = s.match_id
     WHERE m.match_id = ?";
 
 $stmt = $conn->prepare($match_query);
@@ -55,6 +59,99 @@ while ($stat = $stats_result->fetch_assoc()) {
     $game_stats[] = $stat;
 }
 
+// Function to calculate player score based on stats and position
+function calculatePlayerScore($player, $game_stats) {
+    $score = 0;
+    $position = strtolower($player['position']);
+    
+    foreach ($game_stats as $stat) {
+        $stat_name = strtolower($stat['stat_name']);
+        if (isset($player['stats'][$stat['stat_name']])) {
+            $stat_value = $player['stats'][$stat['stat_name']];
+            
+            // Base weights for different stats
+            switch ($stat_name) {
+                case 'points':
+                    $weight = 1.0;
+                    // Bonus for high scoring
+                    if ($stat_value >= 20) $weight += 0.2;
+                    if ($stat_value >= 30) $weight += 0.3;
+                    break;
+                    
+                case 'assists':
+                    $weight = 0.7;
+                    // Bonus for playmaking
+                    if ($stat_value >= 10) $weight += 0.2;
+                    break;
+                    
+                case 'rebounds':
+                    $weight = 0.5;
+                    // Bonus for double-digit rebounds
+                    if ($stat_value >= 10) $weight += 0.2;
+                    break;
+                    
+                case 'steals':
+                    $weight = 0.7;
+                    // Bonus for exceptional defense
+                    if ($stat_value >= 5) $weight += 0.2;
+                    break;
+                    
+                case 'blocks':
+                    $weight = 0.7;
+                    // Bonus for exceptional defense
+                    if ($stat_value >= 3) $weight += 0.2;
+                    break;
+                    
+                default:
+                    $weight = 0.3;
+            }
+            
+            // Position-based adjustments
+            switch ($position) {
+                case 'guard':
+                    if (in_array($stat_name, ['assists', 'steals'])) $weight *= 1.2;
+                    break;
+                case 'forward':
+                    if (in_array($stat_name, ['rebounds', 'points'])) $weight *= 1.2;
+                    break;
+                case 'center':
+                    if (in_array($stat_name, ['blocks', 'rebounds'])) $weight *= 1.2;
+                    break;
+            }
+            
+            $score += $stat_value * $weight;
+        }
+    }
+    
+    // Bonus for all-around performance (if multiple stats are good)
+    $good_stats_count = 0;
+    foreach ($player['stats'] as $stat_name => $value) {
+        switch (strtolower($stat_name)) {
+            case 'points':
+                if ($value >= 15) $good_stats_count++;
+                break;
+            case 'assists':
+                if ($value >= 5) $good_stats_count++;
+                break;
+            case 'rebounds':
+                if ($value >= 5) $good_stats_count++;
+                break;
+            case 'steals':
+                if ($value >= 2) $good_stats_count++;
+                break;
+            case 'blocks':
+                if ($value >= 2) $good_stats_count++;
+                break;
+        }
+    }
+    
+    if ($good_stats_count >= 3) {
+        $score *= 1.2; // 20% bonus for all-around performance
+    }
+    
+    return $score;
+}
+
 // Function to get player stats
 function getPlayerStats($conn, $team_id, $match_id)
 {
@@ -64,10 +161,16 @@ function getPlayerStats($conn, $team_id, $match_id)
             p.player_lastname,
             p.player_firstname,
             p.jersey_number,
+            p.team_id,
+            pi.picture,
+            pi.position,
+            pi.height,
+            pi.weight,
             ps.stat_name,
             ps.stat_value
         FROM players p
         LEFT JOIN player_match_stats ps ON p.player_id = ps.player_id AND ps.match_id = ?
+        LEFT JOIN players_info pi ON p.player_id = pi.player_id
         WHERE p.team_id = ?
         ORDER BY p.jersey_number";
 
@@ -85,6 +188,11 @@ function getPlayerStats($conn, $team_id, $match_id)
                 'player_lastname' => $row['player_lastname'],
                 'player_firstname' => $row['player_firstname'],
                 'jersey_number' => $row['jersey_number'],
+                'team_id' => $row['team_id'],
+                'picture' => $row['picture'],
+                'position' => $row['position'],
+                'height' => $row['height'],
+                'weight' => $row['weight'],
                 'stats' => []
             ];
         }
@@ -95,10 +203,42 @@ function getPlayerStats($conn, $team_id, $match_id)
     return array_values($players);
 }
 
-
 // Get player stats for both teams
 $teamA_players = getPlayerStats($conn, $match['teamA_id'], $match_id);
 $teamB_players = getPlayerStats($conn, $match['teamB_id'], $match_id);
+
+// Find the Player of the Game
+$all_players = array_merge($teamA_players, $teamB_players);
+$potg = null;
+$highest_score = -1;
+
+foreach ($all_players as $player) {
+    $player_score = calculatePlayerScore($player, $game_stats);
+    if ($player_score > $highest_score) {
+        $highest_score = $player_score;
+        $potg = $player;
+    }
+}
+
+// Get player's team name
+$potg_team = ($potg) ? ($match['teamA_id'] == $potg['team_id'] ? $match['teamA_name'] : $match['teamB_name']) : '';
+
+// Determine the winner
+$winner = '';
+$score_difference = abs($match['score_teamA'] - $match['score_teamB']);
+if ($match['score_teamA'] > $match['score_teamB']) {
+    $winner = $match['teamA_name'];
+} elseif ($match['score_teamB'] > $match['score_teamA']) {
+    $winner = $match['teamB_name'];
+}
+
+// Generate match summary
+$match_summary = "";
+if ($winner) {
+    $match_summary = "$winner wins by $score_difference points in this intense match!";
+} else {
+    $match_summary = "The match ended in a draw with both teams showing great performance!";
+}
 include '../navbar/navbar.php';
 
 ?>
@@ -116,83 +256,148 @@ include '../navbar/navbar.php';
     <link rel="stylesheet" href="../styles/committee.css">
     <link rel="stylesheet" href="../styles/dashboard.css">
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --background-color: #f8f9fa;
+            --card-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        body {
+            background-color: var(--background-color);
+        }
+
+        .team-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .team-logo:hover {
+            transform: scale(1.1);
+        }
+
         .score-display {
-            font-size: 2rem;
+            font-size: 3.5rem;
             font-weight: bold;
-            text-align: center;
-            padding: 1rem;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            margin: 1rem 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: var(--primary-color);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
-        .team-name {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 1rem;
+        .match-info {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease;
         }
 
-        .player-card {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-        }
-
-        .player-card:hover {
+        .match-info:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .player-name {
-            font-weight: 600;
-            color: #495057;
-            font-size: 1.25rem;
+        .stats-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
         }
 
-        .jersey-number {
-            background-color: #e9ecef;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-weight: 600;
-            margin-right: 0.5rem;
+        .stats-card:hover {
+            transform: translateY(-5px);
         }
 
-        .stat-item {
-            display: inline-block;
-            margin-right: 1rem;
-            color: #6c757d;
+        .player-stats {
             font-size: 0.9rem;
         }
 
-        .stat-value {
-            font-weight: 600;
-            color: #212529;
+        .match-summary {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: var(--card-shadow);
         }
 
-        .winner {
-            color: #28a745;
+        .potg-card {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: var(--card-shadow);
         }
 
-        .loser {
-            color: #dc3545;
+        .potg-stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
         }
 
-        .back-button {
-            margin-top: 2rem;
-            text-align: center;
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            margin: 5px;
+            display: inline-block;
+        }
+
+        .player-image {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .player-image:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .score-display {
+                font-size: 2.5rem;
+            }
+            .team-logo {
+                width: 60px;
+                height: 60px;
+            }
+            .container {
+                padding: 10px;
+            }
+            .match-info {
+                padding: 15px;
+            }
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .score-display {
+                font-size: 2rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            h2 {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
-
 <body>
-
-    <nav>
+    
+<nav>
         <?php
         $current_page = 'matchlist';
 
@@ -206,99 +411,172 @@ include '../navbar/navbar.php';
         ?>
     </nav>
     <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <h2 class="text-center mb-4"><?= htmlspecialchars($match['game_name']) ?> Match Summary</h2>
-                <div class="text-start mb-4 back-button">
-                    <a href="<?= $user_role === 'Committee' ? 'match_list.php' : 'admin_match_list.php' ?>" class="btn btn-primary">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Matches
-                    </a>
+
+    <div class="container py-4">
+        <!-- Match Header -->
+        <div class="match-info text-center">
+            <h1 class="h3 mb-4"><?php echo htmlspecialchars($match['game_name']); ?> Match Summary</h1>
+            <div class="row align-items-center">
+                <div class="col-4 text-end">
+                    <h2 class="h4"><?php echo htmlspecialchars($match['teamA_name']); ?></h2>
+                    <!--<img src="../team_logos/<?php echo $match['teamA_id']; ?>.png" alt="Team A Logo" class="team-logo"> -->
                 </div>
-
-                <!-- Score Display -->
-                <div class="score-display">
-                    <div class="row align-items-center">
-                        <div class="col-5 text-end">
-                            <span class="<?= $match['score_teamA'] > $match['score_teamB'] ? 'winner' : 'loser' ?>">
-                                <?= htmlspecialchars($match['teamA_name']) ?>
-                            </span>
-                        </div>
-                        <div class="col-2">
-                            <span class="score">
-                                <?= $match['score_teamA'] ?> - <?= $match['score_teamB'] ?>
-                            </span>
-                        </div>
-                        <div class="col-5 text-start">
-                            <span class="<?= $match['score_teamB'] > $match['score_teamA'] ? 'winner' : 'loser' ?>">
-                                <?= htmlspecialchars($match['teamB_name']) ?>
-                            </span>
-                        </div>
+                <div class="col-4">
+                    <div class="score-display">
+                        <?php echo $match['score_teamA']; ?> - <?php echo $match['score_teamB']; ?>
                     </div>
-                </div>
-
-                <!-- Player Stats -->
-                <div class="row mt-4">
-                    <!-- Team A Players -->
-                    <div class="col-md-6">
-                        <h3 class="team-name"><?= htmlspecialchars($match['teamA_name']) ?></h3>
-                        <?php foreach ($teamA_players as $player): ?>
-                            <div class="player-card">
-                                <div class="player-name mb-2">
-                                    <span class="jersey-number">#<?= htmlspecialchars($player['jersey_number']) ?></span>
-                                    <?= htmlspecialchars($player['player_firstname']) ?> <?= htmlspecialchars($player['player_lastname']) ?>
-                                </div>
-                                <div class="player-stats">
-                                    <?php foreach ($game_stats as $stat): ?>
-                                        <div class="stat-item">
-                                            <?= htmlspecialchars($stat['stat_name']) ?>:
-                                            <span class="stat-value">
-                                                <?= isset($player['stats'][$stat['stat_name']]) ? $player['stats'][$stat['stat_name']] : '0' ?>
-                                            </span>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <!-- Team B Players -->
-                    <div class="col-md-6">
-                        <h3 class="team-name"><?= htmlspecialchars($match['teamB_name']) ?></h3>
-                        <?php foreach ($teamB_players as $player): ?>
-                            <div class="player-card">
-                                <div class="player-name mb-2">
-                                    <span class="jersey-number">#<?= htmlspecialchars($player['jersey_number']) ?></span>
-                                    <?= htmlspecialchars($player['player_firstname']) ?> <?= htmlspecialchars($player['player_lastname']) ?>
-                                </div>
-                                <div class="player-stats">
-                                    <?php foreach ($game_stats as $stat): ?>
-                                        <div class="stat-item">
-                                            <?= htmlspecialchars($stat['stat_name']) ?>:
-                                            <span class="stat-value">
-                                                <?= isset($player['stats'][$stat['stat_name']]) ? $player['stats'][$stat['stat_name']] : '0' ?>
-                                            </span>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-
-
-
-                <script>
-                    <?php if (isset($_SESSION['alert_shown'])) : ?>
-                        Swal.fire({
-                            title: 'Match Ended!',
-                            text: 'The match has concluded successfully.',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        });
-                        <?php unset($_SESSION['alert_shown']); // Clear the session variable after showing the alert 
-                        ?>
+                    <?php if ($match['schedule_date']): ?>
+                        <div class="text-muted">
+                            <i class="fas fa-calendar"></i> <?php echo date('F j, Y', strtotime($match['schedule_date'])); ?><br>
+                            <i class="fas fa-clock"></i> <?php echo date('g:i A', strtotime($match['schedule_time'])); ?><br>
+                            <i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($match['venue']); ?>
+                        </div>
                     <?php endif; ?>
-                </script>
-</body>
+                </div>
+                <div class="col-4 text-start">
+                    <h2 class="h4"><?php echo htmlspecialchars($match['teamB_name']); ?></h2>
+                    <!--<img src="../team_logos/<?php echo $match['teamB_id']; ?>.png" alt="Team B Logo" class="team-logo"> -->
+                </div>
+            </div>
+        </div>
 
+        <!-- Match Summary -->
+        <div class="match-summary">
+            <h3 class="h5"><i class="fas fa-chart-line"></i> Match Overview</h3>
+            <p><?php echo htmlspecialchars($match_summary); ?></p>
+        </div>
+
+        <!-- Player of the Game Card -->
+        <?php if ($potg): ?>
+        <div class="potg-card">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center">
+                    <?php
+                    $player_image = '../uploads/players/default.png'; // Default image path
+                    if (!empty($potg['picture']) && file_exists('../uploads/players/' . $potg['picture'])) {
+                        $player_image = '../uploads/players/' . $potg['picture'];
+                    }
+                    ?>
+                    <img src="<?php echo htmlspecialchars($player_image); ?>"
+                         alt="Player Image" 
+                         class="player-image mb-3">
+                    <h3 class="h4">Player of the Game</h3>
+                    <p class="text-light mb-0"><?php echo htmlspecialchars($potg['position']); ?></p>
+                    <p class="text-light-50">
+                        <?php echo htmlspecialchars($potg['height']); ?> cm | 
+                        <?php echo htmlspecialchars($potg['weight']); ?> kg
+                    </p>
+                </div>
+                <div class="col-md-8">
+                    <h2 class="h3 mb-3">
+                        #<?php echo htmlspecialchars($potg['jersey_number']); ?> 
+                        <?php echo htmlspecialchars($potg['player_firstname'] . ' ' . $potg['player_lastname']); ?>
+                    </h2>
+                    <p class="mb-2"><?php echo htmlspecialchars($potg_team); ?></p>
+                    <div class="potg-stats">
+                        <?php foreach ($game_stats as $stat): ?>
+                            <?php if (isset($potg['stats'][$stat['stat_name']])): ?>
+                                <span class="stat-badge">
+                                    <?php echo htmlspecialchars($stat['stat_name']); ?>: 
+                                    <?php echo htmlspecialchars($potg['stats'][$stat['stat_name']]); ?>
+                                </span>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+
+        <!-- Player Statistics -->
+        <div class="row">
+            <!-- Team A Stats -->
+            <div class="col-md-6">
+                <div class="card stats-card">
+                    <div class="card-header bg-light">
+                        <h3 class="h5 mb-0"><?php echo htmlspecialchars($match['teamA_name']); ?> Player Statistics</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover player-stats">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <?php foreach ($game_stats as $stat): ?>
+                                            <th><?php echo htmlspecialchars($stat['stat_name']); ?></th>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($teamA_players as $player): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($player['jersey_number']); ?></td>
+                                            <td><?php echo htmlspecialchars($player['player_firstname'] . ' ' . $player['player_lastname']); ?></td>
+                                            <?php foreach ($game_stats as $stat): ?>
+                                                <td><?php echo isset($player['stats'][$stat['stat_name']]) ? htmlspecialchars($player['stats'][$stat['stat_name']]) : '0'; ?></td>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team B Stats -->
+            <div class="col-md-6">
+                <div class="card stats-card">
+                    <div class="card-header bg-light">
+                        <h3 class="h5 mb-0"><?php echo htmlspecialchars($match['teamB_name']); ?> Player Statistics</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover player-stats">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Player</th>
+                                        <?php foreach ($game_stats as $stat): ?>
+                                            <th><?php echo htmlspecialchars($stat['stat_name']); ?></th>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($teamB_players as $player): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($player['jersey_number']); ?></td>
+                                            <td><?php echo htmlspecialchars($player['player_firstname'] . ' ' . $player['player_lastname']); ?></td>
+                                            <?php foreach ($game_stats as $stat): ?>
+                                                <td><?php echo isset($player['stats'][$stat['stat_name']]) ? htmlspecialchars($player['stats'][$stat['stat_name']]) : '0'; ?></td>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <?php if (isset($_SESSION['alert_shown']) && $_SESSION['alert_shown']) : ?>
+    <script>
+        Swal.fire({
+            title: 'Match Ended!',
+            text: 'The match has concluded successfully.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then(() => {
+            <?php unset($_SESSION['alert_shown']); ?>
+        });
+    </script>
+<?php endif; ?>
+
+
+</body>
 </html>

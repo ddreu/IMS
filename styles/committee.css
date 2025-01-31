@@ -105,6 +105,16 @@ body {
     padding: 20px;
 }
 
+@media screen and (max-width: 768px) {
+    .main {
+        margin-left: 0; 
+        padding: 0;
+    }
+    
+}
+
+
+
 h2 {
     margin-bottom: 20px; /* Add space below the heading */
 }
@@ -168,3 +178,7 @@ h2 {
     font-size: 22px;
     padding: 10px;
 }
+
+
+/* mobile sidebar */
+
