@@ -74,7 +74,131 @@ include '../navbar/navbar.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="bracket-manager.js"></script>
-   
+    <style>
+        /* Bracket Container Styles */
+        #bracket-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Force minimum dimensions to maintain structure */
+        .jQBracket {
+            min-width: 1000px !important; /* Ensure minimum width */
+            min-height: 500px !important; /* Ensure minimum height */
+            padding: 40px 20px !important;
+            font-size: 14px !important;
+        }
+
+        .jQBracket .tools {
+            display: none !important; /* Hide tools to prevent structure breaking */
+        }
+
+        /* Maintain round spacing */
+        .jQBracket .round {
+            margin-right: 50px !important;
+            min-width: 150px !important;
+        }
+
+        .jQBracket .round:last-child {
+            margin-right: 20px !important;
+        }
+
+        /* Team and match box sizing */
+        .jQBracket .team {
+            width: 200px !important;
+            height: 35px !important;
+            background-color: #ffffff !important;
+            border: 1px solid #e0e0e0 !important;
+            border-radius: 4px !important;
+            margin: 2px 0 !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        /* Maintain connector lines */
+        .jQBracket .connector {
+            border-color: #ccc !important;
+            border-width: 2px !important;
+        }
+
+        .jQBracket .connector.filled {
+            border-color: #666 !important;
+        }
+
+        .jQBracket .connector div.connector {
+            border-width: 2px !important;
+        }
+
+        /* Score styles */
+        .jQBracket .score {
+            min-width: 40px !important;
+            padding: 3px 5px !important;
+            background-color: #f8f9fa !important;
+            border-left: 1px solid #e0e0e0 !important;
+            text-align: center !important;
+        }
+
+        /* Team label styles */
+        .jQBracket .label {
+            width: calc(100% - 45px) !important; /* Account for score width */
+            padding: 5px 10px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        /* Container wrapper to force scrolling */
+        .bracket-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 20px; /* Space for scrollbar */
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 768px) {
+            #bracket-container {
+                padding: 10px 5px;
+                margin: 10px 0;
+            }
+
+            .jQBracket {
+                font-size: 12px !important;
+                padding: 20px 10px !important;
+            }
+
+            /* Maintain minimum dimensions even on mobile */
+            .jQBracket .team {
+                min-width: 180px !important;
+                height: 30px !important;
+            }
+
+            .jQBracket .label {
+                padding: 3px 8px !important;
+            }
+
+            .jQBracket .score {
+                min-width: 35px !important;
+                padding: 3px !important;
+            }
+        }
+
+        /* Loading and error states */
+        .bracket-loading, .bracket-error {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
 </head>
 
 <body>
@@ -402,9 +526,14 @@ include '../navbar/navbar.php';
                                     });
                                 </script>
                             </div>
-
                             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
                             <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.css" rel="stylesheet">
+                            <script>
+                                $(document).ready(function() {
+                                    // Wrap bracket container with wrapper div
+                                    $('#bracket-container').wrap('<div class="bracket-wrapper"></div>');
+                                });
+                            </script>
                         </div>
                     </div>
                 </div>

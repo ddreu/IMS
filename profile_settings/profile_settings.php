@@ -3,6 +3,9 @@ session_start();
 include_once '../connection/conn.php';
 include '../user_logs/logger.php';
 $conn = con();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // Regenerate session ID for security
 session_regenerate_id(true);
@@ -31,7 +34,7 @@ $game_id = $_SESSION['game_id'];
 $game_name = $_SESSION['game_name'];
 
 // Fetch the current hashed password
-$sql = "SELECT password FROM Users WHERE id = ?";
+$sql = "SELECT password FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -69,7 +72,7 @@ function updateUserProfile($conn, $user_id)
         $_SESSION['error_message'] = "Age must be a valid number.";
     } else {
         // Fetch current user details for comparison
-        $fetch_sql = "SELECT firstname, lastname, middleinitial, age, gender, email FROM Users WHERE id = ?";
+        $fetch_sql = "SELECT firstname, lastname, middleinitial, age, gender, email FROM users WHERE id = ?";
         $stmt_fetch = $conn->prepare($fetch_sql);
         $stmt_fetch->bind_param("i", $user_id);
         $stmt_fetch->execute();
@@ -77,7 +80,7 @@ function updateUserProfile($conn, $user_id)
         $stmt_fetch->close();
 
         // Update user profile details if validation passes
-        $update_profile_sql = "UPDATE Users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ? WHERE id = ?";
+        $update_profile_sql = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ? WHERE id = ?";
         $stmt_update_profile = $conn->prepare($update_profile_sql);
         $stmt_update_profile->bind_param("ssssisi", $firstname, $lastname, $middleinitial, $age, $gender, $email, $user_id);
 

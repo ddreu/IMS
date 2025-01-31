@@ -17,7 +17,7 @@ try {
     // Extract and validate required data
     $game_id = isset($data['game_id']) ? intval($data['game_id']) : null;
     $department_id = isset($data['department_id']) ? intval($data['department_id']) : null;
-    $grade_level = isset($data['grade_level']) ? intval($data['grade_level']) : null;
+    $grade_level = isset($data['grade_level']) ? $data['grade_level'] : null;
     $teams = isset($data['teams']) ? $data['teams'] : null;
     $matches = isset($data['matches']) ? $data['matches'] : null;
     $rounds = isset($data['rounds']) ? intval($data['rounds']) : null;
@@ -34,7 +34,7 @@ try {
                           VALUES (?, ?, ?, ?, ?, 'ongoing', NOW(), 'single')");
 
     $total_teams = count($teams);
-    $stmt->bind_param("iiiii", $game_id, $department_id, $grade_level, $total_teams, $rounds);
+    $stmt->bind_param("iisii", $game_id, $department_id, $grade_level, $total_teams, $rounds);
     
     if (!$stmt->execute()) {
         throw new Exception('Failed to create bracket: ' . $stmt->error);

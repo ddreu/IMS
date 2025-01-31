@@ -94,10 +94,6 @@ class BracketManager {
         }
     }
 
-    generateUniqueId() {
-        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    }
-
     generateBracketStructure() {
         const teams = [...this.teams];
         const matches = [];
@@ -149,7 +145,7 @@ class BracketManager {
             const teamB = seededPositions[i + 1];
             
             matches.push({
-                match_identifier: `M${this.gameId}-D${this.departmentId}-${this.gradeLevel || 'ALL'}-R1-${currentMatchNumber}-${this.generateUniqueId()}`,
+                match_identifier: `M${this.gameId}-R1-${currentMatchNumber}`,
                 round: 1,
                 match_number: currentMatchNumber,
                 next_match_number: Math.floor(currentMatchNumber / 2) + (totalSlots / 2),
@@ -178,7 +174,7 @@ class BracketManager {
                 }
 
                 matches.push({
-                    match_identifier: `M${this.gameId}-D${this.departmentId}-${this.gradeLevel || 'ALL'}-R${currentRound}-${currentMatchNumber}-${this.generateUniqueId()}`,
+                    match_identifier: `M${this.gameId}-R${currentRound}-${currentMatchNumber}`,
                     round: currentRound,
                     match_number: currentMatchNumber,
                     next_match_number: isLastRound ? 0 : Math.floor(currentMatchNumber / 2) + matchesInRound/2,
@@ -196,7 +192,7 @@ class BracketManager {
 
         // Add third place match
         matches.push({
-            match_identifier: `M${this.gameId}-D${this.departmentId}-${this.gradeLevel || 'ALL'}-R${currentRound}-${currentMatchNumber}-${this.generateUniqueId()}`,
+            match_identifier: `M${this.gameId}-R${currentRound}-${currentMatchNumber}`,
             round: currentRound,
             match_number: currentMatchNumber,
             next_match_number: 0,
@@ -276,7 +272,7 @@ class BracketManager {
 
             // Store the match
             firstRoundMatches.push({
-                match_identifier: `M${this.gameId}-D${this.departmentId}-${this.gradeLevel || 'ALL'}-R1-${currentMatchNumber}-${this.generateUniqueId()}`,
+                match_identifier: `M${this.gameId}-R1-${currentMatchNumber}`,
                 round: 1,
                 match_number: currentMatchNumber,
                 next_match_number: nextMatchNumber,
@@ -339,7 +335,7 @@ class BracketManager {
                 }
 
                 matches.push({
-                    match_identifier: `M${this.gameId}-D${this.departmentId}-${this.gradeLevel || 'ALL'}-R${round}-${currentMatchNumber}-${this.generateUniqueId()}`,
+                    match_identifier: `M${this.gameId}-R${round}-${currentMatchNumber}`,
                     round: round,
                     match_number: currentMatchNumber,
                     next_match_number: nextMatchNumber,
@@ -354,7 +350,7 @@ class BracketManager {
         // Add third place match as the last match
         const thirdPlaceMatchNumber = baseMatchNumbers[totalRounds] + 1;
         matches.push({
-            match_identifier: `M${this.gameId}-D${this.departmentId}-${this.gradeLevel || 'ALL'}-R${totalRounds}-${thirdPlaceMatchNumber}-${this.generateUniqueId()}`,
+            match_identifier: `M${this.gameId}-R${totalRounds}-${thirdPlaceMatchNumber}`,
             round: totalRounds,
             match_number: thirdPlaceMatchNumber,
             next_match_number: 0,
@@ -401,7 +397,6 @@ class BracketManager {
                 body: JSON.stringify({
                     game_id: this.gameId,
                     department_id: this.departmentId,
-                    grade_level: this.gradeLevel || null,  // Include grade level if selected
                     teams: bracketStructure.teams,
                     matches: bracketStructure.matches,
                     rounds: bracketStructure.rounds

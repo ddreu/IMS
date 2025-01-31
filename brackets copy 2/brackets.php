@@ -75,41 +75,6 @@ include '../navbar/navbar.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="bracket-manager.js"></script>
     <style>
-
-                /* Custom styles for jQuery Bracket */
-                .jQBracket .team {
-            position: relative;
-            min-width: 150px;
-        }
-        
-        .jQBracket .team .score {
-            position: absolute;
-            right: -35px;
-            width: 30px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-left: none;
-            color: #495057;
-            font-weight: bold;
-        }
-        
-        .jQBracket .team.win .score {
-            background-color: #e8f5e9;
-        }
-      
-        /* Ensure team names don't overlap with scores */
-        .jQBracket .team .label {
-            margin-right: 35px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        
         /* Bracket Container Styles */
         #bracket-container {
             background: #fff;
@@ -130,8 +95,19 @@ include '../navbar/navbar.php';
             font-size: 14px !important;
         }
 
+        .jQBracket .tools {
+            display: none !important; /* Hide tools to prevent structure breaking */
+        }
 
-      
+        /* Maintain round spacing */
+        .jQBracket .round {
+            margin-right: 50px !important;
+            min-width: 150px !important;
+        }
+
+        .jQBracket .round:last-child {
+            margin-right: 20px !important;
+        }
 
         /* Team and match box sizing */
         .jQBracket .team {
@@ -183,10 +159,6 @@ include '../navbar/navbar.php';
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             padding-bottom: 20px; /* Space for scrollbar */
-        }
-
-        .jQBracket .tools {
-            display: none !important; /* Hide tools to prevent structure breaking */
         }
 
         /* Mobile specific adjustments */
@@ -336,8 +308,6 @@ include '../navbar/navbar.php';
                         <div class="card">
                             <div class="card-header">
                                 <h4>Create New Bracket</h4>
-                                <button type="button" id="generate-bracket" class="btn btn-primary mt-3">Generate Bracket</button>
-
                             </div>
                             <div class="card-body">
                                 <form id="bracketForm">
@@ -348,23 +318,23 @@ include '../navbar/navbar.php';
                                             <option value="">All Grade Levels</option>
                                             <?php foreach ($grade_levels as $grade): ?>
                                                 <option value="<?php echo htmlspecialchars($grade); ?>">
-                                                    <?php echo htmlspecialchars($grade); ?>
+                                                    Grade <?php echo htmlspecialchars($grade); ?>
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
                                     <?php endif; ?>
+                                    <button type="button" id="generate-bracket" class="btn btn-primary mt-3">Generate Bracket</button>
                                 </form>
                                 
                                 <!-- Bracket Container -->
                                 <div class="container mt-4">
                                     <div class="row">
                                         <div class="col-12">
+                                            <button id="save-bracket" class="btn btn-primary mb-3">Save Bracket</button>
                                         </div>
                                     </div>
                                     <div id="bracket-container"></div>
-                                    <button id="save-bracket" class="btn btn-success mb-3">Save Bracket</button>
-
                                 </div>
 
                                 <script>
@@ -414,27 +384,10 @@ include '../navbar/navbar.php';
                                     }
 
                                     $(document).ready(function() {
-                                        // Initialize bracket manager with initial grade level
                                         bracketManager = new BracketManager({
                                             gameId: <?php echo $game_id; ?>,
                                             departmentId: <?php echo $department_id; ?>,
-                                            gradeLevel: $('#gradeLevelSelect').val() // Get initial grade level
-                                        });
-
-                                        // Add grade level change handler
-                                        $('#gradeLevelSelect').on('change', function() {
-                                            const selectedGrade = $(this).val();
-                                            console.log('Grade level changed to:', selectedGrade);
-                                            
-                                            // Update bracket manager with new grade level
-                                            bracketManager.gradeLevel = selectedGrade;
-                                            
-                                            // Clear existing bracket
-                                            $('#bracket-container').empty();
-                                            $('#save-bracket').prop('disabled', true);
-                                            
-                                            // Enable generate button
-                                            $('#generate-bracket').prop('disabled', false);
+                                            gradeLevel: <?php echo isset($grade_level) ? $grade_level : 'null'; ?>
                                         });
 
                                         $('#generate-bracket').click(async function() {
@@ -715,18 +668,18 @@ include '../navbar/navbar.php';
                                         }
                                     }
                                 });
-// Add back button if it doesn't exist
-if ($('#backToBrackets').length === 0) {
-    const backButton = $('<button>', {
-        id: 'backToBrackets',
-        class: 'btn btn-secondary mt-3',
-        html: '<span><i class="fas fa-times"></i></span>'
-    }).click(function() {
-        showBracketList();
-    });
-    $('#bracket-container').before(backButton);
-}
 
+                                // Add back button if it doesn't exist
+                                if ($('#backToBrackets').length === 0) {
+                                    const backButton = $('<button>', {
+                                        id: 'backToBrackets',
+                                        class: 'btn btn-secondary mt-3',
+                                        text: 'Back to Brackets List'
+                                    }).click(function() {
+                                        showBracketList();
+                                    });
+                                    $('#bracket-container').before(backButton);
+                                }
 
                                 // Hide the generate button
                                 $('#generate-bracket').hide();
