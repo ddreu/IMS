@@ -1,6 +1,7 @@
 <?php
 
 include_once 'connection/conn.php';
+include_once 'user_logs/logger.php';
 $conn = con();
 
 session_start();
@@ -10,7 +11,7 @@ if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
 
     // Retrieve the school ID from the session
-    $school_id = $_SESSION['school_id'] ?? null;
+    $school_id = $_SESSION['school_id'] ?? null;        
 
     // Delete the session record from the sessions table
     $delete_session_query = "DELETE FROM sessions WHERE user_id = ?";
@@ -18,7 +19,17 @@ if (isset($_SESSION['user_id'])) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
 }
+$description = "User Logged out";
 
+            // Log the action
+            logUserAction(
+                $conn,
+                $user_id,
+                'sessions',
+                'Logged out',
+                $user_id,
+                $description
+            );
 // Clear session data and destroy the session
 session_unset();
 session_destroy();

@@ -712,31 +712,8 @@ include '../navbar/navbar.php';
                                 </h2>
                             </div>
                             <div class="section-content">
-                                <ul class="activity-list">
-                                    <li class="activity-item">
-                                        <!--<div class="activity-icon">
-                                            <i class="fas fa-user-plus"></i>
-                                        </div>
-                                        <div class="activity-details">
-                                            <h4 class="activity-title">New team registration completed</h4>
-                                            <p class="activity-time">
-                                                <i class="fas fa-clock"></i>
-                                                2 hours ago
-                                            </p>
-                                        </div>-->
-                                    </li>
-                                    <li class="activity-item">
-                                        <!--<div class="activity-icon">
-                                            <i class="fas fa-calendar-alt"></i>
-                                        </div>
-                                        <div class="activity-details">
-                                            <h4 class="activity-title">Tournament schedule updated</h4>
-                                            <p class="activity-time">
-                                                <i class="fas fa-clock"></i>
-                                                5 hours ago
-                                            </p>
-                                        </div>-->
-                                    </li>
+                                <ul class="activity-list" id="recentActivityList">
+                                    <!-- Activities will be populated here -->
                                 </ul>
                             </div>
                         </div>
@@ -809,6 +786,75 @@ include '../navbar/navbar.php';
             });
         </script>
     <?php endif; ?>
+
+    <script>
+    // Function to format the timestamp to "time ago" format
+    function timeAgo(timestamp) {
+        const now = new Date();
+        const past = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - past) / 1000);
+
+        if (diffInSeconds < 60) return 'just now';
+        if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' minutes ago';
+        if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' hours ago';
+        if (diffInSeconds < 604800) return Math.floor(diffInSeconds / 86400) + ' days ago';
+        return past.toLocaleDateString();
+    }
+
+    // Function to get appropriate icon based on log action
+    function getActionIcon(action) {
+        const iconMap = {
+            'CREATE': 'fa-plus-circle',
+            'UPDATE': 'fa-edit',
+            'DELETE': 'fa-trash',
+            'LOGIN': 'fa-sign-in-alt',
+            'LOGOUT': 'fa-sign-out-alt'
+        };
+        return iconMap[action] || 'fa-history';
+    }
+
+    // Function to fetch and display recent activities
+    function fetchRecentActivities() {
+        fetch('../user_logs/fetch_logs.php')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response data:', data); // Log the response to see its structure
+                const activityList = document.getElementById('recentActivityList');
+                activityList.innerHTML = ''; // Clear existing items
+
+                // Display only the first 5 items
+                data.data.slice(0, 5).forEach(log => {
+                    const li = document.createElement('li');
+                    li.className = 'activity-item';
+                    li.innerHTML = `
+                        <div class="activity-icon">
+                            <i class="fas ${getActionIcon(log.log_action)}"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4 class="activity-title">${log.log_description}</h4>
+                            <p class="activity-user">
+                                <i class="fas fa-user"></i> ${log.full_name}
+                            </p>
+                            <p class="activity-time">
+                                <i class="fas fa-clock"></i> ${timeAgo(log.log_time)}
+                            </p>
+                        </div>
+                    `;
+                    activityList.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching recent activities:', error);
+            });
+    }
+
+    // Fetch activities when page loads
+    document.addEventListener('DOMContentLoaded', fetchRecentActivities);
+
+    // Refresh activities every 5 minutes
+    setInterval(fetchRecentActivities, 300000);
+</script>
+
 </body>
 
 </html>

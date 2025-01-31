@@ -1,6 +1,7 @@
 <?php
 session_start();
 include_once 'connection/conn.php';
+include_once 'user_logs/logger.php';
 $conn = con();
 
 $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
@@ -63,6 +64,8 @@ if (isset($_POST['submit'])) {
             $user_agent = $_SERVER['HTTP_USER_AGENT'];
             $user_id = $_SESSION['user_id'];
 
+
+
             $insert_session = "
                 INSERT INTO sessions (user_id, ip_address, user_agent)
                 VALUES (?, ?, ?)
@@ -70,6 +73,18 @@ if (isset($_POST['submit'])) {
             $stmt_session = mysqli_prepare($conn, $insert_session);
             mysqli_stmt_bind_param($stmt_session, "iss", $user_id, $ip_address, $user_agent);
             mysqli_stmt_execute($stmt_session);
+
+            $description = "User Logged in";
+
+            // Log the action
+            logUserAction(
+                $conn,
+                $user_id,
+                'sessions',
+                'Logged in',
+                $user_id,
+                $description
+            );
 
             // Check role for redirection
             switch ($_SESSION['role']) {
