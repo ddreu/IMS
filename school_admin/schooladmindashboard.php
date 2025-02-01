@@ -423,10 +423,10 @@ if (isset($_SESSION['success_message'])) {
                                     <div class="text-center text-muted">No recent announcements</div>
                                 <?php endif; ?>
                             </div>
-                </div>
-                </div>
+                        </div>
+                    </div>
                 
-                 <div class="col-lg-4">
+                    <div class="col-lg-4">
                         <div class="content-section">
                             <div class="section-header">
                                 <h2 class="section-title">
