@@ -74,6 +74,8 @@ include '../navbar/navbar.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="bracket-manager.js"></script>
+    <link rel="stylesheet" href="css/bracket-style.css">
+
     <style>
 
                 /* Custom styles for jQuery Bracket */
