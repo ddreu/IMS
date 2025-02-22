@@ -27,7 +27,7 @@
       <a href="../rankings/leaderboards.php" class="custom-navbar__link"><i data-feather="bar-chart-2"></i><span>Rankings</span></a>
     </li>
     <li class="custom-navbar__item">
-      <a href="../user_logs/user_logs.php" class="custom-navbar__link"><i data-feather="activity"></i><span>User Logs</span></a>
+      <a href="../user_logs/user_logs.php" class="custom-navbar__link"><i data-feather="clock"></i><span>User Logs</span></a>
     </li>
   </ul>
 </nav>

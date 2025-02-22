@@ -239,6 +239,28 @@ if ($winner) {
 } else {
     $match_summary = "The match ended in a draw with both teams showing great performance!";
 }
+
+// Fetch set scores from match_periods_info
+$set_scores_query = "
+    SELECT 
+        period_number, 
+        score_teamA, 
+        score_teamB, 
+        timestamp 
+    FROM match_periods_info 
+    WHERE match_id = ? 
+    ORDER BY period_number";
+
+$set_scores_stmt = $conn->prepare($set_scores_query);
+$set_scores_stmt->bind_param("i", $match_id);
+$set_scores_stmt->execute();
+$set_scores_result = $set_scores_stmt->get_result();
+
+$set_scores = [];
+while ($row = $set_scores_result->fetch_assoc()) {
+    $set_scores[] = $row;
+}
+
 include '../navbar/navbar.php';
 
 ?>
@@ -439,6 +461,41 @@ include '../navbar/navbar.php';
                 </div>
             </div>
         </div>
+
+        <!-- Set Scores Section -->
+        <?php if (!empty($set_scores)): ?>
+        <div class="container mt-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Set Scores</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Set</th>
+                                    <th><?php echo htmlspecialchars($match['teamA_name']); ?></th>
+                                    <th><?php echo htmlspecialchars($match['teamB_name']); ?></th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($set_scores as $set): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($set['period_number']); ?></td>
+                                    <td><?php echo htmlspecialchars($set['score_teamA']); ?></td>
+                                    <td><?php echo htmlspecialchars($set['score_teamB']); ?></td>
+                                    <td><?php echo htmlspecialchars($set['timestamp']); ?></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Match Summary -->
         <div class="match-summary">

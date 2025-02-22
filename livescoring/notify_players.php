@@ -5,10 +5,8 @@ $conn = con();
 session_start();
 $user_id = $_SESSION['user_id'];
 
-
-// ClickSend API configuration
-$username = 'andrewbucedeguzman@gmail.com'; // Replace with your ClickSend username
-$apiKey = 'D738671F-D6A4-9B1F-D0C5-414F879FF2D7'; // Replace with your ClickSend API key
+// Semaphore API configuration
+$apiKey = '9211423d3b8b372cac30d1357da0729f'; // Replace with your actual Semaphore API key
 
 // Validate phone number
 function isValidPhoneNumber($phoneNumber)
@@ -68,33 +66,23 @@ function getTeamPlayerNumbers($teamId, $conn)
     return $phoneNumbers;
 }
 
-// Function to send SMS using ClickSend
-function sendClickSendSMS($number, $message, $username, $apiKey)
+// Function to send SMS using Semaphore
+function sendSemaphoreSMS($number, $message, $apiKey)
 {
-    // Prepare the ClickSend API request
-    $url = 'https://rest.clicksend.com/v3/sms/send';
-
-    $data = [
-        'messages' => [
-            [
-                'source' => 'php',
-                'from' => 'YourSenderID',  // Your sender ID (or phone number)
-                'to' => $number,
-                'body' => $message,
-            ],
-        ],
+    // Prepare the Semaphore API request
+    $ch = curl_init();
+    $parameters = [
+        'apikey' => $apiKey,
+        'number' => $number,
+        'message' => $message,
+        'sendername' => 'HydroMatic',
     ];
 
-    $headers = [
-        'Content-Type: application/json',
-        'Authorization: Basic ' . base64_encode($username . ':' . $apiKey),
-    ];
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_URL, 'https://api.semaphore.co/api/v4/messages');
     curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -142,7 +130,9 @@ try {
     $teamBName = getTeamName($teamBId, $conn);
 
     // SMS body
-    $smsBody = "Game: $gameName\n" .
+    $smsBody =
+        "Intramurals Game Alert\n" .
+        "Game: $gameName\n" .
         "$teamAName vs $teamBName\n" .
         "Date: $scheduleDate\n" .
         "Time: $scheduleTime\n" .
@@ -155,7 +145,7 @@ try {
 
     foreach ($teamAPhoneNumbers as $number) {
         if (isValidPhoneNumber($number)) {
-            $result = sendClickSendSMS($number, $smsBody, $username, $apiKey);
+            $result = sendSemaphoreSMS($number, $smsBody, $apiKey);
             if ($result !== false) {
                 $totalNotifiedPlayers++;
             }
@@ -167,7 +157,7 @@ try {
 
     foreach ($teamBPhoneNumbers as $number) {
         if (isValidPhoneNumber($number)) {
-            $result = sendClickSendSMS($number, $smsBody, $username, $apiKey);
+            $result = sendSemaphoreSMS($number, $smsBody, $apiKey);
             if ($result !== false) {
                 $totalNotifiedPlayers++;
             }
@@ -178,7 +168,7 @@ try {
     $description = "Notified players for match $teamAName vs $teamBName. Total number of players notified is $totalNotifiedPlayers.";
 
     // Log user action (custom operation like 'SEND_SMS')
-    logUserAction($conn, $user_id, 'Notificaion', 'Player Notification', $scheduleId, $description);
+    logUserAction($conn, $user_id, 'Notification', 'Player Notification', $scheduleId, $description);
 
     echo "success";
 } catch (Exception $e) {

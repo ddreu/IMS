@@ -78,6 +78,11 @@ if (!$result) {
 
 $logs = [];
 while ($row = $result->fetch_assoc()) {
+    // Convert UTC timestamp to Asia/Manila timezone and format as "Jan 23 2025 11:30 PM"
+    $date = new DateTime($row['log_time'], new DateTimeZone('UTC'));
+    $date->setTimezone(new DateTimeZone('Asia/Manila'));
+    $row['log_time'] = $date->format('M j Y h:i A'); // Example: "Feb 4 2025 11:00 PM"
+
     $logs[] = $row;
 }
 
@@ -99,7 +104,7 @@ $total_pages = ceil($total_rows / $limit);
 
 header('Content-Type: application/json');
 echo json_encode([
-    'status' => 'success', 
+    'status' => 'success',
     'data' => $logs,
     'pagination' => [
         'current_page' => $page,

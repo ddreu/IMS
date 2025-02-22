@@ -6,10 +6,14 @@ $conn = con();
 // Set the content type to JSON
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user_id'])) {
+// Check if the user is logged in
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['school_id'])) {
     echo json_encode(['success' => false, 'message' => 'User not logged in']);
     exit();
 }
+
+// Retrieve the user's school ID from the session
+$school_id = $_SESSION['school_id'];
 
 // Get filter parameters
 $department_id = isset($_GET['department_id']) ? $_GET['department_id'] : null;
@@ -17,7 +21,7 @@ $game_id = isset($_GET['game_id']) ? $_GET['game_id'] : null;
 $grade_level = isset($_GET['grade_level']) ? $_GET['grade_level'] : null;
 
 try {
-    // Build the query
+    // Build the query with school_id filtering
     $query = "SELECT 
         b.bracket_id,
         b.game_id,
@@ -33,10 +37,11 @@ try {
     FROM brackets b
     JOIN departments d ON b.department_id = d.id
     JOIN games g ON b.game_id = g.game_id
-    WHERE 1=1";
+    JOIN schools s ON d.school_id = s.school_id
+    WHERE s.school_id = ?";
 
-    $params = [];
-    $types = "";
+    $params = [$school_id];
+    $types = "i";
 
     // Add filters if provided
     if ($department_id) {
@@ -96,3 +101,4 @@ try {
 }
 
 $conn->close();
+?>

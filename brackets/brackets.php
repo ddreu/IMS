@@ -74,153 +74,9 @@ include '../navbar/navbar.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="bracket-manager.js"></script>
-    <link rel="stylesheet" href="css/bracket-style.css">
-
-    <style>
-
-                /* Custom styles for jQuery Bracket */
-                .jQBracket .team {
-            position: relative;
-            min-width: 150px;
-        }
-        
-        .jQBracket .team .score {
-            position: absolute;
-            right: -35px;
-            width: 30px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-left: none;
-            color: #495057;
-            font-weight: bold;
-        }
-        
-        .jQBracket .team.win .score {
-            background-color: #e8f5e9;
-        }
-      
-        /* Ensure team names don't overlap with scores */
-        .jQBracket .team .label {
-            margin-right: 35px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        
-        /* Bracket Container Styles */
-        #bracket-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin: 20px auto;
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* Force minimum dimensions to maintain structure */
-        .jQBracket {
-            min-width: 1000px !important; /* Ensure minimum width */
-            min-height: 500px !important; /* Ensure minimum height */
-            padding: 40px 20px !important;
-            font-size: 14px !important;
-        }
-
-
-      
-
-        /* Team and match box sizing */
-        .jQBracket .team {
-            width: 200px !important;
-            height: 35px !important;
-            background-color: #ffffff !important;
-            border: 1px solid #e0e0e0 !important;
-            border-radius: 4px !important;
-            margin: 2px 0 !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-
-        /* Maintain connector lines */
-        .jQBracket .connector {
-            border-color: #ccc !important;
-            border-width: 2px !important;
-        }
-
-        .jQBracket .connector.filled {
-            border-color: #666 !important;
-        }
-
-        .jQBracket .connector div.connector {
-            border-width: 2px !important;
-        }
-
-        /* Score styles */
-        .jQBracket .score {
-            min-width: 40px !important;
-            padding: 3px 5px !important;
-            background-color: #f8f9fa !important;
-            border-left: 1px solid #e0e0e0 !important;
-            text-align: center !important;
-        }
-
-        /* Team label styles */
-        .jQBracket .label {
-            width: calc(100% - 45px) !important; /* Account for score width */
-            padding: 5px 10px !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-
-        /* Container wrapper to force scrolling */
-        .bracket-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 20px; /* Space for scrollbar */
-        }
-
-        .jQBracket .tools {
-            display: none !important; /* Hide tools to prevent structure breaking */
-        }
-
-        /* Mobile specific adjustments */
-        @media (max-width: 768px) {
-            #bracket-container {
-                padding: 10px 5px;
-                margin: 10px 0;
-            }
-
-            .jQBracket {
-                font-size: 12px !important;
-                padding: 20px 10px !important;
-            }
-
-            /* Maintain minimum dimensions even on mobile */
-            .jQBracket .team {
-                min-width: 180px !important;
-                height: 30px !important;
-            }
-
-            .jQBracket .label {
-                padding: 3px 8px !important;
-            }
-
-            .jQBracket .score {
-                min-width: 35px !important;
-                padding: 3px !important;
-            }
-        }
-
-        /* Loading and error states */
-        .bracket-loading, .bracket-error {
+<style>
+/* Loading and error states */
+.bracket-loading, .bracket-error {
             min-height: 200px;
             display: flex;
             align-items: center;
@@ -228,7 +84,20 @@ include '../navbar/navbar.php';
             text-align: center;
             padding: 20px;
         }
-    </style>
+        .jQBracket .tools {
+            display: none !important; /* Hide tools to prevent structure breaking */
+        }
+
+/* Container wrapper to force scrolling */
+.bracket-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 20px; /* Space for scrollbar */
+        }
+
+</style>
+
 </head>
 
 <body>
@@ -589,134 +458,204 @@ include '../navbar/navbar.php';
 
 
             <script>
-                // Add click handler for view button
-                $('.view-bracket').on('click', function() {
-                    const bracketId = $(this).data('bracket-id');
-                    
-                    // Fetch bracket data
-                    fetch('fetch_bracket.php?bracket_id=' + bracketId)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Clear existing bracket
-                                $('#bracket-container').empty();
-                                
-                                // Process matches data for jQuery bracket format
-                                console.log('Raw data from server:', data);
-                                
-                                // Get all round numbers except 'third-place'
-                                const roundNumbers = Object.keys(data.matches)
-                                    .filter(key => key !== 'third-place' && !isNaN(parseInt(key)))
-                                    .sort((a, b) => parseInt(a) - parseInt(b));
-                                
-                                console.log('Round numbers:', roundNumbers);
-                                
-                                // Calculate the total number of teams in first round
-                                const totalTeams = data.matches['1'] ? data.matches['1'].length * 2 : 0;
-                                
-                                // Initialize empty teams array
-                                const teams = [];
-                                
-                                // Fill teams array with actual teams or empty slots
-                                if (data.matches['1'] && data.matches['1'].length > 0) {
-                                    data.matches['1'].forEach(match => {
-                                        teams.push([
-                                            match.teamA_name || 'TBD',
-                                            match.teamB_name || 'TBD'
-                                        ]);
-                                    });
-                                }
-                                
-                                console.log('Teams array:', teams);
-                                
-                                // Initialize results array with proper structure
-                                // Each round should have the correct number of matches
-                                const results = [];
-                                let matchesInRound = Math.floor(totalTeams / 2);
-                                
-                                roundNumbers.forEach(roundNum => {
-                                    const roundResults = [];
-                                    const roundMatches = data.matches[roundNum] || [];
+                // Ensure view bracket functionality works after page load
+                $(document).ready(function() {
+                    // Rebind click event for view-bracket buttons
+                    $('.view-bracket').off('click').on('click', function() {
+                        const bracketId = $(this).data('bracket-id');
+                        console.log('View Bracket clicked:', bracketId);
+                        
+                        // Fetch bracket data
+                        fetch('fetch_bracket.php?bracket_id=' + bracketId)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Clear existing bracket
+                                    $('#bracket-container').empty();
                                     
-                                    // Fill this round with the correct number of matches
-                                    for (let i = 0; i < matchesInRound; i++) {
-                                        const match = roundMatches[i];
-                                        if (match) {
-                                            // If we have actual match data
-                                            if (match.status === 'Finished' && 
-                                                match.score_teamA !== null && 
-                                                match.score_teamB !== null) {
-                                                roundResults.push([
-                                                    parseInt(match.score_teamA) || 0,
-                                                    parseInt(match.score_teamB) || 0
-                                                ]);
-                                            } else if (match.winning_team_id !== null) {
-                                                roundResults.push(
-                                                    match.winning_team_id === match.teamA_id ? 
-                                                    [1, 0] : [0, 1]
-                                                );
-                                            } else if (match.teamA_id === -1 || match.teamB_id === -1) {
-                                                roundResults.push(
-                                                    match.teamA_id === -1 ? [0, 1] : [1, 0]
-                                                );
-                                            } else {
-                                                roundResults.push([0, 0]);
-                                            }
-                                        } else {
-                                            // Fill with empty match result
-                                            roundResults.push([0, 0]);
-                                        }
+                                    // ENHANCED DEBUGGING
+                                    console.group('Bracket Data Validation');
+                                    console.log('Raw data from server:', JSON.parse(JSON.stringify(data)));
+                                    
+                                    // Validate basic data structure
+                                    if (!data.success) {
+                                        console.error('Fetch failed:', data.message);
+                                        $('#bracket-container').html(`
+                                            <div class="alert alert-danger">
+                                                Failed to load bracket: ${data.message || 'Unknown error'}
+                                            </div>
+                                        `);
+                                        return;
+                                    }
+
+                                    // Validate matches object
+                                    if (!data.matches || typeof data.matches !== 'object') {
+                                        console.error('Invalid matches structure:', data.matches);
+                                        $('#bracket-container').html(`
+                                            <div class="alert alert-warning">
+                                                No valid matches found in bracket data.
+                                            </div>
+                                        `);
+                                        return;
+                                    }
+
+                                    // Detailed matches logging
+                                    console.log('Matches Object Keys:', Object.keys(data.matches));
+                                    Object.keys(data.matches)
+                                        .filter(key => !isNaN(parseInt(key)))
+                                        .forEach(round => {
+                                            console.log(`Round ${round} Matches:`, data.matches[round]);
+                                        });
+
+                                    // Validate third-place match if exists
+                                    if (data.matches['third-place']) {
+                                        console.log('Third Place Match:', data.matches['third-place']);
+                                    }
+
+                                    // Get all round numbers except 'third-place'
+                                    const roundNumbers = Object.keys(data.matches)
+                                        .filter(key => key !== 'third-place' && !isNaN(parseInt(key)))
+                                        .sort((a, b) => parseInt(a) - parseInt(b));
+                                    
+                                    console.log('Sorted Round Numbers:', roundNumbers);
+
+                                    // Detailed round validation
+                                    roundNumbers.forEach(round => {
+                                        const roundMatches = data.matches[round];
+                                        console.group(`Round ${round} Validation`);
+                                        console.log('Total Matches:', roundMatches.length);
+                                        
+                                        roundMatches.forEach((match, index) => {
+                                            console.log(`Match ${index + 1} Details:`, {
+                                                matchId: match.match_id,
+                                                matchNumber: match.match_number,
+                                                teamA: {
+                                                    id: match.teamA_id,
+                                                    name: match.teamA_name
+                                                },
+                                                teamB: {
+                                                    id: match.teamB_id,
+                                                    name: match.teamB_name
+                                                },
+                                                score: {
+                                                    teamA: match.score_teamA,
+                                                    teamB: match.score_teamB
+                                                },
+                                                status: match.status,
+                                                winningTeam: match.winning_team_id
+                                            });
+                                        });
+                                        console.groupEnd();
+                                    });
+
+                                    console.groupEnd();
+
+                                    // Calculate the total number of teams in first round
+                                    const totalTeams = data.matches['1'] ? data.matches['1'].length * 2 : 0;
+                                    
+                                    // Initialize empty teams array
+                                    const teams = [];
+                                    
+                                    // Fill teams array with actual teams or empty slots
+                                    if (data.matches['1'] && data.matches['1'].length > 0) {
+                                        data.matches['1'].forEach(match => {
+                                            teams.push([
+                                                match.teamA_name || 'TBD',
+                                                match.teamB_name || 'TBD'
+                                            ]);
+                                        });
                                     }
                                     
-                                    results.push(roundResults);
-                                    // Number of matches in next round is half of current round
-                                    matchesInRound = Math.floor(matchesInRound / 2);
-                                });
-                                
-                                console.log('Final results array:', results);
-                                
-                                // Ensure we have at least one team
-                                if (teams.length === 0) {
-                                    console.error('No teams available');
-                                    $('#bracket-container').html('<div class="alert alert-warning">No teams available for the bracket.</div>');
-                                    return;
-                                }
-                                
-                                const bracketData = {
-                                    teams: teams,
-                                    results: results
-                                };
-                                
-                                console.log('Final bracket data:', bracketData);
-
-                                // Initialize the bracket with current state
-                                $('#bracket-container').bracket({
-                                    teamWidth: 150,
-                                    scoreWidth: 40,
-                                    matchMargin: 50,
-                                    roundMargin: 50,
-                                    init: bracketData,
-                                    save: function(){}, // Read-only mode
-                                    decorator: {
-                                        edit: function(){}, // Disable editing
-                                        render: function(container, data, score, state) {
-                                            container.empty();
-                                            if (data === null) {
-                                                container.append("BYE");
-                                            } else if (data === "TBD") {
-                                                container.append("TBD");
+                                    console.log('Teams array:', teams);
+                                    
+                                    // Initialize results array with proper structure
+                                    // Each round should have the correct number of matches
+                                    const results = [];
+                                    let matchesInRound = Math.floor(totalTeams / 2);
+                                    
+                                    roundNumbers.forEach(roundNum => {
+                                        const roundResults = [];
+                                        const roundMatches = data.matches[roundNum] || [];
+                                        
+                                        // Fill this round with the correct number of matches
+                                        for (let i = 0; i < matchesInRound; i++) {
+                                            const match = roundMatches[i];
+                                            if (match) {
+                                                // If we have actual match data
+                                                if (match.status === 'Finished' && 
+                                                    match.score_teamA !== null && 
+                                                    match.score_teamB !== null) {
+                                                    roundResults.push([
+                                                        parseInt(match.score_teamA) || 0,
+                                                        parseInt(match.score_teamB) || 0
+                                                    ]);
+                                                } else if (match.winning_team_id !== null) {
+                                                    roundResults.push(
+                                                        match.winning_team_id === match.teamA_id ? 
+                                                        [1, 0] : [0, 1]
+                                                    );
+                                                } else if (match.teamA_id === -1 || match.teamB_id === -1) {
+                                                    roundResults.push(
+                                                        match.teamA_id === -1 ? [0, 1] : [1, 0]
+                                                    );
+                                                } else {
+                                                    roundResults.push([0, 0]);
+                                                }
                                             } else {
-                                                container.append(data);
-                                                if (score !== undefined && score !== null) {
-                                                    container.append($('<div>', {
-                                                        class: 'score',
-                                                        text: score
-                                                    }));
+                                                // Fill with empty match result
+                                                roundResults.push([0, 0]);
+                                            }
+                                        }
+                                        
+                                        results.push(roundResults);
+                                        // Number of matches in next round is half of current round
+                                        matchesInRound = Math.floor(matchesInRound / 2);
+                                    });
+                                    
+                                    console.log('Final results array:', results);
+                                    
+                                    // Ensure we have at least one team
+                                    if (teams.length === 0) {
+                                        console.error('No teams available');
+                                        $('#bracket-container').html('<div class="alert alert-warning">No teams available for the bracket.</div>');
+                                        return;
+                                    }
+                                    
+                                    const bracketData = {
+                                        teams: teams,
+                                        results: results
+                                    };
+                                    
+                                    console.log('Final bracket data:', bracketData);
+
+                                    // Initialize the bracket with current state
+                                    $('#bracket-container').bracket({
+                                        teamWidth: 150,
+                                        scoreWidth: 40,
+                                        matchMargin: 50,
+                                        roundMargin: 50,
+                                        init: bracketData,
+                                        save: function(){}, // Read-only mode
+                                        decorator: {
+                                            edit: function(){}, // Disable editing
+                                            render: function(container, data, score, state) {
+                                                container.empty();
+                                                if (data === null) {
+                                                    container.append("BYE");
+                                                } else if (data === "TBD") {
+                                                    container.append("TBD");
+                                                } else {
+                                                    container.append(data);
+                                                    if (score !== undefined && score !== null) {
+                                                        container.append($('<div>', {
+                                                            class: 'score',
+                                                            text: score
+                                                        }));
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                });
+                                    });
 // Add back button if it doesn't exist
 if ($('#backToBrackets').length === 0) {
     const backButton = $('<button>', {
@@ -730,26 +669,27 @@ if ($('#backToBrackets').length === 0) {
 }
 
 
-                                // Hide the generate button
-                                $('#generate-bracket').hide();
-                                
-                            } else {
-                                console.error('Error loading bracket:', data.message);
+                                    // Hide the generate button
+                                    $('#generate-bracket').hide();
+                                    
+                                } else {
+                                    console.error('Error loading bracket:', data.message);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Failed to load bracket: ' + data.message
+                                    });
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
-                                    text: 'Failed to load bracket: ' + data.message
+                                    text: 'Failed to load bracket. Please try again.'
                                 });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Failed to load bracket. Please try again.'
                             });
-                        });
+                    });
                 });
             </script>
             <script>
@@ -908,28 +848,28 @@ if ($('#backToBrackets').length === 0) {
                                 },
                                 success: function(response) {
                                     if (response.success) {
-                                        Swal.fire(
-                                            'Deleted!',
-                                            response.message,
-                                            'success'
-                                        ).then(() => {
+                                        Swal.fire({
+                                            title: 'Success!',
+                                            text: 'Bracket has been deleted successfully.',
+                                            icon: 'success'
+                                        }).then(() => {
                                             // Reload the page to show the saved bracket
                                             window.location.reload();
                                         });
                                     } else {
-                                        Swal.fire(
-                                            'Error',
-                                            response.message,
-                                            'error'
-                                        );
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: response.message,
+                                            icon: 'error'
+                                        });
                                     }
                                 },
                                 error: function() {
-                                    Swal.fire(
-                                        'Error',
-                                        'Failed to delete bracket. Please try again.',
-                                        'error'
-                                    );
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'Failed to delete bracket. Please try again.',
+                                        icon: 'error'
+                                    });
                                 }
                             });
                         }

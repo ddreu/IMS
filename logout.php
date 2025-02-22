@@ -11,26 +11,28 @@ if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
 
     // Retrieve the school ID from the session
-    $school_id = $_SESSION['school_id'] ?? null;        
+    $school_id = $_SESSION['school_id'] ?? null;
 
     // Delete the session record from the sessions table
     $delete_session_query = "DELETE FROM sessions WHERE user_id = ?";
     $stmt = mysqli_prepare($conn, $delete_session_query);
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
-}
-$description = "User Logged out";
+    mysqli_stmt_close($stmt);
 
-            // Log the action
-            logUserAction(
-                $conn,
-                $user_id,
-                'sessions',
-                'Logged out',
-                $user_id,
-                $description
-            );
-// Clear session data and destroy the session
+    // **Log the action BEFORE destroying session**
+    $description = "User Logged out";
+    logUserAction(
+        $conn,
+        $user_id, // Ensure we use the user ID before session destruction
+        'sessions',
+        'Logged out',
+        $user_id,
+        $description
+    );
+}
+
+// **Clear session data and destroy session AFTER logging**
 session_unset();
 session_destroy();
 

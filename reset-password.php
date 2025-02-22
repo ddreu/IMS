@@ -124,7 +124,7 @@ if (isset($_SESSION['message'])) {
 
         <?php if ($message_class === 'success'): ?>
             <div class="login-link">
-                <a href="login.php">Go to Login Page</a>
+                <a href="intrasports.net/login.php">Go to Login Page</a>
             </div>
         <?php endif; ?>
     </div>

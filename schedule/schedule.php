@@ -576,51 +576,39 @@ include '../navbar/navbar.php';
             const scheduleTimeInput = document.getElementById('schedule_time');
 
             if (scheduleDateInput) {
-                // Set min attribute to today
-                scheduleDateInput.min = getTodayFormatted();
+                // Comment out min attribute setting
+                // scheduleDateInput.min = getTodayFormatted();
 
-                // Add event listener to validate date
-                scheduleDateInput.addEventListener('change', function() {
-                    const selectedDate = new Date(this.value);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0); // Reset time part for accurate date comparison
+                // Comment out date validation
+                // scheduleDateInput.addEventListener('change', function() {
+                //     const selectedDate = new Date(this.value);
+                //     const today = new Date();
+                //     today.setHours(0, 0, 0, 0); // Reset time part for accurate date comparison
 
-                    if (selectedDate < today) {
-                        const dateError = document.getElementById('dateError');
-                        dateError.textContent = 'Please select a future date.';
-                        dateError.style.display = 'block';
-                    } else {
-                        const dateError = document.getElementById('dateError');
-                        dateError.textContent = '';
-                        dateError.style.display = 'none';
-                    }
-                });
-            }
-
-            // Function to show error message with timeout
-            function showTimedError(errorElement, message) {
-                if (errorElement.timeout) {
-                    clearTimeout(errorElement.timeout);
-                }
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-                errorElement.timeout = setTimeout(() => {
-                    errorElement.style.display = 'none';
-                    errorElement.textContent = '';
-                }, 3000);
+                //     if (selectedDate < today) {
+                //         const dateError = document.getElementById('dateError');
+                //         dateError.textContent = 'Please select a future date.';
+                //         dateError.style.display = 'block';
+                //     } else {
+                //         const dateError = document.getElementById('dateError');
+                //         dateError.textContent = '';
+                //         dateError.style.display = 'none';
+                //     }
+                // });
             }
 
             // Function to validate date
             function validateDate(dateInput, errorElement) {
-                const selectedDate = new Date(dateInput.value);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                // Comment out date validation
+                // const selectedDate = new Date(dateInput.value);
+                // const today = new Date();
+                // today.setHours(0, 0, 0, 0);
 
-                if (selectedDate < today) {
-                    showTimedError(errorElement, 'Please select a future date.');
-                    dateInput.value = '';
-                    return false;
-                }
+                // if (selectedDate < today) {
+                //     showTimedError(errorElement, 'Please select a future date.');
+                //     dateInput.value = '';
+                //     return false;
+                // }
                 return true;
             }
 
@@ -632,7 +620,7 @@ include '../navbar/navbar.php';
                 // Commenting out time validation
                 // if (hours < 7 || hours >= 19) {
                 //     showTimedError(errorElement, 'Please select a time between 7:00 AM and 7:00 PM.');
-                //     timeInput.value = '';
+                //     timeInput.value = ''; // Clear the invalid time
                 //     return false;
                 // }
                 return true;
@@ -648,20 +636,21 @@ include '../navbar/navbar.php';
 
                 // Set minimum date to today for create modal
                 if (scheduleDateInput) {
-                    scheduleDateInput.min = getTodayFormatted();
+                    // Comment out min attribute setting
+                    // scheduleDateInput.min = getTodayFormatted();
 
-                    // Add date validation
-                    scheduleDateInput.addEventListener('change', function() {
-                        const selectedDate = new Date(this.value);
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0); // Reset time part for accurate date comparison
+                    // Comment out date validation
+                    // scheduleDateInput.addEventListener('change', function() {
+                    //     const selectedDate = new Date(this.value);
+                    //     const today = new Date();
+                    //     today.setHours(0, 0, 0, 0); // Reset time part for accurate date comparison
 
-                        if (selectedDate < today) {
-                            showTimedError(dateError, 'Please select a future date.');
-                            this.value = ''; // Clear the invalid date
-                            return;
-                        }
-                    });
+                    //     if (selectedDate < today) {
+                    //         showTimedError(dateError, 'Please select a future date.');
+                    //         this.value = ''; // Clear the invalid date
+                    //         return;
+                    //     }
+                    // });
                 }
 
                 // Time validation
@@ -706,7 +695,7 @@ include '../navbar/navbar.php';
                 // editScheduleTimeInput.max = '19:00';
 
                 // Set minimum date to today for edit modal
-                editScheduleDateInput.min = getTodayFormatted();
+                // editScheduleDateInput.min = getTodayFormatted();
 
                 // Date validation
                 editScheduleDateInput.addEventListener('change', function() {
@@ -714,10 +703,11 @@ include '../navbar/navbar.php';
                     const today = new Date();
                     today.setHours(0, 0, 0, 0); // Reset time part for accurate date comparison
 
-                    if (selectedDate < today) {
-                        showTimedError(editDateError, 'Please select a future date.');
-                        this.value = ''; // Clear the invalid date
-                    }
+                    // Comment out date validation
+                    // if (selectedDate < today) {
+                    //     showTimedError(editDateError, 'Please select a future date.');
+                    //     this.value = ''; // Clear the invalid date
+                    // }
                 });
 
                 // Time validation

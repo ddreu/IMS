@@ -135,9 +135,9 @@ $conn = con();
                 <thead class="thead-dark">
                     <tr>
                         <th>User</th>
-                        <th>Action</th>
+                       <!--<th>Action</th>-->
                         <th>Operation</th>
-                        <th>Record ID</th>
+                        <!--<th>Record ID</th>-->
                         <th>Description</th>
                         <th>Timestamp</th>
                         <th>Details</th>
@@ -191,7 +191,7 @@ $conn = con();
         let currentPage = 1;
         let totalPages = 1;
 
-        async function fetchLogs() {
+         async function fetchLogs() {
             try {
                 const sortColumn = document.getElementById('sortColumn').value;
                 const sortOrder = document.getElementById('sortOrder').value;
@@ -214,18 +214,16 @@ $conn = con();
                     result.data.forEach(log => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td data-label="User">${log.full_name}</td>
-                            <td data-label="Action">${log.log_action}</td>
-                            <td data-label="Operation">${log.table_name}</td>
-                            <td data-label="Record ID">${log.log_record_id}</td>
-                            <td data-label="Description">${log.log_description}</td>
-                            <td data-label="Timestamp">${new Date(log.log_time).toLocaleString()}</td>
-                            <td data-label="Details">
-                                <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">
-                                    View Details
-                                </button>
-                            </td>
-                        `;
+                    <td data-label="User">${log.full_name}</td>
+                    <td data-label="Operation">${log.table_name}</td>
+                    <td data-label="Description">${log.log_description}</td>
+                    <td data-label="Timestamp">${log.log_time}</td> <!-- Directly using formatted date from PHP -->
+                    <td data-label="Details">
+                        <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">
+                            View Details
+                        </button>
+                    </td>
+                `;
                         logsTable.appendChild(row);
                     });
                 }
@@ -233,6 +231,7 @@ $conn = con();
                 console.error('Error fetching logs:', error);
             }
         }
+
 
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', function() {

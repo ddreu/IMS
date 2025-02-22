@@ -31,31 +31,8 @@ $match_query = $conn->prepare("
 $match_query->bind_param("i", $schedule_id);
 $match_query->execute();
 $match = $match_query->get_result()->fetch_assoc();
+$match_query->close();
 
-// Fetch game rules
-$rules_query = $conn->prepare("
-    SELECT scoring_unit, score_increment_options, period_type, number_of_periods, 
-           duration_per_period, time_limit, point_cap, max_fouls, timeouts_per_period
-    FROM game_scoring_rules
-    WHERE game_id = ? AND department_id = ?");
-$rules_query->bind_param("ii", $game_id, $department_id);
-$rules_query->execute();
-$rules = $rules_query->get_result()->fetch_assoc();
-
-// If no rules found, use defaults
-if (!$rules) {
-    $rules = [
-        'scoring_unit' => 'points',
-        'score_increment_options' => '1,2,3',
-        'period_type' => 'quarter',
-        'number_of_periods' => 4,
-        'duration_per_period' => 10,
-        'time_limit' => 40,
-        'point_cap' => 100,
-        'max_fouls' => 5,
-        'timeouts_per_period' => 2
-    ];
-}
 ?>
 
 <!DOCTYPE html>

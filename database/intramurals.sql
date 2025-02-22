@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 31, 2025 at 04:54 AM
+-- Generation Time: Feb 03, 2025 at 08:00 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -65,13 +65,6 @@ CREATE TABLE `brackets` (
   `bracket_type` enum('single','double') NOT NULL DEFAULT 'single'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `brackets`
---
-
-INSERT INTO `brackets` (`bracket_id`, `game_id`, `department_id`, `grade_level`, `total_teams`, `rounds`, `status`, `created_at`, `bracket_type`) VALUES
-(294, 18, 1, NULL, 12, 4, 'ongoing', '2025-01-30 19:03:52', 'single');
-
 -- --------------------------------------------------------
 
 --
@@ -124,7 +117,7 @@ INSERT INTO `games` (`game_id`, `game_name`, `number_of_players`, `category`, `e
 (27, 'Chess', 2, 'Individual Sports', 'Indoor', '2024-10-23 16:54:28', 8),
 (28, 'Badminton', 2, 'Individual Sports', 'Outdoor', '2024-10-23 16:55:47', 8),
 (29, 'Patintero', 8, 'Team Sports', 'Outdoor', '2024-10-23 16:55:56', 8),
-(30, 'Word Factory', 2, 'Individual Sports', 'Indoor', '2024-10-23 16:56:12', 8);
+(30, 'Word Factory', 4, 'Individual Sports', 'Indoor', '2024-10-23 16:56:12', 8);
 
 -- --------------------------------------------------------
 
@@ -145,16 +138,17 @@ CREATE TABLE `game_scoring_rules` (
   `time_limit` tinyint(1) DEFAULT NULL,
   `point_cap` int(11) DEFAULT NULL,
   `max_fouls` int(11) DEFAULT NULL,
-  `timeouts_per_period` int(11) DEFAULT 0
+  `timeouts_per_period` int(11) DEFAULT 0,
+  `game_type` enum('point','set','default') NOT NULL DEFAULT 'point'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `game_scoring_rules`
 --
 
-INSERT INTO `game_scoring_rules` (`id`, `game_id`, `department_id`, `school_id`, `scoring_unit`, `score_increment_options`, `period_type`, `number_of_periods`, `duration_per_period`, `time_limit`, `point_cap`, `max_fouls`, `timeouts_per_period`) VALUES
-(7, 18, 1, 8, 'Point', '1,2,3', 'Quarter', 4, 10, 1, 0, 5, 4),
-(12, 27, 1, 8, 'Point', '1', 'Set', 4, 5, 1, 0, 0, 0);
+INSERT INTO `game_scoring_rules` (`id`, `game_id`, `department_id`, `school_id`, `scoring_unit`, `score_increment_options`, `period_type`, `number_of_periods`, `duration_per_period`, `time_limit`, `point_cap`, `max_fouls`, `timeouts_per_period`, `game_type`) VALUES
+(7, 18, 1, 8, 'Point', '1,2,3', '0', 4, 10, 1, 0, 5, 4, 'set'),
+(12, 27, 1, 8, 'Point', '1', 'Set', 4, 5, 1, 0, 0, 0, 'point');
 
 -- --------------------------------------------------------
 
@@ -227,6 +221,23 @@ INSERT INTO `grade_section_course` (`id`, `department_id`, `grade_level`, `stran
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `live_default_scores`
+--
+
+CREATE TABLE `live_default_scores` (
+  `live_default_score_id` int(11) NOT NULL,
+  `schedule_id` int(11) NOT NULL,
+  `game_id` int(11) NOT NULL,
+  `teamA_score` int(11) DEFAULT 0,
+  `teamB_score` int(11) DEFAULT 0,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `teamA_id` int(11) NOT NULL,
+  `teamB_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `live_scores`
 --
 
@@ -247,6 +258,28 @@ CREATE TABLE `live_scores` (
   `time_remaining` int(11) DEFAULT NULL COMMENT 'Remaining time in seconds for current period',
   `timer_status` enum('running','paused','ended') DEFAULT 'paused' COMMENT 'Current timer status',
   `last_timer_update` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Last time the timer was updated'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `live_set_scores`
+--
+
+CREATE TABLE `live_set_scores` (
+  `live_set_score_id` int(11) NOT NULL,
+  `schedule_id` int(11) NOT NULL,
+  `game_id` int(11) NOT NULL,
+  `teamA_score` int(11) DEFAULT 0,
+  `teamB_score` int(11) DEFAULT 0,
+  `teamA_sets_won` int(11) DEFAULT 0,
+  `teamB_sets_won` int(11) DEFAULT 0,
+  `current_set` int(11) DEFAULT 1,
+  `timeout_teamA` int(11) DEFAULT 0,
+  `timeout_teamB` int(11) DEFAULT 0,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `teamA_id` int(11) NOT NULL,
+  `teamB_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -590,7 +623,97 @@ INSERT INTO `logs` (`log_id`, `table_name`, `operation`, `record_id`, `user_id`,
 (320, 'Brackets', 'DELETE', 292, 67, '2025-01-31 03:03:06', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
 (321, 'Brackets', 'DELETE', 293, 67, '2025-01-31 03:03:50', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
 (322, 'schedules', 'CREATE', 2094, 67, '2025-01-31 04:50:11', 'CRIM - Basketball vs BSCS - Basketball - Basketball | Scheduled on 2025-01-31 at 07:00:00, Venue: gym', NULL, NULL),
-(323, 'schedules', 'UPDATE', 104, 67, '2025-01-31 05:00:10', 'Modified the schedule for CRIM - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 07:00:00, Venue: gym \n                            to 2025-01-31 at 05:00, Venue: gym', NULL, NULL);
+(323, 'schedules', 'UPDATE', 104, 67, '2025-01-31 05:00:10', 'Modified the schedule for CRIM - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 07:00:00, Venue: gym \n                            to 2025-01-31 at 05:00, Venue: gym', NULL, NULL),
+(324, 'games', 'CREATE', 40, 56, '2025-01-31 17:58:48', 'Added a new game: Name = \'aededse\', Number of Players = 22, Category = \'Individual Sports\', Environment = \'Indoor\'.', NULL, NULL),
+(325, 'games', 'DELETE', 40, 56, '2025-01-31 18:05:59', 'Deleted game: Name = \'aededse\', Number of Players = 22, Category = \'Individual Sports\', Environment = \'Indoor\'.', NULL, NULL),
+(326, 'games', 'UPDATE', 30, 56, '2025-01-31 18:16:58', 'Updated game \'Word Factory\': Number of Players: \'2\' → \'4\'', NULL, NULL),
+(327, 'announcements', 'CREATE', 50, 56, '2025-01-31 18:28:56', 'Added Announcement titled \"srfdfvdfv\"', NULL, NULL),
+(328, 'announcements', 'UPDATE', 50, 56, '2025-01-31 18:29:05', 'Edited content. ', NULL, NULL),
+(329, 'announcements', 'DELETE', 50, 56, '2025-01-31 18:29:13', 'Deleted Announcement titled \"srfdfvdfv\"', NULL, NULL),
+(330, 'Pointing System', 'UPDATE', 8, 56, '2025-01-31 18:29:20', 'Updated third_place_points from 2 to 3. ', NULL, NULL),
+(331, 'Brackets', 'DELETE', 294, 67, '2025-01-31 21:16:06', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(332, 'schedules', 'CREATE', 2110, 67, '2025-01-31 21:16:44', 'CRIM - Basketball vs EDUC - Basketball - Basketball | Scheduled on 2025-01-31 at 09:20:00, Venue: Gym', NULL, NULL),
+(333, 'schedules', 'CREATE', 2111, 67, '2025-01-31 21:17:11', 'll - Basketball vs wda - Basketball - Basketball | Scheduled on 2025-01-31 at 21:20:00, Venue: Gym', NULL, NULL),
+(334, 'schedules', 'DELETE', 105, 67, '2025-01-31 21:17:18', 'Canceled schedule for Match #2110: CRIM - Basketball vs EDUC - Basketball (Basketball) scheduled on 2025-01-31 at 9:20 AM, Venue: Gym', NULL, NULL),
+(335, 'schedules', 'CREATE', 2110, 67, '2025-01-31 21:17:37', 'CRIM - Basketball vs EDUC - Basketball - Basketball | Scheduled on 2025-01-31 at 21:20:00, Venue: Gym', NULL, NULL),
+(336, 'schedules', 'UPDATE', 106, 67, '2025-01-31 21:18:05', 'Modified the schedule for ll - Basketball vs wda - Basketball - Basketball \n                            from 2025-01-31 at 21:20:00, Venue: Gym \n                            to 2025-02-01 at 21:20, Venue: Gym', NULL, NULL),
+(337, 'schedules', 'UPDATE', 106, 67, '2025-01-31 21:18:15', 'Modified the schedule for ll - Basketball vs wda - Basketball - Basketball \n                            from 2025-02-01 at 21:20:00, Venue: Gym \n                            to 2025-01-31 at 21:20, Venue: Gym', NULL, NULL),
+(338, 'schedules', 'CREATE', 2116, 67, '2025-01-31 21:55:45', 'BSBA - Basketball vs BSCS - Basketball - Basketball | Scheduled on 2025-01-31 at 09:20:00, Venue: Gym', NULL, NULL),
+(339, 'schedules', 'DELETE', 108, 67, '2025-01-31 21:55:52', 'Canceled schedule for Match #2116: BSBA - Basketball vs BSCS - Basketball (Basketball) scheduled on 2025-01-31 at 9:20 AM, Venue: Gym', NULL, NULL),
+(340, 'schedules', 'CREATE', 2116, 67, '2025-01-31 21:56:24', 'BSBA - Basketball vs BSCS - Basketball - Basketball | Scheduled on 2025-01-31 at 21:40:00, Venue: Gym', NULL, NULL),
+(341, 'schedules', 'UPDATE', 109, 67, '2025-01-31 21:58:39', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 21:40:00, Venue: Gym \n                            to 2025-01-31 at 21:58:39, Venue: Gym', NULL, NULL),
+(342, 'schedules', 'UPDATE', 109, 67, '2025-01-31 21:58:42', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 21:58:39, Venue: Gym \n                            to 2025-01-31 at 21:58:42, Venue: Gym', NULL, NULL),
+(343, 'schedules', 'UPDATE', 109, 67, '2025-01-31 21:58:49', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 21:58:42, Venue: Gym \n                            to 2025-01-31 at 21:58:49, Venue: Gym', NULL, NULL),
+(344, 'schedules', 'UPDATE', 109, 67, '2025-01-31 21:58:50', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 21:58:49, Venue: Gym \n                            to 2025-01-31 at 21:58:50, Venue: Gym', NULL, NULL),
+(345, 'schedules', 'UPDATE', 109, 67, '2025-01-31 21:59:22', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 21:58:50, Venue: Gym \n                            to 2025-01-31 at 21:59:22, Venue: Gym', NULL, NULL),
+(346, 'schedules', 'UPDATE', 109, 67, '2025-01-31 21:59:27', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 21:59:22, Venue: Gym \n                            to 2025-01-31 at 21:59:27, Venue: Gym', NULL, NULL),
+(347, 'schedules', 'UPDATE', 109, 67, '2025-01-31 22:12:33', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 21:59:27, Venue: Gym \n                            to 2025-01-31 at 22:20, Venue: Gym', NULL, NULL),
+(348, 'schedules', 'UPDATE', 109, 67, '2025-01-31 22:20:47', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 22:20:00, Venue: Gym \n                            to 2025-01-31 at 22:25, Venue: Gym', NULL, NULL),
+(349, 'schedules', 'UPDATE', 106, 67, '2025-01-31 22:27:00', 'Modified the schedule for ll - Basketball vs wda - Basketball - Basketball \n                            from 2025-01-31 at 9:20 PM, Venue: Gym \n                            to January 31, 2025 at 10:34 PM, Venue: Gym', NULL, NULL),
+(350, 'schedules', 'CREATE', 2112, 67, '2025-01-31 22:27:34', 'Created schedule for match between ff - Basketball and asasa - Basketball', NULL, NULL),
+(351, 'schedules', 'CREATE', 2113, 67, '2025-01-31 22:30:13', 'adwawd - Basketball vs BSA - Basketball - Basketball | Scheduled on January 31, 2025 at 7:00 PM, Venue: School Gym', NULL, NULL),
+(352, 'Matches', 'Match Start', 106, 67, '2025-01-31 22:32:12', 'Started the match between ll - Basketball vs wda - Basketball', NULL, NULL),
+(353, 'schedules', 'UPDATE', 107, 67, '2025-01-31 23:06:01', 'Modified the schedule for CRIM - Basketball vs EDUC - Basketball - Basketball \n                            from 2025-01-31 at 9:20 PM, Venue: Gym \n                            to January 31, 2025 at 11:20 PM, Venue: Gym', NULL, NULL),
+(354, 'Matches', 'Match Start', 107, 67, '2025-01-31 23:06:30', 'Started the match between CRIM - Basketball vs EDUC - Basketball', NULL, NULL),
+(355, 'Users', 'UPDATE', 67, 56, '2025-02-01 01:16:33', 'Updated user details for \"John Doe\" (Committee): Department: College → SHS', NULL, NULL),
+(356, 'Brackets', 'DELETE', 305, 67, '2025-02-01 01:56:20', 'Deleted a bracket for Game: Basketball, Department: SHS', NULL, NULL),
+(357, 'Brackets', 'DELETE', 304, 67, '2025-02-01 01:56:22', 'Deleted a bracket for Game: Basketball, Department: SHS', NULL, NULL),
+(358, 'Brackets', 'DELETE', 303, 67, '2025-02-01 02:06:23', 'Deleted a bracket for Game: Basketball, Department: SHS', NULL, NULL),
+(359, 'Brackets', 'DELETE', 306, 67, '2025-02-01 02:06:26', 'Deleted a bracket for Game: Basketball, Department: SHS', NULL, NULL),
+(360, 'Users', 'UPDATE', 67, 56, '2025-02-01 02:07:26', 'Updated user details for \"John Doe\" (Committee): Department: SHS → College', NULL, NULL),
+(361, 'Brackets', 'DELETE', 308, 67, '2025-02-01 02:08:27', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(362, 'sessions', 'Logged out', 56, 56, '2025-02-01 05:10:54', 'User Logged out', NULL, NULL),
+(363, 'sessions', 'Logged in', 56, 56, '2025-02-01 14:54:04', 'User Logged in', NULL, NULL),
+(364, 'sessions', 'Logged out', 56, 56, '2025-02-01 17:38:18', 'User Logged out', NULL, NULL),
+(365, 'sessions', 'Logged in', 68, 68, '2025-02-01 17:38:25', 'User Logged in', NULL, NULL),
+(366, 'sessions', 'Logged out', 68, 68, '2025-02-01 17:46:19', 'User Logged out', NULL, NULL),
+(367, 'sessions', 'Logged in', 56, 56, '2025-02-01 17:46:25', 'User Logged in', NULL, NULL),
+(368, 'sessions', 'Logged out', 56, 56, '2025-02-01 18:27:11', 'User Logged out', NULL, NULL),
+(369, 'schedules', 'UPDATE', 110, 67, '2025-02-01 18:57:49', 'Modified the schedule for ff - Basketball vs asasa - Basketball - Basketball \n                            from 2025-01-31 at 10:00 AM, Venue: School Gym \n                            to February 01, 2025 at 7:12 AM, Venue: School Gym', NULL, NULL),
+(370, 'schedules', 'UPDATE', 109, 67, '2025-02-01 18:58:28', 'Modified the schedule for BSBA - Basketball vs BSCS - Basketball - Basketball \n                            from 2025-01-31 at 10:25 PM, Venue: Gym \n                            to February 01, 2025 at 7:09 PM, Venue: Gym', NULL, NULL),
+(371, 'Matches', 'Match Start', 109, 67, '2025-02-01 18:59:07', 'Started the match between BSCS - Basketball vs BSBA - Basketball', NULL, NULL),
+(372, 'sessions', 'Logged in', 1, 1, '2025-02-02 07:13:49', 'User Logged in', NULL, NULL),
+(373, 'sessions', 'Logged out', 1, 1, '2025-02-02 16:33:08', 'User Logged out', NULL, NULL),
+(374, 'Matches', 'Match Start', 109, 67, '2025-02-02 16:34:04', 'Started the match between BSCS - Basketball vs BSBA - Basketball', NULL, NULL),
+(375, 'Game Rules', 'CREATE/UPDATE', NULL, 67, '2025-02-02 18:06:52', 'Updated the game scoring rules for Basketball under the College department.', NULL, NULL),
+(376, 'Game Rules', 'CREATE/UPDATE', NULL, 67, '2025-02-02 18:07:07', 'Updated the game scoring rules for Basketball under the College department.', NULL, NULL),
+(377, 'Game Rules', 'CREATE/UPDATE', NULL, 67, '2025-02-02 18:07:15', 'Updated the game scoring rules for Basketball under the College department.', NULL, NULL),
+(378, 'Game Rules', 'CREATE/UPDATE', NULL, 67, '2025-02-02 18:19:20', 'Updated the game scoring rules for Basketball under the College department.', NULL, NULL),
+(379, 'Matches', 'Match Start', 109, 67, '2025-02-02 18:19:27', 'Started the match between BSCS - Basketball vs BSBA - Basketball', NULL, NULL),
+(380, 'schedules', 'UPDATE', 110, 67, '2025-02-02 20:43:20', 'Modified the schedule for ff - Basketball vs asasa - Basketball - Basketball \n                            from 2025-02-01 at 7:12 AM, Venue: School Gym \n                            to February 02, 2025 at 8:30 PM, Venue: School Gym', NULL, NULL),
+(381, 'Matches', 'Match Start', 110, 67, '2025-02-02 20:43:27', 'Started the match between ff - Basketball vs asasa - Basketball', NULL, NULL),
+(382, 'schedules', 'UPDATE', 111, 67, '2025-02-02 20:57:08', 'Modified the schedule for adwawd - Basketball vs BSA - Basketball - Basketball \n                            from 2025-01-31 at 7:00 PM, Venue: School Gym \n                            to February 02, 2025 at 9:00 PM, Venue: School Gym', NULL, NULL),
+(383, 'Matches', 'Match Start', 111, 67, '2025-02-02 20:57:16', 'Started the match between BSA - Basketball vs adwawd - Basketball', NULL, NULL),
+(384, 'Matches', 'Match Ended', 111, 67, '2025-02-02 20:57:40', 'Ended the match between  vs ', NULL, NULL),
+(385, 'Matches', 'Match Ended', 111, 67, '2025-02-02 20:58:48', 'Ended the match between  vs ', NULL, NULL),
+(386, 'Matches', 'Match Ended', 111, 67, '2025-02-02 20:59:20', 'Ended the match between  vs ', NULL, NULL),
+(387, 'schedules', 'CREATE', 2117, 67, '2025-02-02 21:15:43', 'CRIM - Basketball vs ll - Basketball - Basketball | Scheduled on February 02, 2025 at 9:15 PM, Venue: Closed Gym', NULL, NULL),
+(388, 'Matches', 'Match Start', 112, 67, '2025-02-02 21:17:12', 'Started the match between CRIM - Basketball vs ll - Basketball', NULL, NULL),
+(389, 'schedules', 'CREATE', 2118, 67, '2025-02-02 21:26:51', 'ff - Basketball vs BSHM - Basketball - Basketball | Scheduled on February 02, 2025 at 9:29 PM, Venue: Open Gym', NULL, NULL),
+(390, 'Players', 'Register', 328, 67, '2025-02-02 21:28:57', 'Registered player De Guzman, Andrew to team \'BSHM - Basketball\'', NULL, NULL),
+(391, 'Notification', 'Player Notification', 113, 67, '2025-02-02 21:37:08', 'Notified players for match ff - Basketball vs BSHM - Basketball. Total number of players notified is 1.', NULL, NULL),
+(392, 'Notification', 'Player Notification', 113, 67, '2025-02-02 21:38:36', 'Notified players for match ff - Basketball vs BSHM - Basketball. Total number of players notified is 1.', NULL, NULL),
+(393, 'schedules', 'UPDATE', 113, 67, '2025-02-03 01:03:59', 'Modified the schedule for ff - Basketball vs BSHM - Basketball - Basketball \n                            from 2025-02-02 at 9:29 PM, Venue: Open Gym \n                            to February 03, 2025 at 1:29 AM, Venue: Open Gym', NULL, NULL),
+(394, 'Matches', 'Match Start', 113, 67, '2025-02-03 01:04:07', 'Started the match between BSHM - Basketball vs ff - Basketball', NULL, NULL),
+(395, 'Game Rules', 'CREATE/UPDATE', NULL, 67, '2025-02-03 01:05:11', 'Updated the game scoring rules for Basketball under the College department.', NULL, NULL),
+(396, 'Matches', 'Match Start', 113, 67, '2025-02-03 01:05:52', 'Started the match between BSHM - Basketball vs ff - Basketball', NULL, NULL),
+(397, 'Matches', 'Match Start', 113, 67, '2025-02-03 02:56:47', 'Started the match between BSHM - Basketball vs ff - Basketball', NULL, NULL),
+(398, 'schedules', 'CREATE', 2119, 67, '2025-02-03 05:11:46', 'awdawda - Basketball vs BSHM - Basketball - Basketball | Scheduled on February 03, 2025 at 5:15 AM, Venue: Closed Gym', NULL, NULL),
+(399, 'schedules', 'UPDATE', 114, 67, '2025-02-03 06:20:33', 'Modified the schedule for awdawda - Basketball vs BSHM - Basketball - Basketball \n                            from 2025-02-03 at 5:15 AM, Venue: Closed Gym \n                            to February 03, 2025 at 6:15 AM, Venue: Closed Gym', NULL, NULL),
+(400, 'Matches', 'Match Start', 114, 67, '2025-02-03 06:20:45', 'Started the match between BSHM - Basketball vs awdawda - Basketball', NULL, NULL),
+(401, 'Game Rules', 'CREATE/UPDATE', NULL, 67, '2025-02-03 06:22:02', 'Updated the game scoring rules for Basketball under the College department.', NULL, NULL),
+(402, 'Matches', 'Match Start', 114, 67, '2025-02-03 06:22:11', 'Started the match between BSHM - Basketball vs awdawda - Basketball', NULL, NULL),
+(403, 'schedules', 'UPDATE', 114, 67, '2025-02-03 06:54:44', 'Modified the schedule for awdawda - Basketball vs BSHM - Basketball - Basketball \n                            from 2025-02-03 at 6:15 AM, Venue: Closed Gym \n                            to February 03, 2025 at 6:31 AM, Venue: Closed Gym', NULL, NULL),
+(404, 'Matches', 'Match Start', 114, 67, '2025-02-03 06:54:49', 'Started the match between BSHM - Basketball vs awdawda - Basketball', NULL, NULL),
+(405, 'schedules', 'CREATE', 2120, 67, '2025-02-03 14:32:51', 'BSBA - Basketball vs CRIM - Basketball - Basketball | Scheduled on February 03, 2025 at 2:31 PM, Venue: Open Gym', NULL, NULL),
+(406, 'Matches', 'Match Start', 115, 67, '2025-02-03 14:32:56', 'Started the match between CRIM - Basketball vs BSBA - Basketball', NULL, NULL),
+(407, 'schedules', 'CREATE', 2121, 67, '2025-02-03 14:37:08', 'BSHM - Basketball vs awdawda - Basketball - Basketball | Scheduled on February 04, 2025 at 2:30 PM, Venue: Closed Gym', NULL, NULL),
+(408, 'schedules', 'UPDATE', 116, 67, '2025-02-03 14:37:25', 'Modified the schedule for BSHM - Basketball vs awdawda - Basketball - Basketball \n                            from 2025-02-04 at 2:30 PM, Venue: Closed Gym \n                            to February 03, 2025 at 2:30 PM, Venue: Closed Gym', NULL, NULL),
+(409, 'Matches', 'Match Start', 116, 67, '2025-02-03 14:37:31', 'Started the match between BSHM - Basketball vs awdawda - Basketball', NULL, NULL),
+(410, 'sessions', 'Logged out', 67, 67, '2025-02-03 14:59:56', 'User Logged out', NULL, NULL),
+(411, 'sessions', 'Logged in', 56, 56, '2025-02-03 15:00:10', 'User Logged in', NULL, NULL),
+(412, 'leaderboard', 'RESET', NULL, 56, '2025-02-03 15:00:22', 'Reset leaderboards: points, wins, losses for teams, and deleted all brackets for the school.', NULL, NULL),
+(413, 'sessions', 'Logged out', 56, 56, '2025-02-03 15:00:31', 'User Logged out', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -611,27 +734,22 @@ CREATE TABLE `matches` (
   `match_type` enum('regular','semifinal','final','third_place') DEFAULT 'regular'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `matches`
+-- Table structure for table `match_periods_info`
 --
 
-INSERT INTO `matches` (`match_id`, `match_identifier`, `bracket_id`, `teamA_id`, `teamB_id`, `round`, `match_number`, `next_match_number`, `status`, `match_type`) VALUES
-(2092, 'M18-R1-1', 294, 660, -1, 1, 1, 9, 'Finished', 'regular'),
-(2093, 'M18-R1-2', 294, 256, -1, 1, 2, 9, 'Finished', 'regular'),
-(2094, 'M18-R1-3', 294, 248, 240, 1, 3, 10, 'Upcoming', 'regular'),
-(2095, 'M18-R1-4', 294, 652, 588, 1, 4, 10, 'Pending', 'regular'),
-(2096, 'M18-R1-5', 294, 668, 328, 1, 5, 11, 'Pending', 'regular'),
-(2097, 'M18-R1-6', 294, 312, 596, 1, 6, 11, 'Pending', 'regular'),
-(2098, 'M18-R1-7', 294, -1, 320, 1, 7, 12, 'Finished', 'regular'),
-(2099, 'M18-R1-8', 294, -1, 644, 1, 8, 12, 'Finished', 'regular'),
-(2100, 'M18-R2-9', 294, 660, 256, 2, 9, 13, 'Pending', 'regular'),
-(2101, 'M18-R2-10', 294, -2, -2, 2, 10, 13, 'Pending', 'regular'),
-(2102, 'M18-R2-11', 294, -2, 644, 2, 11, 14, 'Pending', 'regular'),
-(2103, 'M18-R2-12', 294, 320, 644, 2, 12, 14, 'Pending', 'regular'),
-(2104, 'M18-R3-13', 294, -2, -2, 3, 13, 15, 'Pending', 'semifinal'),
-(2105, 'M18-R3-14', 294, -2, -2, 3, 14, 15, 'Pending', 'semifinal'),
-(2106, 'M18-R4-15', 294, -2, -2, 4, 15, 0, 'Pending', 'final'),
-(2107, 'M18-R4-16', 294, -2, -2, 4, 16, 0, 'Pending', 'third_place');
+CREATE TABLE `match_periods_info` (
+  `period_info_id` int(11) NOT NULL,
+  `match_id` int(11) NOT NULL,
+  `period_number` int(11) NOT NULL,
+  `teamA_id` int(11) NOT NULL,
+  `teamB_id` int(11) NOT NULL,
+  `score_teamA` int(11) DEFAULT 0,
+  `score_teamB` int(11) DEFAULT 0,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -664,7 +782,9 @@ INSERT INTO `match_progression_logs` (`log_id`, `match_id`, `team_id`, `update_t
 (9, 381, 240, 'next_match_teamA_update', 'From match 378', '2025-01-09 01:00:37'),
 (10, 380, 248, 'next_match_teamA_update', 'From match 376', '2025-01-10 09:30:16'),
 (11, 486, 240, 'next_match_teamB_update', 'From match 483', '2025-01-29 02:17:14'),
-(12, 486, 320, 'next_match_teamA_update', 'From match 482', '2025-01-29 17:11:37');
+(12, 486, 320, 'next_match_teamA_update', 'From match 482', '2025-01-29 17:11:37'),
+(13, 2117, 596, 'next_match_teamB_update', 'From match 2111', '2025-01-31 22:33:01'),
+(14, 2117, 248, 'next_match_teamA_update', 'From match 2110', '2025-01-31 23:06:49');
 
 -- --------------------------------------------------------
 
@@ -716,7 +836,8 @@ INSERT INTO `players` (`player_id`, `player_lastname`, `player_firstname`, `play
 (249, 'Capistrano', 'Charlotte', '', 320, '2024-12-20 11:28:55', 77),
 (250, 'Guevarra', 'Jamie', '', 248, '2024-12-21 02:36:48', 4),
 (251, 'Doe', 'John', '', 312, '2025-01-08 14:54:06', 44),
-(252, 'Smith', 'John', 'A', 256, '2025-01-23 12:30:24', 10);
+(252, 'Smith', 'John', 'A', 256, '2025-01-23 12:30:24', 10),
+(256, 'De Guzman', 'Andrew', 'B.', 328, '2025-02-02 13:28:57', 1);
 
 -- --------------------------------------------------------
 
@@ -751,7 +872,8 @@ INSERT INTO `players_info` (`player_info_id`, `player_id`, `email`, `phone_numbe
 (26, 249, 'charlotte@gmail.com', '+639261769542', '2010-02-20', NULL, '', '', ''),
 (27, 250, 'jamie@gmail.com', '+639121212121', '2010-02-15', NULL, '', '', ''),
 (28, 251, 'johndoe@gmail.com', '+639754136498', '2005-05-08', NULL, '', '', 'Small Forward'),
-(29, 252, 'john.smith@test.com', '9876543210', '2000-01-01', NULL, '6\"0', '160 lbs', 'Guard');
+(29, 252, 'john.smith@test.com', '9876543210', '2000-01-01', NULL, '6\"0', '160 lbs', 'Guard'),
+(33, 256, 'test@gmail.com', '+639754136497', '1990-11-30', NULL, '', '', 'Small Forward');
 
 -- --------------------------------------------------------
 
@@ -789,7 +911,7 @@ CREATE TABLE `pointing_system` (
 --
 
 INSERT INTO `pointing_system` (`id`, `school_id`, `first_place_points`, `second_place_points`, `third_place_points`, `created_at`) VALUES
-(1, 8, 10, 7, 2, '2024-12-17 01:13:48');
+(1, 8, 10, 7, 3, '2024-12-17 01:13:48');
 
 -- --------------------------------------------------------
 
@@ -804,13 +926,6 @@ CREATE TABLE `schedules` (
   `schedule_time` time NOT NULL,
   `venue` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `schedules`
---
-
-INSERT INTO `schedules` (`schedule_id`, `match_id`, `schedule_date`, `schedule_time`, `venue`) VALUES
-(104, 2094, '2025-01-31', '05:00:00', 'gym');
 
 -- --------------------------------------------------------
 
@@ -851,13 +966,6 @@ CREATE TABLE `sessions` (
   `expires_at` timestamp NOT NULL DEFAULT (current_timestamp() + interval 1 hour)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `sessions`
---
-
-INSERT INTO `sessions` (`session_id`, `user_id`, `ip_address`, `user_agent`, `created_at`, `expires_at`) VALUES
-(189, 67, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36', '2025-01-31 01:25:00', '2025-01-31 02:25:00');
-
 -- --------------------------------------------------------
 
 --
@@ -882,7 +990,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (-2, 'To Be Determined', 0, '2024-12-01 00:29:16', 0, 0, 0),
 (-1, 'BYE', 0, '2024-12-01 19:26:39', 0, 0, 0),
 (239, 'BSCS - Volleyball', 2, '2024-11-02 11:14:51', 67, 0, 0),
-(240, 'BSCS - Basketball', 18, '2024-11-02 11:14:51', 67, 1, 0),
+(240, 'BSCS - Basketball', 18, '2024-11-02 11:14:51', 67, 0, 0),
 (241, 'BSCS - Dama', 22, '2024-11-02 11:14:51', 67, 0, 0),
 (242, 'BSCS - Dart', 26, '2024-11-02 11:14:51', 67, 0, 0),
 (243, 'BSCS - Chess', 27, '2024-11-02 11:14:51', 67, 0, 0),
@@ -898,7 +1006,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (253, 'CRIM - Patintero', 29, '2024-11-02 11:14:55', 68, 0, 0),
 (254, 'CRIM - Word Factory', 30, '2024-11-02 11:14:55', 68, 0, 0),
 (255, 'BSA - Volleyball', 2, '2024-11-02 11:15:21', 69, 0, 0),
-(256, 'BSA - Basketball', 18, '2024-11-02 11:15:21', 69, 0, 2),
+(256, 'BSA - Basketball', 18, '2024-11-02 11:15:21', 69, 0, 0),
 (257, 'BSA - Dama', 22, '2024-11-02 11:15:21', 69, 0, 0),
 (258, 'BSA - Dart', 26, '2024-11-02 11:15:21', 69, 0, 0),
 (259, 'BSA - Chess', 27, '2024-11-02 11:15:21', 69, 0, 0),
@@ -930,7 +1038,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (285, 'Obedience - Patintero', 29, '2024-11-02 14:26:20', 72, 0, 0),
 (286, 'Obedience - Word Factory', 30, '2024-11-02 14:26:20', 72, 0, 0),
 (311, 'BSBA - Volleyball', 2, '2024-11-09 05:25:00', 76, 0, 0),
-(312, 'BSBA - Basketball', 18, '2024-11-09 05:25:00', 76, 0, 1),
+(312, 'BSBA - Basketball', 18, '2024-11-09 05:25:00', 76, 0, 0),
 (313, 'BSBA - Dama', 22, '2024-11-09 05:25:00', 76, 0, 0),
 (314, 'BSBA - Dart', 26, '2024-11-09 05:25:00', 76, 0, 0),
 (315, 'BSBA - Chess', 27, '2024-11-09 05:25:00', 76, 0, 0),
@@ -938,7 +1046,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (317, 'BSBA - Patintero', 29, '2024-11-09 05:25:00', 76, 0, 0),
 (318, 'BSBA - Word Factory', 30, '2024-11-09 05:25:00', 76, 0, 0),
 (319, 'EDUC - Volleyball', 2, '2024-11-09 05:25:19', 77, 0, 0),
-(320, 'EDUC - Basketball', 18, '2024-11-09 05:25:19', 77, 1, 0),
+(320, 'EDUC - Basketball', 18, '2024-11-09 05:25:19', 77, 0, 0),
 (321, 'EDUC - Dama', 22, '2024-11-09 05:25:19', 77, 0, 0),
 (322, 'EDUC - Dart', 26, '2024-11-09 05:25:19', 77, 0, 0),
 (323, 'EDUC - Chess', 27, '2024-11-09 05:25:19', 77, 0, 0),
@@ -1026,7 +1134,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (593, 'ff - Patintero', 29, '2025-01-28 19:51:33', 114, 0, 0),
 (594, 'ff - Word Factory', 30, '2025-01-28 19:51:33', 114, 0, 0),
 (595, 'll - Volleyball', 2, '2025-01-28 19:52:32', 115, 0, 0),
-(596, 'll - Basketball', 18, '2025-01-28 19:52:32', 115, 1, 0),
+(596, 'll - Basketball', 18, '2025-01-28 19:52:32', 115, 0, 0),
 (597, 'll - Dama', 22, '2025-01-28 19:52:32', 115, 0, 0),
 (598, 'll - Dart', 26, '2025-01-28 19:52:32', 115, 0, 0),
 (599, 'll - Chess', 27, '2025-01-28 19:52:32', 115, 0, 0),
@@ -1034,7 +1142,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (601, 'll - Patintero', 29, '2025-01-28 19:52:32', 115, 0, 0),
 (602, 'll - Word Factory', 30, '2025-01-28 19:52:32', 115, 0, 0),
 (643, 'asasa - Volleyball', 2, '2025-01-29 09:35:57', 121, 0, 0),
-(644, 'asasa - Basketball', 18, '2025-01-29 09:35:57', 121, 0, 1),
+(644, 'asasa - Basketball', 18, '2025-01-29 09:35:57', 121, 0, 0),
 (645, 'asasa - Dama', 22, '2025-01-29 09:35:57', 121, 0, 0),
 (646, 'asasa - Dart', 26, '2025-01-29 09:35:57', 121, 0, 0),
 (647, 'asasa - Chess', 27, '2025-01-29 09:35:57', 121, 0, 0),
@@ -1042,7 +1150,7 @@ INSERT INTO `teams` (`team_id`, `team_name`, `game_id`, `created_at`, `grade_sec
 (649, 'asasa - Patintero', 29, '2025-01-29 09:35:57', 121, 0, 0),
 (650, 'asasa - Word Factory', 30, '2025-01-29 09:35:57', 121, 0, 0),
 (651, 'wda - Volleyball', 2, '2025-01-29 09:42:01', 122, 0, 0),
-(652, 'wda - Basketball', 18, '2025-01-29 09:42:01', 122, 1, 0),
+(652, 'wda - Basketball', 18, '2025-01-29 09:42:01', 122, 0, 0),
 (653, 'wda - Dama', 22, '2025-01-29 09:42:01', 122, 0, 0),
 (654, 'wda - Dart', 26, '2025-01-29 09:42:01', 122, 0, 0),
 (655, 'wda - Chess', 27, '2025-01-29 09:42:01', 122, 0, 0),
@@ -1159,6 +1267,16 @@ ALTER TABLE `grade_section_course`
   ADD KEY `idx_department_grade` (`department_id`,`grade_level`);
 
 --
+-- Indexes for table `live_default_scores`
+--
+ALTER TABLE `live_default_scores`
+  ADD PRIMARY KEY (`live_default_score_id`),
+  ADD KEY `schedule_id` (`schedule_id`),
+  ADD KEY `game_id` (`game_id`),
+  ADD KEY `teamA_id` (`teamA_id`),
+  ADD KEY `teamB_id` (`teamB_id`);
+
+--
 -- Indexes for table `live_scores`
 --
 ALTER TABLE `live_scores`
@@ -1168,6 +1286,16 @@ ALTER TABLE `live_scores`
   ADD KEY `fk_teamA_id` (`teamA_id`),
   ADD KEY `fk_teamB_id` (`teamB_id`),
   ADD KEY `idx_timer_status` (`timer_status`);
+
+--
+-- Indexes for table `live_set_scores`
+--
+ALTER TABLE `live_set_scores`
+  ADD PRIMARY KEY (`live_set_score_id`),
+  ADD KEY `schedule_id` (`schedule_id`),
+  ADD KEY `game_id` (`game_id`),
+  ADD KEY `teamA_id` (`teamA_id`),
+  ADD KEY `teamB_id` (`teamB_id`);
 
 --
 -- Indexes for table `logs`
@@ -1186,6 +1314,15 @@ ALTER TABLE `matches`
   ADD KEY `matches_ibfk_4` (`bracket_id`),
   ADD KEY `matches_ibfk_2` (`teamA_id`),
   ADD KEY `matches_ibfk_3` (`teamB_id`);
+
+--
+-- Indexes for table `match_periods_info`
+--
+ALTER TABLE `match_periods_info`
+  ADD PRIMARY KEY (`period_info_id`),
+  ADD KEY `match_id` (`match_id`),
+  ADD KEY `teamA_id` (`teamA_id`),
+  ADD KEY `teamB_id` (`teamB_id`);
 
 --
 -- Indexes for table `match_progression_logs`
@@ -1281,13 +1418,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `announcement`
 --
 ALTER TABLE `announcement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `brackets`
 --
 ALTER TABLE `brackets`
-  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=295;
+  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=309;
 
 --
 -- AUTO_INCREMENT for table `departments`
@@ -1299,13 +1436,13 @@ ALTER TABLE `departments`
 -- AUTO_INCREMENT for table `games`
 --
 ALTER TABLE `games`
-  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `game_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `game_scoring_rules`
 --
 ALTER TABLE `game_scoring_rules`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `game_stats_config`
@@ -1320,52 +1457,70 @@ ALTER TABLE `grade_section_course`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=125;
 
 --
+-- AUTO_INCREMENT for table `live_default_scores`
+--
+ALTER TABLE `live_default_scores`
+  MODIFY `live_default_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT for table `live_scores`
 --
 ALTER TABLE `live_scores`
-  MODIFY `live_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4117;
+  MODIFY `live_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4131;
+
+--
+-- AUTO_INCREMENT for table `live_set_scores`
+--
+ALTER TABLE `live_set_scores`
+  MODIFY `live_set_score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=324;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=414;
 
 --
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2108;
+  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2187;
+
+--
+-- AUTO_INCREMENT for table `match_periods_info`
+--
+ALTER TABLE `match_periods_info`
+  MODIFY `period_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `match_progression_logs`
 --
 ALTER TABLE `match_progression_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `match_results`
 --
 ALTER TABLE `match_results`
-  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `players`
 --
 ALTER TABLE `players`
-  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=256;
+  MODIFY `player_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=257;
 
 --
 -- AUTO_INCREMENT for table `players_info`
 --
 ALTER TABLE `players_info`
-  MODIFY `player_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `player_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `player_match_stats`
 --
 ALTER TABLE `player_match_stats`
-  MODIFY `stat_record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+  MODIFY `stat_record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `pointing_system`
@@ -1377,7 +1532,7 @@ ALTER TABLE `pointing_system`
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
 
 --
 -- AUTO_INCREMENT for table `schools`
@@ -1389,7 +1544,7 @@ ALTER TABLE `schools`
 -- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=192;
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=204;
 
 --
 -- AUTO_INCREMENT for table `teams`
@@ -1454,6 +1609,15 @@ ALTER TABLE `grade_section_course`
   ADD CONSTRAINT `grade_section_course_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`);
 
 --
+-- Constraints for table `live_default_scores`
+--
+ALTER TABLE `live_default_scores`
+  ADD CONSTRAINT `live_default_scores_ibfk_1` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`schedule_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `live_default_scores_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `live_default_scores_ibfk_3` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `live_default_scores_ibfk_4` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `live_scores`
 --
 ALTER TABLE `live_scores`
@@ -1461,6 +1625,15 @@ ALTER TABLE `live_scores`
   ADD CONSTRAINT `fk_teamB_id` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`),
   ADD CONSTRAINT `live_scores_ibfk_1` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`schedule_id`),
   ADD CONSTRAINT `live_scores_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+
+--
+-- Constraints for table `live_set_scores`
+--
+ALTER TABLE `live_set_scores`
+  ADD CONSTRAINT `live_set_scores_ibfk_1` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`schedule_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `live_set_scores_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `live_set_scores_ibfk_3` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `live_set_scores_ibfk_4` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `logs`
@@ -1475,6 +1648,14 @@ ALTER TABLE `matches`
   ADD CONSTRAINT `matches_ibfk_2` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `matches_ibfk_3` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `matches_ibfk_4` FOREIGN KEY (`bracket_id`) REFERENCES `brackets` (`bracket_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `match_periods_info`
+--
+ALTER TABLE `match_periods_info`
+  ADD CONSTRAINT `match_periods_info_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `matches` (`match_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `match_periods_info_ibfk_2` FOREIGN KEY (`teamA_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `match_periods_info_ibfk_3` FOREIGN KEY (`teamB_id`) REFERENCES `teams` (`team_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `match_results`

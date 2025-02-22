@@ -64,18 +64,40 @@ try {
             $status = 'finished';
             if ($nextMatch > 0) {
                 if (!isset($advancedTeams[$nextMatch])) {
-                    $advancedTeams[$nextMatch] = array();
+                    $advancedTeams[$nextMatch] = array(
+                        'teamA_placement' => null,
+                        'teamB_placement' => null
+                    );
                 }
-                $advancedTeams[$nextMatch][] = $teamB;
+                
+                // Determine placement based on current match number
+                if ($matchNum % 2 == 1) {
+                    // Odd match number: prefer teamA placement
+                    $advancedTeams[$nextMatch]['teamA_placement'] = $teamB;
+                } else {
+                    // Even match number: prefer teamB placement
+                    $advancedTeams[$nextMatch]['teamB_placement'] = $teamB;
+                }
             }
         } else if ($teamB == -1 && $teamA != -1) {
             // Team A advances
             $status = 'finished';
             if ($nextMatch > 0) {
                 if (!isset($advancedTeams[$nextMatch])) {
-                    $advancedTeams[$nextMatch] = array();
+                    $advancedTeams[$nextMatch] = array(
+                        'teamA_placement' => null,
+                        'teamB_placement' => null
+                    );
                 }
-                $advancedTeams[$nextMatch][] = $teamA;
+                
+                // Determine placement based on current match number
+                if ($matchNum % 2 == 1) {
+                    // Odd match number: prefer teamA placement
+                    $advancedTeams[$nextMatch]['teamA_placement'] = $teamA;
+                } else {
+                    // Even match number: prefer teamB placement
+                    $advancedTeams[$nextMatch]['teamB_placement'] = $teamA;
+                }
             }
         }
         
@@ -97,12 +119,13 @@ try {
         
         // If this match has advanced teams, update teamA and teamB
         if (isset($advancedTeams[$matchNum])) {
-            if (count($advancedTeams[$matchNum]) > 0) {
-                $teamA = array_shift($advancedTeams[$matchNum]);
-                $teamB = -2; // TBD
-                if (count($advancedTeams[$matchNum]) > 0) {
-                    $teamB = array_shift($advancedTeams[$matchNum]);
-                }
+            // Prioritize placement based on match number pattern
+            if ($advancedTeams[$matchNum]['teamA_placement'] !== null) {
+                $teamA = $advancedTeams[$matchNum]['teamA_placement'];
+                $teamB = $advancedTeams[$matchNum]['teamB_placement'] ?? -2;
+            } elseif ($advancedTeams[$matchNum]['teamB_placement'] !== null) {
+                $teamB = $advancedTeams[$matchNum]['teamB_placement'];
+                $teamA = $advancedTeams[$matchNum]['teamA_placement'] ?? -2;
             }
         }
         

@@ -18,7 +18,7 @@ function sendRegistrationEmail($email, $password, $school_name) {
                 <p><strong>Password:</strong> {$password}</p>
             </div>
             <p>For security reasons, we strongly recommend changing your password after your first login.</p>
-            <p>You can log in at: <a href='http://localhost/IMS/login.php'>IMS Login</a></p>
+            <p>You can log in at: <a href='http://intrasports.net/login.php'>IMS Login</a></p>
             <p>If you have any questions or need assistance, please don't hesitate to contact the system administrator.</p>
             <br>
             <p>Best regards,<br>IMS Team</p>
@@ -68,7 +68,7 @@ function sendUserRegistrationEmail($email, $firstname, $password, $role, $school
                 <p><strong>Password:</strong> {$password}</p>
             </div>
             <p>For security reasons, we strongly recommend changing your password after your first login.</p>
-            <p>You can log in at: <a href='http://localhost/IMS/login.php'>IMS Login</a></p>
+            <p>You can log in at: <a href='http://intrasports.net/login.php'>IMS Login</a></p>
             <p>If you have any questions or need assistance, please contact your school administrator.</p>
             <br>
             <p>Best regards,<br>IMS Team</p>

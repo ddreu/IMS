@@ -99,97 +99,145 @@ session_start();
                     }
 
                     matches.forEach(match => {
-                        const formattedDate = new Date(match.schedule_date).toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-
                         // Static live indicator
                         const liveIndicator = `<span class="badge bg-success">Live</span>`;
 
+                        // Function to render additional info based on source table
+                        const renderAdditionalInfo = (team, additionalInfo, sourceTable) => {
+                            let additionalInfoHtml = '';
+
+                            switch(sourceTable) {
+                                case 'live_scores':
+                                    if (additionalInfo.period) {
+                                        additionalInfoHtml += `
+                                            <div class="stat-item">
+                                                <span class="stat-label">Period</span>
+                                                <span>${additionalInfo.period}</span>
+                                            </div>
+                                        `;
+                                    }
+                                    if (additionalInfo.timeouts !== null) {
+                                        additionalInfoHtml += `
+                                            <div class="stat-item">
+                                                <span class="stat-label">Timeouts</span>
+                                                <span>${additionalInfo.timeouts}</span>
+                                            </div>
+                                        `;
+                                    }
+                                    break;
+
+                                case 'live_set_scores':
+                                    if (additionalInfo.sets_won !== null) {
+                                        additionalInfoHtml += `
+                                            <div class="stat-item">
+                                                <span class="stat-label">Sets Won</span>
+                                                <span>${additionalInfo.sets_won}</span>
+                                            </div>
+                                        `;
+                                    }
+                                    if (additionalInfo.current_set) {
+                                        additionalInfoHtml += `
+                                            <div class="stat-item">
+                                                <span class="stat-label">Current Set</span>
+                                                <span>${additionalInfo.current_set}</span>
+                                            </div>
+                                        `;
+                                    }
+                                    if (additionalInfo.timeouts !== null) {
+                                        additionalInfoHtml += `
+                                            <div class="stat-item">
+                                                <span class="stat-label">Timeouts</span>
+                                                <span>${additionalInfo.timeouts}</span>
+                                            </div>
+                                        `;
+                                    }
+                                    break;
+                            }
+
+                            return additionalInfoHtml;
+                        };
+
+                        // Function to render VS section based on source table
+                        const renderVsSection = (match) => {
+                            let vsContent = '<div class="vs-section">';
+                            vsContent += '<div>VS</div>';
+
+                            // Add set or period information for both live_scores and live_set_scores
+                            if (match.source_table === 'live_scores' && match.teamA.additional_info.period) {
+                                vsContent += `
+                                    <div class="period-info">
+                                        Period ${match.teamA.additional_info.period}
+                                    </div>
+                                    ${match.teamA.additional_info.timer ? `
+                                        <div class="timer-display">
+                                            ${match.teamA.additional_info.timer}
+                                        </div>
+                                    ` : ''}
+                                `;
+                            } else if (match.source_table === 'live_set_scores' && match.teamA.additional_info.current_set) {
+                                vsContent += `
+                                    <div class="period-info">
+                                        Set ${match.teamA.additional_info.current_set}
+                                    </div>
+                                `;
+                            }
+
+                            vsContent += '</div>';
+                            return vsContent;
+                        };
+
                         const matchCard = `
-        <div class="match-result-card">
-            <div class="match-header">
-                <div class="d-flex align-items-center">
-                    <span class="game-icon">
-                        <i class="fas fa-basketball-ball"></i>
-                    </span>
-                    <h5 class="match-title">${match.game_name}</h5>
-                </div>
-                <div class="match-date">
-                    <i class="far fa-calendar-alt"></i>
-                    ${formattedDate}
+<div class="match-result-card">
+    <div class="match-header">
+        <div class="d-flex align-items-center">
+            <span class="game-icon">
+                <i class="fas fa-basketball-ball"></i>
+            </span>
+            <h5 class="match-title">${match.game_name}</h5>
+        </div>
+        <div class="match-date">
+            <i class="far fa-calendar-alt"></i>
+            ${match.formatted_date || 'Date Not Available'}
+        </div>
+    </div>
+    <div>
+        <div class="live-indicator d-flex justify-content-between align-items-center" style="margin-left: 10px; margin-right: 10px;">
+            <div class="live-indicator-item">
+                ${liveIndicator}
+            </div>
+            <button onclick="viewStream(${match.schedule_id})" class="btn btn-sm btn-danger">
+                <i class="fas fa-video"></i>Watch Live
+            </button>
+        </div>
+    </div>
+
+    <div class="match-body">
+        <div class="row align-items-center">
+            <div class="col-md-5">
+                <div class="team-section">
+                    <div class="team-name">${match.teamA.name}</div>
+                    <div class="team-score">${match.teamA.score}</div>
+                    <div class="stats-box">
+                        ${renderAdditionalInfo(match.teamA, match.teamA.additional_info, match.source_table)}
+                    </div>
                 </div>
             </div>
-            <div>
-    <div class="live-indicator d-flex justify-content-between align-items-center" style="margin-left: 10px; margin-right: 10px;">
-        <div class="live-indicator-item">
-            ${liveIndicator}
+            <div class="col-md-2">
+                ${renderVsSection(match)}
+            </div>
+            <div class="col-md-5">
+                <div class="team-section">
+                    <div class="team-name">${match.teamB.name}</div>
+                    <div class="team-score">${match.teamB.score}</div>
+                    <div class="stats-box">
+                        ${renderAdditionalInfo(match.teamB, match.teamB.additional_info, match.source_table)}
+                    </div>
+                </div>
+            </div>
         </div>
-        <button onclick="viewStream(${match.schedule_id})" class="btn btn-sm btn-danger">
-            <i class="fas fa-video"></i>Watch Live
-        </button>
     </div>
 </div>
-
-            <div class="match-body">
-                <div class="row align-items-center">
-                    <div class="col-md-5">
-                        <div class="team-section">
-                            <div class="team-name">${match.teamA_name}</div>
-                            <div class="team-score">${match.teamA_score}</div>
-                            <div class="stats-box">
-                                ${match.has_timeouts ? `
-                                    <div class="stat-item">
-                                        <span class="stat-label">Timeouts</span>
-                                        <span>${match.timeout_teamA || 0}/${match.timeout_per_team}</span>
-                                    </div>
-                                ` : ''}
-                                ${match.has_fouls ? `
-                                    <div class="stat-item">
-                                        <span class="stat-label">Fouls</span>
-                                        <span>${match.foul_teamA || 0}/${match.max_fouls_per_team}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="vs-section">
-                            <div>VS</div>
-                            <div class="period-info">Period ${match.period}</div>
-                            ${match.time_remaining !== null ? `
-                                <div class="timer-display">${match.time_formatted}</div>
-                                <div class="timer-status ${match.timer_status}">${match.timer_status}</div>
-                            ` : ''}
-                        </div>
-                    </div>
-                    <div class="col-md-5">
-                        <div class="team-section">
-                            <div class="team-name">${match.teamB_name}</div>
-                            <div class="team-score">${match.teamB_score}</div>
-                            <div class="stats-box">
-                                ${match.has_timeouts ? `
-                                    <div class="stat-item">
-                                        <span class="stat-label">Timeouts</span>
-                                        <span>${match.timeout_teamB || 0}/${match.timeout_per_team}</span>
-                                    </div>
-                                ` : ''}
-                                ${match.has_fouls ? `
-                                    <div class="stat-item">
-                                        <span class="stat-label">Fouls</span>
-                                        <span>${match.foul_teamB || 0}/${match.max_fouls_per_team}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+`;
                         matchResultsContainer.append(matchCard);
                     });
                 },
@@ -211,7 +259,7 @@ session_start();
             // Convert scheduleId to string for consistency
             scheduleId = String(scheduleId);
             console.log('Opening stream viewer for schedule ID:', scheduleId);
-            
+
             // Create modal with video player
             const modal = $(`
                 <div class="modal fade" id="streamModal" tabindex="-1">
@@ -239,7 +287,7 @@ session_start();
             });
 
             // Connect to WebSocket when modal is shown
-            modal.on('shown.bs.modal', function () {
+            modal.on('shown.bs.modal', function() {
                 console.log('Modal shown, initializing streaming context');
                 const streamingContext = {
                     ws: null,
@@ -275,7 +323,7 @@ session_start();
                         console.log('Skipping MediaSource initialization - modal closed or init pending');
                         return;
                     }
-                    
+
                     console.log('Initializing MediaSource');
                     const video = document.getElementById('streamVideo');
                     if (!video) {
@@ -322,7 +370,7 @@ session_start();
                         video.style.display = 'block';
                         video.style.background = '#000';
                         video.style.minHeight = '360px'; // Ensure video has visible height
-                        
+
                         // Add event listeners
                         video.onplay = () => console.log('Video started playing');
                         video.onpause = () => console.log('Video paused');
@@ -345,7 +393,7 @@ session_start();
                                 streamingContext.pendingInit = false;
                                 return;
                             }
-                            
+
                             console.log('MediaSource opened');
                             try {
                                 const mimeType = 'video/webm;codecs=vp8';
@@ -357,13 +405,13 @@ session_start();
                                 streamingContext.sourceBuffer.mode = 'sequence';
                                 streamingContext.isSourceBufferActive = true;
                                 console.log('SourceBuffer created and initialized');
-                                
+
                                 // Set up updateend event handler
                                 streamingContext.sourceBuffer.addEventListener('updateend', () => {
                                     if (streamingContext.isSourceBufferActive) {
                                         console.log('SourceBuffer update ended, processing queue');
                                         processQueue();
-                                        
+
                                         // Try to play if not already playing
                                         if (video.paused) {
                                             console.log('Attempting to play video after buffer update');
@@ -375,7 +423,7 @@ session_start();
                                 streamingContext.sourceBuffer.addEventListener('error', (e) => {
                                     console.error('SourceBuffer error:', e);
                                 });
-                                
+
                                 // Process any queued data
                                 processQueue();
                             } catch (e) {
@@ -383,7 +431,7 @@ session_start();
                                 updateStatus('Error initializing video player: ' + e.message, true);
                             }
                             streamingContext.pendingInit = false;
-                            
+
                             // Remove the handler after first use
                             streamingContext.mediaSource.removeEventListener('sourceopen', sourceOpenHandler);
                         });
@@ -417,7 +465,7 @@ session_start();
                         console.log('Skipping queue processing - modal closed or source buffer inactive');
                         return;
                     }
-                    
+
                     if (!streamingContext.sourceBuffer || streamingContext.sourceBuffer.updating) {
                         console.log('Source buffer not ready or currently updating');
                         return;
@@ -425,7 +473,7 @@ session_start();
 
                     console.log('Processing queue, length:', streamingContext.queue.length);
                     let processedChunks = 0;
-                    
+
                     while (streamingContext.queue.length > 0 && !streamingContext.sourceBuffer.updating) {
                         const data = streamingContext.queue[0]; // Peek at first item
                         try {
@@ -434,7 +482,7 @@ session_start();
                             console.log('Successfully appended buffer');
                             streamingContext.queue.shift(); // Remove only after successful append
                             processedChunks++;
-                            
+
                             // Break if we've processed enough chunks to avoid blocking
                             if (processedChunks >= 5) {
                                 console.log('Processed maximum chunks per cycle');
@@ -471,7 +519,7 @@ session_start();
 
                     console.log('Connecting to WebSocket server');
                     streamingContext.ws = new WebSocket('ws://localhost:8090');
-                    
+
                     streamingContext.ws.onopen = () => {
                         if (!streamingContext.isModalOpen) {
                             console.log('Modal closed after WebSocket connection, closing socket');
@@ -480,7 +528,7 @@ session_start();
                         }
                         console.log('WebSocket connected');
                         streamingContext.reconnectAttempts = 0;
-                        
+
                         // Send schedule ID to server
                         const initMessage = {
                             type: 'init',
@@ -489,7 +537,7 @@ session_start();
                         };
                         console.log('Sending init message:', initMessage);
                         streamingContext.ws.send(JSON.stringify(initMessage));
-                        
+
                         updateStatus('Connected. Waiting for stream...');
                     };
 
@@ -498,7 +546,7 @@ session_start();
                         try {
                             const data = JSON.parse(event.data);
                             console.log('Received message:', data.type, data.scheduleId === streamingContext.scheduleId);
-                            
+
                             if (data.type === 'welcome') {
                                 console.log('Received welcome message:', data.message);
                             } else if (data.type === 'video' && data.scheduleId === streamingContext.scheduleId) {
@@ -506,10 +554,10 @@ session_start();
                                 try {
                                     // Convert array back to binary data
                                     const uint8Array = new Uint8Array(data.data);
-                                    
+
                                     // If we haven't initialized MediaSource yet, do it now
-                                    if (!streamingContext.mediaSource || 
-                                        streamingContext.mediaSource.readyState !== 'open' || 
+                                    if (!streamingContext.mediaSource ||
+                                        streamingContext.mediaSource.readyState !== 'open' ||
                                         !streamingContext.isSourceBufferActive) {
                                         console.log('Initializing MediaSource for first chunk');
                                         initializeMediaSource();
@@ -523,26 +571,28 @@ session_start();
                                                 if (streamingContext.mediaSource.readyState === 'open') {
                                                     resolve();
                                                 } else {
-                                                    streamingContext.mediaSource.addEventListener('sourceopen', resolve, { once: true });
+                                                    streamingContext.mediaSource.addEventListener('sourceopen', resolve, {
+                                                        once: true
+                                                    });
                                                 }
                                             });
                                             console.log('MediaSource opened, readyState:', streamingContext.mediaSource.readyState);
                                         }
                                     }
-                                    
+
                                     if (data.isFirstChunk) {
                                         console.log('Received first chunk');
                                         streamingContext.hasReceivedFirstChunk = true;
                                         updateStatus('');
                                     }
-                                    
+
                                     // Add to queue
                                     streamingContext.queue.push(uint8Array);
                                     console.log('Added chunk to queue, length:', streamingContext.queue.length);
-                                    
+
                                     // Try to process queue
-                                    if (streamingContext.isSourceBufferActive && 
-                                        streamingContext.sourceBuffer && 
+                                    if (streamingContext.isSourceBufferActive &&
+                                        streamingContext.sourceBuffer &&
                                         !streamingContext.sourceBuffer.updating) {
                                         processQueue();
                                     } else {
@@ -589,17 +639,17 @@ session_start();
             });
 
             // Cleanup when modal is hidden
-            modal.on('hide.bs.modal', function () {
+            modal.on('hide.bs.modal', function() {
                 console.log('Modal hiding, cleaning up resources');
                 const context = modal.data('streamingContext');
                 if (context) {
                     context.isModalOpen = false;
                     context.isSourceBufferActive = false;
-                    
+
                     if (context.ws) {
                         context.ws.close();
                     }
-                    
+
                     if (context.mediaSource && context.mediaSource.readyState === 'open') {
                         if (context.sourceBuffer) {
                             try {
@@ -614,11 +664,11 @@ session_start();
                             console.error('Error ending media stream:', e);
                         }
                     }
-                    
+
                     // Clear queue
                     context.queue = [];
                 }
-                
+
                 const video = document.getElementById('streamVideo');
                 if (video) {
                     video.pause();
@@ -628,7 +678,7 @@ session_start();
             });
 
             // Remove modal from DOM after it's hidden
-            modal.on('hidden.bs.modal', function () {
+            modal.on('hidden.bs.modal', function() {
                 console.log('Modal hidden, removing from DOM');
                 modal.remove();
             });

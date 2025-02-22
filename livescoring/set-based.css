@@ -1,0 +1,1113 @@
+/* ================================ */
+/* 🌎 Global Styles & Resets */
+/* ================================ */
+
+:root {
+    --primary-color: #3d91f5;
+    --background-light: #f5f5f5;
+    --secondary-color: #252527;
+    --accent-color: #ffa500;
+    --danger-color: #dc3545;
+    --background-dark: #1e1e1e;
+    --text-color: white;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* ================================ */
+/* 🏆 Body & Main Layout */
+/* ================================ */
+
+body {
+    /*background: linear-gradient(to bottom, #121212, var(--background-dark));*/
+    color: var(--text-color);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 1em;
+    background: linear-gradient(#000000 50%, #3d91f5 50%);
+    overflow: hidden;
+}
+
+/* 📌 Scoreboard Container */
+.scoreboard {
+    background: var(--background-dark);
+    padding: 2em;
+    border-radius: 10px;
+    width: 90%;
+    height: 90%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+    width: 95vw;
+    height: auto;
+    max-height: 90vh;
+    overflow: hidden;
+    padding: 1.5em;
+}
+
+/* ================================ */
+/* 🔴 End Match Button */
+/* ================================ */
+
+.end-match {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--danger-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.7em 1.5em;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.3s;
+}
+
+.end-match:hover {
+    background: #c82333;
+}
+
+/* ================================ */
+/* 🏅 Teams & Scores */
+/* ================================ */
+
+.teams-container {
+    display: flex;
+    flex-wrap: wrap;  /* Allows wrapping to prevent overflow */
+    justify-content: center; /* Centers teams */
+    gap: 10px;
+    align-items: center;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+
+.team {
+
+    
+    background: var(--secondary-color);
+    padding: 1em;
+    border-radius: 8px;
+    flex: 1;
+    text-align: center;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+    max-width: 100%;  /* Ensures it doesn’t exceed the parent's width */
+    max-height: 100%; /* Ensures it doesn’t exceed the parent's height */
+    overflow: hidden; /* Prevents content from spilling out */
+    box-sizing: border-box; /* Ensures padding doesn't increase its size */
+}
+
+
+/* ================================ */
+/* 🏆 Sets Won Container */
+/* ================================ */
+
+.set-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+  
+    background: var(--secondary-color);
+    padding: 0.8em;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 11px;
+    margin-top: 10px;
+  
+    height: 90%;
+
+        width: 15%; /* Adjusts to avoid too much width */
+        max-width: 100%;
+        min-width: 80px;
+        height: auto;
+    
+    
+
+}
+
+/* 🔹 Header Styling */
+.set-container h3 {
+    margin-bottom: 2em;
+}
+
+/* 🔸 Set Wins Wrapper */
+.set-wins-wrapper {
+    display: flex;
+    flex-direction: column; /* Makes buttons and text stack */
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    font-size: 1.5rem;
+}
+
+#currentSet {
+    font-size: 3rem;
+}
+
+/* 🟢 Buttons */
+.set-wins-wrapper button {
+    background: var(--primary-color);
+    border: none;
+    padding: 0.2em 0.4em; /* Reduced padding */
+    font-size: 0.9rem; /* Smaller font */
+    cursor: pointer;
+    border-radius: 5px;
+    transition: transform 0.2s ease-in-out;
+    width: 30px; /* Small, but still visible */
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.set-wins-wrapper button:hover {
+    transform: scale(1.1);
+}
+
+/* 🔢 Score Styling */
+.score-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 2rem;
+    margin: 10px 0;
+}
+
+/* 🔘 Score Buttons */
+.score-wrapper button {
+    background: var(--primary-color);
+    border: none;
+    padding: 0.5em 1em;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.score-wrapper button:hover {
+    transform: scale(1.1);
+}
+
+#scoreA, #scoreB {
+    font-size: 3.5rem;
+}
+
+/* ================================ */
+/* 🏐 Ongoing Set */
+/* ================================ */
+
+.set-control {
+    text-align: center;
+    background: var(--secondary-color);
+    border-radius: 8px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+    
+    flex: 0 1 20%;  /* Allows it to shrink properly */
+    min-width: 120px; /* Reduces minimum width to make space */
+    max-width: 100%;
+    
+    padding: 0.5em; /* Reduce padding to save space */
+}
+
+
+/* 🔘 Set Buttons */
+.set-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 2rem;
+
+    
+}
+
+.set-buttons button {
+    background: var(--primary-color);
+    border: none;
+    padding: 0.5em 1em;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: transform 0.2s ease-in-out;
+
+    width: 30px; /* Make buttons smaller */
+    height: 30px;
+    font-size: 1rem;
+    padding: 0.2em;
+}
+
+.set-buttons button:hover {
+    transform: scale(1.1);
+}
+
+/* ================================ */
+/* 🏆 End Set Button */
+/* ================================ */
+
+.end-set-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+#endSetBtn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#endSetBtn:hover {
+    background-color: #c82333;
+}
+
+#endSetBtn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.5);
+}
+
+
+/* ================================ */
+
+.team-sets-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.team-label {
+    font-size: 1rem;
+    flex-wrap: wrap;
+    font-weight: 400;
+    color: var(--text-color);
+}
+
+/* ================================ */
+
+
+.timeout-container {
+ 
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap; /* Allows buttons to adjust instead of overflowing */
+    width: 100%;
+}
+
+
+
+
+/* ================================ */
+/* 📱 Comprehensive Mobile Responsiveness */
+/* ================================ */
+
+/* Global Container Adjustments */
+@media screen and (max-width: 768px) {
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        min-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Main Scoreboard Container */
+    .scoreboard {
+        width: 100vw;
+        max-width: 100%;
+        padding: 0.5em;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Score Wrapper Responsiveness */
+    .score-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+
+    /* Team Score Container */
+    .team-score {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.5em;
+    }
+
+    /* Team Name Responsiveness */
+    .team-name {
+        font-size: 1rem;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Score Display */
+    .score {
+        font-size: 2.5rem;
+        max-width: 100%;
+        text-align: center;
+    }
+
+    /* Sets and Timeout Containers */
+    .set-container,
+    .timeout-container {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 0.5em;
+    }
+
+    /* Card Responsiveness */
+    .card {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .card-header {
+        padding: 0.5em;
+        font-size: 0.9rem;
+    }
+
+    .card-body {
+        padding: 0.5em;
+    }
+
+    /* Sets Display */
+    .sets-display {
+        font-size: 1rem;
+        padding: 5px;
+        margin: 0 5px;
+        max-width: 100%;
+    }
+
+    /* Timeout Buttons */
+    .timeout-btn {
+        padding: 5px;
+        font-size: 0.8rem;
+    }
+
+    .timeout-btn i {
+        font-size: 0.7rem;
+    }
+
+    /* Specific Orientation Adjustments */
+    @media (orientation: landscape) {
+        .score-wrapper {
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .team-score {
+            width: 48%;
+        }
+
+        .team-name {
+            font-size: 0.9rem;
+        }
+
+        .score {
+            font-size: 2rem;
+        }
+    }
+
+    @media (orientation: portrait) {
+        .team-name {
+            font-size: 1rem;
+        }
+
+        .score {
+            font-size: 2.5rem;
+        }
+    }
+}
+
+/* Prevent text overflow and ensure responsiveness */
+@media screen and (max-width: 480px) {
+    .team-name {
+        font-size: 0.9rem;
+    }
+
+    .score {
+        font-size: 2rem;
+    }
+}
+
+/* Additional Touch and Interaction Improvements */
+@media screen and (max-width: 768px) {
+    * {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    input, 
+    textarea, 
+    button {
+        font-size: 16px; /* Prevents auto-zoom on iOS */
+    }
+    
+}
+
+
+
+
+/* Touch Interaction Improvements */
+* {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+/* Responsive Typography */
+html {
+    font-size: 16px;
+}
+
+@media screen and (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    html {
+        font-size: 12px;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .scoreboard {
+        width: 95%;
+        padding: 1.5em;
+        height: 90%;
+        
+    }
+
+    .score-wrapper {
+        font-size: 1.5rem;
+    }
+
+    .set-buttons button {
+        font-size: 1.2rem;
+    }
+    .set-wins-wrapper button {
+        width: 25px;
+        height: 25px;
+        font-size: 0.8rem;
+        padding: 0.1em 0.3em;
+    }
+    .set-container {
+        width: 8%;
+    }
+    .set-container h3 {
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+
+    .score-wrapper button {
+        padding: 0.4em 0.8em;
+        font-size: 1rem;
+    }
+    .set-buttons button {
+        padding: 0.4em 0.8em;
+        font-size: 1rem;
+    }
+
+    #scoreA, #scoreB {
+        font-size: 3.5rem;
+    }
+
+    .end-match {
+        font-size: 0.8rem;
+        padding: 0.5em 1em;
+    }
+
+    /* 🟢 Hover Effect */
+    .set-wins-wrapper button:hover {
+        transform: scale(1.05);
+    }
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 15px;
+}
+
+.modal-title {
+    font-weight: bold;
+    color: #333;
+}
+
+.modal-body {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 15px;
+}
+
+.modal-footer .btn {
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.modal-footer .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: #545b62;
+}
+
+.modal-footer .btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.modal-footer .btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* ================================ */
+/* 🕒 Timeout Card Styling */
+/* ================================ */
+
+.card {
+    background-color: var(--secondary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.card-header {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    padding: 0.5em 1em;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.card-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+}
+
+.card-body .btn-sm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.card-body .btn-sm:hover {
+    transform: scale(1.1);
+}
+
+.card-body .btn-outline-danger {
+    border: 2px solid var(--danger-color);
+    color: var(--danger-color);
+}
+
+.card-body .btn-outline-success {
+    border: 2px solid #28a745;
+    color: #28a745;
+}
+
+.card-body #teamA-timeouts, 
+.card-body #teamB-timeouts {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-color);
+    min-width: 60px;
+    text-align: center;
+    margin: 0 15px;
+}
+
+/* Enhanced Sets Won and Timeout Card Styling */
+.sets-card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+
+.sets-card-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.sets-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #212529;
+    min-width: 50px;
+    text-align: center;
+    margin: 0 15px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+.timeout-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.timeout-btn:hover {
+    transform: scale(1.1);
+}
+
+.timeout-btn i {
+    font-size: 0.9rem;
+}
+
+/* ================================ */
+/* 🔄 Reset Button */
+/* ================================ */
+
+.reset-btn {
+    background: var(--secondary-color);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    font-size: 1rem;
+    padding: 0.5em 1.5em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.2s;
+    margin-top: 10px;
+    position: relative;
+}
+
+/* 🟢 Hover Effect */
+.reset-btn:hover {
+    background: var(--primary-color);
+    color: black;
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .teams-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .team {
+        width: 90%;
+    }
+
+    .set-container {
+        width: 20%;
+    }
+
+    .timeout-container {
+        flex-wrap: wrap;
+    }
+}
+
+
+@media (max-width: 1024px) and (max-height: 480px) {
+    /* ================================ */
+    /* 🌎 Mobile Landscape Styles */
+    /* ================================ */
+
+    :root {
+        --primary-color: #3d91f5;
+        --secondary-color: #252527;
+        --danger-color: #dc3545;
+        --background-dark: #1e1e1e;
+        --text-color: white;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+
+    /* ================================ */
+    /* 🏆 Body & Main Layout */
+    /* ================================ */
+
+    body {
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+        padding: 0.5em;
+        background: linear-gradient(#000000 50%, #3d91f5 50%);
+        overflow: hidden;
+    }
+
+    /* 📌 Scoreboard Container */
+    .scoreboard {
+        background: var(--background-dark);
+        padding: 1em;
+        border-radius: 10px;
+        width: 98vw;
+        height: auto;
+        max-height: 90vh;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+    }
+
+    /* ================================ */
+    /* 🔴 End Match Button */
+    /* ================================ */
+
+    .end-match {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: var(--danger-color);
+        color: var(--text-color);
+        border: none;
+        padding: 0.5em 1em;
+        font-size: 0.8rem;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 10;
+        transition: background 0.3s;
+    }
+
+    .end-match:hover {
+        background: #c82333;
+    }
+
+    /* ================================ */
+    /* 🏐 Ongoing Set */
+    /* ================================ */
+
+    .set-control {
+        text-align: center;
+        background: var(--secondary-color);
+        border-radius: 8px;
+        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+        flex: 0 1 10%; /* Smaller width to fit inline */
+        min-width: 80px;
+        max-width: 140px;
+        padding: 0.4em;
+    }
+
+    /* 🔘 Set Buttons */
+    .set-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        font-size: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .set-buttons button {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+        padding: 0.1em;
+    }
+
+    /* ================================ */
+    /* 🏅 Teams & Scores */
+    /* ================================ */
+
+    .teams-container {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    /* 🔢 Score Containers */
+    .team {
+        background: var(--secondary-color);
+        padding: 0.6em;
+        border-radius: 8px;
+        flex: 1;
+        text-align: center;
+        box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3);
+        max-width: 47%; /* Ensures team boxes fit inline */
+        overflow: hidden;
+    }
+
+    /* Score and Timeout Section */
+    .score-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 1.6rem;
+        margin: 5px 0;
+    }
+
+    /* Score Buttons */
+    .score-wrapper button {
+        background: var(--primary-color);
+        border: none;
+        padding: 0.3em 0.6em;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .score-wrapper button:hover {
+        transform: scale(1.05);
+    }
+
+    #scoreA, #scoreB {
+        font-size: 2rem;
+    }
+
+    /* ================================ */
+    /* 🏆 End Set Button */
+    /* ================================ */
+
+    .end-set-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 5px;
+    }
+
+    #endSetBtn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 12px;
+        border-radius: 5px;
+        font-size: 10px;
+        text-transform: uppercase;
+        transition: background-color 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    #endSetBtn:hover {
+        background-color: #c82333;
+    }
+
+    /* ================================ */
+    /* ⏳ Timeout Container */
+    /* ================================ */
+
+    .timeout-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 3px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .timeout-container button {
+        min-width: 22px;
+        min-height: 22px;
+        font-size: 0.8rem;
+        padding: 0.2em;
+    }
+
+    /* ================================ */
+    /* 🔄 Reset Button */
+    /* ================================ */
+
+    .reset-btn {
+        background: var(--secondary-color);
+        border: 2px solid var(--primary-color);
+        color: var(--primary-color);
+        font-size: 0.8rem;
+        padding: 0.3em 1em;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease-in-out, transform 0.2s;
+        margin-top: 5px;
+        position: relative;
+    }
+
+    /* 🟢 Hover Effect */
+    .reset-btn:hover {
+        background: var(--primary-color);
+        color: black;
+        transform: scale(1.05);
+    }
+
+    /* ================================ */
+    /* 📱 Responsive Adjustments */
+    /* ================================ */
+
+    @media (max-width: 820px) and (orientation: landscape) {
+        .scoreboard {
+            width: 100vw;
+            padding: 0.8em;
+        }
+
+        .teams-container {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .set-control {
+            flex: 0 1 100%;
+            max-width: 120px;
+        }
+
+        .team {
+            width: 95%;
+        }
+
+        .timeout-container {
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (max-width: 1024px) and (max-height: 480px) {
+        /* 📌 Scoreboard Container */
+        .scoreboard {
+            width: 98vw;
+            padding: 1em;
+        }
+    
+        /* 🏐 Ongoing Set */
+        .set-control {
+            flex: 0 1 20%;  /* Increase width for better centering */
+            min-width: 150px;
+            max-width: 200px;
+            padding: 0.6em;
+            margin: 0 auto; /* Centers it */
+        }
+    
+        /* 🔘 Set Buttons */
+        .set-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.3rem;
+        }
+    
+        .set-buttons button {
+            width: 28px;
+            height: 28px;
+            font-size: 1rem;
+            padding: 0.2em;
+        }
+    
+        /* 🏅 Teams & Scores */
+        .teams-container {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-around;
+            align-items: center;
+            gap: 10px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+    
+        /* 🔢 Score Containers */
+        .team {
+            max-width: 40%; /* Ensure teams don't get too wide */
+            padding: 0.8em;
+        }
+    
+        /* 🔄 Reset Button */
+        .reset-btn {
+            margin-top: 8px;
+        }
+        .team h2 {
+            font-size: 1.1rem;
+        }
+    }
+    
+}
+

@@ -346,24 +346,55 @@ include '../navbar/navbar.php';
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Make an AJAX request to start_match.php
                     fetch('start_match.php', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'Content-Type': 'application/x-www-form-urlencoded'
                             },
                             body: `schedule_id=${schedule_id}&teamA_id=${teamA_id}&teamB_id=${teamB_id}&game_id=${game_id}`
                         })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Redirect to live scoring page
-                                window.location.href = `live_scoring.php?schedule_id=${schedule_id}&teamA_id=${teamA_id}&teamB_id=${teamB_id}`;
+                                let redirectPage;
+                                switch (data.game_type) {
+                                    case 'point':
+                                        redirectPage = 'point_based_scoreboard.php';
+                                        break;
+                                    case 'set':
+                                        redirectPage = 'set-test.php';
+                                        break;
+                                    case 'default':
+                                    default:
+                                        redirectPage = 'default_scoreboard.php';
+                                        break;
+                                }
+                                window.location.href = `${redirectPage}?schedule_id=${schedule_id}&teamA_id=${teamA_id}&teamB_id=${teamB_id}`;
                             } else {
                                 Swal.fire('Error', data.message, 'error');
                             }
                         })
                         .catch(error => Swal.fire('Error', 'An unexpected error occurred', 'error'));
+                }
+            });
+        }
+
+        function joinMatch(scheduleId, teamAId, teamBId, gameId) {
+            Swal.fire({
+                title: 'Record Player Statistics',
+                text: 'Do you want to proceed to record player statistics for this match?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Record',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'player_statistics.php?schedule_id=' + scheduleId + 
+                                   '&teamA_id=' + teamAId + 
+                                   '&teamB_id=' + teamBId + 
+                                   '&game_id=' + gameId;
                 }
             });
         }
@@ -512,21 +543,21 @@ include '../navbar/navbar.php';
                                                                         </li>
                                                                         <?php
                                                                         // Set the default timezone to ensure consistent time handling
-                                                                        date_default_timezone_set('Asia/Manila');
+                                                                       // date_default_timezone_set('Asia/Manila');
 
                                                                         // Parse the scheduled date and time
-                                                                        $scheduleDateTime = strtotime($row['schedule_date'] . ' ' . $row['schedule_time']);
+                                                                       // $scheduleDateTime = strtotime($row['schedule_date'] . ' ' . $row['schedule_time']);
 
                                                                         // Get the current date and time
-                                                                        $currentDateTime = time(); // Using time() for simplicity
+                                                                        //$currentDateTime = time(); // Using time() for simplicity
 
                                                                         // Calculate the absolute time difference
-                                                                        $timeDiff = abs($scheduleDateTime - $currentDateTime);
+                                                                       // $timeDiff = abs($scheduleDateTime - $currentDateTime);
 
                                                                         // Show the button if:
                                                                         // 1. It's the same day
                                                                         // 2. The scheduled time is within 30 minutes (before or after)
-                                                                        if (date('Y-m-d', $scheduleDateTime) === date('Y-m-d', $currentDateTime) && $timeDiff <= 1800):
+                                                                       // if (date('Y-m-d', $scheduleDateTime) === date('Y-m-d', $currentDateTime) && $timeDiff <= 1800):
                                                                         ?>
                                                                             <!-- Start Match action -->
                                                                             <li>
@@ -534,12 +565,15 @@ include '../navbar/navbar.php';
                                                                                     Start Match
                                                                                 </button>
                                                                             </li>
-                                                                        <?php endif; ?>
+                                                                        <?php //endif; ?>
                                                                     <?php elseif ($row['status'] === 'Ongoing'): ?>
                                                                         <!-- Continue Match action -->
                                                                         <li>
                                                                             <button class="dropdown-item" onclick="startMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
                                                                                 Continue Match
+                                                                            </button>
+                                                                            <button class="dropdown-item" onclick="joinMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
+                                                                                Record Stats
                                                                             </button>
                                                                         </li>
                                                                     <?php elseif ($row['status'] === 'Finished'): ?>
@@ -563,10 +597,10 @@ include '../navbar/navbar.php';
 
                                 <!-- Mobile Card View -->
                                 <div class="match-cards d-md-none">
-                                    <?php 
+                                    <?php
                                     // Reset result pointer
                                     $result->data_seek(0);
-                                    while ($row = $result->fetch_assoc()): 
+                                    while ($row = $result->fetch_assoc()):
                                     ?>
                                         <div class="match-card">
                                             <div class="match-card-header">
@@ -589,7 +623,7 @@ include '../navbar/navbar.php';
                                                     ?>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="match-card-teams">
                                                 <div class="team-name"><?= htmlspecialchars($row['teamA_name']) ?></div>
                                                 <div class="vs-badge">VS</div>
@@ -628,19 +662,27 @@ include '../navbar/navbar.php';
                                             </div>
 
                                             <div class="match-card-actions">
-                            <?php if ($row['status'] == 'Upcoming'): ?>
-                                <button class="btn btn-primary" onclick="startMatch(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>, <?= $row['game_id'] ?>)">
-                                    <i class="fas fa-play"></i> Start Match
-                                </button>
-                                <button class="btn btn-info" onclick="notifyPlayers(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>)">
-                                    <i class="fas fa-bell"></i> Notify
-                                </button>
-                            <?php else: ?>
-                                <button class="btn btn-secondary" onclick="viewMatchDetails(<?= $row['match_id'] ?>)">
-                                    <i class="fas fa-eye"></i> View Details
-                                </button>
-                            <?php endif; ?>
-                        </div>
+                                                <?php if ($row['status'] == 'Upcoming'): ?>
+                                                    <button class="btn btn-primary" onclick="startMatch(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>, <?= $row['game_id'] ?>)">
+                                                        <i class="fas fa-play"></i> Start Match
+                                                    </button>
+                                                    <button class="btn btn-info" onclick="notifyPlayers(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>)">
+                                                        <i class="fas fa-bell"></i> Notify
+                                                    </button>
+                                                <?php elseif ($row['status'] == 'Ongoing'): ?>
+                                                    <button class="btn btn-success" onclick="startMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
+                                                        <i class="fas fa-play"></i> Continue Match
+                                                    </button>
+                                                    <button class="btn btn-info" onclick="joinMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
+                                                        <i class="fas fa-clipboard-list"></i> Record Stats
+                                                    </button>
+                                                <?php elseif ($row['status'] == 'Finished'): ?>
+                                                    <a href="match_summary.php?match_id=<?= $row['match_id']; ?>" class="btn btn-secondary">
+                                                        <i class="fas fa-eye"></i> View Summary
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
+
                                         </div>
                                     <?php endwhile; ?>
                                 </div>

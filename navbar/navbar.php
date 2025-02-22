@@ -4,7 +4,7 @@
 
         <!-- Toggle button -->
         <button
-        id="committeeSidebarToggle"
+            id="committeeSidebarToggle"
             class="navbar-toggler"
             type="button"
             data-bs-target="#csidebar"
@@ -15,7 +15,7 @@
         </button>
 
         <button
-        id="sidebarToggle"
+            id="sidebarToggle"
             class="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
@@ -108,7 +108,7 @@
         if (sidebarToggle) sidebarToggle.style.display = 'none';
 
         // Show appropriate button based on role
-        if (userRole === 'Committee') {
+        if (userRole === 'Committee' || userRole === 'superadmin') {
             if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'block';
         } else {
             if (sidebarToggle) sidebarToggle.style.display = 'block';
@@ -135,10 +135,10 @@
             togglerButton.addEventListener('click', function(event) {
                 event.preventDefault(); // Prevent default Bootstrap behavior
                 event.stopPropagation(); // Prevent event from bubbling
-                
+
                 // Toggle the 'active' class on the sidebar
                 sidebar.classList.toggle('active');
-                
+
                 // Add/remove 'sidebar-active' class to body for overlay
                 document.body.classList.toggle('sidebar-active');
 
@@ -182,7 +182,7 @@
         // Check if sidebar exists and is currently active
         if (sidebar && sidebar.classList.contains('active')) {
             // Check if the click is outside the sidebar and not on the toggler button
-            if (!sidebar.contains(event.target) && 
+            if (!sidebar.contains(event.target) &&
                 !togglerButton.contains(event.target)) {
                 sidebar.classList.remove('active');
                 document.body.classList.remove('sidebar-active');

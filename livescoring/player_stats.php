@@ -49,7 +49,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const gameId = <?= $match['game_id'] ?>;
+        const gameId = <?= $game_id = $_SESSION['game_id'] ?>;
         let gameStats = [];
         let playerStats = {};
 
@@ -116,7 +116,7 @@
                 });
 
                 // Add to appropriate team list
-                if (teamId === <?= $match['teamA_id'] ?>) {
+                if (teamId === <?= $teamA_id = $_GET['teamA_id'] ?>) {
                     teamAList.appendChild(playerStatContainer);
                 } else {
                     teamBList.appendChild(playerStatContainer);

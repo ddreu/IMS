@@ -23,6 +23,7 @@ $stmt->close(); // Close this statement
 
 // Separate handling for Scoring Rules
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['scoring_unit'])) {
+    $game_type = $_POST['game_type']; // Capture selected game type
     $scoring_unit = $_POST['scoring_unit'];
     $score_increment_options = $_POST['score_increment_options'];
     $period_type = $_POST['period_type'];
@@ -31,13 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['scoring_unit'])) {
     $timeouts_per_period = $_POST['timeouts_per_period'];
     $time_limit = isset($_POST['time_limit']) ? 1 : 0;
     $point_cap = $_POST['point_cap'];
-    $max_fouls = $_POST['max_fouls']; // Add the missing semicolon here
+    $max_fouls = $_POST['max_fouls'];
 
     $query = "
     INSERT INTO game_scoring_rules 
-    (game_id, department_id, school_id, scoring_unit, score_increment_options, period_type, number_of_periods, duration_per_period, timeouts_per_period, time_limit, point_cap, max_fouls)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (game_id, department_id, school_id, game_type, scoring_unit, score_increment_options, period_type, number_of_periods, duration_per_period, timeouts_per_period, time_limit, point_cap, max_fouls)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON DUPLICATE KEY UPDATE
+        game_type = VALUES(game_type),
         scoring_unit = VALUES(scoring_unit),
         score_increment_options = VALUES(score_increment_options),
         period_type = VALUES(period_type),
@@ -50,10 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['scoring_unit'])) {
 
     $stmt = $conn->prepare($query);
     $stmt->bind_param(
-        "iiisssiiiiii",
+        "iiisssiiiiiii",
         $assigned_game_id,
         $assigned_department_id,
         $assigned_school_id,
+        $game_type,  // New parameter
         $scoring_unit,
         $score_increment_options,
         $period_type,
@@ -84,6 +87,7 @@ $stmt->bind_param("iii", $assigned_game_id, $assigned_department_id, $assigned_s
 $stmt->execute();
 $scoring_rules = $stmt->get_result()->fetch_assoc();
 $stmt->close(); // Close this statement
+
 
 include '../navbar/navbar.php';
 
@@ -151,6 +155,17 @@ $conn->close();
                         </div>
                         <div class="card-body">
                             <form method="POST" action="">
+
+                                <!-- 🏆 Game Type Selection -->
+                                <div class="mb-3">
+                                    <label class="form-label">Select Game Type</label>
+                                    <select name="game_type" class="form-select">
+                                        <option value="point" <?php echo (isset($scoring_rules['game_type']) && $scoring_rules['game_type'] == 'point') ? 'selected' : ''; ?>>Point-Based (Basketball, Soccer, etc.)</option>
+                                        <option value="set" <?php echo (isset($scoring_rules['game_type']) && $scoring_rules['game_type'] == 'set') ? 'selected' : ''; ?>>Set-Based (Volleyball, Tennis, etc.)</option>
+                                        <option value="default" <?php echo (isset($scoring_rules['game_type']) && $scoring_rules['game_type'] == 'default') ? 'selected' : ''; ?>>Default (Board Games, Esports, etc.)</option>
+                                    </select>
+                                </div>
+
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Scoring Unit</label>
@@ -193,11 +208,14 @@ $conn->close();
                                         </div>
                                     </div>
                                 </div>
+
                                 <button type="submit" class="btn btn-primary">Save Scoring Rules</button>
                             </form>
                         </div>
                     </div>
                 </div>
+
+
 
                 <div class="col-md-6">
                     <div class="card mb-4 mt-4">

@@ -135,16 +135,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Log the action using logUserAction
-            logUserAction(
-                $conn,
-                $_SESSION['user_id'], // Logged-in user performing the action
-                'Users',              // Table name
-                'UPDATE',             // Operation type
-                $user_id,             // Record ID of updated user
-                $description,         // Description of the operation
-                json_encode($current_user), // Previous data (before update)
-                json_encode($_POST)  // New data (after update)
-            );
+          //  logUserAction(
+          //      $conn,
+        //        $_SESSION['user_id'], // Logged-in user performing the action
+         //       'Users',              // Table name
+          //      'UPDATE',             // Operation type
+        //        $user_id,             // Record ID of updated user
+         //       $description,         // Description of the operation
+          //      json_encode($current_user), // Previous data (before update)
+        //        json_encode($_POST)  // New data (after update)
+         //   );
 
             echo json_encode([
                 "status" => "success",

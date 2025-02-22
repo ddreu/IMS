@@ -81,6 +81,11 @@ try {
         $match['score_teamA'] = isset($match['score_teamA']) ? intval($match['score_teamA']) : null;
         $match['score_teamB'] = isset($match['score_teamB']) ? intval($match['score_teamB']) : null;
         
+        // Explicitly map winner and loser
+        $match['winner_id'] = $match['winning_team_id'];
+        $match['loser_id'] = ($match['winning_team_id'] == $match['teamA_id']) ? $match['teamB_id'] : 
+                              (($match['winning_team_id'] == $match['teamB_id']) ? $match['teamA_id'] : null);
+        
         if ($round == -1) {
             // Third place match
             $matches['third-place'] = $match;

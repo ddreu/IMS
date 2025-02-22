@@ -1,0 +1,160 @@
+/* General Reset */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Background Styling */
+body {
+    height: 100vh;
+    background: linear-gradient(#000000 50%, #07e387 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Scoreboard */
+.scoreboard {
+    background-color: #1e1e21;
+    width: min(90%, 34em);
+    padding: 3em;
+    border-radius: 0.5em;
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr;
+    align-items: center;
+    position: relative;
+}
+
+/* Teams */
+.team {
+    text-align: center;
+    background-color: #353638;
+    padding: 2em;
+    border-radius: 0.5em;
+}
+.team h2 {
+    color: #07e387;
+}
+.team p {
+    color: #ffffff;
+    font-size: 3.75em;
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Reset Button */
+#reset-btn {
+    background-color: transparent;
+    border: 3px solid #07e387;
+    color: #07e387;
+    height: 5em;
+    width: 5em;
+    margin: auto;
+    border-radius: 0.5em;
+}
+
+/* Increase/Decrease Score Buttons */
+.team button {
+    background-color: #07e387;
+    border: none;
+    outline: none;
+    padding: 0.3em 0.7em;
+    border-radius: 0.3em;
+    font-weight: 600;
+    font-size: 1.3em;
+}
+
+/* 🟥 Styled End Match Button */
+.end-match {
+    background-color: #dc3545;
+    border: none;
+    color: white;
+    padding: 0.8em 1.5em;
+    font-size: 1.2em;
+    font-weight: 600;
+    border-radius: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    transition: background-color 0.3s ease;
+    width: fit-content;
+    position: absolute;
+    top: 10px;  /* Adjust for spacing */
+    left: 10px; /* Positioned at top-left */
+    z-index: 1000;
+}
+
+.end-match i {
+    font-size: 1.3em;
+}
+
+/* Hover Effect */
+.end-match:hover {
+    background-color: #c82333;
+}
+
+/* ✅ Move to Top-Right (Alternative) */
+.end-match.right {
+    left: auto;
+    right: 10px;
+}
+
+/* 📱 Responsive Media Queries */
+@media (max-width: 768px) {
+    .scoreboard {
+        width: 95%;
+        grid-template-columns: 1fr;
+        padding: 2em;
+        gap: 1.5em;
+    }
+
+    .team {
+        padding: 1.5em;
+    }
+
+    .team p {
+        font-size: 3em;
+    }
+
+    .team button {
+        font-size: 1.1em;
+    }
+
+    #reset-btn {
+        height: 4em;
+        width: 4em;
+    }
+
+    .end-match {
+        font-size: 1em;
+        padding: 0.7em 1.2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .team p {
+        font-size: 2.5em;
+    }
+
+    .team button {
+        font-size: 1em;
+        padding: 0.2em 0.5em;
+    }
+
+    #reset-btn {
+        height: 3.5em;
+        width: 3.5em;
+    }
+
+    .end-match {
+        font-size: 0.9em;
+        padding: 0.6em 1em;
+    }
+}

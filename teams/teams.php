@@ -238,11 +238,11 @@ $conn->close();
     </nav>
     <!-- Main Content -->
     <div class="mt-4">
-        <div class="container-fluid">
+        <div class="container-fluid px-3 px-md-4">
             <section class="main">
-                <div class="main-top d-flex justify-content-between align-items-center">
+                <div class="main-top d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
                     <?php if ($role != 'Committee'): ?>
-                        <h2 class="mb-4">
+                        <h2 class="mb-3 mb-md-0">
                             <?php 
                             if ($grade_section_course_id) {
                                 $sql = "SELECT gsc.*, d.department_name 
@@ -265,77 +265,76 @@ $conn->close();
                             ?> Teams
                         </h2>
                     <?php else: ?>
-                        <h2 class="mb-4">Teams for <?= htmlspecialchars($game_name) ?> - <?= htmlspecialchars($department_name) ?></h2>
+                        <h2 class="mb-3 mb-md-0">Teams for <?= htmlspecialchars($game_name) ?> - <?= htmlspecialchars($department_name) ?></h2>
                     <?php endif; ?>
+                    
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTeamModal">Add Team</button>
                 </div>
 
                 <?php if (!empty($teams_by_grade)): ?>
                     <?php foreach ($teams_by_grade as $grade_level => $teams): ?>
                         <div class="card shadow mt-3">
-                            
-                                <div class="row mt-3">
-                                    <div class="col text-end">
-                                        
-                                    <button type="button" class="btn btn-success btn-sm me-3" data-bs-toggle="modal" data-bs-target="#addTeamModal">Add Team</button>                                    <!--<h4 class="m-0 font-weight-bold text-primary"><?= htmlspecialchars($grade_level) ?></h4>-->
-                                    </div>
-                                </div>
-                            
-                            <div class="card-body p-4">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <?php if ($department_name === 'College'): ?>
-                                                <th>Team Name</th>
-                                                <th>Course Name</th>
-                                            <?php elseif ($department_name === 'SHS'): ?>
-                                                <th>Team Name</th>
-                                                <th>Strand</th>
-                                                <th>Grade Level</th>
-                                                <th>Section Name</th>
-                                            <?php elseif ($department_name === 'JHS' || $department_name === 'Elementary'): ?>
-                                                <th>Team Name</th>
-                                                <th>Grade Level</th>
-                                                <th>Section Name</th>
-                                            <?php endif; ?>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($teams as $row): ?>
+                            <div class="card-body p-3 p-md-4">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
                                             <tr>
                                                 <?php if ($department_name === 'College'): ?>
-                                                    <td><?= htmlspecialchars($row['team_name']) ?></td>
-                                                    <td><?= htmlspecialchars($row['course_name'] ?? '-') ?></td>
+                                                    <th>Team Name</th>
+                                                    <th>Course Name</th>
                                                 <?php elseif ($department_name === 'SHS'): ?>
-                                                    <td><?= htmlspecialchars($row['team_name']) ?></td>
-                                                    <td><?= htmlspecialchars($row['strand'] ?? '-') ?></td>
-                                                    <td><?= htmlspecialchars($row['grade_level']) ?></td>
-                                                    <td><?= htmlspecialchars($row['section_name']) ?></td>
+                                                    <th>Team Name</th>
+                                                    <th>Strand</th>
+                                                    <th>Grade Level</th>
+                                                    <th>Section Name</th>
                                                 <?php elseif ($department_name === 'JHS' || $department_name === 'Elementary'): ?>
-                                                    <td><?= htmlspecialchars($row['team_name']) ?></td>
-                                                    <td><?= htmlspecialchars($row['grade_level']) ?></td>
-                                                    <td><?= htmlspecialchars($row['section_name']) ?></td>
+                                                    <th>Team Name</th>
+                                                    <th>Grade Level</th>
+                                                    <th>Section Name</th>
                                                 <?php endif; ?>
-                                                <td>
-                                                    <a href="../player/view_roster.php?team_id=<?= htmlspecialchars($row['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-info btn-sm">View Roster</a>
-                                                    <a href="../player/player_registration.php?team_id=<?= htmlspecialchars($row['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-primary btn-sm">Register Player</a>
-                                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editTeamModal" 
-                                                    data-team-id="<?= htmlspecialchars($row['team_id']) ?>" 
-                                                    data-team-name="<?= htmlspecialchars($row['team_name']) ?>">
-                                                        Edit
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDeletion(<?= htmlspecialchars($row['team_id']) ?>)">Delete</button>
-                                                    </td>
-
+                                                <th>Action</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($teams as $row): ?>
+                                                <tr>
+                                                    <?php if ($department_name === 'College'): ?>
+                                                        <td><?= htmlspecialchars($row['team_name']) ?></td>
+                                                        <td><?= htmlspecialchars($row['course_name'] ?? '-') ?></td>
+                                                    <?php elseif ($department_name === 'SHS'): ?>
+                                                        <td><?= htmlspecialchars($row['team_name']) ?></td>
+                                                        <td><?= htmlspecialchars($row['strand'] ?? '-') ?></td>
+                                                        <td><?= htmlspecialchars($row['grade_level']) ?></td>
+                                                        <td><?= htmlspecialchars($row['section_name']) ?></td>
+                                                    <?php elseif ($department_name === 'JHS' || $department_name === 'Elementary'): ?>
+                                                        <td><?= htmlspecialchars($row['team_name']) ?></td>
+                                                        <td><?= htmlspecialchars($row['grade_level']) ?></td>
+                                                        <td><?= htmlspecialchars($row['section_name']) ?></td>
+                                                    <?php endif; ?>
+                                                    <td>
+                                                        <div class="d-flex flex-column flex-md-row gap-2">
+                                                            <a href="../player/view_roster.php?team_id=<?= htmlspecialchars($row['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-info btn-sm">View Roster</a>
+                                                            <a href="../player/player_registration.php?team_id=<?= htmlspecialchars($row['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-primary btn-sm">Register Player</a>
+                                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editTeamModal" 
+                                                            data-team-id="<?= htmlspecialchars($row['team_id']) ?>" 
+                                                            data-team-name="<?= htmlspecialchars($row['team_name']) ?>">
+                                                                Edit
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDeletion(<?= htmlspecialchars($row['team_id']) ?>)">Delete</button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <p>No teams registered yet for this game and department.</p>
+                    <div class="alert alert-info text-center" role="alert">
+                        No teams registered yet for this game and department.
+                    </div>
                 <?php endif; ?>
             </section>
         </div>

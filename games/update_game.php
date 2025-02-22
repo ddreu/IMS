@@ -10,20 +10,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $number_of_players = intval($_POST['number_of_players']);
     $category = trim($_POST['category']);
     $environment = trim($_POST['environment']);
+    $school_id = $_SESSION['school_id']; // Get the school_id from the session
 
     // Validate inputs
     if (empty($game_name) || empty($number_of_players) || empty($category) || empty($environment)) {
         $response = ['status' => 'error', 'message' => 'All fields are required.'];
     } else {
         // Fetch previous data for logging
-        $fetch_sql = "SELECT * FROM games WHERE game_id = ?";
+        $fetch_sql = "SELECT * FROM games WHERE game_id = ? AND school_id = ?";
         $fetch_stmt = mysqli_prepare($conn, $fetch_sql);
 
         if ($fetch_stmt) {
-            mysqli_stmt_bind_param($fetch_stmt, "i", $game_id);
+            mysqli_stmt_bind_param($fetch_stmt, "ii", $game_id, $school_id);
             mysqli_stmt_execute($fetch_stmt);
             $fetch_result = mysqli_stmt_get_result($fetch_stmt);
             $previous_data = mysqli_fetch_assoc($fetch_result);
+
+            if (!$previous_data) {
+                $response = ['status' => 'error', 'message' => 'Game not found for your school.'];
+                header('Content-Type: application/json');
+                echo json_encode($response);
+                exit;
+            }
+
             $previous_game_name = $previous_data['game_name'];
             mysqli_stmt_close($fetch_stmt);
         } else {
@@ -33,24 +42,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
 
-        // Check for duplicate game name
-        $check_sql = "SELECT * FROM games WHERE game_name = ? AND game_id != ?";
+        // Check for duplicate game name within the same school
+        $check_sql = "SELECT * FROM games WHERE game_name = ? AND game_id != ? AND school_id = ?";
         $check_stmt = mysqli_prepare($conn, $check_sql);
 
         if ($check_stmt) {
-            mysqli_stmt_bind_param($check_stmt, "si", $game_name, $game_id);
+            mysqli_stmt_bind_param($check_stmt, "sii", $game_name, $game_id, $school_id);
             mysqli_stmt_execute($check_stmt);
             $check_result = mysqli_stmt_get_result($check_stmt);
 
             if (mysqli_num_rows($check_result) > 0) {
-                $response = ['status' => 'error', 'message' => 'Game name already exists!'];
+                $response = ['status' => 'error', 'message' => 'Game name already exists for your school!'];
             } else {
-                // Update game data
-                $update_sql = "UPDATE games SET game_name = ?, number_of_players = ?, category = ?, environment = ? WHERE game_id = ?";
+                // Update game data within the same school
+                $update_sql = "UPDATE games SET game_name = ?, number_of_players = ?, category = ?, environment = ? WHERE game_id = ? AND school_id = ?";
                 $update_stmt = mysqli_prepare($conn, $update_sql);
 
                 if ($update_stmt) {
-                    mysqli_stmt_bind_param($update_stmt, "sissi", $game_name, $number_of_players, $category, $environment, $game_id);
+                    mysqli_stmt_bind_param($update_stmt, "sissii", $game_name, $number_of_players, $category, $environment, $game_id, $school_id);
                     $update_result = mysqli_stmt_execute($update_stmt);
 
                     if ($update_result) {
