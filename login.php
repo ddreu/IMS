@@ -18,12 +18,10 @@ if (isset($_POST['submit'])) {
             u.*, 
             d.department_name, 
             s.school_name, 
-            s.school_code,
-            g.game_name 
+            s.school_code
         FROM users u
         LEFT JOIN departments d ON u.department = d.id
         LEFT JOIN schools s ON u.school_id = s.school_id
-        LEFT JOIN games g ON u.game_id = g.game_id
         WHERE u.email = ?
     ";
 
@@ -39,12 +37,11 @@ if (isset($_POST['submit'])) {
 
     if (mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
-
-
+        $user_id = $row['id'];
 
         // Verify password
         if (password_verify($password, $row['password'])) {
-            // Store all user and related information in session
+            // Store user information in session
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['role'] = $row['role'];
@@ -58,63 +55,72 @@ if (isset($_POST['submit'])) {
             $_SESSION['school_id'] = $row['school_id'];
             $_SESSION['school_name'] = $row['school_name'];
             $_SESSION['school_code'] = $row['school_code'];
-            $_SESSION['game_id'] = $row['game_id'];
-            $_SESSION['game_name'] = $row['game_name'];
 
-            // Insert a session record into the sessions table
+            // Insert session log
             $ip_address = $_SERVER['REMOTE_ADDR'];
             $user_agent = $_SERVER['HTTP_USER_AGENT'];
-            $user_id = $_SESSION['user_id'];
-
-
-
-            $insert_session = "
-                INSERT INTO sessions (user_id, ip_address, user_agent)
-                VALUES (?, ?, ?)
-            ";
+            $insert_session = "INSERT INTO sessions (user_id, ip_address, user_agent) VALUES (?, ?, ?)";
             $stmt_session = mysqli_prepare($conn, $insert_session);
             mysqli_stmt_bind_param($stmt_session, "iss", $user_id, $ip_address, $user_agent);
             mysqli_stmt_execute($stmt_session);
 
-            $description = "User Logged in";
+            logUserAction($conn, $user_id, 'sessions', 'Logged in', $user_id, "User Logged in");
 
-            // Log the action
-            logUserAction(
-                $conn,
-                $user_id,
-                'sessions',
-                'Logged in',
-                $user_id,
-                $description
-            );
-
-            // Check role for redirection
+            // Role-based redirection
             switch ($_SESSION['role']) {
                 case 'superadmin':
                     $_SESSION['success_message'] = "Welcome Super Admin!";
-                    $_SESSION['success_type'] = "superadmin"; // Set success type
+                    $_SESSION['success_type'] = 'superadmin';
                     header('Location: super_admin/sa_dashboard.php');
                     exit();
+
                 case 'School Admin':
                     $_SESSION['success_message'] = "Welcome School Admin!";
-                    $_SESSION['success_type'] = "superadmin"; // Set success type
+                    $_SESSION['success_type'] = 'School Admin';
                     header('Location: school_admin/schooladmindashboard.php');
                     exit();
 
                 case 'Department Admin':
                     $_SESSION['success_message'] = "Welcome Department Admin!";
-                    $_SESSION['success_type'] = "departmentadmin"; // Set success type
+                    $_SESSION['success_type'] = 'Department Admin';
                     header('Location: department_admin/departmentadmindashboard.php');
                     exit();
 
                 case 'Committee':
-                    // Check for assigned game
-                    if (!empty($_SESSION['game_id'])) { // Check if game_id exists
+                    // Fetch all assigned games
+                    $gameQuery = "
+                    SELECT g.game_id, g.game_name 
+                    FROM games g
+                    WHERE g.game_id = (
+                        SELECT game_id FROM users WHERE id = ?
+                    )
+                    UNION
+                    SELECT g.game_id, g.game_name 
+                    FROM committee_games cg
+                    JOIN games g ON cg.game_id = g.game_id
+                    WHERE cg.committee_id = ?;
+                ";
+
+                    $stmtGame = mysqli_prepare($conn, $gameQuery);
+                    mysqli_stmt_bind_param($stmtGame, "ii", $user_id, $user_id);
+                    mysqli_stmt_execute($stmtGame);
+                    $gameResult = mysqli_stmt_get_result($stmtGame);
+
+
+                    if (mysqli_num_rows($gameResult) > 1) {
+                        // Multiple games assigned, redirect to selection page
+                        $_SESSION['success_message'] = "We found multiple games assigned to your account. Please select your game.";
+                        header('Location: select_dashboard.php');
+                        exit();
+                    } elseif ($rowGame = mysqli_fetch_assoc($gameResult)) {
+                        // Only one game assigned, store it in session and go to dashboard
+                        $_SESSION['game_id'] = $rowGame['game_id'];
+                        $_SESSION['game_name'] = $rowGame['game_name'];
                         $_SESSION['success_message'] = "Welcome to Committee Dashboard!";
-                        $_SESSION['success_type'] = "committee"; // Set success type
                         header('Location: committee/committeedashboard.php');
                         exit();
                     } else {
+                        // No game assigned
                         $_SESSION['error_message'] = 'No game assigned to your account!';
                         header('Location: committee/no_game_assigned.php');
                         exit();
@@ -122,7 +128,6 @@ if (isset($_POST['submit'])) {
 
                 default:
                     $_SESSION['success_message'] = "Welcome to User Dashboard!";
-                    $_SESSION['success_type'] = "user"; // Set success type
                     header('Location: userdashboard.php');
                     exit();
             }
@@ -134,13 +139,14 @@ if (isset($_POST['submit'])) {
     }
 }
 
-// Display success or error message using JavaScript
+
+// Display error message
 if (!empty($error)) {
     $errorMessage = implode("<br>", $error);
-    echo '<script>console.log("Error Message:", ' . json_encode($errorMessage) . ');</script>';
     echo '<script>alert("Error: ' . htmlspecialchars($errorMessage) . '");</script>';
 }
 ?>
+
 
 
 

@@ -401,7 +401,8 @@ class BracketManager {
                 body: JSON.stringify({
                     game_id: this.gameId,
                     department_id: this.departmentId,
-                    grade_level: this.gradeLevel || null,  // Include grade level if selected
+                    grade_level: this.gradeLevel || null,  
+                    bracket_type: 'single',  // Make sure this is set
                     teams: bracketStructure.teams,
                     matches: bracketStructure.matches,
                     rounds: bracketStructure.rounds
@@ -424,3 +425,118 @@ class BracketManager {
         }
     }
 }
+
+class RoundRobinManager {
+    constructor(options) {
+        this.teams = [];
+        this.matches = [];
+        this.rounds = 0;
+        this.gameId = options.gameId;
+        this.departmentId = options.departmentId;
+        this.gradeLevel = options.gradeLevel;
+    }
+
+    async fetchTeams() {
+        try {
+            console.log('Fetching teams with params:', {
+                department_id: this.departmentId,
+                game_id: this.gameId,
+                grade_level: this.gradeLevel
+            });
+
+            const response = await $.ajax({
+                url: 'fetch_teams.php',
+                method: 'GET',
+                data: {
+                    department_id: this.departmentId,
+                    game_id: this.gameId,
+                    grade_level: this.gradeLevel
+                }
+            });
+            
+            console.log('Fetch teams response:', response);
+            
+            if (response.success) {
+                if (!response.teams || response.teams.length < 2) {
+                    throw new Error('At least two teams are required for a Round Robin tournament.');
+                }
+                this.teams = this.shuffleTeams(response.teams);
+                return this.teams;
+            } else {
+                throw new Error(response.message || 'Failed to fetch teams');
+            }
+        } catch (error) {
+            console.error('Error fetching teams:', error);
+            throw new Error(`Failed to fetch teams: ${error.message}`);
+        }
+    }
+
+    shuffleTeams(teams) {
+        const shuffled = [...teams];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+
+    generateMatches() {
+        if (this.teams.length === 0) {
+            console.error("No teams available to generate matches.");
+            return [];
+        }
+
+        let teams = [...this.teams];
+        
+        // If teams are odd, add a "BYE" placeholder team
+        if (teams.length % 2 !== 0) {
+            teams.push({
+                team_id: -1,
+                team_name: "BYE"
+            });
+        }
+
+        this.rounds = teams.length - 1;
+        let halfSize = teams.length / 2;
+        let generatedMatches = [];
+        let matchNumber = 1;
+
+        for (let round = 0; round < this.rounds; round++) {
+            let roundMatches = [];
+
+            for (let i = 0; i < halfSize; i++) {
+                let teamA = teams[i];
+                let teamB = teams[teams.length - 1 - i];
+
+                if (teamA.team_id !== -1 && teamB.team_id !== -1) {
+                    roundMatches.push({
+                        match_identifier: `M${this.gameId}-D${this.departmentId}-${this.gradeLevel || 'ALL'}-RR-R${round + 1}-${matchNumber}-${this.generateUniqueId()}`,
+                        round: round + 1,
+                        match_number: matchNumber,
+                        teamA_id: teamA.team_id,
+                        teamB_id: teamB.team_id,
+                        match_type: 'round_robin',
+                        status: 'Pending'
+                    });
+                    matchNumber++;
+                }
+            }
+
+            generatedMatches.push(roundMatches);
+            teams.splice(1, 0, teams.pop()); // Rotate teams (Keep first team fixed)
+        }
+
+        this.matches = generatedMatches;
+        console.log("Generated Round Robin Matches:", this.matches);
+        return {
+            teams: this.teams,
+            matches: generatedMatches.flat(), // Flatten the array of round matches
+            rounds: this.rounds
+        };
+    }
+
+    generateUniqueId() {
+        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+}
+

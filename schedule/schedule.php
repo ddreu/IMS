@@ -55,17 +55,20 @@ if ($selected_department_id) {
     $grade_query = "SELECT DISTINCT gsc.grade_level 
                    FROM grade_section_course gsc 
                    WHERE gsc.department_id = ? 
-                   ORDER BY gsc.grade_level";
+                   AND gsc.grade_level IS NOT NULL 
+                   AND gsc.grade_level != ''
+                   ORDER BY CAST(gsc.grade_level AS UNSIGNED)";
+
     $stmt = $conn->prepare($grade_query);
-    $stmt->bind_param("i", $selected_department_id);
-    $stmt->execute();
-    $grade_result = $stmt->get_result();
-    while ($row = $grade_result->fetch_assoc()) {
-        if (!empty($row['grade_level'])) {
+    if ($stmt) {
+        $stmt->bind_param("i", $selected_department_id);
+        $stmt->execute();
+        $grade_result = $stmt->get_result();
+        while ($row = $grade_result->fetch_assoc()) {
             $grade_levels[] = $row['grade_level'];
         }
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 // Function to fetch schedules filtered by the user's school
@@ -181,7 +184,6 @@ include '../navbar/navbar.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Schedule</title>
     <style>
-       
     </style>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -195,7 +197,7 @@ include '../navbar/navbar.php';
 </head>
 
 <body>
-    
+
 
     <?php
     $current_page = 'schedule';
@@ -251,13 +253,16 @@ include '../navbar/navbar.php';
                                     </div>
                                     <div class="filter-group">
                                         <label class="filter-label" for="filterGradeLevel">Grade Level</label>
-                                        <select class="filter-select" id="filterGradeLevel" <?= empty($grade_levels) ? 'disabled' : '' ?>>
+                                        <select class="filter-select" id="filterGradeLevel">
                                             <option value="">All Grade Levels</option>
-                                            <?php foreach ($grade_levels as $grade): ?>
-                                                <option value="<?= $grade ?>" <?= $selected_grade_level == $grade ? 'selected' : '' ?>>
-                                                    <?= htmlspecialchars($grade) ?>
-                                                </option>
-                                            <?php endforeach; ?>
+                                            <?php if (!empty($grade_levels)): ?>
+                                                <?php foreach ($grade_levels as $grade): ?>
+                                                    <option value="<?= htmlspecialchars($grade) ?>"
+                                                        <?= ($selected_grade_level == $grade) ? 'selected' : '' ?>>
+                                                        <?= htmlspecialchars($grade) ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </select>
                                     </div>
                                     <div class="filter-group">
@@ -961,20 +966,12 @@ include '../navbar/navbar.php';
             function fetchGradeLevelsForDepartment(departmentId) {
                 console.log('Fetching grade levels for department:', departmentId);
                 const gradeLevelSelect = document.getElementById('filterGradeLevel');
-                const gradeLevelContainer = document.getElementById('filterGradeLevelContainer');
-                const selectedOption = document.querySelector(`#filterDepartment option[value="${departmentId}"]`);
-                const isCollege = selectedOption ? selectedOption.getAttribute('data-is-college') === '1' : false;
 
-                // Hide grade level dropdown if College is selected
-                gradeLevelContainer.style.display = isCollege ? 'none' : 'block';
-
-                if (!departmentId || isCollege) {
-                    gradeLevelSelect.innerHTML = '<option value="">Select Department First</option>';
-                    gradeLevelSelect.disabled = true;
+                if (!departmentId) {
+                    gradeLevelSelect.innerHTML = '<option value="">All Grade Levels</option>';
                     return;
                 }
 
-                gradeLevelSelect.disabled = false;
                 fetch(`../api/get_grade_levels.php?department_id=${departmentId}`)
                     .then(response => {
                         if (!response.ok) {
@@ -985,14 +982,14 @@ include '../navbar/navbar.php';
                     .then(data => {
                         console.log('Received grade levels:', data);
                         gradeLevelSelect.innerHTML = '<option value="">All Grade Levels</option>';
+
                         if (Array.isArray(data)) {
                             data.forEach(grade => {
                                 if (grade) { // Only add non-empty grade levels
-                                    const selected = grade === '<?php echo $selected_grade_level; ?>' ? 'selected' : '';
-                                    gradeLevelSelect.innerHTML += `
-                                        <option value="${grade}" ${selected}>
-                                            ${grade}
-                                        </option>`;
+                                    const option = document.createElement('option');
+                                    option.value = grade;
+                                    option.textContent = grade;
+                                    gradeLevelSelect.appendChild(option);
                                 }
                             });
                         }
@@ -1003,12 +1000,18 @@ include '../navbar/navbar.php';
                     });
             }
 
-            // Update grade levels when department changes
+            // Add event listener for department change
             document.getElementById('filterDepartment').addEventListener('change', function() {
                 const departmentId = this.value;
                 console.log('Department changed to:', departmentId);
                 fetchGradeLevelsForDepartment(departmentId);
             });
+
+            // Initial load if department is selected
+            const initialDepartment = document.getElementById('filterDepartment').value;
+            if (initialDepartment) {
+                fetchGradeLevelsForDepartment(initialDepartment);
+            }
 
             // Add filter functionality
             document.getElementById('applyFilters').addEventListener('click', function() {

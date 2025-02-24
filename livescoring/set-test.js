@@ -413,16 +413,41 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
 
-                    const data = {
-                        schedule_id: this.scheduleId,
-                        match_id: this.matchId,
-                        teamA_id: this.teamAId,
-                        teamB_id: this.teamBId
-                    };
+                    // First check bracket type
+                    this.sendAjax('helper/get_bracket_type.php', { schedule_id: this.scheduleId })
+                        .then(bracketData => {
+                            if (!bracketData.success) {
+                                throw new Error(bracketData.error || 'Failed to get bracket type');
+                            }
 
-                    this.sendAjax('end_set.php', data)
+                            // Determine endpoint based on bracket type
+                            const endpoint = bracketData.bracket_type === 'round_robin' 
+                                ? 'process_round_robin/end_match_set-based.php'
+                                : 'end_set.php';
+
+                            console.log('Using endpoint:', endpoint);
+
+                            // Send end match request
+                            const data = {
+                                schedule_id: this.scheduleId,
+                                match_id: this.matchId,
+                                teamA_id: this.teamAId,
+                                teamB_id: this.teamBId
+                            };
+
+                            return this.sendAjax(endpoint, data);
+                        })
                         .then(response => {
                             if (response.success) {
+                                // Clear all set-test states from localStorage
+                                localStorage.removeItem('set_test_teamA_timeouts');
+                                localStorage.removeItem('set_test_teamB_timeouts');
+                                localStorage.removeItem('set_test_teamA_score');
+                                localStorage.removeItem('set_test_teamB_score');
+                                localStorage.removeItem('set_test_currentSet');
+                                localStorage.removeItem('set_test_teamA_sets');
+                                localStorage.removeItem('set_test_teamB_sets');
+
                                 Swal.fire({
                                     title: 'Match Ended!',
                                     text: 'The match has concluded successfully.',

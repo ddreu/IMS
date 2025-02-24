@@ -24,15 +24,16 @@ $stmt->close(); // Close this statement
 // Separate handling for Scoring Rules
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['scoring_unit'])) {
     $game_type = $_POST['game_type']; // Capture selected game type
-    $scoring_unit = $_POST['scoring_unit'];
-    $score_increment_options = $_POST['score_increment_options'];
-    $period_type = $_POST['period_type'];
-    $number_of_periods = $_POST['number_of_periods'];
-    $duration_per_period = $_POST['duration_per_period'];
-    $timeouts_per_period = $_POST['timeouts_per_period'];
-    $time_limit = isset($_POST['time_limit']) ? 1 : 0;
-    $point_cap = $_POST['point_cap'];
-    $max_fouls = $_POST['max_fouls'];
+    $scoring_unit = $_POST['scoring_unit'] ?? 0;
+    $score_increment_options = $_POST['score_increment_options'] ?? 0;
+    $period_type = $_POST['period_type'] ?? 0;
+    $number_of_periods = $_POST['number_of_periods'] ?? 0;
+    $duration_per_period = $_POST['duration_per_period'] ?? 0;
+    $timeouts_per_period = $_POST['timeouts_per_period'] ?? 0;
+    $time_limit = isset($_POST['time_limit']) ? 1 : 0; // Checkbox remains boolean
+    $point_cap = $_POST['point_cap'] ?? 0;
+    $max_fouls = $_POST['max_fouls'] ?? 0;
+
 
     $query = "
     INSERT INTO game_scoring_rules 
@@ -213,6 +214,43 @@ $conn->close();
                             </form>
                         </div>
                     </div>
+
+                    <!--  <div class="card mt-4 mx-auto">
+                        <div class="card-header bg-primary text-white">
+                            <h4>Round Robin Tournament Points</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="scoringForm">
+                              
+                                <div class="mb-3">
+                                    <label class="form-label">Points for a Win</label>
+                                    <input type="number" name="win_points" class="form-control" value="<?php echo isset($scoring_rules['win_points']) ? $scoring_rules['win_points'] : 3; ?>" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Points for a Draw</label>
+                                    <input type="number" name="draw_points" class="form-control" value="<?php echo isset($scoring_rules['draw_points']) ? $scoring_rules['draw_points'] : 1; ?>" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Points for a Loss</label>
+                                    <input type="number" name="loss_points" class="form-control" value="<?php echo isset($scoring_rules['loss_points']) ? $scoring_rules['loss_points'] : 0; ?>" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Bonus Points (Optional)</label>
+                                    <input type="number" name="bonus_points" class="form-control" value="<?php echo isset($scoring_rules['bonus_points']) ? $scoring_rules['bonus_points'] : 0; ?>">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">Save</button>
+                            </form>
+
+                            <div id="responseMessage" class="mt-3"></div>
+                        </div>
+                    </div> -->
+
+
+
                 </div>
 
 
@@ -280,6 +318,7 @@ $conn->close();
                 </div>
             </div>
         </div>
+
         <script>
             function deleteStat(statId) {
                 Swal.fire({

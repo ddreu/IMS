@@ -703,6 +703,15 @@ const stateManager = {
                 startTimer();
             }
         }
+    },
+    clear: function() {
+        // Clear all state
+        localStorage.removeItem('basketballScoreboardState');
+        localStorage.removeItem('point_based_teamA_score');
+        localStorage.removeItem('point_based_teamB_score');
+        localStorage.removeItem('point_based_teamA_timeouts');
+        localStorage.removeItem('point_based_teamB_timeouts');
+        localStorage.removeItem('point_based_currentSet');
     }
 };
 
@@ -854,93 +863,127 @@ function endMatch() {
 }
 
 function processEndMatch(matchData) {
-    // Comprehensive error handling for end match process
     return new Promise((resolve, reject) => {
-        Swal.fire({
-            title: 'End Match?',
-            text: 'Are you sure you want to end the match?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, End Match'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Only send schedule_id to process_end_match.php
-                fetch('process_end_match.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        schedule_id: matchData.schedule_id
+        // First fetch the bracket type
+        fetch('helper/get_bracket_type.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ schedule_id: matchData.schedule_id })
+        })
+        .then(response => response.json())
+        .then(bracketData => {
+            if (!bracketData.success) {
+                throw new Error(bracketData.error || 'Failed to get bracket type');
+            }
+
+            // Determine which endpoint to use based on bracket type
+            const endpoint = bracketData.bracket_type === 'round_robin' 
+                ? 'process_round_robin/end_match_points.php'
+                : 'process_end_match.php';
+
+            console.log('Using endpoint:', endpoint);
+
+            // Continue with match end confirmation
+            Swal.fire({
+                title: 'End Match?',
+                text: 'Are you sure you want to end the match?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, End Match'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send to appropriate endpoint
+                    fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            schedule_id: matchData.schedule_id
+                        })
                     })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(response => {
-                    console.log('End Match Response:', response);
-                    
-                    if (response.success) {
-                        Swal.fire({
-                            title: 'Match Ended!',
-                            text: 'The match has concluded successfully.',
-                            icon: 'success',
-                            showCancelButton: true,
-                            confirmButtonText: 'View Summary',
-                            cancelButtonText: 'Back to Matches'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Use match_id from the response or original data
-                                const matchId = response.match_id || matchData.match_id;
-                                window.location.href = `match_summary.php?match_id=${matchId}&status=${response.status}`;
-                            } else {
-                                window.location.href = 'match_list.php';
-                            }
-                        });
-                        resolve(response);
-                    } else {
-                        if (response.overtime_required) {
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(response => {
+                        console.log('End Match Response:', response);
+                        
+                        if (response.success) {
                             Swal.fire({
-                                title: 'Overtime Required',
-                                text: response.error,
-                                icon: 'info',
+                                title: 'Match Ended!',
+                                text: 'The match has concluded successfully.',
+                                icon: 'success',
                                 showCancelButton: true,
-                                confirmButtonText: 'Start Overtime',
-                                cancelButtonText: 'Cancel'
+                                confirmButtonText: 'View Summary',
+                                cancelButtonText: 'Back to Matches'
                             }).then((result) => {
+                                // Clear state before redirecting
+                                stateManager.clear(); // Clear basketball state
+                                localStorage.removeItem('point_based_teamA_score');
+                                localStorage.removeItem('point_based_teamB_score');
+                                localStorage.removeItem('point_based_teamA_timeouts');
+                                localStorage.removeItem('point_based_teamB_timeouts');
+                                localStorage.removeItem('point_based_currentSet');
+
                                 if (result.isConfirmed) {
-                                    // Set up overtime period
-                                    document.getElementById('periodCounter').textContent = 'OT';
-                                    // Reset timer for overtime
-                                    timeLeft = 5 * 60; // 5 minutes
-                                    pauseTimer();
-                                    sendUpdate();
+                                    const matchId = response.match_id || matchData.match_id;
+                                    window.location.href = `match_summary.php?match_id=${matchId}&status=${response.status}`;
+                                } else {
+                                    window.location.href = 'match_list.php';
                                 }
                             });
+                            resolve(response);
                         } else {
-                            throw new Error(response.error || 'Failed to end match');
+                            if (response.overtime_required) {
+                                Swal.fire({
+                                    title: 'Overtime Required',
+                                    text: response.error,
+                                    icon: 'info',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'Start Overtime',
+                                    cancelButtonText: 'Cancel'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        document.getElementById('periodCounter').textContent = 'OT';
+                                        timeLeft = 5 * 60; // 5 minutes
+                                        pauseTimer();
+                                        sendUpdate();
+                                    }
+                                });
+                            } else {
+                                throw new Error(response.error || 'Failed to end match');
+                            }
                         }
-                    }
-                })
-                .catch(error => {
-                    console.error('End Match Error:', error);
-                    
-                    Swal.fire({
-                        title: 'Error',
-                        text: error.message || 'Failed to end match. Please try again.',
-                        icon: 'error'
+                    })
+                    .catch(error => {
+                        console.error('End Match Error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: error.message || 'Failed to end match. Please try again.',
+                            icon: 'error'
+                        });
+                        reject(error);
                     });
-                    
-                    reject(error);
-                });
-            } else {
-                reject(new Error('Match end cancelled'));
-            }
+                } else {
+                    reject(new Error('Match end cancelled'));
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error getting bracket type:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to determine bracket type. Please try again.',
+                icon: 'error'
+            });
+            reject(error);
         });
     });
 }

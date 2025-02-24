@@ -16,94 +16,94 @@ if ($_SESSION['role'] !== 'Committee') {
     exit();
 }
 
-// Fetch games to display in the sidebar
-$games_sql = "SELECT game_name FROM games"; // Assuming you have a 'games' table
+// Use `game_id` and `game_name` directly from session
+$assigned_game_id = $_SESSION['game_id'] ?? null;
+$assigned_game_name = $_SESSION['game_name'] ?? 'Committee Dashboard'; // Default name
+
+// Use department info from session if available
+$assigned_department_id = $_SESSION['department_id'] ?? null;
+$_SESSION['department_name'] = $_SESSION['department_name'] ?? null;
+$_SESSION['school_name'] = $_SESSION['school_name'] ?? null;
+
+// Fetch games for the sidebar
+$games_sql = "SELECT game_name FROM games";
 $games_result = $conn->query($games_sql);
 
-// Fetch user data including department and school names
-$user_id = $_SESSION['user_id'];
-$user_data_sql = "
-    SELECT 
-        u.*, 
-        d.department_name, 
-        s.school_name, 
-        g.game_name 
-    FROM users u
-    LEFT JOIN departments d ON u.department = d.id
-    LEFT JOIN schools s ON u.school_id = s.school_id
-    LEFT JOIN games g ON u.game_id = g.game_id
-    WHERE u.id = ?
-";
-
-$user_data_stmt = mysqli_prepare($conn, $user_data_sql);
-mysqli_stmt_bind_param($user_data_stmt, "i", $user_id);
-mysqli_stmt_execute($user_data_stmt);
-$user_data_result = mysqli_stmt_get_result($user_data_stmt);
-$user_data = mysqli_fetch_assoc($user_data_result);
-
-// Store relevant data in session
-$_SESSION['department_name'] = $user_data['department_name'] ?? null;
-$_SESSION['school_name'] = $user_data['school_name'] ?? null;
-$_SESSION['game_name'] = $user_data['game_name'] ?? null;
-
-// Fetch the assigned game name for the title
-$assigned_game_id = $_SESSION['game_id'] ?? null;
-$assigned_department_id = $_SESSION['department_id'] ?? null;
-
-// Fetch the assigned game name if a game_id exists
-$assigned_game = $assigned_game_id ? $user_data['game_name'] : 'Committee Dashboard'; // Default title if not assigned
-
-// Fetch the teams assigned to the user's game
-$teams_sql = "SELECT t.team_name 
-FROM teams t 
-JOIN grade_section_course g ON t.grade_section_course_id = g.id 
-WHERE t.game_id = ? AND g.department_id = ?";
-$teams_stmt = mysqli_prepare($conn, $teams_sql);
-mysqli_stmt_bind_param($teams_stmt, "ii", $assigned_game_id, $assigned_department_id);
-mysqli_stmt_execute($teams_stmt);
-$teams_result = mysqli_stmt_get_result($teams_stmt);
-
-// Initialize the $teams variable
+// Fetch the teams assigned to the user's selected game
 $teams = [];
-if ($teams_result->num_rows > 0) {
+if ($assigned_game_id && $assigned_department_id) {
+    $teams_sql = "SELECT t.team_name 
+        FROM teams t 
+        JOIN grade_section_course g ON t.grade_section_course_id = g.id 
+        WHERE t.game_id = ? AND g.department_id = ?";
+
+    $teams_stmt = mysqli_prepare($conn, $teams_sql);
+    mysqli_stmt_bind_param($teams_stmt, "ii", $assigned_game_id, $assigned_department_id);
+    mysqli_stmt_execute($teams_stmt);
+    $teams_result = mysqli_stmt_get_result($teams_stmt);
+
     while ($team = mysqli_fetch_assoc($teams_result)) {
-        $teams[] = $team; // Add each team to the array
+        $teams[] = $team;
     }
+    mysqli_stmt_close($teams_stmt);
 }
 
-// Fetch ongoing tournaments count from brackets table
-$ongoing_tournaments_sql = "SELECT COUNT(*) as ongoing_count 
-                             FROM brackets b
-                             WHERE b.status = 'Ongoing' 
-                             AND b.game_id = ? 
-                             AND b.department_id = ?";
-$stmt = $conn->prepare($ongoing_tournaments_sql);
-$stmt->bind_param("ii", $_SESSION['game_id'], $_SESSION['department_id']);
-$stmt->execute();
-$ongoing_result = $stmt->get_result();
-$ongoing_count = $ongoing_result->fetch_assoc()['ongoing_count'];
-$stmt->close();
+// Fetch ongoing tournaments count
+$ongoing_count = 0;
+if ($assigned_game_id && $assigned_department_id) {
+    $ongoing_tournaments_sql = "SELECT COUNT(*) as ongoing_count 
+                                FROM brackets 
+                                WHERE status = 'Ongoing' 
+                                AND game_id = ? 
+                                AND department_id = ?";
+    $stmt = $conn->prepare($ongoing_tournaments_sql);
+    $stmt->bind_param("ii", $assigned_game_id, $assigned_department_id);
+    $stmt->execute();
+    $ongoing_result = $stmt->get_result();
+    $ongoing_count = $ongoing_result->fetch_assoc()['ongoing_count'] ?? 0;
+    $stmt->close();
+}
 
 // Fetch bracket status
-$bracket_status_sql = "SELECT status 
-                      FROM brackets 
-                      WHERE game_id = ? 
-                      AND department_id = ?
-                      LIMIT 1";
-$stmt = $conn->prepare($bracket_status_sql);
-$stmt->bind_param("ii", $_SESSION['game_id'], $_SESSION['department_id']);
-$stmt->execute();
-$bracket_result = $stmt->get_result();
-$bracket_status = $bracket_result->fetch_assoc();
-$stmt->close();
+$current_status = 'No Tournament';
+if ($assigned_game_id && $assigned_department_id) {
+    $bracket_status_sql = "SELECT status 
+                           FROM brackets 
+                           WHERE game_id = ? 
+                           AND department_id = ?
+                           LIMIT 1";
+    $stmt = $conn->prepare($bracket_status_sql);
+    $stmt->bind_param("ii", $assigned_game_id, $assigned_department_id);
+    $stmt->execute();
+    $bracket_result = $stmt->get_result();
+    $bracket_status = $bracket_result->fetch_assoc();
+    $stmt->close();
 
-// Set default values if no bracket found
-$current_status = $bracket_status ? $bracket_status['status'] : 'No Tournament';
+    $current_status = $bracket_status ? $bracket_status['status'] : 'No Tournament';
+}
 
-// For debugging
-echo "<!-- Current Status: " . $current_status . " -->";
+// Fetch upcoming scheduled matches count
+$total_scheduled_matches = 0;
+if ($assigned_game_id && $assigned_department_id) {
+    $scheduled_matches_sql = "SELECT COUNT(*) as total_scheduled
+        FROM schedules s
+        JOIN matches m ON s.match_id = m.match_id
+        JOIN brackets b ON m.bracket_id = b.bracket_id
+        WHERE m.status = 'Upcoming'
+        AND b.game_id = ?
+        AND b.department_id = ?
+        AND s.schedule_date > NOW()";
 
-// Define badge classes for different statuses
+    $stmt = $conn->prepare($scheduled_matches_sql);
+    $stmt->bind_param("ii", $assigned_game_id, $assigned_department_id);
+    $stmt->execute();
+    $scheduled_matches_result = $stmt->get_result();
+    $scheduled_matches = $scheduled_matches_result->fetch_assoc();
+    $total_scheduled_matches = $scheduled_matches['total_scheduled'] ?? 0;
+    $stmt->close();
+}
+
+// Set up badge classes for different statuses
 $badge_class = [
     'Group Stage' => 'bg-primary text-white',
     'Quarter Finals' => 'bg-info text-white',
@@ -114,43 +114,21 @@ $badge_class = [
     'No Tournament' => 'bg-secondary text-white'
 ];
 
-// For debugging
-echo "<!-- Badge Class: " . ($badge_class[$current_status] ?? 'not found') . " -->";
-
-// Fetch the number of scheduled upcoming matches
-$assigned_game_id = $_SESSION['game_id'] ?? null;
-$assigned_department_id = $_SESSION['department_id'] ?? null;
-
-$scheduled_matches_sql = "
-    SELECT COUNT(*) as total_scheduled
-    FROM schedules s
-    JOIN matches m ON s.match_id = m.match_id
-    JOIN brackets b ON m.bracket_id = b.bracket_id
-    WHERE m.status = 'Upcoming'
-    AND b.game_id = ?
-    AND b.department_id = ?
-    AND s.schedule_date > NOW()"; // Ensuring that the match is in the future
-
-$stmt = $conn->prepare($scheduled_matches_sql);
-$stmt->bind_param("ii", $assigned_game_id, $assigned_department_id);
-$stmt->execute();
-$scheduled_matches_result = $stmt->get_result();
-$scheduled_matches = $scheduled_matches_result->fetch_assoc();
-$total_scheduled_matches = $scheduled_matches['total_scheduled'] ?? 0;
-$stmt->close();
-
-
 // Get phase display text
-$phase_text = $bracket_status ? ucfirst($bracket_status['status']) . ' Stage' : 'No Active Tournament';
+$phase_text = ucfirst($current_status) . ' Stage';
 
-// Check for success message in session
-$successMessage = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : null;
+// Check for success message
+$successMessage = $_SESSION['success_message'] ?? null;
+unset($_SESSION['success_message']); // Clear success message after use
 
-// Clear the success message after fetching it
-unset($_SESSION['success_message']);
 
-// Include SweetAlert
+//echo "<!-- Assigned Game ID: " . $assigned_game_id . " -->";
+//echo "<!-- Assigned Game Name: " . $assigned_game_name . " -->";
+//echo "<!-- Current Status: " . $current_status . " -->";
+//echo "<!-- Total Scheduled Matches: " . $total_scheduled_matches . " -->";
+
 ?>
+
 <?php
 include '../navbar/navbar.php';
 ?>
@@ -160,7 +138,7 @@ include '../navbar/navbar.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($assigned_game . ' Committee Dashboard'); ?></title>
+    <title><?php echo htmlspecialchars($assigned_game_name . ' Committee Dashboard'); ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -655,7 +633,7 @@ include '../navbar/navbar.php';
                     <!-- Dashboard Title and Subtitle -->
                     <div>
                         <h1 class="dashboard-title mb-0">
-                            <?php echo htmlspecialchars($assigned_game); ?> Dashboard
+                            <?php echo htmlspecialchars($assigned_game_name); ?> Dashboard
                         </h1>
                         <p class="dashboard-subtitle mb-0">
                             <?php echo htmlspecialchars($_SESSION['department_name']); ?> Department
@@ -788,45 +766,45 @@ include '../navbar/navbar.php';
     <?php endif; ?>
 
     <script>
-    // Function to format the timestamp to "time ago" format
-    function timeAgo(timestamp) {
-        const now = new Date();
-        const past = new Date(timestamp);
-        const diffInSeconds = Math.floor((now - past) / 1000);
+        // Function to format the timestamp to "time ago" format
+        function timeAgo(timestamp) {
+            const now = new Date();
+            const past = new Date(timestamp);
+            const diffInSeconds = Math.floor((now - past) / 1000);
 
-        if (diffInSeconds < 60) return 'just now';
-        if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' minutes ago';
-        if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' hours ago';
-        if (diffInSeconds < 604800) return Math.floor(diffInSeconds / 86400) + ' days ago';
-        return past.toLocaleDateString();
-    }
+            if (diffInSeconds < 60) return 'just now';
+            if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' minutes ago';
+            if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' hours ago';
+            if (diffInSeconds < 604800) return Math.floor(diffInSeconds / 86400) + ' days ago';
+            return past.toLocaleDateString();
+        }
 
-    // Function to get appropriate icon based on log action
-    function getActionIcon(action) {
-        const iconMap = {
-            'CREATE': 'fa-plus-circle',
-            'UPDATE': 'fa-edit',
-            'DELETE': 'fa-trash',
-            'LOGIN': 'fa-sign-in-alt',
-            'LOGOUT': 'fa-sign-out-alt'
-        };
-        return iconMap[action] || 'fa-history';
-    }
+        // Function to get appropriate icon based on log action
+        function getActionIcon(action) {
+            const iconMap = {
+                'CREATE': 'fa-plus-circle',
+                'UPDATE': 'fa-edit',
+                'DELETE': 'fa-trash',
+                'LOGIN': 'fa-sign-in-alt',
+                'LOGOUT': 'fa-sign-out-alt'
+            };
+            return iconMap[action] || 'fa-history';
+        }
 
-    // Function to fetch and display recent activities
-    function fetchRecentActivities() {
-        fetch('../user_logs/fetch_logs.php')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Response data:', data); // Log the response to see its structure
-                const activityList = document.getElementById('recentActivityList');
-                activityList.innerHTML = ''; // Clear existing items
+        // Function to fetch and display recent activities
+        function fetchRecentActivities() {
+            fetch('../user_logs/fetch_logs.php')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response data:', data); // Log the response to see its structure
+                    const activityList = document.getElementById('recentActivityList');
+                    activityList.innerHTML = ''; // Clear existing items
 
-                // Display only the first 5 items
-                data.data.slice(0, 5).forEach(log => {
-                    const li = document.createElement('li');
-                    li.className = 'activity-item';
-                    li.innerHTML = `
+                    // Display only the first 5 items
+                    data.data.slice(0, 5).forEach(log => {
+                        const li = document.createElement('li');
+                        li.className = 'activity-item';
+                        li.innerHTML = `
                         <div class="activity-icon">
                             <i class="fas ${getActionIcon(log.log_action)}"></i>
                         </div>
@@ -840,20 +818,20 @@ include '../navbar/navbar.php';
                             </p>
                         </div>
                     `;
-                    activityList.appendChild(li);
+                        activityList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching recent activities:', error);
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching recent activities:', error);
-            });
-    }
+        }
 
-    // Fetch activities when page loads
-    document.addEventListener('DOMContentLoaded', fetchRecentActivities);
+        // Fetch activities when page loads
+        document.addEventListener('DOMContentLoaded', fetchRecentActivities);
 
-    // Refresh activities every 5 minutes
-    setInterval(fetchRecentActivities, 300000);
-</script>
+        // Refresh activities every 5 minutes
+        setInterval(fetchRecentActivities, 300000);
+    </script>
 
 </body>
 

@@ -16,16 +16,17 @@ if (!isset($_SESSION['user_id'])) {
 $department_id = isset($_GET['department_id']) ? intval($_GET['department_id']) : 0;
 
 if (!$department_id) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Department ID is required']);
-    exit();
+    echo json_encode([]);
+    exit;
 }
 
 // Fetch grade levels for the specified department
-$query = "SELECT DISTINCT gsc.grade_level 
-          FROM grade_section_course gsc 
-          WHERE gsc.department_id = ? 
-          ORDER BY gsc.grade_level";
+$query = "SELECT DISTINCT grade_level 
+          FROM grade_section_course 
+          WHERE department_id = ? 
+          AND grade_level IS NOT NULL 
+          AND grade_level != ''
+          ORDER BY CAST(grade_level AS UNSIGNED)";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $department_id);
 $stmt->execute();
@@ -33,9 +34,7 @@ $result = $stmt->get_result();
 
 $grade_levels = [];
 while ($row = $result->fetch_assoc()) {
-    if (!empty($row['grade_level'])) {
-        $grade_levels[] = $row['grade_level'];
-    }
+    $grade_levels[] = $row['grade_level'];
 }
 
 $stmt->close();
