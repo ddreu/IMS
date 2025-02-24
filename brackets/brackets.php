@@ -72,7 +72,6 @@ include '../navbar/navbar.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="../styles/committee.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.css" rel="stylesheet">
-    <?php include 'handler.php'; ?>
     <style>
         /* Loading and error states */
         .bracket-loading,
@@ -89,9 +88,12 @@ include '../navbar/navbar.php';
             display: none !important;
         }
 
+
+
+
         /* Container wrapper to force scrolling */
         .bracket-wrapper {
-            width: 100vw;
+            width: 100%;
             /* Use viewport width */
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -101,6 +103,7 @@ include '../navbar/navbar.php';
             margin-right: -15px;
         }
 
+
         /* Bracket container styles */
         #bracket-container {
             white-space: nowrap;
@@ -108,7 +111,10 @@ include '../navbar/navbar.php';
             width: 100%;
             min-height: 500px;
             /* Ensure minimum height */
+            margin-left: -18%;
         }
+
+
 
         /* Ensure the bracket fits within its container */
         .jQBracket {
@@ -118,21 +124,52 @@ include '../navbar/navbar.php';
             /* Slightly reduce font size */
         }
 
-        /* Adjust connector lines for better visibility */
-        .jQBracket .connector {
-            border-color: #666;
+
+
+        .jQBracket.doubleElimination {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: flex-start !important;
+            margin: 0 !important;
+            padding: 20px 0;
         }
 
-        /* Make the bracket more compact if needed */
+        /*
+        .jQBracket .bracket,
+        .jQBracket .loserBracket,
+        .jQBracket .finals {
+            float: none !important;
+            clear: none !important;
+            position: relative !important;
+            margin-left: 0 !important;
+        }
+
+        
+        .jQBracket.doubleElimination .loserBracket {
+            margin-top: 30px;
+        }
+
+        .jQBracket.doubleElimination .finals {
+            margin-top: 0;
+            padding-left: 0;
+        }
+
+        .jQBracket .team {
+            width: 120px !important;
+        }
+
         .jQBracket .round {
-            margin-right: 25px;
-            /* Slightly increase spacing */
+            margin-right: 15px;
         }
 
-        /* Hide duplicate scroll messages */
-        .scroll-hint:not(:first-of-type) {
-            display: none;
+        .jQBracket .connector {
+            border-color: #666 !important;
         }
+
+        .jQBracket.doubleElimination>div {
+            display: flex !important;
+            gap: 20px;
+        } */
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -296,372 +333,382 @@ include '../navbar/navbar.php';
                                     </div>
                                 </div>
                                 <!-- Bracket container -->
+                                <div class="bracket-wrapper">
+
+                                    <div id="bracket-content"></div>
+                                </div>
+
                                 <div id="bracket-container"></div>
                                 <button id="save-bracket" class="btn btn-success mb-3">Save Bracket</button>
 
-
                             </div>
-                            <!-- ✅ Load jQuery First (Required for jQuery Bracket) -->
-                            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-                            <!-- ✅ Load jQuery Bracket AFTER jQuery -->
-                            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
 
-                            <!-- ✅ Load Bootstrap JS at the Very End -->
-                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-                            <!-- ✅ Load Your Custom Scripts Last -->
-                            <script src="bracket-manager.js"></script>
-                            <script src="double-bracket-manager.js"></script>
-                            <?php include 'handler.php'; ?>
-
-                            <script>
-                                $(document).ready(function() {
-                                    // Initialize bracket managers as null
-                                    window.singleBracketManager = null;
-                                    window.currentBracketManager = null;
-
-                                    // Verify jQuery and plugins
-                                    if (typeof jQuery === 'undefined') {
-                                        console.error('jQuery is not loaded');
-                                    } else {
-                                        console.log('jQuery version:', jQuery.fn.jquery);
-                                    }
-
-                                    if (typeof jQuery.fn.bracket === 'undefined') {
-                                        console.error('jQuery bracket plugin is not loaded');
-                                    } else {
-                                        console.log('jQuery bracket plugin is loaded');
-                                    }
-                                });
-                            </script>
                         </div>
+                        <!-- ✅ Load jQuery First (Required for jQuery Bracket) -->
+                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+                        <!-- ✅ Load jQuery Bracket AFTER jQuery -->
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
+
+                        <!-- ✅ Load Bootstrap JS at the Very End -->
+                        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+                        <!-- ✅ Load Your Custom Scripts Last -->
+                        <script src="bracket-manager.js"></script>
+                        <script src="double-bracket-manager.js"></script>
+                        <?php include 'handler.php'; ?>
+
+                        <script>
+                            $(document).ready(function() {
+                                // Initialize bracket managers as null
+                                window.singleBracketManager = null;
+                                window.currentBracketManager = null;
+
+                                // Verify jQuery and plugins
+                                if (typeof jQuery === 'undefined') {
+                                    console.error('jQuery is not loaded');
+                                } else {
+                                    console.log('jQuery version:', jQuery.fn.jquery);
+                                }
+
+                                if (typeof jQuery.fn.bracket === 'undefined') {
+                                    console.error('jQuery bracket plugin is not loaded');
+                                } else {
+                                    console.log('jQuery bracket plugin is loaded');
+                                }
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
+        </div>
 
 
-            <script>
-                // Ensure view bracket functionality works after page load
-                $(document).ready(function() {
-                    // Rebind click event for view-bracket buttons
-                    $('.view-bracket').off('click').on('click', function() {
-                        const bracketId = $(this).data('bracket-id');
-                        console.log('View Bracket clicked:', bracketId);
+        <script>
+            // Ensure view bracket functionality works after page load
+            $(document).ready(function() {
+                // Rebind click event for view-bracket buttons
+                $('.view-bracket').off('click').on('click', function() {
+                    const bracketId = $(this).data('bracket-id');
+                    console.log('View Bracket clicked:', bracketId);
 
-                        // Fetch bracket data
-                        fetch('fetch_bracket.php?bracket_id=' + bracketId)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    // Clear existing bracket
-                                    $('#bracket-container').empty();
+                    $('#bracket-content').empty(); // Clear the content
 
-                                    // ENHANCED DEBUGGING
-                                    console.group('Bracket Data Validation');
-                                    console.log('Raw data from server:', JSON.parse(JSON.stringify(data)));
 
-                                    // Validate basic data structure
-                                    if (!data.success) {
-                                        console.error('Fetch failed:', data.message);
-                                        $('#bracket-container').html(`
+                    // Fetch bracket data
+                    fetch('fetch_bracket.php?bracket_id=' + bracketId)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Clear existing bracket
+                                $('#bracket-container').empty();
+
+                                // ENHANCED DEBUGGING
+                                console.group('Bracket Data Validation');
+                                console.log('Raw data from server:', JSON.parse(JSON.stringify(data)));
+
+                                // Validate basic data structure
+                                if (!data.success) {
+                                    console.error('Fetch failed:', data.message);
+                                    $('#bracket-container').html(`
                                             <div class="alert alert-danger">
                                                 Failed to load bracket: ${data.message || 'Unknown error'}
                                             </div>
                                         `);
-                                        return;
-                                    }
+                                    return;
+                                }
 
-                                    // Validate matches object
-                                    if (!data.matches || typeof data.matches !== 'object') {
-                                        console.error('Invalid matches structure:', data.matches);
-                                        $('#bracket-container').html(`
+                                // Validate matches object
+                                if (!data.matches || typeof data.matches !== 'object') {
+                                    console.error('Invalid matches structure:', data.matches);
+                                    $('#bracket-container').html(`
                                             <div class="alert alert-warning">
                                                 No valid matches found in bracket data.
                                             </div>
                                         `);
-                                        return;
-                                    }
+                                    return;
+                                }
 
-                                    // Detailed matches logging
-                                    console.log('Matches Object Keys:', Object.keys(data.matches));
-                                    Object.keys(data.matches)
-                                        .filter(key => !isNaN(parseInt(key)))
-                                        .forEach(round => {
-                                            console.log(`Round ${round} Matches:`, data.matches[round]);
-                                        });
-
-                                    // Validate third-place match if exists
-                                    if (data.matches['third-place']) {
-                                        console.log('Third Place Match:', data.matches['third-place']);
-                                    }
-
-                                    // Get all round numbers except 'third-place'
-                                    const roundNumbers = Object.keys(data.matches)
-                                        .filter(key => key !== 'third-place' && !isNaN(parseInt(key)))
-                                        .sort((a, b) => parseInt(a) - parseInt(b));
-
-                                    console.log('Sorted Round Numbers:', roundNumbers);
-
-                                    // Detailed round validation
-                                    roundNumbers.forEach(round => {
-                                        const roundMatches = data.matches[round];
-                                        console.group(`Round ${round} Validation`);
-                                        console.log('Total Matches:', roundMatches.length);
-
-                                        roundMatches.forEach((match, index) => {
-                                            console.log(`Match ${index + 1} Details:`, {
-                                                matchId: match.match_id,
-                                                matchNumber: match.match_number,
-                                                teamA: {
-                                                    id: match.teamA_id,
-                                                    name: match.teamA_name
-                                                },
-                                                teamB: {
-                                                    id: match.teamB_id,
-                                                    name: match.teamB_name
-                                                },
-                                                score: {
-                                                    teamA: match.score_teamA,
-                                                    teamB: match.score_teamB
-                                                },
-                                                status: match.status,
-                                                winningTeam: match.winning_team_id
-                                            });
-                                        });
-                                        console.groupEnd();
+                                // Detailed matches logging
+                                console.log('Matches Object Keys:', Object.keys(data.matches));
+                                Object.keys(data.matches)
+                                    .filter(key => !isNaN(parseInt(key)))
+                                    .forEach(round => {
+                                        console.log(`Round ${round} Matches:`, data.matches[round]);
                                     });
 
+                                // Validate third-place match if exists
+                                if (data.matches['third-place']) {
+                                    console.log('Third Place Match:', data.matches['third-place']);
+                                }
+
+                                // Get all round numbers except 'third-place'
+                                const roundNumbers = Object.keys(data.matches)
+                                    .filter(key => key !== 'third-place' && !isNaN(parseInt(key)))
+                                    .sort((a, b) => parseInt(a) - parseInt(b));
+
+                                console.log('Sorted Round Numbers:', roundNumbers);
+
+                                // Detailed round validation
+                                roundNumbers.forEach(round => {
+                                    const roundMatches = data.matches[round];
+                                    console.group(`Round ${round} Validation`);
+                                    console.log('Total Matches:', roundMatches.length);
+
+                                    roundMatches.forEach((match, index) => {
+                                        console.log(`Match ${index + 1} Details:`, {
+                                            matchId: match.match_id,
+                                            matchNumber: match.match_number,
+                                            teamA: {
+                                                id: match.teamA_id,
+                                                name: match.teamA_name
+                                            },
+                                            teamB: {
+                                                id: match.teamB_id,
+                                                name: match.teamB_name
+                                            },
+                                            score: {
+                                                teamA: match.score_teamA,
+                                                teamB: match.score_teamB
+                                            },
+                                            status: match.status,
+                                            winningTeam: match.winning_team_id
+                                        });
+                                    });
                                     console.groupEnd();
+                                });
 
-                                    // Calculate the total number of teams in first round
-                                    const totalTeams = data.matches['1'] ? data.matches['1'].length * 2 : 0;
+                                console.groupEnd();
 
-                                    // Initialize empty teams array
-                                    const teams = [];
+                                // Calculate the total number of teams in first round
+                                const totalTeams = data.matches['1'] ? data.matches['1'].length * 2 : 0;
 
-                                    // Fill teams array with actual teams or empty slots
-                                    if (data.matches['1'] && data.matches['1'].length > 0) {
-                                        data.matches['1'].forEach(match => {
-                                            teams.push([
-                                                match.teamA_name || 'TBD',
-                                                match.teamB_name || 'TBD'
-                                            ]);
-                                        });
-                                    }
+                                // Initialize empty teams array
+                                const teams = [];
 
-                                    console.log('Teams array:', teams);
-
-                                    // Initialize results array with proper structure
-                                    // Each round should have the correct number of matches
-                                    const results = [];
-                                    let matchesInRound = Math.floor(totalTeams / 2);
-
-                                    roundNumbers.forEach(roundNum => {
-                                        const roundResults = [];
-                                        const roundMatches = data.matches[roundNum] || [];
-
-                                        // Fill this round with the correct number of matches
-                                        for (let i = 0; i < matchesInRound; i++) {
-                                            const match = roundMatches[i];
-                                            if (match) {
-                                                // If we have actual match data
-                                                if (match.status === 'Finished' &&
-                                                    match.score_teamA !== null &&
-                                                    match.score_teamB !== null) {
-                                                    roundResults.push([
-                                                        parseInt(match.score_teamA) || 0,
-                                                        parseInt(match.score_teamB) || 0
-                                                    ]);
-                                                } else if (match.winning_team_id !== null) {
-                                                    roundResults.push(
-                                                        match.winning_team_id === match.teamA_id ? [1, 0] : [0, 1]
-                                                    );
-                                                } else if (match.teamA_id === -1 || match.teamB_id === -1) {
-                                                    roundResults.push(
-                                                        match.teamA_id === -1 ? [0, 1] : [1, 0]
-                                                    );
-                                                } else {
-                                                    roundResults.push([0, 0]);
-                                                }
-                                            } else {
-                                                // Fill with empty match result
-                                                roundResults.push([0, 0]);
-                                            }
-                                        }
-
-                                        results.push(roundResults);
-                                        // Number of matches in next round is half of current round
-                                        matchesInRound = Math.floor(matchesInRound / 2);
-                                    });
-
-                                    console.log('Final results array:', results);
-
-                                    // Ensure we have at least one team
-                                    if (teams.length === 0) {
-                                        console.error('No teams available');
-                                        $('#bracket-container').html('<div class="alert alert-warning">No teams available for the bracket.</div>');
-                                        return;
-                                    }
-
-                                    const bracketData = {
-                                        teams: teams,
-                                        results: results
-                                    };
-
-                                    console.log('Final bracket data:', bracketData);
-
-                                    // Initialize the bracket with current state
-                                    $('#bracket-container').bracket({
-                                        teamWidth: 150,
-                                        scoreWidth: 40,
-                                        matchMargin: 50,
-                                        roundMargin: 50,
-                                        init: bracketData,
-                                        save: function() {}, // Read-only mode
-                                        decorator: {
-                                            edit: function() {}, // Disable editing
-                                            render: function(container, data, score, state) {
-                                                container.empty();
-                                                if (data === null) {
-                                                    container.append("BYE");
-                                                } else if (data === "TBD") {
-                                                    container.append("TBD");
-                                                } else {
-                                                    container.append(data);
-                                                    if (score !== undefined && score !== null) {
-                                                        container.append($('<div>', {
-                                                            class: 'score',
-                                                            text: score
-                                                        }));
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    });
-                                    // Add back button if it doesn't exist
-                                    if ($('#backToBrackets').length === 0) {
-                                        const backButton = $('<button>', {
-                                            id: 'backToBrackets',
-                                            class: 'btn btn-secondary mt-3',
-                                            html: '<span><i class="fas fa-times"></i></span>'
-                                        }).click(function() {
-                                            showBracketList();
-                                        });
-                                        $('#bracket-container').before(backButton);
-                                    }
-
-
-                                    // Hide the generate button
-                                    $('#generate-bracket').hide();
-
-                                } else {
-                                    console.error('Error loading bracket:', data.message);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: 'Failed to load bracket: ' + data.message
+                                // Fill teams array with actual teams or empty slots
+                                if (data.matches['1'] && data.matches['1'].length > 0) {
+                                    data.matches['1'].forEach(match => {
+                                        teams.push([
+                                            match.teamA_name || 'TBD',
+                                            match.teamB_name || 'TBD'
+                                        ]);
                                     });
                                 }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
+
+                                console.log('Teams array:', teams);
+
+                                // Initialize results array with proper structure
+                                // Each round should have the correct number of matches
+                                const results = [];
+                                let matchesInRound = Math.floor(totalTeams / 2);
+
+                                roundNumbers.forEach(roundNum => {
+                                    const roundResults = [];
+                                    const roundMatches = data.matches[roundNum] || [];
+
+                                    // Fill this round with the correct number of matches
+                                    for (let i = 0; i < matchesInRound; i++) {
+                                        const match = roundMatches[i];
+                                        if (match) {
+                                            // If we have actual match data
+                                            if (match.status === 'Finished' &&
+                                                match.score_teamA !== null &&
+                                                match.score_teamB !== null) {
+                                                roundResults.push([
+                                                    parseInt(match.score_teamA) || 0,
+                                                    parseInt(match.score_teamB) || 0
+                                                ]);
+                                            } else if (match.winning_team_id !== null) {
+                                                roundResults.push(
+                                                    match.winning_team_id === match.teamA_id ? [1, 0] : [0, 1]
+                                                );
+                                            } else if (match.teamA_id === -1 || match.teamB_id === -1) {
+                                                roundResults.push(
+                                                    match.teamA_id === -1 ? [0, 1] : [1, 0]
+                                                );
+                                            } else {
+                                                roundResults.push([0, 0]);
+                                            }
+                                        } else {
+                                            // Fill with empty match result
+                                            roundResults.push([0, 0]);
+                                        }
+                                    }
+
+                                    results.push(roundResults);
+                                    // Number of matches in next round is half of current round
+                                    matchesInRound = Math.floor(matchesInRound / 2);
+                                });
+
+                                console.log('Final results array:', results);
+
+                                // Ensure we have at least one team
+                                if (teams.length === 0) {
+                                    console.error('No teams available');
+                                    $('#bracket-container').html('<div class="alert alert-warning">No teams available for the bracket.</div>');
+                                    return;
+                                }
+
+                                const bracketData = {
+                                    teams: teams,
+                                    results: results
+                                };
+
+                                console.log('Final bracket data:', bracketData);
+
+                                // Initialize the bracket with current state
+                                $('#bracket-container').bracket({
+                                    teamWidth: 150,
+                                    scoreWidth: 40,
+                                    matchMargin: 50,
+                                    roundMargin: 50,
+                                    init: bracketData,
+                                    save: function() {}, // Read-only mode
+                                    decorator: {
+                                        edit: function() {}, // Disable editing
+                                        render: function(container, data, score, state) {
+                                            container.empty();
+                                            if (data === null) {
+                                                container.append("BYE");
+                                            } else if (data === "TBD") {
+                                                container.append("TBD");
+                                            } else {
+                                                container.append(data);
+                                                if (score !== undefined && score !== null) {
+                                                    container.append($('<div>', {
+                                                        class: 'score',
+                                                        text: score
+                                                    }));
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                                // Add back button if it doesn't exist
+                                if ($('#backToBrackets').length === 0) {
+                                    const backButton = $('<button>', {
+                                        id: 'backToBrackets',
+                                        class: 'btn btn-secondary mt-3',
+                                        html: '<span><i class="fas fa-times"></i></span>'
+                                    }).click(function() {
+                                        showBracketList();
+                                    });
+                                    $('#bracket-container').before(backButton);
+                                }
+
+
+                                // Hide the generate button
+                                $('#generate-bracket').hide();
+
+                            } else {
+                                console.error('Error loading bracket:', data.message);
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
-                                    text: 'Failed to load bracket. Please try again.'
+                                    text: 'Failed to load bracket: ' + data.message
                                 });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to load bracket. Please try again.'
                             });
-                    });
+                        });
                 });
-            </script>
-            <script>
-                function showBracketList() {
-                    // Show the generate button and hide back button
-                    $('#generate-bracket').show();
-                    $('#backToBrackets').remove();
+            });
+        </script>
+        <script>
+            function showBracketList() {
+                // Show the generate button and hide back button
+                $('#generate-bracket').show();
+                $('#backToBrackets').remove();
 
-                    // Show the bracket actions
-                    $('#bracketActions').show();
+                // Show the bracket actions
+                $('#bracketActions').show();
 
-                    $('#bracket-container').html(`
+                $('#bracket-container').html(`
             <div class="text-center p-5">
                 <h4>Welcome to Tournament Bracket Generator</h4>
                 <p>Select a bracket type and click "Generate Bracket" to begin.</p>
             </div>
         `);
 
-                    // Show the bracket list table
-                    $('#bracketListContainer').show();
+                // Show the bracket list table
+                $('#bracketListContainer').show();
 
-                    // Reload the bracket list
-                    loadBrackets();
-                }
+                // Reload the bracket list
+                loadBrackets();
+            }
 
 
 
-                function deleteBracket(bracketId) {
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This will permanently delete this bracket and all its matches. This action cannot be undone!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: 'delete_bracket.php',
-                                method: 'POST',
-                                data: {
-                                    bracket_id: bracketId
-                                },
-                                success: function(response) {
-                                    if (response.success) {
-                                        Swal.fire({
-                                            title: 'Success!',
-                                            text: 'Bracket has been deleted successfully.',
-                                            icon: 'success'
-                                        }).then(() => {
-                                            // Reload the page to show the saved bracket
-                                            window.location.reload();
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: 'Error!',
-                                            text: response.message,
-                                            icon: 'error'
-                                        });
-                                    }
-                                },
-                                error: function() {
+            function deleteBracket(bracketId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This will permanently delete this bracket and all its matches. This action cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'delete_bracket.php',
+                            method: 'POST',
+                            data: {
+                                bracket_id: bracketId
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire({
+                                        title: 'Success!',
+                                        text: 'Bracket has been deleted successfully.',
+                                        icon: 'success'
+                                    }).then(() => {
+                                        // Reload the page to show the saved bracket
+                                        window.location.reload();
+                                    });
+                                } else {
                                     Swal.fire({
                                         title: 'Error!',
-                                        text: 'Failed to delete bracket. Please try again.',
+                                        text: response.message,
                                         icon: 'error'
                                     });
                                 }
-                            });
-                        }
-                    });
-                }
+                            },
+                            error: function() {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Failed to delete bracket. Please try again.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
 
-                function loadBrackets() {
-                    $.ajax({
-                        url: 'fetch_bracket.php',
-                        method: 'GET',
-                        data: {
-                            game_id: <?php echo $game_id; ?>,
-                            dept_id: <?php echo $department_id; ?>
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                const brackets = response.brackets;
-                                let tableBody = '';
+            function loadBrackets() {
+                $.ajax({
+                    url: 'fetch_bracket.php',
+                    method: 'GET',
+                    data: {
+                        game_id: <?php echo $game_id; ?>,
+                        dept_id: <?php echo $department_id; ?>
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            const brackets = response.brackets;
+                            let tableBody = '';
 
-                                brackets.forEach(function(bracket) {
-                                    tableBody += `
+                            brackets.forEach(function(bracket) {
+                                tableBody += `
                                         <tr>
                                             <td>${bracket.bracket_name}</td>
                                             <td>${bracket.created_at}</td>
@@ -675,111 +722,111 @@ include '../navbar/navbar.php';
                                             </td>
                                         </tr>
                                     `;
-                                });
+                            });
 
-                                if (brackets.length === 0) {
-                                    tableBody = '<tr><td colspan="3" class="text-center">No brackets found</td></tr>';
-                                }
-
-                                $('#bracketTableBody').html(tableBody);
-                            } else {
-                                console.error('Failed to load brackets:', response.message);
+                            if (brackets.length === 0) {
+                                tableBody = '<tr><td colspan="3" class="text-center">No brackets found</td></tr>';
                             }
-                        },
-                        error: function() {
-                            console.error('Failed to load brackets');
+
+                            $('#bracketTableBody').html(tableBody);
+                        } else {
+                            console.error('Failed to load brackets:', response.message);
                         }
-                    });
-                }
-            </script>
-            <script>
-                $('#save-bracket').on('click', async function() {
-                    try {
-                        const bracketType = $('#bracketTypeSelect').val();
-                        const bracketManager = bracketType === 'double' ?
-                            window.currentBracketManager :
-                            window.singleBracketManager;
-
-                        if (!bracketManager) {
-                            throw new Error('No bracket manager available');
-                        }
-
-                        const bracketState = bracketManager.getCurrentBracketState();
-                        if (!bracketState) {
-                            throw new Error('No bracket structure available');
-                        }
-
-                        // Add bracket type to the state
-                        bracketState.bracket_type = bracketType;
-
-                        await bracketManager.saveBracket(bracketState);
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'Bracket saved successfully!'
-                        });
-                    } catch (error) {
-                        console.error('Error saving bracket:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Failed to save bracket: ' + error.message
-                        });
+                    },
+                    error: function() {
+                        console.error('Failed to load brackets');
                     }
                 });
-            </script>
-            <script>
-                // Replace the existing round robin view handler
-                $('.view-round-robin').on('click', function() {
-                    const bracketId = $(this).data('bracket-id');
+            }
+        </script>
+        <script>
+            $('#save-bracket').on('click', async function() {
+                try {
+                    const bracketType = $('#bracketTypeSelect').val();
+                    const bracketManager = bracketType === 'double' ?
+                        window.currentBracketManager :
+                        window.singleBracketManager;
 
-                    // Show loading state
+                    if (!bracketManager) {
+                        throw new Error('No bracket manager available');
+                    }
+
+                    const bracketState = bracketManager.getCurrentBracketState();
+                    if (!bracketState) {
+                        throw new Error('No bracket structure available');
+                    }
+
+                    // Add bracket type to the state
+                    bracketState.bracket_type = bracketType;
+
+                    await bracketManager.saveBracket(bracketState);
+
                     Swal.fire({
-                        title: 'Loading...',
-                        text: 'Fetching tournament schedule',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Bracket saved successfully!'
                     });
+                } catch (error) {
+                    console.error('Error saving bracket:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to save bracket: ' + error.message
+                    });
+                }
+            });
+        </script>
+        <script>
+            // Replace the existing round robin view handler
+            $('.view-round-robin').on('click', function() {
+                const bracketId = $(this).data('bracket-id');
 
-                    // Fetch round robin data
-                    fetch('fetch_round_robin.php?bracket_id=' + bracketId)
-                        .then(response => {
-                            console.log('Raw response:', response);
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Parsed data:', data);
-                            Swal.close();
+                // Show loading state
+                Swal.fire({
+                    title: 'Loading...',
+                    text: 'Fetching tournament schedule',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
-                            if (data.success) {
-                                // Populate tournament info
-                                $('#tournamentGame').text(data.tournament_info.game_name);
-                                $('#tournamentDept').text(data.tournament_info.department_name);
-                                $('#tournamentStatus').text(data.tournament_info.status);
-                                $('#tournamentTeams').text(data.tournament_info.total_teams);
+                // Fetch round robin data
+                fetch('fetch_round_robin.php?bracket_id=' + bracketId)
+                    .then(response => {
+                        console.log('Raw response:', response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Parsed data:', data);
+                        Swal.close();
 
-                                // Populate scoring rules inputs
-                                if (data.scoring_rules) {
-                                    $('#viewWinPoints').val(data.scoring_rules.win_points);
-                                    $('#viewDrawPoints').val(data.scoring_rules.draw_points);
-                                    $('#viewLossPoints').val(data.scoring_rules.loss_points);
-                                    $('#viewBonusPoints').val(data.scoring_rules.bonus_points);
-                                }
+                        if (data.success) {
+                            // Populate tournament info
+                            $('#tournamentGame').text(data.tournament_info.game_name);
+                            $('#tournamentDept').text(data.tournament_info.department_name);
+                            $('#tournamentStatus').text(data.tournament_info.status);
+                            $('#tournamentTeams').text(data.tournament_info.total_teams);
 
-                                // Populate standings table
-                                const standingsBody = $('#standingsTableBody');
-                                standingsBody.empty();
+                            // Populate scoring rules inputs
+                            if (data.scoring_rules) {
+                                $('#viewWinPoints').val(data.scoring_rules.win_points);
+                                $('#viewDrawPoints').val(data.scoring_rules.draw_points);
+                                $('#viewLossPoints').val(data.scoring_rules.loss_points);
+                                $('#viewBonusPoints').val(data.scoring_rules.bonus_points);
+                            }
 
-                                let rank = 1;
-                                data.standings.forEach((team) => {
-                                    const rankEmoji = rank === 1 ? '1️⃣' : rank === 2 ? '2️⃣' : rank === 3 ? '3️⃣' : rank;
-                                    const rowClass = rank === 1 ? 'table-success' :
-                                        rank === 2 ? 'table-info' :
-                                        rank === 3 ? 'table-warning' : '';
-                                    standingsBody.append(`
+                            // Populate standings table
+                            const standingsBody = $('#standingsTableBody');
+                            standingsBody.empty();
+
+                            let rank = 1;
+                            data.standings.forEach((team) => {
+                                const rankEmoji = rank === 1 ? '1️⃣' : rank === 2 ? '2️⃣' : rank === 3 ? '3️⃣' : rank;
+                                const rowClass = rank === 1 ? 'table-success' :
+                                    rank === 2 ? 'table-info' :
+                                    rank === 3 ? 'table-warning' : '';
+                                standingsBody.append(`
                                         <tr class="${rowClass}">
                                             <td>${rankEmoji}</td>
                                             <td><strong>${team.team_name}</strong></td>
@@ -798,79 +845,79 @@ include '../navbar/navbar.php';
                                             </td>
                                         </tr>
                                     `);
-                                    rank++;
-                                });
+                                rank++;
+                            });
 
-                                // Add bonus points handler
-                                $(document).on('click', '.add-bonus', async function() {
-                                    const teamId = $(this).data('team-id');
-                                    const bracketId = $(this).data('bracket-id');
+                            // Add bonus points handler
+                            $(document).on('click', '.add-bonus', async function() {
+                                const teamId = $(this).data('team-id');
+                                const bracketId = $(this).data('bracket-id');
 
-                                    const {
-                                        value: bonusPoints
-                                    } = await Swal.fire({
-                                        title: 'Add Bonus Points',
-                                        input: 'number',
-                                        inputLabel: 'Enter bonus points',
-                                        inputValue: 0,
-                                        showCancelButton: true,
-                                        inputValidator: (value) => {
-                                            if (!value) {
-                                                return 'Please enter a number';
-                                            }
-                                        }
-                                    });
-
-                                    if (bonusPoints) {
-                                        try {
-                                            const response = await fetch('save_round_robin_points.php', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify({
-                                                    bracket_id: bracketId,
-                                                    team_id: teamId,
-                                                    bonus_points: parseInt(bonusPoints),
-                                                    action: 'add_bonus'
-                                                })
-                                            });
-
-                                            const result = await response.json();
-
-                                            if (result.success) {
-                                                Swal.fire({
-                                                    icon: 'success',
-                                                    title: 'Success',
-                                                    text: 'Bonus points added successfully!'
-                                                }).then(() => {
-                                                    // Refresh the standings
-                                                    $('.view-round-robin[data-bracket-id="' + bracketId + '"]').click();
-                                                });
-                                            } else {
-                                                throw new Error(result.message);
-                                            }
-                                        } catch (error) {
-                                            console.error('Error adding bonus points:', error);
-                                            Swal.fire({
-                                                icon: 'error',
-                                                title: 'Error',
-                                                text: 'Failed to add bonus points: ' + error.message
-                                            });
+                                const {
+                                    value: bonusPoints
+                                } = await Swal.fire({
+                                    title: 'Add Bonus Points',
+                                    input: 'number',
+                                    inputLabel: 'Enter bonus points',
+                                    inputValue: 0,
+                                    showCancelButton: true,
+                                    inputValidator: (value) => {
+                                        if (!value) {
+                                            return 'Please enter a number';
                                         }
                                     }
                                 });
 
-                                // Populate matches table
-                                const matchesBody = $('#matchesTableBody');
-                                matchesBody.empty();
+                                if (bonusPoints) {
+                                    try {
+                                        const response = await fetch('save_round_robin_points.php', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                bracket_id: bracketId,
+                                                team_id: teamId,
+                                                bonus_points: parseInt(bonusPoints),
+                                                action: 'add_bonus'
+                                            })
+                                        });
 
-                                data.matches.forEach(match => {
-                                    const scores = match.status.toLowerCase() === 'finished' ?
-                                        `${match.score_teamA || '-'} - ${match.score_teamB || '-'}` :
-                                        '-';
+                                        const result = await response.json();
 
-                                    matchesBody.append(`
+                                        if (result.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Success',
+                                                text: 'Bonus points added successfully!'
+                                            }).then(() => {
+                                                // Refresh the standings
+                                                $('.view-round-robin[data-bracket-id="' + bracketId + '"]').click();
+                                            });
+                                        } else {
+                                            throw new Error(result.message);
+                                        }
+                                    } catch (error) {
+                                        console.error('Error adding bonus points:', error);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: 'Failed to add bonus points: ' + error.message
+                                        });
+                                    }
+                                }
+                            });
+
+                            // Populate matches table
+                            const matchesBody = $('#matchesTableBody');
+                            matchesBody.empty();
+
+                            data.matches.forEach(match => {
+                                const scores = match.status.toLowerCase() === 'finished' ?
+                                    `${match.score_teamA || '-'} - ${match.score_teamB || '-'}` :
+                                    '-';
+
+                                matchesBody.append(`
                                         <tr>
                                             <td>Round ${match.round}</td>
                                             <td>Match ${match.match_number}</td>
@@ -884,69 +931,69 @@ include '../navbar/navbar.php';
                                             </td>
                                         </tr>
                                     `);
-                                });
+                            });
 
-                                // Add save points handler
-                                $('#savePoints').off('click').on('click', async function() {
-                                    try {
-                                        const response = await fetch('save_round_robin_points.php', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json'
-                                            },
-                                            body: JSON.stringify({
-                                                bracket_id: bracketId,
-                                                win_points: parseInt($('#viewWinPoints').val()) || 0,
-                                                draw_points: parseInt($('#viewDrawPoints').val()) || 0,
-                                                loss_points: parseInt($('#viewLossPoints').val()) || 0,
-                                                bonus_points: parseInt($('#viewBonusPoints').val()) || 0
-                                            })
-                                        });
+                            // Add save points handler
+                            $('#savePoints').off('click').on('click', async function() {
+                                try {
+                                    const response = await fetch('save_round_robin_points.php', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            bracket_id: bracketId,
+                                            win_points: parseInt($('#viewWinPoints').val()) || 0,
+                                            draw_points: parseInt($('#viewDrawPoints').val()) || 0,
+                                            loss_points: parseInt($('#viewLossPoints').val()) || 0,
+                                            bonus_points: parseInt($('#viewBonusPoints').val()) || 0
+                                        })
+                                    });
 
-                                        const result = await response.json();
+                                    const result = await response.json();
 
-                                        if (result.success) {
-                                            Swal.fire({
-                                                icon: 'success',
-                                                title: 'Success',
-                                                text: 'Scoring points updated successfully!'
-                                            });
-                                        } else {
-                                            throw new Error(result.message);
-                                        }
-                                    } catch (error) {
-                                        console.error('Error saving points:', error);
+                                    if (result.success) {
                                         Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error',
-                                            text: 'Failed to update scoring points: ' + error.message
+                                            icon: 'success',
+                                            title: 'Success',
+                                            text: 'Scoring points updated successfully!'
                                         });
+                                    } else {
+                                        throw new Error(result.message);
                                     }
-                                });
+                                } catch (error) {
+                                    console.error('Error saving points:', error);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Failed to update scoring points: ' + error.message
+                                    });
+                                }
+                            });
 
-                                // Show the modal
-                                const modal = new bootstrap.Modal(document.getElementById('viewRoundRobinModal'));
-                                modal.show();
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: data.message || 'Failed to load tournament schedule'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Detailed error:', error);
-                            Swal.close();
+                            // Show the modal
+                            const modal = new bootstrap.Modal(document.getElementById('viewRoundRobinModal'));
+                            modal.show();
+                        } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: 'Failed to load tournament schedule. Error: ' + error.message
+                                text: data.message || 'Failed to load tournament schedule'
                             });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Detailed error:', error);
+                        Swal.close();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to load tournament schedule. Error: ' + error.message
                         });
-                });
-            </script>
-        </div>
+                    });
+            });
+        </script>
+    </div>
     </div>
 
 </body>

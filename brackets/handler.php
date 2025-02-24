@@ -202,25 +202,34 @@
                 $('#generate-bracket').prop('disabled', false);
             });
 
-            // Listen for generate event instead of button click
+            // Add error handling for team count
             document.addEventListener('generate', async function() {
                 if ($('#bracketTypeSelect').val() !== 'double') return;
+
                 try {
                     $(this).prop('disabled', true);
                     $('#bracket-container').html('<div class="text-center"><div class="spinner-border" role="status"></div><div>Generating bracket...</div></div>');
 
                     const teams = await bracketManager.fetchTeams();
 
-                    // Generate structure with proper bracket data
-                    const structure = bracketManager.generateDoubleBracketStructure();
-                    console.log('Generated structure:', structure);
+                    // Validate team count
+                    try {
+                        bracketManager.validateTeamCount(teams.length);
+                    } catch (error) {
+                        throw new Error(`Invalid team count: ${error.message}`);
+                    }
 
-                    // Initialize with just the bracketData property
+                    const structure = bracketManager.generateDoubleBracketStructure();
                     bracketManager.initializeBracketDisplay(structure.bracketData);
 
-                    // Store the structure for saving later
-                    generatedStructure = structure;
+                    // Handle BYE matches automatically
+                    structure.matches.forEach(match => {
+                        if (match.teamA_id === -1 || match.teamB_id === -1) {
+                            bracketManager.handleByeMatch(match);
+                        }
+                    });
 
+                    generatedStructure = structure;
                     $('#save-bracket').prop('disabled', false);
 
                 } catch (error) {
@@ -531,6 +540,9 @@
 
         // Handle Generate button click
         $('#generate-bracket').on('click', function() {
+            // Clear the bracket content text
+            $('#bracket-content').empty(); // Clear the content
+
             // Only trigger generation for the currently selected type
             if (!currentBracketType) return;
 
@@ -538,8 +550,8 @@
             document.dispatchEvent(event);
         });
 
-        $('#bracket-container').html(`
-            <div class="text-center p-5">
+        $('#bracket-content').html(`
+            <div class="text-center p-5 mx-0">
                 <h4>Welcome to Tournament Bracket Generator</h4>
                 <p>Select a bracket type and click "Generate Bracket" to begin.</p>
             </div>
