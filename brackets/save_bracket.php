@@ -212,29 +212,48 @@ function saveDoubleBracket($data, $conn)
         match_id, next_winner_match, next_loser_match, bracket_position
     ) VALUES (?, ?, ?, ?)");
 
+    // Process and save matches
     foreach ($matches as $match) {
-        // Calculate next_match_number based on bracket position
-        $next_match_number = 0;
+        // Handle BYE matches
+        $status = $match['status'];
+        $teamA = $match['teamA_id'];
+        $teamB = $match['teamB_id'];
 
-        if ($match['bracket'] === 'winners') {
-            $next_match_number = $match['next_winner_match'];
-        } else if ($match['bracket'] === 'losers') {
-            $next_match_number = $match['next_winner_match'];
-        } else if ($match['bracket'] === 'finals') {
-            $next_match_number = $match['next_winner_match'];
+        // Auto-advance teams if this is a BYE match
+        if ($teamA === -1 || $teamB === -1) {
+            $status = 'finished';
+
+            // Find the winning team
+            $winningTeamId = $teamA === -1 ? $teamB : $teamA;
+
+            // Update next match if it exists
+            if ($match['next_winner_match'] > 0) {
+                $nextMatchNum = $match['next_winner_match'];
+                // Find the next match and update its team
+                foreach ($matches as &$nextMatch) {
+                    if ($nextMatch['match_number'] === $nextMatchNum) {
+                        if ($nextMatch['teamA_id'] === -2) {
+                            $nextMatch['teamA_id'] = $winningTeamId;
+                        } else {
+                            $nextMatch['teamB_id'] = $winningTeamId;
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
-        // Insert into matches first
+        // Insert match with updated status
         $matchStmt->bind_param(
             "siiiiisss",
             $match['match_identifier'],
             $bracket_id,
-            $match['teamA_id'],
-            $match['teamB_id'],
+            $teamA,
+            $teamB,
             $match['round'],
             $match['match_number'],
-            $next_match_number,  // For main matches table progression
-            $match['status'],
+            $match['next_winner_match'],
+            $status,
             $match['match_type']
         );
 

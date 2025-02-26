@@ -188,7 +188,8 @@
         let generatedStructure;
 
         try {
-            bracketManager = new DoubleBracketManager({
+            // Initialize the bracket manager using the static method
+            bracketManager = DoubleBracketManager.initialize({
                 gameId: <?php echo $game_id; ?>,
                 departmentId: <?php echo $department_id; ?>,
                 gradeLevel: $('#gradeLevelSelect').val()
@@ -252,14 +253,17 @@
                         throw new Error('No bracket structure available');
                     }
                     const result = await bracketManager.saveBracket(generatedStructure);
+
                     if (result.success) {
                         Swal.fire({
                             title: 'Success!',
-                            text: 'Bracket has been saved successfully.',
+                            text: result.message,
                             icon: 'success'
                         }).then(() => {
                             location.reload();
                         });
+                    } else {
+                        throw new Error(result.message);
                     }
                 } catch (error) {
                     console.error('Error saving bracket:', error);
@@ -273,8 +277,10 @@
 
         } catch (error) {
             console.error('Error initializing double bracket:', error);
+            throw error;
         }
     }
+
 
 
     //ROUND ROBIN

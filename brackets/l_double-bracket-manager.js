@@ -1,3 +1,106 @@
+/*
+
+
+function doubleBracket() {
+        let bracketManager;
+        let generatedStructure;
+
+        try {
+            // Initialize the bracket manager using the static method
+            bracketManager = DoubleBracketManager.initialize({
+                gameId: <?php echo $game_id; ?>,
+                departmentId: <?php echo $department_id; ?>,
+                gradeLevel: $('#gradeLevelSelect').val()
+            });
+
+            $('#gradeLevelSelect').on('change', function() {
+                const selectedGrade = $(this).val();
+                bracketManager.gradeLevel = selectedGrade;
+                $('#bracket-container').empty();
+                $('#save-bracket').prop('disabled', true);
+                $('#generate-bracket').prop('disabled', false);
+            });
+
+            // Add error handling for team count
+            document.addEventListener('generate', async function() {
+                if ($('#bracketTypeSelect').val() !== 'double') return;
+
+                try {
+                    $(this).prop('disabled', true);
+                    $('#bracket-container').html('<div class="text-center"><div class="spinner-border" role="status"></div><div>Generating bracket...</div></div>');
+
+                    const teams = await bracketManager.fetchTeams();
+
+                    // Validate team count
+                    try {
+                        bracketManager.validateTeamCount(teams.length);
+                    } catch (error) {
+                        throw new Error(`Invalid team count: ${error.message}`);
+                    }
+
+                    const structure = bracketManager.generateDoubleBracketStructure();
+                    bracketManager.initializeBracketDisplay(structure.bracketData);
+
+                    // Handle BYE matches automatically
+                    structure.matches.forEach(match => {
+                        if (match.teamA_id === -1 || match.teamB_id === -1) {
+                            bracketManager.handleByeMatch(match);
+                        }
+                    });
+
+                    generatedStructure = structure;
+                    $('#save-bracket').prop('disabled', false);
+
+                } catch (error) {
+                    console.error('Error generating bracket:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message
+                    });
+                    $('#bracket-container').empty();
+                } finally {
+                    $(this).prop('disabled', false);
+                }
+            });
+
+            // Add save handler
+            $('#save-bracket').off('click').on('click', async function() {
+                try {
+                    if (!generatedStructure) {
+                        throw new Error('No bracket structure available');
+                    }
+                    const result = await bracketManager.saveBracket(generatedStructure);
+                    if (result.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Bracket has been saved successfully.',
+                            icon: 'success'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error saving bracket:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: error.message,
+                        icon: 'error'
+                    });
+                }
+            });
+
+        } catch (error) {
+            console.error('Error initializing double bracket:', error);
+            throw error;
+        }
+    }
+
+
+*/
+
+
+
 class DoubleBracketManager {
     constructor(options) {
         if (!options || !options.gameId || !options.departmentId) {
@@ -41,61 +144,11 @@ class DoubleBracketManager {
         });
     }
 
+    // Handle bracket updates
     handleBracketUpdate(data) {
         console.log('Bracket updated:', data);
         this.bracketData = data;
-        
-        // Update matches based on bracket data
-        const results = data.results;
-        
-        // Update winners bracket
-        results[0].forEach((round, roundIndex) => {
-            round.forEach((matchResult, matchIndex) => {
-                const matchNumber = matchIndex + 1 + (roundIndex * Math.pow(2, roundIndex));
-                const match = this.matches.find(m => 
-                    m.bracket === 'winners' && 
-                    m.round === roundIndex + 1 && 
-                    m.match_number === matchNumber
-                );
-                
-                if (match) {
-                    match.score_teamA = matchResult[0];
-                    match.score_teamB = matchResult[1];
-                    match.status = (matchResult[0] !== null || matchResult[1] !== null) ? 'Finished' : 'Pending';
-                }
-            });
-        });
-    
-        // Update losers bracket
-        results[1].forEach((round, roundIndex) => {
-            round.forEach((matchResult, matchIndex) => {
-                const match = this.matches.find(m => 
-                    m.bracket === 'losers' && 
-                    m.round === roundIndex + 1 && 
-                    m.match_number === matchIndex + this.matches.filter(m => m.bracket === 'winners').length + 1
-                );
-                
-                if (match) {
-                    match.score_teamA = matchResult[0];
-                    match.score_teamB = matchResult[1];
-                    match.status = (matchResult[0] !== null || matchResult[1] !== null) ? 'Finished' : 'Pending';
-                }
-            });
-        });
-    
-        // Update finals
-        if (results[2] && results[2][0] && results[2][0][0]) {
-            const finalMatch = this.matches.find(m => m.bracket === 'finals');
-            if (finalMatch) {
-                finalMatch.score_teamA = results[2][0][0][0];
-                finalMatch.score_teamB = results[2][0][0][1];
-                finalMatch.status = (results[2][0][0][0] !== null || results[2][0][0][1] !== null) ? 'Finished' : 'Pending';
-            }
-        }
-    
-        // Update state with new data and matches
         this.state.updateBracketData(data);
-        this.state.updateMatches(this.matches);
     }
 
     // Handle team editing
@@ -445,9 +498,9 @@ class DoubleBracketManager {
                 teamA_id: match.teamA_id,
                 teamB_id: match.teamB_id,
                 status: match.status,
-                match_type: match.match_type
-              //  score_teamA: match.score_teamA || 0,
-              //  score_teamB: match.score_teamB || 0
+                match_type: match.match_type,
+                score_teamA: match.score_teamA || 0,
+                score_teamB: match.score_teamB || 0
             })),
             rounds: {
                 winners: winnersRounds,
@@ -553,13 +606,13 @@ class DoubleBracketManager {
         // Initialize results arrays
         for (let i = 0; i < winnersRounds; i++) {
             bracketData.results[0].push(
-                new Array(Math.pow(2, winnersRounds - i - 1)).fill([null, null])
+                new Array(Math.pow(2, winnersRounds - i - 1)).fill([0, 0])
             );
         }
 
         for (let i = 0; i < losersRounds; i++) {
             bracketData.results[1].push(
-                new Array(Math.pow(2, Math.floor((losersRounds - i - 1) / 2))).fill([null, null])
+                new Array(Math.pow(2, Math.floor((losersRounds - i - 1) / 2))).fill([0, 0])
             );
         }
 
@@ -588,69 +641,41 @@ class DoubleBracketManager {
     }
 
     distributeByes(teams) {
-        console.log('Distributing BYEs for teams:', teams);
+        console.log('distributeByes called with teams:', teams);
         
-        const teamCount = teams.length;
+        // Convert team objects to names
+        const teamNames = teams.map(team => team.team_name);
+        const teamCount = teamNames.length;
         const nextPowerOfTwo = Math.pow(2, Math.ceil(Math.log2(teamCount)));
         const byeCount = nextPowerOfTwo - teamCount;
         
-        // Create array for all slots
-        let positions = new Array(nextPowerOfTwo).fill(null);
+        console.log('Distribution calculation:', {
+            teamCount,
+            nextPowerOfTwo,
+            byeCount
+        });
+
+        // Create array for seeded positions
+        let positions = [...teamNames];
         
-        // Calculate standard tournament seeding positions
-        for (let seed = 1; seed <= nextPowerOfTwo; seed++) {
-            const position = this.calculateSeedPosition(seed, nextPowerOfTwo);
-            
-            if (seed <= teamCount) {
-                // Place actual team
-                positions[position - 1] = teams[seed - 1];
-            } else {
-                // Place BYE
-                positions[position - 1] = { team_id: -1, team_name: 'BYE' };
-            }
+        // Add BYEs in optimal positions
+        for (let i = 0; i < byeCount; i++) {
+            const insertPosition = i * 2 + 1;
+            positions.splice(insertPosition, 0, 'BYE');
         }
         
-        // Create pairs for first round
+        // Create pairs
         const pairs = [];
         for (let i = 0; i < positions.length; i += 2) {
-            pairs.push([
-                positions[i]?.team_name || 'BYE',
-                positions[i + 1]?.team_name || 'BYE'
-            ]);
+            pairs.push([positions[i], positions[i + 1]]);
         }
         
-        console.log('Generated pairs:', pairs);
+        console.log('Final distribution:', {
+            positions,
+            pairs
+        });
+        
         return pairs;
-    }
-
-    calculateSeedPosition(seed, totalSlots) {
-        // Standard tournament seeding algorithm
-        // For a 8-team bracket:
-        // 1 -> 1
-        // 2 -> 8
-        // 3 -> 5
-        // 4 -> 4
-        // 5 -> 3
-        // 6 -> 6
-        // 7 -> 7
-        // 8 -> 2
-        let position = 1;
-        let round = 1;
-        let roundSize = totalSlots;
-        
-        while (roundSize > 1) {
-            const roundPosition = Math.ceil(seed / Math.pow(2, round - 1));
-            const isOdd = roundPosition % 2 === 1;
-            
-            if (isOdd) {
-                position += roundSize / 2;
-            }
-            
-            roundSize /= 2;
-            round += 1;
-        }
-        
-        return position;
     }
 
     generateAllMatches(teamPairs, winnersRounds, losersRounds) {
@@ -681,11 +706,9 @@ class DoubleBracketManager {
                         teamA_id: teamAId,
                         teamB_id: teamBId,
                         status: hasBye ? 'Finished' : 'Pending',
-                        match_type: round === winnersRounds ? 'winners_final' : 'winners_regular'
-                       // score_teamA: hasBye ? (teamA === 'BYE' ? 0 : 1) : 0,
-                       // score_teamB: hasBye ? (teamB === 'BYE' ? 0 : 1) : 0
-                    //   score_teamA: null,
-                   //    score_teamB: null
+                        match_type: round === winnersRounds ? 'winners_final' : 'winners_regular',
+                        score_teamA: hasBye ? (teamA === 'BYE' ? 0 : 1) : 0,
+                        score_teamB: hasBye ? (teamB === 'BYE' ? 0 : 1) : 0
                     });
                 } else {
                     // Subsequent rounds with TBD teams
@@ -699,9 +722,9 @@ class DoubleBracketManager {
                         teamA_id: -2,
                         teamB_id: -2,
                         status: 'Pending',
-                        match_type: round === winnersRounds ? 'winners_final' : 'winners_regular'
-                     //  score_teamA: null,
-                    //    score_teamB: null
+                        match_type: round === winnersRounds ? 'winners_final' : 'winners_regular',
+                        score_teamA: 0,
+                        score_teamB: 0
                     });
                 }
                 matchNumber++;
@@ -723,9 +746,9 @@ class DoubleBracketManager {
                     teamA_id: -2,
                     teamB_id: -2,
                     status: 'Pending',
-                    match_type: round === losersRounds ? 'losers_final' : 'losers_regular'
-                   // score_teamA: null,
-                   // score_teamB: null
+                    match_type: round === losersRounds ? 'losers_final' : 'losers_regular',
+                    score_teamA: 0,
+                    score_teamB: 0
                 });
                 matchNumber++;
             }
@@ -742,9 +765,9 @@ class DoubleBracketManager {
             teamA_id: -2,
             teamB_id: -2,
             status: 'Pending',
-            match_type: 'finals'
-           // score_teamA: null,
-           // score_teamB: null
+            match_type: 'finals',
+            score_teamA: 0,
+            score_teamB: 0
         });
     
         console.log('Generated all matches:', matches);
@@ -948,15 +971,15 @@ class DoubleBracketManager {
             if (match.bracket === 'winners') {
                 if (currentData.results[0][match.round - 1]) {
                     currentData.results[0][match.round - 1][match.match_number - 1] = [
-                      //  match.score_teamA,
-                       // match.score_teamB
+                        match.score_teamA,
+                        match.score_teamB
                     ];
                 }
             } else if (match.bracket === 'losers') {
                 if (currentData.results[1][match.round - 1]) {
                     currentData.results[1][match.round - 1][match.match_number - 1] = [
-                       // match.score_teamA,
-                       // match.score_teamB
+                        match.score_teamA,
+                        match.score_teamB
                     ];
                 }
             }
@@ -1011,8 +1034,8 @@ class DoubleBracketManager {
             if (match.teamA_id === -1 || match.teamB_id === -1) {
                 // Set match as finished with proper scores
                 match.status = 'Finished';
-                //match.score_teamA = match.teamA_id === -1 ? 0 : 1;
-               // match.score_teamB = match.teamB_id === -1 ? 0 : 1;
+                match.score_teamA = match.teamA_id === -1 ? 0 : 1;
+                match.score_teamB = match.teamB_id === -1 ? 0 : 1;
 
                 // Get the advancing team ID
                 const winningTeamId = match.teamA_id === -1 ? match.teamB_id : match.teamA_id;
@@ -1031,15 +1054,5 @@ class DoubleBracketManager {
         });
 
         return this.matches;
-    }
-
-    updateMatchTeam(matchIdentifier, teamA, teamB) {
-        const match = this.matches.find(m => m.match_identifier === matchIdentifier);
-        if (match) {
-            match.teamA_id = this.getTeamId(teamA);
-            match.teamB_id = this.getTeamId(teamB);
-            match.status = 'Pending'; // Reset status to pending if teams are changed
-            console.log(`Updated match ${matchIdentifier} with teams: ${teamA}, ${teamB}`);
-        }
     }
 }

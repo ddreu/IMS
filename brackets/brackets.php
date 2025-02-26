@@ -356,6 +356,8 @@ include '../navbar/navbar.php';
 
                         <!-- ✅ Load Your Custom Scripts Last -->
                         <script src="bracket-manager.js"></script>
+                        <script src="bracket-state.js"></script>
+
                         <script src="double-bracket-manager.js"></script>
                         <?php include 'handler.php'; ?>
 
