@@ -116,6 +116,7 @@ class DoubleBracketManager {
         input.on('change', function() {
             const selectedValue = $(this).val();
             doneCb(selectedValue === 'BYE' || selectedValue === '' ? null : selectedValue);
+
         });
     }
 
@@ -1036,10 +1037,52 @@ class DoubleBracketManager {
     updateMatchTeam(matchIdentifier, teamA, teamB) {
         const match = this.matches.find(m => m.match_identifier === matchIdentifier);
         if (match) {
-            match.teamA_id = this.getTeamId(teamA);
-            match.teamB_id = this.getTeamId(teamB);
+            match.teamA_id = this.getTeamId(teamA); // Ensure this method returns the correct ID
+            match.teamB_id = this.getTeamId(teamB); // Ensure this method returns the correct ID
             match.status = 'Pending'; // Reset status to pending if teams are changed
             console.log(`Updated match ${matchIdentifier} with teams: ${teamA}, ${teamB}`);
+        } else {
+            console.error(`Match with identifier ${matchIdentifier} not found.`);
         }
+    }
+
+    initializeEventListeners() {
+        // Add event listeners for team selection in dropdowns
+        $('.team-select').on('change', async (event) => {
+            const matchNumber = $(event.target).data('match-number');
+            const selectedValue = $(event.target).val();
+            const teamId = selectedValue === 'BYE' || selectedValue === '' ? null : selectedValue;
+     
+            try {
+                // Update the match team
+                this.updateMatchTeam(matchNumber, teamId);
+     
+                // Prepare the bracket state to save
+                const bracketState = {
+                    teams: this.teams,
+                    matches: this.matches,
+                    rounds: this.rounds
+                };
+     
+                // Save the updated bracket state
+                await this.saveBracket(bracketState);
+                console.log('Bracket saved successfully after team selection.');
+                console.log('Current matches state after update:', this.matches);
+     
+            } catch (error) {
+                console.error('Error updating match team or saving bracket:', error);
+                alert('Failed to update match team or save bracket: ' + error.message);
+            }
+        });
+
+        // Add other event listeners as needed (e.g., for buttons)
+        $('#generate-bracket').on('click', () => {
+            try {
+                this.generateBracket();
+            } catch (error) {
+                console.error('Error generating bracket:', error);
+                alert('Failed to generate bracket: ' + error.message);
+            }
+        });
     }
 }

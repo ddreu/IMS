@@ -37,7 +37,6 @@ session_start();
 
     <div class="container pb-4">
         <div class="match-results">
-            <!-- Content will be dynamically loaded here -->
         </div>
     </div>
 
@@ -45,7 +44,6 @@ session_start();
 
     <script>
         function fetchLiveScores() {
-            // Function to extract URL parameters
             function getUrlParams() {
                 const params = new URLSearchParams(window.location.search);
                 return {
@@ -54,7 +52,6 @@ session_start();
                 };
             }
 
-            // Get the parameters from the URL
             const {
                 department_id,
                 grade_level
@@ -72,7 +69,6 @@ session_start();
                     const matchResultsContainer = $('.match-results');
                     matchResultsContainer.empty();
 
-                    // Check if data is an error response
                     if (data.error) {
                         matchResultsContainer.html(`
                         <div class="text-center p-4">
@@ -99,14 +95,12 @@ session_start();
                     }
 
                     matches.forEach(match => {
-                        // Static live indicator
                         const liveIndicator = `<span class="badge bg-success">Live</span>`;
 
-                        // Function to render additional info based on source table
                         const renderAdditionalInfo = (team, additionalInfo, sourceTable) => {
                             let additionalInfoHtml = '';
 
-                            switch(sourceTable) {
+                            switch (sourceTable) {
                                 case 'live_scores':
                                     if (additionalInfo.period) {
                                         additionalInfoHtml += `
@@ -157,12 +151,10 @@ session_start();
                             return additionalInfoHtml;
                         };
 
-                        // Function to render VS section based on source table
                         const renderVsSection = (match) => {
                             let vsContent = '<div class="vs-section">';
                             vsContent += '<div>VS</div>';
 
-                            // Add set or period information for both live_scores and live_set_scores
                             if (match.source_table === 'live_scores' && match.teamA.additional_info.period) {
                                 vsContent += `
                                     <div class="period-info">
