@@ -1,33 +1,30 @@
 <?php
 // send-password-reset.php
 
-session_start(); // Start session for message handling
+session_start();
 
-date_default_timezone_set('Asia/Manila'); // Set timezone to Philippine Standard Time
+date_default_timezone_set('Asia/Manila');
 
 
-include_once 'connection/conn.php'; 
+include_once 'connection/conn.php';
 $conn = con();
 
 $message = '';
 $message_class = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST["email"]); // Trim to remove any extra spaces
+    $email = trim($_POST["email"]);
 
-    // Validate email format
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = "Please enter a valid email address.";
         $message_class = "error";
     } else {
         require_once __DIR__ . "/email_handler.php";
 
-        // Generate and store token
         $token = generateToken();
         $tokenResult = storeToken($conn, $email, $token);
 
         if ($tokenResult['success']) {
-            // Send password reset email
             $emailResult = sendPasswordResetEmail($email, $token);
             if ($emailResult['success']) {
                 $message = $emailResult['message'];
@@ -45,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,11 +52,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .success {
             color: green;
         }
+
         .error {
             color: red;
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -78,4 +78,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
 </body>
+
 </html>

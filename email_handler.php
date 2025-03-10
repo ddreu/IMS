@@ -1,20 +1,17 @@
 <?php
 
-function sendPasswordResetEmail($email, $token) {
+function sendPasswordResetEmail($email, $token)
+{
     $mail = require __DIR__ . "/mailer.php";
     $mail->addAddress($email);
 
     $mail->Subject = "Password Reset Request";
-    // Get the protocol (http or https)
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
 
-    // Get the domain (e.g., intrasports.com)
-    $host = $_SERVER['HTTP_HOST']; 
+    $host = $_SERVER['HTTP_HOST'];
 
-    // Construct the reset URL dynamically
     $resetUrl = "$protocol://$host/reset-password.php?token=" . urlencode($token);
-    
-    // Create a professional HTML email body
+
     $mail->Body = "
         <html>
         <body style='font-family: Arial, sans-serif;'>
@@ -61,17 +58,19 @@ function sendPasswordResetEmail($email, $token) {
     }
 }
 
-function generateToken() {
+function generateToken()
+{
     return bin2hex(random_bytes(16));
 }
 
-function storeToken($conn, $email, $token) {
+function storeToken($conn, $email, $token)
+{
     $token_hash = hash("sha256", $token);
-    $expiry = date("Y-m-d H:i:s", time() + 60 * 30); // Token expires in 30 minutes
+    $expiry = date("Y-m-d H:i:s", time() + 60 * 30);
 
     $sql = "UPDATE users SET reset_token_hash = ?, reset_token_expires_at = ? WHERE email = ?";
     $stmt = $conn->prepare($sql);
-    
+
     if (!$stmt) {
         return [
             'success' => false,

@@ -13,13 +13,13 @@ $mail = new PHPMailer(true);
 
 $mail->isSMTP();
 $mail->SMTPAuth = true;
-$mail->Host = "smtp.sendgrid.net"; // Use SendGrid SMTP server
-$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Use TLS encryption
-$mail->Port = 587; // Port number for TLS
-$mail->Username = "apikey"; // This should be the literal string "apikey"
-$mail->Password = "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"; // Replace with your actual SendGrid API key
+$mail->Host = "smtp.sendgrid.net";
+$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+$mail->Port = 587;
+$mail->Username = "apikey";
+$mail->Password = "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";
 
 $mail->isHtml(true);
-$mail->setFrom("intramuralsims2024@gmail.com", "IMS"); // Use your verified sender email
+$mail->setFrom("intramuralsims2024@gmail.com", "IMS");
 
 return $mail;
