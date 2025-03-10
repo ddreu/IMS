@@ -4,7 +4,6 @@ include_once '../connection/conn.php';
 include_once '../user_logs/logger.php';
 $conn = con();
 
-// Get the logged-in committee details
 $role = $_SESSION['role'];
 $game_id = $_SESSION['game_id'];
 $department_id = $_SESSION['department_id'];
@@ -16,10 +15,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Function to add a team
 function addTeam($teamName, $gameId, $gradeSectionCourseId, $conn)
 {
-    // Check if a team is already registered for this grade section course and game
     $checkSql = "SELECT team_id FROM teams WHERE grade_section_course_id = ? AND game_id = ?";
     $checkStmt = $conn->prepare($checkSql);
 
@@ -38,7 +35,6 @@ function addTeam($teamName, $gameId, $gradeSectionCourseId, $conn)
 
     $checkStmt->close();
 
-    // If no team exists, proceed to add the team
     $wins = 0;
     $losses = 0;
     $createdAt = date('Y-m-d H:i:s');
@@ -54,7 +50,6 @@ function addTeam($teamName, $gameId, $gradeSectionCourseId, $conn)
     $stmt->bind_param("siisis", $teamName, $gameId, $gradeSectionCourseId, $wins, $losses, $createdAt);
 
     if ($stmt->execute()) {
-        // Log user action before returning
         $description = "Registered team '$teamName'";
         logUserAction($conn, $_SESSION['user_id'], 'Team', 'CREATE', $gradeSectionCourseId, $description);
 
@@ -66,14 +61,13 @@ function addTeam($teamName, $gameId, $gradeSectionCourseId, $conn)
     }
 }
 
-// Handle AJAX request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['team_name'])) {
     $teamName = $_POST['team_name'];
     $gameId = $_SESSION['game_id'];
     $gradeSectionCourseId = $_POST['grade_section_course_id'];
 
     $response = addTeam($teamName, $gameId, $gradeSectionCourseId, $conn);
-    echo json_encode($response); // Send JSON response
+    echo json_encode($response);
     exit();
 }
 

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Viewer - Watch Live Stream</title>
+</head>
+
+<body>
+    <h1>Watch Live Stream</h1>
+    <video id="viewerVideo" autoplay playsinline style="width: 100%; max-width: 600px; border: 1px solid #ccc;"></video>
+
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+    <script>
+        const APP_ID = "60a61e72ebf84ea39be8d203e3269b9c";
+        const CHANNEL_NAME = "Intramurals";
+        const TOKEN = null;
+
+        async function watchLive() {
+            try {
+                const client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+
+                await client.setClientRole("audience");
+
+                await client.join(APP_ID, CHANNEL_NAME, TOKEN, null);
+
+                client.on("user-published", async (user, mediaType) => {
+                    console.log(`User published: ${mediaType}`);
+                    await client.subscribe(user, mediaType);
+
+                    if (mediaType === "video") {
+                        const remoteVideoTrack = user.videoTrack;
+                        remoteVideoTrack.play("viewerVideo");
+                    }
+
+                    if (mediaType === "audio") {
+                        const remoteAudioTrack = user.audioTrack;
+                        remoteAudioTrack.play();
+                    }
+                });
+
+                client.on("user-unpublished", (user) => {
+                    console.log("User unpublished");
+                });
+
+                alert("Connected to live stream");
+            } catch (error) {
+                console.error("Error watching live stream:", error);
+                alert(`Failed to watch live stream: ${error.message}`);
+            }
+        }
+
+        watchLive();
+    </script>
+</body>
+
+</html>

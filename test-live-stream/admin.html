@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Start Live Stream</title>
+</head>
+
+<body>
+    <h1>Start Live Stream</h1>
+    <button onclick="startLive('camera')">Start with Camera</button>
+    <button onclick="startLive('screen')">Start with Screen</button>
+    <button onclick="stopLive()">Stop Live Stream</button>
+    <video id="localVideo" autoplay playsinline muted
+        style="width: 100%; max-width: 600px; border: 1px solid #ccc;"></video>
+
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+    <script>
+        const APP_ID = "60a61e72ebf84ea39be8d203e3269b9c";
+        const CHANNEL_NAME = "Intramurals";
+        const TOKEN = null;
+
+        let client;
+        let localVideoTrack;
+        let localAudioTrack;
+
+        async function requestPermissions() {
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                console.log("Permissions granted");
+            } catch (error) {
+                console.error("Permission denied:", error);
+                alert(`Permission denied: ${error.message}`);
+            }
+        }
+
+        window.onload = () => {
+            requestPermissions();
+        };
+
+        async function startLive(type) {
+            try {
+                client = AgoraRTC.createClient({ mode: "live", codec: "vp8" });
+
+                await client.setClientRole("host");
+
+                await client.join(APP_ID, CHANNEL_NAME, TOKEN, null);
+
+                if (type === "camera") {
+                    [localAudioTrack, localVideoTrack] = await Promise.all([
+                        AgoraRTC.createMicrophoneAudioTrack(),
+                        AgoraRTC.createCameraVideoTrack()
+                    ]);
+                } else if (type === "screen") {
+                    localVideoTrack = await AgoraRTC.createScreenVideoTrack();
+                    localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                } else {
+                    alert("Invalid stream type");
+                    return;
+                }
+
+                localVideoTrack.play("localVideo");
+
+                await client.publish([localVideoTrack, localAudioTrack]);
+
+                alert("Live stream started!");
+            } catch (error) {
+                console.error("Error starting live stream:", error);
+                alert(`Failed to start live stream: ${error.message}`);
+            }
+        }
+
+        async function stopLive() {
+            try {
+                if (localVideoTrack) {
+                    localVideoTrack.stop();
+                    localVideoTrack.close();
+                }
+                if (localAudioTrack) {
+                    localAudioTrack.stop();
+                    localAudioTrack.close();
+                }
+                if (client) {
+                    await client.leave();
+                }
+                alert("Live stream stopped!");
+            } catch (error) {
+                console.error("Error stopping live stream:", error);
+                alert(`Failed to stop live stream: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+
+</html>
