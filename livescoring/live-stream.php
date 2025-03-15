@@ -172,7 +172,7 @@ include '../navbar/navbar.php';
         ?>
     </nav>
     <div class="live-stream-container">
-        <h1>Live Stream for Schedule ID: <?= $schedule_id ?></h1>
+        <h1>Live Stream for:</h1>
         <p>Game ID: <?= $game_name ?> | Teams: <?= $teamA_name ?> vs <?= $teamB_name ?></p>
 
         <div class="stream-type-selector mb-4">
