@@ -391,10 +391,10 @@ include '../navbar/navbar.php';
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'player_statistics.php?schedule_id=' + scheduleId + 
-                                   '&teamA_id=' + teamAId + 
-                                   '&teamB_id=' + teamBId + 
-                                   '&game_id=' + gameId;
+                    window.location.href = 'player_statistics.php?schedule_id=' + scheduleId +
+                        '&teamA_id=' + teamAId +
+                        '&teamB_id=' + teamBId +
+                        '&game_id=' + gameId;
                 }
             });
         }
@@ -543,29 +543,30 @@ include '../navbar/navbar.php';
                                                                         </li>
                                                                         <?php
                                                                         // Set the default timezone to ensure consistent time handling
-                                                                       // date_default_timezone_set('Asia/Manila');
+                                                                        // date_default_timezone_set('Asia/Manila');
 
                                                                         // Parse the scheduled date and time
-                                                                       // $scheduleDateTime = strtotime($row['schedule_date'] . ' ' . $row['schedule_time']);
+                                                                        // $scheduleDateTime = strtotime($row['schedule_date'] . ' ' . $row['schedule_time']);
 
                                                                         // Get the current date and time
                                                                         //$currentDateTime = time(); // Using time() for simplicity
 
                                                                         // Calculate the absolute time difference
-                                                                       // $timeDiff = abs($scheduleDateTime - $currentDateTime);
+                                                                        // $timeDiff = abs($scheduleDateTime - $currentDateTime);
 
                                                                         // Show the button if:
                                                                         // 1. It's the same day
                                                                         // 2. The scheduled time is within 30 minutes (before or after)
-                                                                       // if (date('Y-m-d', $scheduleDateTime) === date('Y-m-d', $currentDateTime) && $timeDiff <= 1800):
+                                                                        // if (date('Y-m-d', $scheduleDateTime) === date('Y-m-d', $currentDateTime) && $timeDiff <= 1800):
                                                                         ?>
-                                                                            <!-- Start Match action -->
-                                                                            <li>
-                                                                                <button class="dropdown-item" onclick="startMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
-                                                                                    Start Match
-                                                                                </button>
-                                                                            </li>
-                                                                        <?php //endif; ?>
+                                                                        <!-- Start Match action -->
+                                                                        <li>
+                                                                            <button class="dropdown-item" onclick="startMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
+                                                                                Start Match
+                                                                            </button>
+                                                                        </li>
+                                                                        <?php //endif; 
+                                                                        ?>
                                                                     <?php elseif ($row['status'] === 'Ongoing'): ?>
                                                                         <!-- Continue Match action -->
                                                                         <li>
@@ -575,6 +576,11 @@ include '../navbar/navbar.php';
                                                                             <button class="dropdown-item" onclick="joinMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
                                                                                 Record Stats
                                                                             </button>
+                                                                            <a class="dropdown-item"
+                                                                                href="live-stream.php?schedule_id=<?= $row['schedule_id']; ?>&teamA_id=<?= $row['teamA_id']; ?>&teamB_id=<?= $row['teamB_id']; ?>&game_id=<?= $row['game_id']; ?>">
+                                                                                Live Stream
+                                                                            </a>
+
                                                                         </li>
                                                                     <?php elseif ($row['status'] === 'Finished'): ?>
                                                                         <!-- View Summary action -->

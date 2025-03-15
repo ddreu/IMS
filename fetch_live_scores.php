@@ -50,6 +50,7 @@ try {
             teamA_name, 
             teamB_name,
             game_name,
+            game_id,
             department_id,
             grade_level,
             timeout_per_team,
@@ -72,6 +73,7 @@ try {
                 tA.team_name AS teamA_name, 
                 tB.team_name AS teamB_name,
                 g.game_name,
+                g.game_id,
                 b.department_id,
                 b.grade_level,
                 COALESCE(gsr.timeouts_per_period, 4) as timeout_per_team,
@@ -104,6 +106,7 @@ try {
                 tA.team_name AS teamA_name, 
                 tB.team_name AS teamB_name,
                 g.game_name,
+                g.game_id,
                 b.department_id,
                 b.grade_level,
                 COALESCE(gsr.timeouts_per_period, 4) as timeout_per_team,
@@ -136,6 +139,7 @@ try {
                 tA.team_name AS teamA_name, 
                 tB.team_name AS teamB_name,
                 g.game_name,
+                g.game_id,
                 b.department_id,
                 b.grade_level,
                 COALESCE(gsr.timeouts_per_period, 4) as timeout_per_team,
@@ -181,12 +185,12 @@ try {
     // If no matches found, log additional diagnostic information
     if (empty($matches)) {
         error_log("DEBUG: No matches found. Performing additional diagnostics:");
-        
+
         // Check live_set_scores table
         $lssQuery = "SELECT * FROM live_set_scores LIMIT 5";
         $lssResult = $conn->query($lssQuery);
         error_log("DEBUG: Sample live_set_scores rows: " . print_r($lssResult->fetch_all(MYSQLI_ASSOC), true));
-        
+
         // Check schedules table
         $schedQuery = "SELECT * FROM schedules LIMIT 5";
         $schedResult = $conn->query($schedQuery);
@@ -194,7 +198,8 @@ try {
     }
 
     // Function to normalize live score data
-    function normalizeLiveScoreData($rawData) {
+    function normalizeLiveScoreData($rawData)
+    {
         $normalizedData = [];
 
         foreach ($rawData as $match) {
@@ -202,28 +207,29 @@ try {
             $normalizedMatch = [
                 'schedule_id' => $match['schedule_id'],
                 'game_name' => $match['game_name'],
+                'game_id' => $match['game_id'],
                 'source_table' => $match['source_table'],
                 'schedule_date' => $match['schedule_date'] ?? null,
-                'formatted_date' => isset($match['schedule_date']) 
-                    ? date('l, F j, Y', strtotime($match['schedule_date'])) 
+                'formatted_date' => isset($match['schedule_date'])
+                    ? date('l, F j, Y', strtotime($match['schedule_date']))
                     : null,
-                
+
                 // Team A Information
                 'teamA' => [
                     'id' => $match['teamA_id'],
                     'name' => $match['teamA_name'],
                     'score' => $match['teamA_score'] ?? 0,
-                    
+
                     // Table-specific additional information
                     'additional_info' => []
                 ],
-                
+
                 // Team B Information
                 'teamB' => [
                     'id' => $match['teamB_id'],
                     'name' => $match['teamB_name'],
                     'score' => $match['teamB_score'] ?? 0,
-                    
+
                     // Table-specific additional information
                     'additional_info' => []
                 ]
@@ -235,20 +241,22 @@ try {
                     // Add period, timer, fouls, and timeouts for live_scores
                     $normalizedMatch['teamA']['additional_info'] = [
                         'period' => $match['current_set'], // Reusing current_set as period
-                        'timer' => $match['time_remaining'] ? 
-                            sprintf("%02d:%02d", 
-                                floor($match['time_remaining'] / 60), 
+                        'timer' => $match['time_remaining'] ?
+                            sprintf(
+                                "%02d:%02d",
+                                floor($match['time_remaining'] / 60),
                                 $match['time_remaining'] % 60
                             ) : null,
                         'fouls' => null, // Add foul tracking if available
                         'timeouts' => $match['timeout_teamA']
                     ];
-                    
+
                     $normalizedMatch['teamB']['additional_info'] = [
                         'period' => $match['current_set'],
-                        'timer' => $match['time_remaining'] ? 
-                            sprintf("%02d:%02d", 
-                                floor($match['time_remaining'] / 60), 
+                        'timer' => $match['time_remaining'] ?
+                            sprintf(
+                                "%02d:%02d",
+                                floor($match['time_remaining'] / 60),
                                 $match['time_remaining'] % 60
                             ) : null,
                         'fouls' => null,
@@ -263,7 +271,7 @@ try {
                         'current_set' => $match['current_set'] ?? 1,
                         'timeouts' => $match['timeout_teamA']
                     ];
-                    
+
                     $normalizedMatch['teamB']['additional_info'] = [
                         'sets_won' => $match['teamB_sets_won'] ?? 0,
                         'current_set' => $match['current_set'] ?? 1,
@@ -294,7 +302,6 @@ try {
     } else {
         echo $jsonOutput;
     }
-
 } catch (Exception $e) {
     // Log the full error details
     error_log("FULL ERROR DETAILS in fetch_live_scores.php:");

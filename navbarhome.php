@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 include_once 'connection/conn.php';
 $conn = con();
 
@@ -140,12 +139,12 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
                     }
                 ?>
                     <div class="dropdown">
-                    <button class="btn d-flex align-items-center gap-2 border-0 px-2 py-1"
-    type="button"
-    id="userDropdown"
-    data-bs-toggle="dropdown"
-    data-bs-display="static" 
-    aria-expanded="false">
+                        <button class="btn d-flex align-items-center gap-2 border-0 px-2 py-1"
+                            type="button"
+                            id="userDropdown"
+                            data-bs-toggle="dropdown"
+                            data-bs-display="static"
+                            aria-expanded="false">
                             <div class=" border-primary p-2" style="background-color: transparent;">
                                 <i class="fas fa-user text-light fa-lg"></i>
                             </div>
@@ -194,7 +193,7 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
                 ?>
             </div>
 
-           <!-- <style>
+            <!-- <style>
                 /* Custom styles for the user section */
                 .dropdown-menu {
                     margin-top: 10px !important;
@@ -225,8 +224,8 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
             </style>-->
         </div>
     </div>
-</nav>
 
+</nav>
 
 
 <script>

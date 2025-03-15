@@ -4,6 +4,7 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+
 .custom-navbar {
   position: fixed;
   top: 6rem;
@@ -1131,6 +1132,7 @@ body {
   }
 }
 
+/* Media Queries */
 @media (max-width: 768px) {
   .custom-navbar,
   .custom-navbar ul,
