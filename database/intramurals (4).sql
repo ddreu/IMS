@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 24, 2025 at 07:42 PM
+-- Generation Time: Mar 15, 2025 at 06:46 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -179,8 +179,8 @@ INSERT INTO `brackets` (`bracket_id`, `game_id`, `department_id`, `grade_level`,
 (564, 54, 20, 'Grade 10', 6, 3, 'ongoing', '2025-02-12 13:40:11', 'single'),
 (565, 54, 20, 'Grade 7', 8, 3, 'ongoing', '2025-02-13 02:33:25', 'single'),
 (571, 18, 1, NULL, 6, 3, 'ongoing', '2025-02-20 17:39:01', 'single'),
-(618, 18, 1, NULL, 6, 5, 'ongoing', '2025-02-23 17:19:46', 'round_robin'),
-(622, 18, 1, NULL, 6, 9, 'ongoing', '2025-02-24 15:06:16', 'double');
+(629, 18, 1, NULL, 6, 9, 'ongoing', '2025-02-26 05:54:16', 'double'),
+(630, 18, 1, NULL, 6, 9, 'ongoing', '2025-02-26 05:55:20', 'double');
 
 -- --------------------------------------------------------
 
@@ -246,20 +246,34 @@ CREATE TABLE `double_match_info` (
 --
 
 INSERT INTO `double_match_info` (`match_id`, `next_winner_match`, `next_loser_match`, `bracket_position`) VALUES
-(5018, 5, 8, 'winners'),
-(5019, 5, 8, 'winners'),
-(5020, 6, 9, 'winners'),
-(5021, 6, 9, 'winners'),
-(5022, 7, 10, 'winners'),
-(5023, 7, 11, 'winners'),
-(5024, 11, 12, 'winners'),
-(5025, 9, 0, 'losers'),
-(5026, 10, 0, 'losers'),
-(5027, 11, 0, 'losers'),
-(5028, 12, 0, 'losers'),
-(5029, 13, 0, 'losers'),
-(5030, 14, 0, 'finals'),
-(5031, 0, 0, 'finals');
+(5110, 2, 8, 'winners'),
+(5111, 3, 8, 'winners'),
+(5112, 3, 9, 'winners'),
+(5113, 4, 9, 'winners'),
+(5114, 3, 10, 'winners'),
+(5115, 4, 10, 'winners'),
+(5116, 0, 11, 'winners'),
+(5117, 10, 0, 'losers'),
+(5118, 11, 0, 'losers'),
+(5119, 12, 0, 'losers'),
+(5120, 13, 0, 'losers'),
+(5121, 13, 0, 'losers'),
+(5122, 14, 0, 'losers'),
+(5123, 0, 0, 'finals'),
+(5124, 2, 8, 'winners'),
+(5125, 3, 8, 'winners'),
+(5126, 3, 9, 'winners'),
+(5127, 4, 9, 'winners'),
+(5128, 3, 10, 'winners'),
+(5129, 4, 10, 'winners'),
+(5130, 0, 11, 'winners'),
+(5131, 10, 0, 'losers'),
+(5132, 11, 0, 'losers'),
+(5133, 12, 0, 'losers'),
+(5134, 13, 0, 'losers'),
+(5135, 13, 0, 'losers'),
+(5136, 14, 0, 'losers'),
+(5137, 0, 0, 'finals');
 
 -- --------------------------------------------------------
 
@@ -4121,7 +4135,17 @@ INSERT INTO `logs` (`log_id`, `table_name`, `operation`, `record_id`, `user_id`,
 (3466, 'sessions', 'Logged out', 56, 56, '2025-02-24 16:53:59', 'User Logged out', NULL, NULL),
 (3467, 'sessions', 'Logged in', 67, 67, '2025-02-24 16:54:06', 'User Logged in', NULL, NULL),
 (3468, 'Brackets', 'DELETE', 621, 67, '2025-02-24 23:06:23', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
-(3469, 'Brackets', 'DELETE', 623, 67, '2025-02-25 01:07:52', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL);
+(3469, 'Brackets', 'DELETE', 623, 67, '2025-02-25 01:07:52', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(3470, 'Brackets', 'DELETE', 625, 67, '2025-02-26 13:20:09', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(3471, 'Brackets', 'DELETE', 624, 67, '2025-02-26 13:20:14', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(3472, 'Brackets', 'DELETE', 628, 67, '2025-02-26 13:53:36', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(3473, 'Brackets', 'DELETE', 627, 67, '2025-02-26 13:53:40', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(3474, 'Brackets', 'DELETE', 626, 67, '2025-02-26 13:53:44', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(3475, 'Brackets', 'DELETE', 622, 67, '2025-02-26 13:53:48', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(3476, 'Brackets', 'DELETE', 618, 67, '2025-02-26 13:53:52', 'Deleted a bracket for Game: Basketball, Department: College', NULL, NULL),
+(3477, 'sessions', 'Logged in', 67, 67, '2025-02-28 14:28:13', 'User Logged in', NULL, NULL),
+(3478, 'sessions', 'Logged in', 67, 67, '2025-03-04 00:01:02', 'User Logged in', NULL, NULL),
+(3479, 'sessions', 'Logged out', 67, 67, '2025-03-04 00:02:10', 'User Logged out', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -5173,35 +5197,34 @@ INSERT INTO `matches` (`match_id`, `match_identifier`, `bracket_id`, `teamA_id`,
 (4452, 'M18-D1-ALL-R2-6-1740073139281-rfdn61qcc', 571, 320, 312, 2, 6, 7, 'Finished', 'semifinal'),
 (4453, 'M18-D1-ALL-R3-7-1740073139281-m9r1t5e2n', 571, 248, 312, 3, 7, 0, 'Upcoming', 'final'),
 (4454, 'M18-D1-ALL-R3-8-1740073139281-xeu35nwhq', 571, 328, 320, 3, 8, 0, 'Upcoming', 'third_place'),
-(4967, 'B618R1M1', 618, 312, 328, 1, 1, NULL, 'Finished', 'regular'),
-(4968, 'B618R1M2', 618, 256, 320, 1, 2, NULL, 'Finished', 'regular'),
-(4969, 'B618R1M3', 618, 248, 240, 1, 3, NULL, 'Finished', 'regular'),
-(4970, 'B618R2M4', 618, 312, 320, 2, 4, NULL, 'Finished', 'regular'),
-(4971, 'B618R2M5', 618, 328, 240, 2, 5, NULL, 'Finished', 'regular'),
-(4972, 'B618R2M6', 618, 256, 248, 2, 6, NULL, 'Finished', 'regular'),
-(4973, 'B618R3M7', 618, 312, 240, 3, 7, NULL, 'Finished', 'regular'),
-(4974, 'B618R3M8', 618, 320, 248, 3, 8, NULL, 'Finished', 'regular'),
-(4975, 'B618R3M9', 618, 328, 256, 3, 9, NULL, 'Finished', 'regular'),
-(4976, 'B618R4M10', 618, 312, 248, 4, 10, NULL, 'Pending', 'regular'),
-(4977, 'B618R4M11', 618, 240, 256, 4, 11, NULL, 'Pending', 'regular'),
-(4978, 'B618R4M12', 618, 320, 328, 4, 12, NULL, 'Pending', 'regular'),
-(4979, 'B618R5M13', 618, 312, 256, 5, 13, NULL, 'Pending', 'regular'),
-(4980, 'B618R5M14', 618, 248, 328, 5, 14, NULL, 'Pending', 'regular'),
-(4981, 'B618R5M15', 618, 240, 320, 5, 15, NULL, 'Pending', 'regular'),
-(5018, 'M18-D1-W-R1-1-1740409572907-sdyt57ktsk', 622, 320, 256, 1, 1, 5, 'Pending', ''),
-(5019, 'M18-D1-W-R1-2-1740409572908-68qsoq3n9p', 622, 312, 248, 1, 2, 5, 'Pending', ''),
-(5020, 'M18-D1-W-R1-3-1740409572908-wzfo4b6lgq', 622, 328, 240, 1, 3, 6, 'Pending', ''),
-(5021, 'M18-D1-W-R1-4-1740409572908-6l436dh28t', 622, -1, -1, 1, 4, 6, 'Pending', ''),
-(5022, 'M18-D1-W-R2-5-1740409572908-yveq3v5mnw', 622, -2, -2, 2, 5, 7, 'Pending', ''),
-(5023, 'M18-D1-W-R2-6-1740409572908-vkmpov7x7k', 622, -2, -2, 2, 6, 7, 'Pending', ''),
-(5024, 'M18-D1-W-R3-7-1740409572908-ev96p2xxcc', 622, -2, -2, 3, 7, 11, 'Pending', ''),
-(5025, 'M18-D1-L-R1-8-1740409572908-afk2prinml', 622, -2, -2, 1, 8, 9, 'Pending', ''),
-(5026, 'M18-D1-L-R1-9-1740409572908-wkp9bomlb2', 622, -2, -2, 1, 9, 10, 'Pending', ''),
-(5027, 'M18-D1-L-R2-10-1740409572908-6btf3v2o7g', 622, -2, -2, 2, 10, 11, 'Pending', ''),
-(5028, 'M18-D1-L-R3-11-1740409572908-juuq6e71zt', 622, -2, -2, 3, 11, 12, 'Pending', ''),
-(5029, 'M18-D1-L-R4-12-1740409572908-iwzig3x0mf', 622, -2, -2, 4, 12, 13, 'Pending', ''),
-(5030, 'M18-D1-F1-13-1740409572908-c78k4alvw8', 622, -2, -2, 1, 13, 14, 'Pending', ''),
-(5031, 'M18-D1-F2-14-1740409572908-y7sgyyjylp', 622, -2, -2, 2, 14, 0, 'Pending', '');
+(5110, 'M18-D1-W-R1-1-1740549241457-bwmum11hbzt', 629, -1, 248, 1, 1, 2, 'Finished', ''),
+(5111, 'M18-D1-W-R1-2-1740549241457-1voupz6hf65', 629, 328, 312, 1, 2, 3, 'Pending', ''),
+(5112, 'M18-D1-W-R1-3-1740549241457-4dv87q8jvhu', 629, -1, 320, 1, 3, 3, 'Finished', ''),
+(5113, 'M18-D1-W-R1-4-1740549241457-rsk4ppva2yd', 629, 240, 256, 1, 4, 4, 'Pending', ''),
+(5114, 'M18-D1-W-R2-5-1740549241458-lamkglo3nlc', 629, -2, -2, 2, 5, 3, 'Pending', ''),
+(5115, 'M18-D1-W-R2-6-1740549241458-3a8fvptpj6f', 629, -2, -2, 2, 6, 4, 'Pending', ''),
+(5116, 'M18-D1-W-R3-7-1740549241458-kppouge14k8', 629, -2, -2, 3, 7, 0, 'Pending', ''),
+(5117, 'M18-D1-L-R1-8-1740549241458-7r5a6d14x7n', 629, -2, -2, 1, 8, 10, 'Pending', ''),
+(5118, 'M18-D1-L-R1-9-1740549241458-evo3ri8gd2f', 629, -2, -2, 1, 9, 11, 'Pending', ''),
+(5119, 'M18-D1-L-R2-10-1740549241458-rjrv0yrexkl', 629, -2, -2, 2, 10, 12, 'Pending', ''),
+(5120, 'M18-D1-L-R2-11-1740549241458-5zu5sohjb08', 629, -2, -2, 2, 11, 13, 'Pending', ''),
+(5121, 'M18-D1-L-R3-12-1740549241458-o9v6ly2hha', 629, -2, -2, 3, 12, 13, 'Pending', ''),
+(5122, 'M18-D1-L-R4-13-1740549241458-32t5376z1t1', 629, -2, -2, 4, 13, 14, 'Pending', ''),
+(5123, 'M18-D1-F-R1-14-1740549241458-9lu4bex985b', 629, -2, -2, 1, 14, 0, 'Pending', ''),
+(5124, 'M18-D1-W-R1-1-1740549308491-w5tc84jv5og', 630, -1, 320, 1, 1, 2, 'Finished', ''),
+(5125, 'M18-D1-W-R1-2-1740549308491-9uuuqqscl4', 630, 256, 248, 1, 2, 3, 'Pending', ''),
+(5126, 'M18-D1-W-R1-3-1740549308491-pywnstts7g', 630, -1, 312, 1, 3, 3, 'Finished', ''),
+(5127, 'M18-D1-W-R1-4-1740549308491-fq79y3pbwnm', 630, 240, 328, 1, 4, 4, 'Pending', ''),
+(5128, 'M18-D1-W-R2-5-1740549308491-h1303ikkjbl', 630, -2, -2, 2, 5, 3, 'Pending', ''),
+(5129, 'M18-D1-W-R2-6-1740549308491-r12uqu972i', 630, -2, -2, 2, 6, 4, 'Pending', ''),
+(5130, 'M18-D1-W-R3-7-1740549308491-w9fvdsmztk', 630, -2, -2, 3, 7, 0, 'Pending', ''),
+(5131, 'M18-D1-L-R1-8-1740549308491-lvatrokib3k', 630, -2, -2, 1, 8, 10, 'Pending', ''),
+(5132, 'M18-D1-L-R1-9-1740549308491-x38x747d118', 630, -2, -2, 1, 9, 11, 'Pending', ''),
+(5133, 'M18-D1-L-R2-10-1740549308491-jusb0sahq8p', 630, -2, -2, 2, 10, 12, 'Pending', ''),
+(5134, 'M18-D1-L-R2-11-1740549308491-yy1eu3al0n8', 630, -2, -2, 2, 11, 13, 'Pending', ''),
+(5135, 'M18-D1-L-R3-12-1740549308491-inc6pb20xm', 630, -2, -2, 3, 12, 13, 'Pending', ''),
+(5136, 'M18-D1-L-R4-13-1740549308491-bxqtloyhson', 630, -2, -2, 4, 13, 14, 'Pending', ''),
+(5137, 'M18-D1-F-R1-14-1740549308491-f20gme2pg1d', 630, -2, -2, 1, 14, 0, 'Pending', '');
 
 -- --------------------------------------------------------
 
@@ -5264,13 +5287,7 @@ INSERT INTO `match_periods_info` (`period_info_id`, `match_id`, `period_number`,
 (98, 3220, 3, 2073, 2168, 3, 0, '2025-02-06 12:47:45'),
 (99, 3221, 1, 2282, 2225, 1, 0, '2025-02-06 12:50:16'),
 (100, 3221, 2, 2282, 2225, 1, 0, '2025-02-06 12:50:20'),
-(101, 3221, 2, 2282, 2225, 2, 0, '2025-02-06 12:50:23'),
-(102, 4974, 1, 320, 248, 6, 4, '2025-02-23 21:43:00'),
-(103, 4974, 2, 320, 248, 3, 0, '2025-02-23 21:43:05'),
-(104, 4974, 3, 320, 248, 3, 4, '2025-02-23 21:52:45'),
-(105, 4975, 1, 328, 256, 4, 0, '2025-02-23 22:19:12'),
-(106, 4975, 2, 328, 256, 0, 4, '2025-02-23 22:19:16'),
-(107, 4975, 3, 328, 256, 4, 0, '2025-02-23 22:19:21');
+(101, 3221, 2, 2282, 2225, 2, 0, '2025-02-06 12:50:23');
 
 -- --------------------------------------------------------
 
@@ -5394,16 +5411,7 @@ INSERT INTO `match_results` (`result_id`, `match_id`, `game_id`, `team_A_id`, `t
 (193, 4448, 18, 240, 248, 2, 9, 248, 240, '2025-02-20 17:43:50'),
 (194, 4449, 18, 256, 320, 2, 8, 320, 256, '2025-02-20 17:44:06'),
 (197, 4451, 18, 328, 248, 2, 9, 248, 328, '2025-02-20 17:56:15'),
-(198, 4452, 18, 320, 312, 2, 8, 312, 320, '2025-02-20 17:56:33'),
-(199, 4967, 18, 312, 328, 2, 7, 328, 312, '2025-02-23 19:42:34'),
-(200, 4968, 18, 256, 320, 7, 27, 320, 256, '2025-02-23 20:31:37'),
-(201, 4969, 18, 248, 240, 7, 28, 240, 248, '2025-02-23 20:41:36'),
-(202, 4970, 18, 312, 320, 10, 4, 312, 320, '2025-02-23 20:47:51'),
-(203, 4971, 18, 328, 240, 10, 1, 328, 240, '2025-02-23 21:05:13'),
-(204, 4972, 18, 256, 248, 2, 8, 248, 256, '2025-02-23 21:11:39'),
-(205, 4973, 18, 312, 240, 0, 6, 240, 312, '2025-02-23 21:12:03'),
-(206, 4974, 18, 320, 248, 2, 1, 320, 248, '2025-02-23 22:14:15'),
-(207, 4975, 18, 328, 256, 2, 1, 328, 256, '2025-02-23 22:19:33');
+(198, 4452, 18, 320, 312, 2, 8, 312, 320, '2025-02-20 17:56:33');
 
 -- --------------------------------------------------------
 
@@ -6543,16 +6551,7 @@ INSERT INTO `schedules` (`schedule_id`, `match_id`, `schedule_date`, `schedule_t
 (754, 4451, '2025-02-21', '07:00:00', '444'),
 (755, 4452, '2025-02-21', '07:00:00', '1'),
 (756, 4454, '2025-02-21', '07:00:00', '5'),
-(757, 4453, '2025-02-21', '07:00:00', '7'),
-(758, 4967, '2025-02-24', '07:00:00', 'A'),
-(759, 4968, '2025-02-24', '07:00:00', 'Xx'),
-(760, 4969, '2025-02-24', '07:00:00', 'Ll'),
-(761, 4970, '2025-02-24', '07:00:00', 'Qq'),
-(762, 4971, '2025-02-24', '07:00:00', 'Ww'),
-(763, 4972, '2025-02-24', '07:00:00', 'Ee'),
-(764, 4973, '2025-02-24', '07:00:00', 'Rr'),
-(765, 4974, '2025-02-24', '07:00:00', 'Tt'),
-(766, 4975, '2025-02-24', '07:00:00', 'Yy');
+(757, 4453, '2025-02-21', '07:00:00', '7');
 
 -- --------------------------------------------------------
 
@@ -6653,8 +6652,7 @@ INSERT INTO `sessions` (`session_id`, `user_id`, `ip_address`, `user_agent`, `cr
 (744, 112, '64.224.126.38', 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Mobile Safari/537.36', '2025-02-12 13:07:03', '2025-02-12 14:07:03'),
 (746, 133, '64.224.126.38', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', '2025-02-12 13:16:35', '2025-02-12 14:16:35'),
 (747, 133, '64.224.126.38', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', '2025-02-13 02:28:39', '2025-02-13 03:28:39'),
-(748, 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36', '2025-02-13 10:15:53', '2025-02-13 11:15:53'),
-(761, 67, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36', '2025-02-24 08:54:06', '2025-02-24 09:54:06');
+(748, 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36', '2025-02-13 10:15:53', '2025-02-13 11:15:53');
 
 -- --------------------------------------------------------
 
@@ -8722,18 +8720,6 @@ CREATE TABLE `team_tournament_points` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `team_tournament_points`
---
-
-INSERT INTO `team_tournament_points` (`id`, `bracket_id`, `team_id`, `total_points`, `bonus_points`, `updated_at`) VALUES
-(1, 618, 328, 15, 0, '2025-02-23 22:19:33'),
-(2, 618, 312, 2, 2, '2025-02-23 22:29:26'),
-(3, 618, 240, 5, 0, '2025-02-23 21:12:03'),
-(4, 618, 248, 5, 0, '2025-02-23 21:11:39'),
-(5, 618, 256, 0, 0, '2025-02-23 21:11:39'),
-(8, 618, 320, 5, 0, '2025-02-23 22:14:15');
-
 -- --------------------------------------------------------
 
 --
@@ -8750,13 +8736,6 @@ CREATE TABLE `tournament_scoring` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tournament_scoring`
---
-
-INSERT INTO `tournament_scoring` (`scoring_id`, `bracket_id`, `win_points`, `draw_points`, `loss_points`, `bonus_points`, `created_at`, `updated_at`) VALUES
-(1, 618, 5, 1, 0, 2, '2025-02-23 17:19:46', '2025-02-23 17:54:20');
 
 -- --------------------------------------------------------
 
@@ -9055,7 +9034,7 @@ ALTER TABLE `announcement`
 -- AUTO_INCREMENT for table `brackets`
 --
 ALTER TABLE `brackets`
-  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=624;
+  MODIFY `bracket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=631;
 
 --
 -- AUTO_INCREMENT for table `committee_games`
@@ -9115,13 +9094,13 @@ ALTER TABLE `live_set_scores`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3470;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3480;
 
 --
 -- AUTO_INCREMENT for table `matches`
 --
 ALTER TABLE `matches`
-  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5040;
+  MODIFY `match_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5138;
 
 --
 -- AUTO_INCREMENT for table `match_periods_info`
@@ -9181,7 +9160,7 @@ ALTER TABLE `schools`
 -- AUTO_INCREMENT for table `sessions`
 --
 ALTER TABLE `sessions`
-  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=762;
+  MODIFY `session_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=764;
 
 --
 -- AUTO_INCREMENT for table `teams`
