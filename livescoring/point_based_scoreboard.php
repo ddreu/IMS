@@ -49,7 +49,7 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <audio id="buzzerSound" src="buzzer/buzzer.mp3"></audio>
-    
+
     <script>
         // Immediately set global game data
         window.gameData = {
@@ -59,7 +59,7 @@ $conn->close();
             teamB_id: '<?php echo htmlspecialchars($teamB_id); ?>',
             match_id: '<?php echo htmlspecialchars($match['match_id']); ?>'
         };
-        
+
         // Utility functions
         const utils = {
             getElement: (id) => document.getElementById(id),
@@ -80,8 +80,8 @@ $conn->close();
 </head>
 
 <body>
-<!-- Schedule ID -->
-<input type="hidden" id="schedule_id" value="<?php echo htmlspecialchars($schedule_id); ?>">
+    <!-- Schedule ID -->
+    <input type="hidden" id="schedule_id" value="<?php echo htmlspecialchars($schedule_id); ?>">
     <input type="hidden" id="match-id" value="<?php echo $match['match_id']; ?>">
     <div class="scoreboard">
         <!-- Header Controls -->
@@ -95,9 +95,9 @@ $conn->close();
 
             <!-- Right Side: Live Stream & Settings -->
             <div class="header-buttons">
-                <button class="score-button live-match" onclick="openLiveStreamSettings()">
+                <!-- <button class="score-button live-match" onclick="openLiveStreamSettings()">
                     <i class="fas fa-video"></i>
-                </button>
+                </button> -->
                 <button class="score-button settings-button" onclick="openSettings()">
                     <i class="fas fa-cog"></i>
                 </button>
@@ -227,7 +227,7 @@ $conn->close();
     </div>
 
     <!-- Live Stream Settings Modal -->
-    <div id="liveStreamModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">
+    <!-- <div id="liveStreamModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">
         <h3 style="color: white; margin-bottom: 15px;">Live Stream Settings</h3>
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <div>
@@ -243,17 +243,16 @@ $conn->close();
                 <button class="score-button" onclick="closeLiveStreamSettings()">Cancel</button>
             </div>
         </div>
-    </div>
-    <?php include 'player_stats.php'; ?>
+    </div> -->
 
-       <!-- Bottom Player Stats Bar -->
-       <div class="player-stats-bar d-none d-md-flex" onclick="window.togglePlayerStats()">
+    <!-- Bottom Player Stats Bar -->
+    <!--<div class="player-stats-bar d-none d-md-flex" onclick="window.togglePlayerStats()">
         <i class="fas fa-users me-2"></i>
         <span>Player Statistics</span>
         <i class="fas fa-chevron-up ms-2"></i>
-    </div>
+    </div> -->
 
-    <nav class="bottom-nav d-md-none">
+    <!-- <nav class="bottom-nav d-md-none">
         <div class="nav-item" onclick="window.toggleGameStats()">
             <i class="fas fa-chart-bar"></i>
             <span>Team Stats</span>
@@ -262,7 +261,7 @@ $conn->close();
             <i class="fas fa-users"></i>
             <span>Player Stats</span>
         </div>
-    </nav>
+    </nav> -->
 
     <!-- End Match Confirmation Modal 
     <div id="endMatchModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">
@@ -303,7 +302,7 @@ $conn->close();
         document.addEventListener('DOMContentLoaded', function() {
             // Check if this is a new match (you might need to pass this information from PHP)
             const isNewMatch = <?= isset($_GET['new_match']) ? 'true' : 'false' ?>;
-            
+
             if (isNewMatch) {
                 clearMatchState();
             }

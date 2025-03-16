@@ -51,7 +51,11 @@ $stream_details = getStreamDetails($_GET['schedule_id'] ?? 0);
         }
 
         .mt {
-            margin-top: 150px;
+            margin-top: 90px;
+        }
+
+        .mt-5 {
+            margin-top: 73px !important;
         }
 
         .video-container {
@@ -426,6 +430,13 @@ $stream_details = getStreamDetails($_GET['schedule_id'] ?? 0);
 <body>
     <div class="nav-container">
         <?php include 'navbarhome.php'; ?>
+    </div>
+
+    <div class="page-header-live mt-5">
+        <div class="container mt-5 pt-4 pb-4 text-center">
+            <h1 class="h3 fw-semibold mb-2">Live Matches</h1>
+            <p class="mb-0" style="font-size: 0.9rem; opacity: 0.9;">Watch matches as they happen in real-time</p>
+        </div>
     </div>
 
     <div class="container mt">
