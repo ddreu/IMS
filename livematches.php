@@ -19,7 +19,7 @@ session_start();
 
     <!-- jQuery for AJAX -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script>
+    <!-- <script src="https://download.agora.io/sdk/release/AgoraRTC_N.js"></script> -->
 
     <style>
         .team-score-display {
@@ -36,6 +36,20 @@ session_start();
         .score {
             font-size: 1.2em;
             color: #2c3e50;
+        }
+
+        .timer-status {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 2px;
+            text-transform: capitalize;
+        }
+
+        .timer-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
         }
     </style>
 </head>
@@ -64,11 +78,11 @@ session_start();
             let additionalInfoHtml = '';
 
             if (sourceTable === 'live_scores') {
-                if (additionalInfo.period) {
+                if (additionalInfo.fouls !== null) {
                     additionalInfoHtml += `
                         <div class="stat-item">
-                            <span class="stat-label">Period</span>
-                            <span>${additionalInfo.period}</span>
+                            <span class="stat-label">Fouls</span>
+                            <span>${additionalInfo.fouls}</span>
                         </div>
                     `;
                 }
@@ -89,11 +103,19 @@ session_start();
                         </div>
                     `;
                 }
-                if (additionalInfo.current_set) {
+                // if (additionalInfo.current_set) {
+                //     additionalInfoHtml += `
+                //         <div class="stat-item">
+                //             <span class="stat-label">Current Set</span>
+                //             <span>${additionalInfo.current_set}</span>
+                //         </div>
+                //     `;
+                // }
+                if (additionalInfo.timeouts !== null) {
                     additionalInfoHtml += `
                         <div class="stat-item">
-                            <span class="stat-label">Current Set</span>
-                            <span>${additionalInfo.current_set}</span>
+                            <span class="stat-label">Timeouts</span>
+                            <span>${additionalInfo.timeouts}</span>
                         </div>
                     `;
                 }
@@ -107,7 +129,7 @@ session_start();
             let vsContent = '<div class="vs-section">';
             vsContent += '<div>VS</div>';
 
-            if (match.source_table === 'live_scores' && match.teamA.additional_info.period) {
+            if (match.source_table === 'live_scores') {
                 vsContent += `
                     <div class="period-info">
                         Period ${match.teamA.additional_info.period}
@@ -115,6 +137,7 @@ session_start();
                     ${match.teamA.additional_info.timer ? `
                         <div class="timer-display">
                             ${match.teamA.additional_info.timer}
+                            <div class="timer-status">(${match.teamA.additional_info.timer_status})</div>
                         </div>
                     ` : ''}
                 `;

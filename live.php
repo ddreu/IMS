@@ -429,11 +429,11 @@ $stream_details = getStreamDetails($_GET['schedule_id'] ?? 0);
     </div>
 
     <div class="container mt">
-        <div class="back-button">
+        <!-- <div class="back-button">
             <a href="livematches.php" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Live Matches
             </a>
-        </div>
+        </div> -->
 
         <h2 class="text-center mb-4">Live Stream - <?php echo htmlspecialchars($_GET['game_name'] ?? ''); ?></h2>
 
@@ -506,11 +506,27 @@ $stream_details = getStreamDetails($_GET['schedule_id'] ?? 0);
             let additionalInfoHtml = '';
 
             if (sourceTable === 'live_scores') {
-                if (additionalInfo.period) {
+                // if (additionalInfo.period) {
+                //     additionalInfoHtml += `
+                //         <div class="stat-item">
+                //             <span class="stat-label">Period</span>
+                //             <span>${additionalInfo.period}</span>
+                //         </div>
+                //     `;
+                // }
+                // if (additionalInfo.timer) {
+                //     additionalInfoHtml += `
+                //         <div class="stat-item">
+                //             <span class="stat-label">Time</span>
+                //             <span>${additionalInfo.timer}</span>
+                //         </div>
+                //     `;
+                // }
+                if (additionalInfo.fouls !== null) {
                     additionalInfoHtml += `
                         <div class="stat-item">
-                            <span class="stat-label">Period</span>
-                            <span>${additionalInfo.period}</span>
+                            <span class="stat-label">Fouls</span>
+                            <span>${additionalInfo.fouls}</span>
                         </div>
                     `;
                 }
@@ -531,11 +547,19 @@ $stream_details = getStreamDetails($_GET['schedule_id'] ?? 0);
                         </div>
                     `;
                 }
-                if (additionalInfo.current_set) {
+                // if (additionalInfo.current_set) {
+                //     additionalInfoHtml += `
+                //         <div class="stat-item">
+                //             <span class="stat-label">Current Set</span>
+                //             <span>${additionalInfo.current_set}</span>
+                //         </div>
+                //     `;
+                // }
+                if (additionalInfo.timeouts !== null) {
                     additionalInfoHtml += `
                         <div class="stat-item">
-                            <span class="stat-label">Current Set</span>
-                            <span>${additionalInfo.current_set}</span>
+                            <span class="stat-label">Timeouts</span>
+                            <span>${additionalInfo.timeouts}</span>
                         </div>
                     `;
                 }
@@ -548,7 +572,7 @@ $stream_details = getStreamDetails($_GET['schedule_id'] ?? 0);
             let vsContent = '<div class="vs-section">';
             vsContent += '<div>VS</div>';
 
-            if (match.source_table === 'live_scores' && match.teamA.additional_info.period) {
+            if (match.source_table === 'live_scores') {
                 vsContent += `
                     <div class="period-info">
                         Period ${match.teamA.additional_info.period}
@@ -556,6 +580,7 @@ $stream_details = getStreamDetails($_GET['schedule_id'] ?? 0);
                     ${match.teamA.additional_info.timer ? `
                         <div class="timer-display">
                             ${match.teamA.additional_info.timer}
+                            <div class="timer-status">(${match.teamA.additional_info.timer_status})</div>
                         </div>
                     ` : ''}
                 `;
