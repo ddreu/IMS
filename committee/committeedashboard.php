@@ -10,6 +10,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// echo "Welcome, " . $_SESSION['user_id'] . "!";
+
 // Check the user's role using the session data
 if ($_SESSION['role'] !== 'Committee') {
     header('Location: ../login.php');

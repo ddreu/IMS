@@ -39,17 +39,16 @@ $conn->close();
         <?php endif; ?>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero-section">
+        <video autoplay muted loop playsinline id="hero-video">
+            <source src="assets/vid/hero-vid.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
         <div class="hero-content">
             <h1>Elevate the Game.</h1>
             <p>Take control of your intramurals. Manage schedules, track scores, and lead your teams to success—all in one place.</p>
-
-
-
-            <!-- <a href="#schools" class="cta-btn">Select Your School</a> -->
             <button class="cta-btn" id="open-schools-btn">Select School</button>
-
         </div>
     </section>
 

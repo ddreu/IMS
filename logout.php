@@ -24,7 +24,7 @@ if (isset($_SESSION['user_id'])) {
     $description = "User Logged out";
     logUserAction(
         $conn,
-        $user_id, // Ensure we use the user ID before session destruction
+        $user_id,
         'sessions',
         'Logged out',
         $user_id,
