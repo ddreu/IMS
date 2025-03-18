@@ -27,7 +27,7 @@ vendor/
 
 # Git LFS
 *.psd
-*.mp4
+# *.mp4
 
 # TypeScript build files (if applicable)
 *.tsbuildinfo
