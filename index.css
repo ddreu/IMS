@@ -35,7 +35,11 @@ body {
   font-size: 1.5rem;
   font-weight: bold;
   color: white;
-  /* Ensure text is still visible */
+  transition: all 0.3s ease;
+}
+
+.navbar .logo:hover {
+  color: #4500b5;
 }
 
 .navbar .login-btn {
@@ -102,12 +106,19 @@ body {
   line-height: 1.2;
   font-weight: 700;
   margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  color: #4500b5;
+}
+
+.hero-content h1:hover {
+  color: #a4a4a4;
 }
 
 .hero-content p {
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 2rem;
+  transition: all 0.3s ease;
 }
 
 .hero-content .cta-btn {
@@ -125,6 +136,7 @@ body {
 
 .hero-content .cta-btn:hover {
   background: #4500b5;
+  color: #fff;
 }
 
 /* School Section Container */

@@ -187,7 +187,7 @@ $conn->close();
         <div class="container-fluid p-4">
             <!-- Welcome Section -->
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0 text-gray-800">Dashboard Overview</h1>
+                <h1 class="h3 mb-0 text-gray-800"><strong>Dashboard Overview</strong></h1>
                 <div class="date text-muted"><?php echo date('l, F j, Y'); ?></div>
             </div>
 

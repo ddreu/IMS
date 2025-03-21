@@ -54,7 +54,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'superadmin') {
                     </thead>
                     <tbody>
                         <?php
-                        // Fetch schools from the database
                         $sql = "SELECT school_id, school_name, school_code, address, logo FROM schools WHERE school_id != 0";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
@@ -71,11 +70,29 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'superadmin') {
                                 echo "<td>" . htmlspecialchars($row['school_code']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['address']) . "</td>";
                                 echo "<td>
-                                        <button class='btn btn-primary btn-sm edit-btn' data-id='{$row['school_id']}'><i class='fas fa-edit'></i> Edit</button>
-                                        <a href='javascript:void(0)' onclick='deleteSchool(" . $row['school_id'] . ", \"" . htmlspecialchars($row['school_name']) . "\")' class='btn btn-danger btn-sm'>
-                                            <i class='fas fa-trash'></i> Delete
-                                        </a>
-                                      </td>";
+                                <div class='dropdown'>
+                                    <button class='btn btn-secondary btn-sm dropdown-toggle' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
+                                        Actions
+                                    </button>
+                                    <ul class='dropdown-menu'>
+                                        <li>
+                                            <a class='dropdown-item' href='school-dashboard-process.php?id={$row['school_id']}'>
+                                                 Open School
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <button class='dropdown-item edit-btn' data-id='{$row['school_id']}'>
+                                                 Edit
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <a class='dropdown-item text-danger' href='javascript:void(0)' onclick='deleteSchool(" . $row['school_id'] . ", \"" . htmlspecialchars($row['school_name']) . "\")'>
+                                                 Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                              </td>";
                                 echo "</tr>";
                             }
                         } else {
