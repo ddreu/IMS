@@ -11,7 +11,8 @@ body {
   /* Dark theme */
   color: #fff;
   overflow-x: hidden;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
 }
 
 /* Navbar Styling */
@@ -141,6 +142,7 @@ body {
 
 /* School Section Container */
 .schools-section {
+  display: none; /* Initially hide the overlay */
   position: fixed;
   bottom: -100%; /* Hide initially */
   left: 0;
@@ -158,7 +160,8 @@ body {
 
 /* Show class to slide up */
 .schools-section.show {
-  bottom: 0;
+  display: flex; /* Show the overlay */
+  bottom: 0; /* Slide up */
 }
 
 /* Grid Layout for Cards */
@@ -172,6 +175,10 @@ body {
   width: 100%;
   max-width: 1000px;
   padding: 1rem;
+}
+
+.school-cards-container a {
+  text-decoration: none;
 }
 
 /* Individual School Card */
@@ -189,6 +196,8 @@ body {
   align-items: center;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
 }
+
+
 
 .school-card:hover {
   transform: translateY(-5px);
@@ -277,6 +286,8 @@ body {
 
   .school-card {
     padding: 1rem;
+    height: auto;
+    max-height: 80vh;
   }
 }
 
@@ -318,11 +329,18 @@ body {
   }
 
   .schools-section {
-    bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
+    bottom: 0;
+    left: 0;
+    right: 0;
     padding: 0.8rem;
     display: none;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .school-card {
+    height: auto;
+    max-height: 80vh;
   }
 
   .school-cards-container {

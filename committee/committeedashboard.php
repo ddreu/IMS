@@ -760,8 +760,9 @@ include '../navbar/navbar.php';
                     icon: 'success',
                     title: 'Success!',
                     text: '<?php echo htmlspecialchars($successMessage); ?>',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#3085d6',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
                     timer: 3000
                 });
             });

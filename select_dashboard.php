@@ -70,6 +70,7 @@ mysqli_close($conn);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -89,6 +90,7 @@ mysqli_close($conn);
             align-items: center;
             text-align: center;
         }
+
         .container {
             padding: 40px;
             border-radius: 15px;
@@ -96,11 +98,13 @@ mysqli_close($conn);
             max-width: 500px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
         }
+
         h1 {
             font-size: 2rem;
             font-weight: bold;
             margin-bottom: 20px;
         }
+
         .dashboard-option {
             display: block;
             text-decoration: none;
@@ -113,12 +117,14 @@ mysqli_close($conn);
             font-weight: 500;
             transition: all 0.3s ease-in-out;
         }
+
         .dashboard-option:hover {
             background: #0056b3;
             transform: scale(1.05);
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -145,9 +151,10 @@ mysqli_close($conn);
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
+                    toast: true,
+                    position: 'top',
                     text: '<?php echo htmlspecialchars($_SESSION['success_message']); ?>',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#3085d6',
+                    showConfirmButton: false,
                     timer: 3000
                 });
             });
@@ -155,4 +162,5 @@ mysqli_close($conn);
         <?php unset($_SESSION['success_message']); ?>
     <?php endif; ?>
 </body>
+
 </html>

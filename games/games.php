@@ -402,18 +402,28 @@ include '../navbar/navbar.php';
                             </div>
                         </div>
                         <div class="col-md-6">
-                                    <form method="GET" action="games.php" class="d-flex gap-2">
-                                        <input type="text" name="search" class="form-control" placeholder="Search games..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </form>
-                                </div>
+                            <form method="GET" action="games.php" class="d-flex gap-2">
+                                <input type="text" name="search" class="form-control" placeholder="Search games..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
                 <div class="card box">
                     <div class="card-body">
+                        <!-- Filter Buttons -->
+                        <div class="btn-group portfolio-filter mb-3 mt-0" role="group" aria-label="Portfolio Filter">
+                            <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
+                                Active
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary filter-btn" data-category="1">
+                                Archived
+                            </button>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="bg-light">
@@ -431,7 +441,7 @@ include '../navbar/navbar.php';
                                     <?php
                                     if ($game_result && mysqli_num_rows($game_result) > 0) {
                                         while ($game = mysqli_fetch_assoc($game_result)) {
-                                            echo '<tr>';
+                                            echo '<tr data-category="' . htmlspecialchars($game['is_archived']) . '">';
                                             echo '<td data-label="Game Name" class="px-4">' . htmlspecialchars($game['game_name']) . '</td>';
                                             echo '<td data-label="Players" class="px-4">' . htmlspecialchars($game['number_of_players']) . '</td>';
                                             echo '<td data-label="Category" class="px-4">' . htmlspecialchars($game['category']) . '</td>';
@@ -441,26 +451,56 @@ include '../navbar/navbar.php';
                                             if ($user['role'] === 'School Admin') {
                                                 echo '<td data-label="Actions" class="px-4 text-center">';
                                                 echo '<div class="btn-group">';
-// Edit button
-echo '<button onclick="openUpdateModal(' .
-htmlspecialchars($game['game_id']) . ', \'' .
-htmlspecialchars($game['game_name']) . '\', ' .
-htmlspecialchars($game['number_of_players']) . ', \'' .
-htmlspecialchars($game['category']) . '\', \'' .
-htmlspecialchars($game['environment']) . '\')" ' .
-'class="btn btn-primary btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
-'<i class="fas fa-edit"></i></button>';                                                        // Delete button and form
-                                                        echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" class="d-inline">';
-                                                        echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
-                                                        echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
-                                                            'class="btn btn-danger btn-sm mx-1" style="width: 38px; height: 32px; padding: 6px 0;">' .
-                                                            '<i class="fas fa-trash"></i></button>';
-                                                        echo '</form>';
-                                               
-                                               
-                                                echo '</div>';
+
+                                                // Dropdown Toggle
+                                                echo '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 32px; padding: 6px 0;">';
+                                                echo '⋮'; // Three dots symbol
+                                                echo '</button>';
+
+                                                // Dropdown Menu
+                                                echo '<ul class="dropdown-menu">';
+
+                                                // Edit Button (Only show if not archived)
+                                                if ($game['is_archived'] != 1) {
+                                                    echo '<li>';
+                                                    echo '<button onclick="openUpdateModal(' . htmlspecialchars($game['game_id']) . ', \'' .
+                                                        htmlspecialchars($game['game_name']) . '\', ' .
+                                                        htmlspecialchars($game['number_of_players']) . ', \'' .
+                                                        htmlspecialchars($game['category']) . '\', \'' .
+                                                        htmlspecialchars($game['environment']) . '\')" ' .
+                                                        'class="dropdown-item" style="padding: 4px 12px; line-height: 1.2;">';
+                                                    echo 'Edit';
+                                                    echo '</button>';
+                                                    echo '</li>';
+                                                }
+
+                                                // Delete Button
+                                                echo '<li>';
+                                                echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST">';
+                                                echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
+                                                echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
+                                                    'class="dropdown-item" style="padding: 4px 12px; line-height: 1.2;">';
+                                                echo 'Delete';
+                                                echo '</button>';
+                                                echo '</form>';
+                                                echo '</li>';
+
+                                                // Archive/Unarchive Button
+                                                echo '<li>';
+                                                echo '<button type="button" class="dropdown-item archive-btn" ' .
+                                                    'data-id="' . htmlspecialchars($game['game_id']) . '" ' .
+                                                    'data-table="games" ' .
+                                                    'data-operation="' . ($game['is_archived'] == 1 ? 'unarchive' : 'archive') . '" ' .
+                                                    'style="padding: 4px 12px; line-height: 1.2;">';
+                                                echo ($game['is_archived'] == 1 ? 'Unarchive' : 'Archive');
+                                                echo '</button>';
+                                                echo '</li>';
+
+                                                echo '</ul>'; // Close dropdown menu
+                                                echo '</div>'; // Close btn-group
                                                 echo '</td>';
                                             }
+
                                             echo '</tr>';
                                         }
                                     } else {
@@ -481,54 +521,54 @@ htmlspecialchars($game['environment']) . '\')" ' .
         </div>
     </div>
 
-<!-- Update Game Modal -->
-<div class="modal fade" id="updateGameModal" tabindex="-1" aria-labelledby="updateGameModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="updateGameModalLabel">Update Game</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form id="updateGameForm" method="post" action="update_game.php">
-                            <div class="modal-body">
-                                <input type="hidden" name="game_id" id="update_game_id">
-
-                                <div class="mb-3">
-                                    <label for="update_game_name" class="form-label">Game Name:</label>
-                                    <input type="text" class="form-control" name="game_name" id="update_game_name" required>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="update_number_of_players" class="form-label">Number of Players per Team:</label>
-                                    <input type="number" class="form-control" name="number_of_players" id="update_number_of_players" min="1" required>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="update_category" class="form-label">Category:</label>
-                                    <select name="category" id="update_category" class="form-select" required>
-                                        <option value="Team Sports">Team Sports</option>
-                                        <option value="Individual Sports">Individual Sports</option>
-                                        <option value="Dual Sports">Dual Sports</option>
-                                    </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="update_environment" class="form-label">Environment:</label>
-                                    <select name="environment" id="update_environment" class="form-select" required>
-                                        <option value="Indoor">Indoor</option>
-                                        <option value="Outdoor">Outdoor</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary" id="updateGameBtn">Update Game</button>
-                            </div>
-                        </form>
-                    </div>
+    <!-- Update Game Modal -->
+    <div class="modal fade" id="updateGameModal" tabindex="-1" aria-labelledby="updateGameModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateGameModalLabel">Update Game</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <form id="updateGameForm" method="post" action="update_game.php">
+                    <div class="modal-body">
+                        <input type="hidden" name="game_id" id="update_game_id">
+
+                        <div class="mb-3">
+                            <label for="update_game_name" class="form-label">Game Name:</label>
+                            <input type="text" class="form-control" name="game_name" id="update_game_name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="update_number_of_players" class="form-label">Number of Players per Team:</label>
+                            <input type="number" class="form-control" name="number_of_players" id="update_number_of_players" min="1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="update_category" class="form-label">Category:</label>
+                            <select name="category" id="update_category" class="form-select" required>
+                                <option value="Team Sports">Team Sports</option>
+                                <option value="Individual Sports">Individual Sports</option>
+                                <option value="Dual Sports">Dual Sports</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="update_environment" class="form-label">Environment:</label>
+                            <select name="environment" id="update_environment" class="form-select" required>
+                                <option value="Indoor">Indoor</option>
+                                <option value="Outdoor">Outdoor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="updateGameBtn">Update Game</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
+    </div>
 
     <!-- Add Game Modal -->
     <div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
@@ -675,6 +715,7 @@ htmlspecialchars($game['environment']) . '\')" ' .
             });
         }
     </script>
+    <script src="../archive/js/archive.js"></script>
 </body>
 
 </html>

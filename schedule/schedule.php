@@ -20,8 +20,8 @@ $role = $_SESSION['role'];
 $user_department_id = $_SESSION['department_id'];
 $user_department_name = $_SESSION['department_name'];
 $school_id = $_SESSION['school_id'];
-$user_game_name = $_SESSION['game_name'];
-$user_game_id = $_SESSION['game_id'];
+$user_game_name = $_SESSION['game_name'] ?? null;
+$user_game_id = $_SESSION['game_id'] ?? null;
 
 // Get URL parameters
 $selected_department_id = isset($_GET['department_id']) ? intval($_GET['department_id']) : null;
@@ -74,21 +74,46 @@ if ($selected_department_id) {
 // Function to fetch schedules filtered by the user's school
 function getAllSchedules($conn, $school_id)
 {
-    $query = "SELECT gs.schedule_id, m.match_id, m.match_type, m.status,
-                     br.game_id, br.department_id, br.grade_level, 
-                     ta.team_name AS teamA_name, tb.team_name AS teamB_name, 
-                     gs.schedule_date, gs.schedule_time, gs.venue, 
-                     d.department_name, g.game_name
-              FROM schedules gs
-              JOIN matches m ON gs.match_id = m.match_id
-              JOIN brackets br ON m.bracket_id = br.bracket_id
-              JOIN teams ta ON m.teamA_id = ta.team_id
-              JOIN teams tb ON m.teamB_id = tb.team_id
-              JOIN departments d ON br.department_id = d.id
-              JOIN schools s ON d.school_id = s.school_id
-              JOIN games g ON br.game_id = g.game_id
-              WHERE s.school_id = ? 
-              ORDER BY gs.schedule_date, gs.schedule_time";
+    // $query = "SELECT gs.schedule_id, m.match_id, m.match_type, m.status,
+    //                  br.game_id, br.department_id, br.grade_level, 
+    //                  ta.team_name AS teamA_name, tb.team_name AS teamB_name, 
+    //                  gs.schedule_date, gs.schedule_time, gs.venue, 
+    //                  d.department_name, g.game_name
+    //           FROM schedules gs
+    //           JOIN matches m ON gs.match_id = m.match_id
+    //           JOIN brackets br ON m.bracket_id = br.bracket_id
+    //           JOIN teams ta ON m.teamA_id = ta.team_id
+    //           JOIN teams tb ON m.teamB_id = tb.team_id
+    //           JOIN departments d ON br.department_id = d.id
+    //           JOIN schools s ON d.school_id = s.school_id
+    //           JOIN games g ON br.game_id = g.game_id
+    //           WHERE s.school_id = ? 
+    //           AND g.is_archived = 0 OR b.is_archived = 0
+    //           ORDER BY gs.schedule_date, gs.schedule_time";
+
+    $query = "SELECT gs.schedule_id, gs.is_archived, m.match_id, m.match_type, m.status,
+       br.game_id, br.department_id, br.grade_level, 
+       ta.team_name AS teamA_name, tb.team_name AS teamB_name, 
+       gs.schedule_date, gs.schedule_time, gs.venue, 
+       d.department_name, g.game_name
+FROM schedules gs
+JOIN matches m ON gs.match_id = m.match_id
+JOIN brackets br ON m.bracket_id = br.bracket_id
+JOIN teams ta ON m.teamA_id = ta.team_id
+JOIN teams tb ON m.teamB_id = tb.team_id
+JOIN departments d ON br.department_id = d.id
+JOIN schools s ON d.school_id = s.school_id
+JOIN games g ON br.game_id = g.game_id
+WHERE s.school_id = ? 
+  AND g.is_archived = 0 
+  AND br.is_archived = 0 
+  AND d.is_archived = 0 
+  AND m.is_archived = 0 
+  AND ta.is_archived = 0 
+  AND tb.is_archived = 0
+ORDER BY gs.schedule_date, gs.schedule_time";
+
+
 
     $stmt = $conn->prepare($query);
     if (!$stmt) {
@@ -228,7 +253,7 @@ include '../navbar/navbar.php';
 
                                 <div class="col-auto">
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#scheduleModal">
-                                        Create Schedule
+                                        <i class="fas fa-plus"></i> Create Schedule
                                     </button>
                                 </div>
 
@@ -283,6 +308,9 @@ include '../navbar/navbar.php';
                                     </button>
                                     <button id="resetFilters" class="btn btn-secondary">
                                         <i class="fas fa-undo"></i> Reset
+                                    </button>
+                                    <button id="exportSchedules" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i> Export Schedules
                                     </button>
                                 </div>
                             </div>
@@ -1162,7 +1190,7 @@ include '../navbar/navbar.php';
             });
         });
     </script>
-
+    <script src="js/schedule.js"></script>
 </body>
 
 </html>

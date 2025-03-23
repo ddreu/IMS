@@ -35,7 +35,6 @@ $selected_grade_level = isset($_GET['grade_level']) ? $_GET['grade_level'] : '';
 // Prepare search terms for SQL
 $searchTermWithWildcards = !empty($searchTerm) ? '%' . $searchTerm . '%' : '%';
 
-// Initialize the SQL query with more precise search conditions
 $sql = "
     SELECT DISTINCT
         s.schedule_id, 
@@ -77,7 +76,12 @@ $sql = "
     )
     AND tA.team_name NOT IN ('TBD', 'To Be Determined')
     AND tB.team_name NOT IN ('TBD', 'To Be Determined')
+    AND b.is_archived = 0
+    AND g.is_archived = 0
+    AND tA.is_archived = 0
+    AND tB.is_archived = 0
 ";
+
 
 // Initialize parameters array with search parameters
 $params = array($searchTerm, $searchTermWithWildcards, $searchTermWithWildcards, $searchTermWithWildcards, $searchTermWithWildcards);
@@ -564,10 +568,10 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
 
             <!-- Mobile Card View -->
             <div class="match-cards d-md-none">
-                <?php 
+                <?php
                 // Reset result pointer
                 $result->data_seek(0);
-                while ($row = $result->fetch_assoc()): 
+                while ($row = $result->fetch_assoc()):
                 ?>
                     <div class="match-card">
                         <div class="match-card-header">
@@ -590,7 +594,7 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
                                 ?>
                             </div>
                         </div>
-                        
+
                         <div class="match-card-teams">
                             <div class="team-name"><?= htmlspecialchars($row['teamA_name']) ?></div>
                             <div class="vs-badge">VS</div>
@@ -677,40 +681,40 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
                         if (result.isConfirmed) {
                             // Send notification
                             fetch('notify_players.php', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                    schedule_id: scheduleId,
-                                    teamA_id: teamAId,
-                                    teamB_id: teamBId
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        schedule_id: scheduleId,
+                                        teamA_id: teamAId,
+                                        teamB_id: teamBId
+                                    })
                                 })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    Swal.fire(
-                                        'Success!',
-                                        'Players have been notified.',
-                                        'success'
-                                    );
-                                } else {
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire(
+                                            'Success!',
+                                            'Players have been notified.',
+                                            'success'
+                                        );
+                                    } else {
+                                        Swal.fire(
+                                            'Error!',
+                                            data.message || 'Failed to notify players.',
+                                            'error'
+                                        );
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
                                     Swal.fire(
                                         'Error!',
-                                        data.message || 'Failed to notify players.',
+                                        'Failed to notify players.',
                                         'error'
                                     );
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                Swal.fire(
-                                    'Error!',
-                                    'Failed to notify players.',
-                                    'error'
-                                );
-                            });
+                                });
                         }
                     });
                 }

@@ -107,23 +107,7 @@ $stmt->close();
                 <span>Leaderboards</span>
             </a>
         </li>
-        <!--<li class="nav-item">
-            <a href="#leaderboardsSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle <?php echo ($current_page == 'leaderboards') ? 'active' : ''; ?>">
-                <i class="fas fa-trophy"></i>
-                <span>Leaderboards</span>
-            </a>
-            <ul class="collapse list-unstyled" id="leaderboardsSubmenu">
-                <?php foreach ($departments as $department) { ?>
-                    <li>
-                        <a class="submenu-item <?php echo (isset($_GET['selected_department_id']) && $_GET['selected_department_id'] == $department['id']) ? 'active' : ''; ?>"
-                            href="../rankings/leaderboards.php?selected_department_id=<?php echo $department['id']; ?>">
-                            <i class="fas fa-building fa-fw"></i>
-                            <span><?php echo htmlspecialchars($department['department_name']); ?></span>
-                        </a>
-                    </li>
-                <?php } ?>
-            </ul>
-        </li>-->
+
         <li class="<?php echo ($current_page == 'games') ? 'active' : ''; ?>">
             <a href="../games/games.php">
                 <i class="fas fa-basketball-ball"></i>

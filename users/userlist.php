@@ -96,6 +96,7 @@ $sql = "
         u.role,
         u.department,
         u.game_id,
+        u.is_archived,
         d.department_name, 
         g.game_name
     FROM 
@@ -110,8 +111,13 @@ $sql = "
         u.email LIKE ?) AND
         u.role NOT IN ('superadmin', 'School Admin') AND 
         u.school_id = ? 
-        AND u.id != ?
+        AND u.id != ? AND 
+        (
+            (u.role = 'committee' AND g.is_archived = 0 AND d.is_archived = 0) OR
+            (u.role = 'department admin' AND d.is_archived = 0)
+        )
 ";
+
 
 if ($selected_department_id !== null) {
     $sql .= " AND u.department = ?";
@@ -495,15 +501,15 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                         <h4 class="mb-3">User List</h4>
                         <div class="row g-3">
                             <div class="col-md-6 col-12">
-                            <form id="searchForm" method="POST" action="userlist.php">
-    <div class="input-group">
-        <span class="input-group-text bg-light border-end-0">
-            <i class="fas fa-search text-muted"></i>
-        </span>
-        <input type="text" class="form-control border-start-0" name="search" id="searchInput" placeholder="Search users..." value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>">
-    </div>
-</form>
-                
+                                <form id="searchForm" method="POST" action="userlist.php">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="fas fa-search text-muted"></i>
+                                        </span>
+                                        <input type="text" class="form-control border-start-0" name="search" id="searchInput" placeholder="Search users..." value="<?php echo isset($_POST['search']) ? $_POST['search'] : ''; ?>">
+                                    </div>
+                                </form>
+
                             </div>
                             <div class="col-md-6 col-12">
                                 <div class="d-flex gap-2">
@@ -592,6 +598,16 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
 
             <div class="card box">
                 <div class="card-body">
+                    <div class="btn-group portfolio-filter mb-3 mt-0" role="group" aria-label="Portfolio Filter">
+                        <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
+                            Active
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary filter-btn" data-category="1">
+                            Archived
+                        </button>
+                    </div>
+
+
                     <div class="table-responsive">
                         <div class="container-fluid p-0">
                             <div class="card shadow-sm">
@@ -610,7 +626,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                             <?php
                                             if ($users_result && mysqli_num_rows($users_result) > 0) {
                                                 while ($row = mysqli_fetch_assoc($users_result)) {
-                                                    echo '<tr>';
+                                                    echo '<tr data-category="' . htmlspecialchars($row['is_archived']) . '">';
                                                     echo '<td class="px-4" data-label="Name">';
                                                     echo '<div class="d-flex align-items-center gap-3">';
                                                     echo '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">';
@@ -629,32 +645,57 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                     echo '<td class="px-4" data-label="Actions">';
                                                     echo '<div class="d-flex gap-2 justify-content-center">';
 
-                                                    // Edit button
-                                                    echo '<button type="button" 
-                                                            class="btn btn-primary btn-sm shadow-sm " style="width: 38px; height: 32px; padding: 6px 0;"
-                                                            onclick="openUpdateModal(
-                                                                \'' . htmlspecialchars($row['id']) . '\',
-                                                                \'' . htmlspecialchars($row['firstname']) . '\',
-                                                                \'' . htmlspecialchars($row['lastname']) . '\',
-                                                                \'' . htmlspecialchars($row['middleinitial']) . '\',
-                                                                \'' . htmlspecialchars($row['age']) . '\',
-                                                                \'' . htmlspecialchars($row['gender']) . '\',
-                                                                \'' . htmlspecialchars($row['email']) . '\',
-                                                                \'' . htmlspecialchars($row['role']) . '\',
-                                                                \'' . htmlspecialchars($row['game_id'] ?? '') . '\',
-                                                                \'' . htmlspecialchars($row['department'] ?? '') . '\'
-                                                            )"
-                                                            title="Edit">';
-                                                    echo '<i class="fas fa-edit"></i>';
-                                                    echo '</button>';
+                                                    // DROPDOWN
+                                                    echo '<div class="dropdown">';
+                                                    echo '<button class="btn btn-secondary btn-sm dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            Actions
+                                                          </button>';
+                                                    echo '<ul class="dropdown-menu" style="z-index: 1050; padding: 4px 8px; line-height: 1.2; min-width: 140px;">';
+
+                                                    // Edit button (only show if not archived)
+                                                    if ($row['is_archived'] != 1) {
+                                                        echo '<li>';
+                                                        echo '<button class="dropdown-item" 
+                                                                    onclick="openUpdateModal(
+                                                                        \'' . htmlspecialchars($row['id']) . '\',
+                                                                        \'' . htmlspecialchars($row['firstname']) . '\',
+                                                                        \'' . htmlspecialchars($row['lastname']) . '\',
+                                                                        \'' . htmlspecialchars($row['middleinitial']) . '\',
+                                                                        \'' . htmlspecialchars($row['age']) . '\',
+                                                                        \'' . htmlspecialchars($row['gender']) . '\',
+                                                                        \'' . htmlspecialchars($row['email']) . '\',
+                                                                        \'' . htmlspecialchars($row['role']) . '\',
+                                                                        \'' . htmlspecialchars($row['game_id'] ?? '') . '\',
+                                                                        \'' . htmlspecialchars($row['department'] ?? '') . '\'
+                                                                    )">
+                                                                    Edit
+                                                                  </button>';
+                                                        echo '</li>';
+                                                    }
 
                                                     // Delete button
-                                                    echo '<button type="button" 
-                                                            class="btn btn-danger btn-sm shadow-sm" style="width: 38px; height: 32px; padding: 6px 0;"
-                                                            onclick="confirmDelete(\'' . htmlspecialchars($row['id']) . '\')"
-                                                            title="Delete">';
-                                                    echo '<i class="fas fa-trash"></i>';
-                                                    echo '</button>';
+                                                    echo '<li>';
+                                                    echo '<button class="dropdown-item" 
+                                                                onclick="confirmDelete(\'' . htmlspecialchars($row['id']) . '\')">
+                                                                Delete
+                                                              </button>';
+                                                    echo '</li>';
+
+                                                    // Archive/Unarchive button
+                                                    echo '<li>';
+                                                    echo '<button type="button"
+                                                                class="dropdown-item archive-btn"
+                                                                data-id="' . htmlspecialchars($row['id']) . '"
+                                                                data-table="users"
+                                                                data-operation="' . ($row['is_archived'] == 1 ? 'unarchive' : 'archive') . '">
+                                                                ' . ($row['is_archived'] == 1 ? 'Unarchive' : 'Archive') . '
+                                                              </button>';
+                                                    echo '</li>';
+
+                                                    echo '</ul>';
+                                                    echo '</div>';
+
+
 
                                                     echo '</div>';
                                                     echo '</td>';
@@ -947,9 +988,8 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                     event.preventDefault(); // Prevent the default form submission
                     confirmUpdate(); // Call the SweetAlert confirmation function
                 });
-
             </script>
-
+            <script src="../archive/js/archive.js"></script>
 </body>
 
 </html>

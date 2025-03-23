@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Check if image was uploaded
     if (!empty($_FILES['image']['name'])) {
         $image = $_FILES['image']['name'];
-        $target_dir = "../uploads/";
+        $target_dir = "../uploads/announcements/";
         $target_file = $target_dir . basename($image);
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         $uploadOk = 1;

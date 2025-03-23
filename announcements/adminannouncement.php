@@ -61,7 +61,8 @@ if (isset($_SESSION['error_message'])) {
 $announcements_query = "SELECT a.*, d.department_name 
                        FROM announcement a 
                        LEFT JOIN departments d ON a.department_id = d.id 
-                       WHERE a.school_id = ? 
+                       WHERE a.school_id = ?
+                       AND d.is_archived = 0
                        ORDER BY a.id DESC";
 $stmt_announcements = mysqli_prepare($conn, $announcements_query);
 
@@ -116,11 +117,11 @@ include '../navbar/navbar.php';
             border-radius: 10px;
             overflow: hidden;
         }
-        
+
         .announcement-table .table {
             margin-bottom: 0;
         }
-        
+
         .announcement-table thead th {
             background-color: #2c3e50;
             color: white;
@@ -130,31 +131,31 @@ include '../navbar/navbar.php';
             padding: 15px;
             border: none;
         }
-        
+
         .announcement-table tbody td {
             padding: 15px;
             vertical-align: middle;
             border-color: #eef2f7;
         }
-        
+
         .announcement-table .btn-group {
             display: flex;
             gap: 5px;
             justify-content: center;
         }
-        
+
         .announcement-table .btn {
             padding: 0.4rem 0.8rem;
             border-radius: 6px;
             transition: all 0.3s ease;
         }
-        
+
         .card.box {
             border: none;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
-        
+
         .card-body {
             padding: 1.5rem;
         }
@@ -204,7 +205,7 @@ include '../navbar/navbar.php';
                 text-align: left;
                 padding: 1rem;
                 position: relative;
-                border-bottom: 1px solid rgba(0,0,0,0.1);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
                 align-items: center;
             }
 
@@ -304,15 +305,25 @@ include '../navbar/navbar.php';
             <div class="container mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2>List of Announcements</h2>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
-                            <i class="fas fa-plus"></i> Add Announcement
-                        </button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAnnouncementModal">
+                        <i class="fas fa-plus"></i> Add Announcement
+                    </button>
                 </div>
             </div>
 
             <div class="card box">
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <!-- Filter Buttons -->
+                    <div class="btn-group portfolio-filter mb-3 mt-0" role="group" aria-label="Portfolio Filter">
+                        <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
+                            Active
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary filter-btn" data-category="1">
+                            Archived
+                        </button>
+                    </div>
+
+                    <div class="table-responsive" style="overflow: visible;">
                         <div class="container-fluid p-0">
                             <div class="card shadow-sm">
                                 <div class="card-body p-0">
@@ -327,12 +338,12 @@ include '../navbar/navbar.php';
                                         <tbody>
                                             <?php if (mysqli_num_rows($announcements_result) > 0): ?>
                                                 <?php while ($row = mysqli_fetch_assoc($announcements_result)): ?>
-                                                    <tr>
+                                                    <tr data-category="<?= htmlspecialchars($row['is_archived']) ?>">
                                                         <td class="px-4 text-break" data-label="Title">
                                                             <div class="d-flex align-items-center gap-3">
                                                                 <?php if (!empty($row["image"])): ?>
                                                                     <div style="width: 40px; height: 40px; overflow: hidden;" class="rounded-circle bg-light d-flex align-items-center justify-content-center">
-                                                                        <img src="<?= htmlspecialchars($row["image"]) ?>" alt="Announcement Image" class="img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
+                                                                        <img src="../uploads/announcements/<?php echo htmlspecialchars($row['image']); ?>" alt="Announcement Image" class="img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
                                                                     </div>
                                                                 <?php else: ?>
                                                                     <div style="width: 40px; height: 40px;" class="rounded-circle bg-secondary d-flex align-items-center justify-content-center">
@@ -350,24 +361,66 @@ include '../navbar/navbar.php';
                                                         </td>
                                                         <td class="px-4" data-label="Actions">
                                                             <div class="d-flex gap-2 justify-content-center">
-                                                                <button class="btn btn-info btn-sm text-white shadow-sm view-btn" 
-                                                                    data-id="<?= htmlspecialchars($row['id']) ?>" 
-                                                                    title="View">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </button>
-                                                                <button class="btn btn-primary btn-sm shadow-sm edit-btn"
-                                                                    data-id="<?= htmlspecialchars($row['id']) ?>"
-                                                                    data-title="<?= htmlspecialchars($row['title']) ?>"
-                                                                    data-message="<?= htmlspecialchars($row['message']) ?>"
-                                                                    data-imagePath="<?= htmlspecialchars($row['image']) ?>"
-                                                                    title="Edit">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </button>
-                                                                <button class="btn btn-danger btn-sm shadow-sm delete-btn" 
-                                                                    data-id="<?= htmlspecialchars($row['id']) ?>" 
-                                                                    title="Delete">
-                                                                    <i class="fas fa-trash"></i>
-                                                                </button>
+                                                                <div class="dropdown">
+                                                                    <button class="btn btn-secondary btn-sm dropdown-toggle shadow-sm"
+                                                                        type="button"
+                                                                        data-bs-toggle="dropdown"
+                                                                        aria-expanded="false">
+                                                                        <i class="fas fa-ellipsis-v"></i>
+                                                                    </button>
+                                                                    <ul class="dropdown-menu" style="z-index: 1050; padding: 4px 8px; line-height: 1.2; min-width: 140px;">
+
+                                                                        <!-- View Button -->
+                                                                        <?php if ($row['is_archived'] == 0): ?>
+                                                                            <li>
+                                                                                <button class="dropdown-item view-btn"
+                                                                                    data-id="<?= htmlspecialchars($row['id']) ?>"
+                                                                                    title="View"
+                                                                                    style="padding: 4px 12px; line-height: 1.2;">
+                                                                                    View
+                                                                                </button>
+                                                                            </li>
+                                                                        <?php endif; ?>
+
+                                                                        <!-- Edit Button -->
+                                                                        <?php if ($row['is_archived'] == 0): ?>
+                                                                            <li>
+                                                                                <button class="dropdown-item edit-btn"
+                                                                                    data-id="<?= htmlspecialchars($row['id']) ?>"
+                                                                                    data-title="<?= htmlspecialchars($row['title']) ?>"
+                                                                                    data-message="<?= htmlspecialchars($row['message']) ?>"
+                                                                                    data-imagePath="<?= htmlspecialchars($row['image']) ?>"
+                                                                                    title="Edit"
+                                                                                    style="padding: 4px 12px; line-height: 1.2;">
+                                                                                    Edit
+                                                                                </button>
+                                                                            </li>
+                                                                        <?php endif; ?>
+
+                                                                        <!-- Delete Button -->
+                                                                        <li>
+                                                                            <button class="dropdown-item delete-btn"
+                                                                                data-id="<?= htmlspecialchars($row['id']) ?>"
+                                                                                title="Delete"
+                                                                                style="padding: 4px 12px; line-height: 1.2;">
+                                                                                Delete
+                                                                            </button>
+                                                                        </li>
+
+                                                                        <!-- Archive/Unarchive Button -->
+                                                                        <li>
+                                                                            <button type="button"
+                                                                                class="dropdown-item archive-btn"
+                                                                                data-id="<?= htmlspecialchars($row['id']) ?>"
+                                                                                data-table="announcements"
+                                                                                data-operation="<?= $row['is_archived'] == 1 ? 'unarchive' : 'archive' ?>"
+                                                                                style="padding: 4px 12px; line-height: 1.2;">
+                                                                                <?= $row['is_archived'] == 1 ? 'Unarchive' : 'Archive' ?>
+                                                                            </button>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -383,6 +436,7 @@ include '../navbar/navbar.php';
                                                 </tr>
                                             <?php endif; ?>
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>
@@ -411,17 +465,17 @@ include '../navbar/navbar.php';
                                     <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
                                 </div>
                                 <?php if ($role === 'School Admin'): ?>
-                                <div class="mb-3">
-                                    <label for="department" class="form-label">Department</label>
-                                    <select class="form-control" id="department" name="department_id">
-                                        <option value="">Select Department</option>
-                                        <?php foreach ($departments as $dept): ?>
-                                            <option value="<?= htmlspecialchars($dept['id']) ?>">
-                                                <?= htmlspecialchars($dept['department_name']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="department" class="form-label">Department</label>
+                                        <select class="form-control" id="department" name="department_id">
+                                            <option value="">Select Department</option>
+                                            <?php foreach ($departments as $dept): ?>
+                                                <option value="<?= htmlspecialchars($dept['id']) ?>">
+                                                    <?= htmlspecialchars($dept['department_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                 <?php endif; ?>
                                 <div class="mb-3">
                                     <label for="image" class="form-label">Image</label>
@@ -476,17 +530,17 @@ include '../navbar/navbar.php';
                                     <textarea class="form-control" id="edit_message" name="message" rows="3" required></textarea>
                                 </div>
                                 <?php if ($role === 'School Admin'): ?>
-                                <div class="mb-3">
-                                    <label for="edit_department" class="form-label">Department</label>
-                                    <select class="form-control" id="edit_department" name="department_id">
-                                        <option value="">Select Department</option>
-                                        <?php foreach ($departments as $dept): ?>
-                                            <option value="<?= htmlspecialchars($dept['id']) ?>">
-                                                <?= htmlspecialchars($dept['department_name']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="edit_department" class="form-label">Department</label>
+                                        <select class="form-control" id="edit_department" name="department_id">
+                                            <option value="">Select Department</option>
+                                            <?php foreach ($departments as $dept): ?>
+                                                <option value="<?= htmlspecialchars($dept['id']) ?>">
+                                                    <?= htmlspecialchars($dept['department_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                 <?php endif; ?>
                                 <div class="mb-3">
                                     <label for="edit_image" class="form-label">Image</label>
@@ -508,7 +562,7 @@ include '../navbar/navbar.php';
             <script>
                 function confirmEdit(event) {
                     event.preventDefault(); // Prevent form from submitting immediately
-                    
+
                     Swal.fire({
                         title: 'Are you sure?',
                         text: "Do you want to save these changes?",
@@ -524,7 +578,7 @@ include '../navbar/navbar.php';
                             document.getElementById('editAnnouncementForm').submit();
                         }
                     });
-                    
+
                     return false; // Prevent form from submitting normally
                 }
 
@@ -536,7 +590,7 @@ include '../navbar/navbar.php';
                             document.getElementById('edit_announcement_id').value = data.id;
                             document.getElementById('edit_title').value = data.title;
                             document.getElementById('edit_message').value = data.message;
-                            
+
                             // Set department if it exists and user is School Admin
                             const departmentSelect = document.getElementById('edit_department');
                             if (departmentSelect && data.department_id) {
@@ -665,7 +719,7 @@ include '../navbar/navbar.php';
                     });
                 });
             </script>
-
+            <script src="../archive/js/archive.js"></script>
 </body>
 
 </html>

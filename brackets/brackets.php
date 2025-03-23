@@ -194,6 +194,7 @@ include '../navbar/navbar.php';
                 </div>
             </div>
 
+
             <!-- Existing Brackets Section -->
             <?php
             // Fetch existing brackets for this game/department
@@ -222,6 +223,7 @@ include '../navbar/navbar.php';
                 LEFT JOIN departments d ON b.department_id = d.id
                 LEFT JOIN games g ON b.game_id = g.game_id
                 WHERE b.game_id = ? AND b.department_id = ? 
+                AND (g.is_archived = 0 AND d.is_archived = 0)
                 GROUP BY b.bracket_id 
                 ORDER BY b.created_at DESC";
             $bracketStmt = $conn->prepare($bracketQuery);
@@ -237,7 +239,18 @@ include '../navbar/navbar.php';
                 <div class="row mb-4">
                     <div class="col">
                         <h3>Existing Brackets</h3>
-                        <div class="table-responsive">
+                        <!-- Filter Buttons -->
+                        <div class="d-flex justify-content-center mb-0 mt-0">
+                            <div class="btn-group w-auto portfolio-filter" role="group" aria-label="Portfolio Filter">
+                                <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
+                                    Active
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary filter-btn" data-category="1">
+                                    Archived
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="overflow: visible;">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -255,7 +268,7 @@ include '../navbar/navbar.php';
                                 </thead>
                                 <tbody>
                                     <?php foreach ($existingBrackets as $bracket): ?>
-                                        <tr>
+                                        <tr data-category="<?= ($bracket['is_archived']) ?>">
                                             <td><?php echo htmlspecialchars($bracket['game_name']); ?></td>
                                             <td><?php echo htmlspecialchars($bracket['department_name']); ?></td>
                                             <?php if ($department_name !== 'College'): ?>
@@ -266,21 +279,48 @@ include '../navbar/navbar.php';
                                             <td><?php echo $bracket['rounds']; ?></td>
                                             <td><?php echo ucfirst($bracket['status']); ?></td>
                                             <td>
-                                                <?php if ($bracket['bracket_type'] === 'round_robin'): ?>
-                                                    <button class="btn btn-primary btn-sm view-round-robin"
-                                                        data-bracket-id="<?php echo $bracket['bracket_id']; ?>">
-                                                        <i class="fas fa-table"></i> View Schedule
+                                                <!-- Dropdown for All Actions -->
+                                                <div class="dropdown d-inline">
+                                                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Actions
                                                     </button>
-                                                <?php else: ?>
-                                                    <button class="btn btn-primary btn-sm view-bracket"
-                                                        data-bracket-id="<?php echo $bracket['bracket_id']; ?>">
-                                                        <i class="fas fa-sitemap"></i> View Bracket
-                                                    </button>
-                                                <?php endif; ?>
-                                                <button class="btn btn-danger btn-sm" onclick="deleteBracket(<?php echo $bracket['bracket_id']; ?>)">
-                                                    <i class="fas fa-trash"></i> Delete
-                                                </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                        <?php if ($bracket['bracket_type'] === 'round_robin'): ?>
+                                                            <!-- View Schedule Button -->
+                                                            <button class="dropdown-item view-round-robin" data-bracket-id="<?php echo $bracket['bracket_id']; ?>">
+                                                                View Schedule
+                                                            </button>
+                                                        <?php else: ?>
+                                                            <!-- View Bracket Button -->
+                                                            <button class="dropdown-item view-bracket" data-bracket-id="<?php echo $bracket['bracket_id']; ?>">
+                                                                View Bracket
+                                                            </button>
+                                                        <?php endif; ?>
+
+                                                        <!-- Archive/Unarchive Button -->
+                                                        <li>
+                                                            <button type="button"
+                                                                class="dropdown-item archive-btn"
+                                                                data-id="<?= htmlspecialchars($bracket['bracket_id']) ?>"
+                                                                data-table="brackets"
+                                                                data-operation="<?= $bracket['is_archived'] == 1 ? 'unarchive' : 'archive' ?>"
+                                                                style="padding: 4px 16px; line-height: 1.2;">
+                                                                <?= $bracket['is_archived'] == 1 ? 'Unarchive' : 'Archive' ?>
+                                                            </button>
+                                                        </li>
+
+                                                        <!-- Delete Button (Always show) -->
+                                                        <li>
+                                                            <button class="dropdown-item text-danger" onclick="deleteBracket(<?php echo $bracket['bracket_id']; ?>)">
+                                                                <i class="fas fa-trash"></i> Delete
+                                                            </button>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
                                             </td>
+
+
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -359,6 +399,8 @@ include '../navbar/navbar.php';
                         <script src="bracket-state.js"></script>
 
                         <script src="double-bracket-manager.js"></script>
+                        <script src="../archive/js/archive.js"></script>
+
                         <?php include 'handler.php'; ?>
 
                         <script>
@@ -578,27 +620,51 @@ include '../navbar/navbar.php';
                                                 container.append("TBD");
                                             } else {
                                                 container.append(data);
-                                                if (score !== undefined && score !== null) {
-                                                    container.append($('<div>', {
-                                                        class: 'score',
-                                                        text: score
-                                                    }));
-                                                }
+
                                             }
                                         }
                                     }
                                 });
                                 // Add back button if it doesn't exist
-                                if ($('#backToBrackets').length === 0) {
+                                // if ($('#backToBrackets').length === 0) {
+                                //     const backButton = $('<button>', {
+                                //         id: 'backToBrackets',
+                                //         class: 'btn btn-secondary mt-3',
+                                //         html: '<span><i class="fas fa-times"></i></span>'
+                                //     }).click(function() {
+                                //         showBracketList();
+                                //     });
+                                //     $('#bracket-container').before(backButton);
+                                // }
+
+                                // Create a container for buttons
+                                if ($('#bracketButtonsContainer').length === 0) {
+                                    const buttonContainer = $('<div>', {
+                                        id: 'bracketButtonsContainer',
+                                        class: 'd-flex justify-content-between mt-3' // ✅ Flexbox to align buttons
+                                    });
+
+                                    // Add Export to PDF button
+                                    const exportButton = $('<button>', {
+                                        id: 'exportBracket',
+                                        class: 'btn btn-success me-2',
+                                        text: 'Export as PDF'
+                                    }).click(exportBracketToPDF);
+
+                                    // Add back button
                                     const backButton = $('<button>', {
                                         id: 'backToBrackets',
-                                        class: 'btn btn-secondary mt-3',
+                                        class: 'btn btn-secondary',
                                         html: '<span><i class="fas fa-times"></i></span>'
                                     }).click(function() {
                                         showBracketList();
                                     });
-                                    $('#bracket-container').before(backButton);
+
+                                    // Append buttons to container
+                                    buttonContainer.append(backButton, exportButton);
+                                    $('#bracket-container').before(buttonContainer);
                                 }
+
 
 
                                 // Hide the generate button
@@ -623,6 +689,57 @@ include '../navbar/navbar.php';
                         });
                 });
             });
+
+            //EXPORT BRACKET TO PDF
+            function exportBracketToPDF() {
+                Swal.fire({
+                    title: 'Exporting...',
+                    text: 'Please wait while the bracket is being exported.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading(); // ✅ Show loading spinner
+                    }
+                });
+
+                const element = document.getElementById('bracket-container');
+                html2canvas(element, {
+                    scale: 2
+                }).then((canvas) => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const {
+                        jsPDF
+                    } = window.jspdf;
+                    const pdf = new jsPDF('landscape');
+                    const imgWidth = 280;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                    pdf.save('bracket.pdf');
+
+                    // ✅ Close loading state and show success toast using SweetAlert
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Bracket exported successfully!',
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }).catch((error) => {
+                    // ✅ Close loading state and show error toast using SweetAlert
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to export bracket.',
+                        text: 'Please try again.',
+                        toast: true,
+                        position: 'top',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                    console.error('Error exporting bracket:', error);
+                });
+            }
         </script>
         <script>
             function showBracketList() {
@@ -646,8 +763,6 @@ include '../navbar/navbar.php';
                 // Reload the bracket list
                 loadBrackets();
             }
-
-
 
             function deleteBracket(bracketId) {
                 Swal.fire({
@@ -997,7 +1112,10 @@ include '../navbar/navbar.php';
         </script>
     </div>
     </div>
-
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 
 </html>

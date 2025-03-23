@@ -83,14 +83,36 @@ $conn->close();
 
             // Open schools section
             openBtn.addEventListener('click', () => {
-                schoolsSection.classList.add('show');
+                schoolsSection.style.display = 'flex'; // Set display to flex when showing
+                setTimeout(() => {
+                    schoolsSection.classList.add('show'); // Add show class after display is set
+                }, 10); // Small timeout to allow display to take effect
             });
 
             // Close schools section
             closeBtn.addEventListener('click', () => {
-                schoolsSection.classList.remove('show');
+                schoolsSection.classList.remove('show'); // Remove show class
+                setTimeout(() => {
+                    schoolsSection.style.display = 'none'; // Set display to none after transition
+                }, 500); // Match this timeout with the CSS transition duration
             });
         });
+
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     const openBtn = document.getElementById('open-schools-btn');
+        //     const closeBtn = document.getElementById('close-btn');
+        //     const schoolsSection = document.getElementById('schools-section');
+
+        //     // Open schools section
+        //     openBtn.addEventListener('click', () => {
+        //         schoolsSection.classList.add('show');
+        //     });
+
+        //     // Close schools section
+        //     closeBtn.addEventListener('click', () => {
+        //         schoolsSection.classList.remove('show');
+        //     });
+        // });
 
         // const container = document.querySelector('.school-cards-container');
 

@@ -114,6 +114,9 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
                 <li class="nav-item">
                     <a class="nav-link text-light px-3 fw-bold" href="livematches.php?<?php echo $query_string; ?>">Live Scores</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light px-3 fw-bold" href="download-app.php?<?php echo $query_string; ?>">App</a>
+                </li>
             </ul>
             <div class="d-flex align-items-center">
                 <?php

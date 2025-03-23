@@ -32,13 +32,15 @@ try {
         b.status,
         b.bracket_type,
         b.created_at,
+        b.is_archived,
         d.department_name,
         g.game_name
     FROM brackets b
     JOIN departments d ON b.department_id = d.id
     JOIN games g ON b.game_id = g.game_id
     JOIN schools s ON d.school_id = s.school_id
-    WHERE s.school_id = ?";
+    WHERE s.school_id = ?
+    AND g.is_archived = 0 AND d.is_archived = 0";
 
     $params = [$school_id];
     $types = "i";
@@ -76,12 +78,14 @@ try {
     $brackets = [];
     while ($row = $result->fetch_assoc()) {
         $brackets[] = [
+            'is_archived' => $row['is_archived'], // Ensure it's integer type
             'bracket_id' => $row['bracket_id'],
             'game_name' => htmlspecialchars($row['game_name']),
             'department_name' => htmlspecialchars($row['department_name']),
             'grade_level' => $row['grade_level'],
             'total_teams' => $row['total_teams'],
             'status' => ucfirst($row['status']),
+            'bracket_type' => htmlspecialchars($row['bracket_type']),
             'created_at' => $row['created_at']
         ];
     }
@@ -91,7 +95,6 @@ try {
         'success' => true,
         'data' => $brackets
     ]);
-
 } catch (Exception $e) {
     // Return error response
     echo json_encode([
@@ -101,4 +104,3 @@ try {
 }
 
 $conn->close();
-?>

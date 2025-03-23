@@ -28,7 +28,44 @@ $status_filter = $_GET['status'] ?? '';
 $currentDate = date('Y-m-d');
 $currentTime = date('H:i:s');
 
-// Build SQL query dynamically
+// // Build SQL query dynamically
+// $sql = "
+//     SELECT 
+//         s.schedule_id, 
+//         m.match_id,
+//         g.game_id, 
+//         g.game_name, 
+//         tA.team_name AS teamA_name, 
+//         tB.team_name AS teamB_name,
+//         s.schedule_date, 
+//         s.schedule_time, 
+//         s.venue,
+//         m.teamA_id, 
+//         m.teamB_id, 
+//         mr.score_teamA AS teamA_score, 
+//         mr.score_teamB AS teamB_score, 
+//         mr.winning_team_id,
+//         m.status,
+//         m.match_type,
+//         m.round,
+//         CASE 
+//             WHEN s.schedule_date = CURRENT_DATE() THEN 
+//                 ABS(TIME_TO_SEC(TIMEDIFF(s.schedule_time, CURRENT_TIME())))
+//             ELSE 
+//                 ABS(DATEDIFF(s.schedule_date, CURRENT_DATE())) * 86400
+//         END as time_difference
+//     FROM schedules s
+//     JOIN matches m ON s.match_id = m.match_id
+//     JOIN brackets b ON m.bracket_id = b.bracket_id
+//     JOIN games g ON b.game_id = g.game_id
+//     JOIN teams tA ON m.teamA_id = tA.team_id
+//     JOIN teams tB ON m.teamB_id = tB.team_id
+//     LEFT JOIN match_results mr ON m.match_id = mr.match_id
+//     WHERE (g.game_name LIKE ? OR tA.team_name LIKE ? OR tB.team_name LIKE ? OR s.venue LIKE ?)
+//     AND tA.team_name NOT IN ('TBD', 'To Be Determined')
+//     AND tB.team_name NOT IN ('TBD', 'To Be Determined')
+// ";
+
 $sql = "
     SELECT 
         s.schedule_id, 
@@ -64,7 +101,13 @@ $sql = "
     WHERE (g.game_name LIKE ? OR tA.team_name LIKE ? OR tB.team_name LIKE ? OR s.venue LIKE ?)
     AND tA.team_name NOT IN ('TBD', 'To Be Determined')
     AND tB.team_name NOT IN ('TBD', 'To Be Determined')
+    AND b.is_archived = 0
+    AND g.is_archived = 0
+    AND tA.is_archived = 0
+    AND tB.is_archived = 0
 ";
+
+
 
 // Dynamic filters based on user role
 $params = [$searchTerm, $searchTerm, $searchTerm, $searchTerm];

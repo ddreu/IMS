@@ -58,7 +58,7 @@ $recent_announcements = mysqli_stmt_get_result($stmt);
 // Get sections/courses/strands count
 $items_query = "";
 $item_label = "";
-switch($department_name) {
+switch ($department_name) {
     case 'College':
         $items_query = "SELECT COUNT(*) as count FROM grade_section_course 
                        WHERE department_id = ? AND course_name IS NOT NULL";
@@ -119,29 +119,35 @@ if (isset($_SESSION['success_message'])) {
             background: white;
             height: 100%;
         }
+
         .stat-card:hover {
             transform: translateY(-5px);
         }
+
         .stat-icon {
             font-size: 2.5rem;
             margin-bottom: 1rem;
             color: #4a90e2;
         }
+
         .stat-title {
             color: #666;
             font-size: 1rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
         }
+
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
             color: #333;
             margin-bottom: 0;
         }
+
         .dashboard-section {
             margin-bottom: 2rem;
         }
+
         .section-title {
             color: #333;
             font-size: 1.5rem;
@@ -150,12 +156,14 @@ if (isset($_SESSION['success_message'])) {
             padding-bottom: 0.5rem;
             border-bottom: 2px solid #4a90e2;
         }
+
         .quick-actions {
             background: white;
             padding: 1.5rem;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         .action-btn {
             padding: 1rem;
             border-radius: 10px;
@@ -163,32 +171,39 @@ if (isset($_SESSION['success_message'])) {
             background: #f8f9fa;
             transition: all 0.2s ease-in-out;
         }
+
         .action-btn:hover {
             background: #e9ecef;
             transform: translateY(-3px);
         }
+
         .action-icon {
             font-size: 1.5rem;
             margin-bottom: 0.5rem;
             color: #4a90e2;
         }
+
         .announcement-card {
             background: white;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
         }
+
         .announcement-item {
             padding: 1rem;
             border-bottom: 1px solid #eee;
         }
+
         .announcement-item:last-child {
             border-bottom: none;
         }
+
         .announcement-date {
             color: #666;
             font-size: 0.9rem;
         }
+
         .department-info {
             background: white;
             border-radius: 15px;
@@ -196,116 +211,121 @@ if (isset($_SESSION['success_message'])) {
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
+
         .department-name {
             font-size: 1.5rem;
             font-weight: 700;
             color: #333;
             margin-bottom: 0.5rem;
         }
+
         .school-name {
             color: #666;
             font-size: 1rem;
         }
 
         /* General styles for the content section */
-.content-section {
-    background-color: #ffffff;
-    border: 1px solid #e3e6f0;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
+        .content-section {
+            background-color: #ffffff;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
-.section-header {
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
+        .section-header {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
 
-.section-title {
-    font-size: 18px;
-    color: #333;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    font-weight: bold;
-}
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
 
-.section-title i {
-    margin-right: 10px;
-    color: #6c757d; /* Grey icon color */
-}
+        .section-title i {
+            margin-right: 10px;
+            color: #6c757d;
+            /* Grey icon color */
+        }
 
-/* Styling the list of activities */
-.activity-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
+        /* Styling the list of activities */
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-.activity-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #f8f9fa;
-    padding-bottom: 15px;
-}
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f8f9fa;
+            padding-bottom: 15px;
+        }
 
-.activity-icon {
-    color: #4e73df; /* Icon color, can be adjusted */
-    font-size: 24px;
-    margin-right: 15px;
-    min-width: 30px;
-    text-align: center;
-}
+        .activity-icon {
+            color: #4e73df;
+            /* Icon color, can be adjusted */
+            font-size: 24px;
+            margin-right: 15px;
+            min-width: 30px;
+            text-align: center;
+        }
 
-.activity-details {
-    flex: 1;
-}
+        .activity-details {
+            flex: 1;
+        }
 
-.activity-title {
-    font-size: 16px;
-    color: #4e73df; /* Link color, can be adjusted */
-    margin: 0 0 5px 0;
-    font-weight: 500;
-}
+        .activity-title {
+            font-size: 16px;
+            color: #4e73df;
+            /* Link color, can be adjusted */
+            margin: 0 0 5px 0;
+            font-weight: 500;
+        }
 
-.activity-user {
-    font-size: 14px;
-    color: #858796;
-    margin: 0;
-    display: flex;
-    align-items: center;
-}
+        .activity-user {
+            font-size: 14px;
+            color: #858796;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
 
-.activity-user i {
-    margin-right: 5px;
-}
+        .activity-user i {
+            margin-right: 5px;
+        }
 
-.activity-time {
-    font-size: 14px;
-    color: #858796;
-    display: flex;
-    align-items: center;
-}
+        .activity-time {
+            font-size: 14px;
+            color: #858796;
+            display: flex;
+            align-items: center;
+        }
 
-.activity-time i {
-    margin-right: 5px;
-}
+        .activity-time i {
+            margin-right: 5px;
+        }
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 768px) {
-    .section-title {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .section-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-    .activity-item {
-        flex-direction: column;
-        align-items: start;
-    }
-}
+            .activity-item {
+                flex-direction: column;
+                align-items: start;
+            }
+        }
     </style>
 </head>
 
@@ -316,23 +336,23 @@ if (isset($_SESSION['success_message'])) {
         include '../navbar/navbar.php';
         include '../department_admin/sidebar.php';
         ?>
-        
+
         <div id="content">
             <div class="container-fluid p-4">
                 <!-- Department Info Section -->
-                 
+
                 <div class="department-info d-flex justify-content-between align-items-center">
                     <div>
-                    <h1 class="department-name"><?php echo htmlspecialchars($department_info['department_name']); ?> Department</h1>
-                    <div class="school-name"><?php echo htmlspecialchars($department_info['school_name']); ?></div>
+                        <h1 class="department-name"><?php echo htmlspecialchars($department_info['department_name']); ?> Department</h1>
+                        <div class="school-name"><?php echo htmlspecialchars($department_info['school_name']); ?></div>
                     </div>
-            <!-- Info Button -->
-    <button type="button" class="btn btn-info btn-circle" data-bs-toggle="modal" data-bs-target="#manualModal" title="Read Manual">
-        <i class="fas fa-info-circle"> Manual</i>
-    </button>
+                    <!-- Info Button -->
+                    <button type="button" class="btn btn-info btn-circle" data-bs-toggle="modal" data-bs-target="#manualModal" title="Read Manual">
+                        <i class="fas fa-info-circle"> Manual</i>
+                    </button>
 
-    <?php include 'department_admin_manual.php'; ?>
-                    
+                    <?php include 'department_admin_manual.php'; ?>
+
                 </div>
 
                 <!-- Statistics Cards -->
@@ -419,8 +439,8 @@ if (isset($_SESSION['success_message'])) {
                             </div>
                         </div>
 
-                            <!-- Recent Announcements -->
-                            <div class="dashboard-section">
+                        <!-- Recent Announcements -->
+                        <div class="dashboard-section">
                             <h2 class="section-title">Recent Announcements</h2>
                             <div class="announcement-card">
                                 <?php if (mysqli_num_rows($recent_announcements) > 0): ?>
@@ -438,7 +458,7 @@ if (isset($_SESSION['success_message'])) {
                                 <?php endif; ?>
                             </div>
                         </div>
-                    </div>      
+                    </div>
 
                     <div class="col-lg-4">
                         <div class="content-section">
@@ -455,7 +475,7 @@ if (isset($_SESSION['success_message'])) {
                             </div>
                         </div>
                     </div>
-                
+
                 </div>
             </div>
         </div>
@@ -468,50 +488,52 @@ if (isset($_SESSION['success_message'])) {
                 title: '<?php echo $successType === "registration" ? "Registration Complete!" : "Login Successful!"; ?>',
                 text: '<?php echo htmlspecialchars($successMessage); ?>',
                 timer: 3000,
+                toast: true,
+                position: 'top-end',
                 showConfirmButton: false
             });
         </script>
     <?php endif; ?>
     <script>
-    // Function to format the timestamp to "time ago" format
-    function timeAgo(timestamp) {
-        const now = new Date();
-        const past = new Date(timestamp);
-        const diffInSeconds = Math.floor((now - past) / 1000);
+        // Function to format the timestamp to "time ago" format
+        function timeAgo(timestamp) {
+            const now = new Date();
+            const past = new Date(timestamp);
+            const diffInSeconds = Math.floor((now - past) / 1000);
 
-        if (diffInSeconds < 60) return 'just now';
-        if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' minutes ago';
-        if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' hours ago';
-        if (diffInSeconds < 604800) return Math.floor(diffInSeconds / 86400) + ' days ago';
-        return past.toLocaleDateString();
-    }
+            if (diffInSeconds < 60) return 'just now';
+            if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' minutes ago';
+            if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' hours ago';
+            if (diffInSeconds < 604800) return Math.floor(diffInSeconds / 86400) + ' days ago';
+            return past.toLocaleDateString();
+        }
 
-    // Function to get appropriate icon based on log action
-    function getActionIcon(action) {
-        const iconMap = {
-            'CREATE': 'fa-plus-circle',
-            'UPDATE': 'fa-edit',
-            'DELETE': 'fa-trash',
-            'LOGIN': 'fa-sign-in-alt',
-            'LOGOUT': 'fa-sign-out-alt'
-        };
-        return iconMap[action] || 'fa-history';
-    }
+        // Function to get appropriate icon based on log action
+        function getActionIcon(action) {
+            const iconMap = {
+                'CREATE': 'fa-plus-circle',
+                'UPDATE': 'fa-edit',
+                'DELETE': 'fa-trash',
+                'LOGIN': 'fa-sign-in-alt',
+                'LOGOUT': 'fa-sign-out-alt'
+            };
+            return iconMap[action] || 'fa-history';
+        }
 
-    // Function to fetch and display recent activities
-    function fetchRecentActivities() {
-        fetch('../user_logs/fetch_logs.php')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Response data:', data); // Log the response to see its structure
-                const activityList = document.getElementById('recentActivityList');
-                activityList.innerHTML = ''; // Clear existing items
+        // Function to fetch and display recent activities
+        function fetchRecentActivities() {
+            fetch('../user_logs/fetch_logs.php')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response data:', data); // Log the response to see its structure
+                    const activityList = document.getElementById('recentActivityList');
+                    activityList.innerHTML = ''; // Clear existing items
 
-                // Display only the first 5 items
-                data.data.slice(0, 5).forEach(log => {
-                    const li = document.createElement('li');
-                    li.className = 'activity-item';
-                    li.innerHTML = `
+                    // Display only the first 5 items
+                    data.data.slice(0, 5).forEach(log => {
+                        const li = document.createElement('li');
+                        li.className = 'activity-item';
+                        li.innerHTML = `
                         <div class="activity-icon">
                             <i class="fas ${getActionIcon(log.log_action)}"></i>
                         </div>
@@ -525,20 +547,20 @@ if (isset($_SESSION['success_message'])) {
                             </p>
                         </div>
                     `;
-                    activityList.appendChild(li);
+                        activityList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching recent activities:', error);
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching recent activities:', error);
-            });
-    }
+        }
 
-    // Fetch activities when page loads
-    document.addEventListener('DOMContentLoaded', fetchRecentActivities);
+        // Fetch activities when page loads
+        document.addEventListener('DOMContentLoaded', fetchRecentActivities);
 
-    // Refresh activities every 5 minutes
-    setInterval(fetchRecentActivities, 300000);
-</script>
+        // Refresh activities every 5 minutes
+        setInterval(fetchRecentActivities, 300000);
+    </script>
 </body>
 
 </html>
