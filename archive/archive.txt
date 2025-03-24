@@ -1,0 +1,32 @@
+filter buttons:
+<!-- Filter Buttons -->
+                    <div class="btn-group portfolio-filter mb-3 mt-0" role="group" aria-label="Portfolio Filter">
+                        <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
+                            Active
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary filter-btn" data-category="1">
+                            Archived
+                        </button>
+                    </div>
+
+table row data:
+<tr data-category="<?= htmlspecialchars($row['is_archived']) ?>">
+
+archive/unarchive button:
+<!-- Archive/Unarchive Button -->
+<li>
+	<button type="button"
+	class="dropdown-item archive-btn"
+	data-id="<?= htmlspecialchars($row['id']) ?>"
+	data-table="announcements"
+	data-operation="<?= $row['is_archived'] == 1 ? 'unarchive' : 'archive' ?>"
+	style="padding: 4px 12px; line-height: 1.2;">
+	<?= $row['is_archived'] == 1 ? 'Unarchive' : 'Archive' ?>
+	</button>
+</li>
+
+script:
+<script src="../archive/js/archive.js"></script>
+
+
+                    <div class="table-responsive" style="overflow: visible;">
