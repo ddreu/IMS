@@ -42,7 +42,7 @@ $conn->close();
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Scoreboard</title>
     <link rel="stylesheet" href="scb_bsktbll.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -149,27 +149,30 @@ $conn->close();
                 </div>
                 <div class="timer" id="gameTimer">10:00</div>
             </div>
+            <div class="middle-container">
+                <div class="center-container">
 
-            <div class="center-container">
-                <div class="label period-label-1">PERIOD</div>
-                <div class="period-control">
-                    <button class="score-button" onclick="updatePeriod(-1)">-</button>
-                    <div class="period" id="periodCounter">1</div>
-                    <button class="score-button" onclick="updatePeriod(1)">+</button>
+                    <div class="period-control">
+                        <button class="score-button" onclick="updatePeriod(-1)">-</button>
+                        <div class="period" id="periodCounter">1</div>
+                        <button class="score-button" onclick="updatePeriod(1)">+</button>
+                    </div>
+                    <div class="label period-label-1">PERIOD</div>
                 </div>
-            </div>
 
-            <div class="middle-section">
-                <div class="label">SHOT CLOCK</div>
-                <div class="shot-clock-control">
-                    <button class="score-button" onclick="startShotClock()"><i class="fas fa-play"></i></button>
-                    <button class="score-button" onclick="pauseShotClock()"><i class="fas fa-pause"></i></button>
-                    <button class="score-button" onclick="resetShotClock()"><i class="fas fa-redo"></i></button>
-                </div>
-                <div class="shot-clock-control">
-                    <!-- <button class="score-button" onclick="updateShotClock(-1)">-</button> -->
-                    <div class="shot-clock" id="shotClock">24</div>
-                    <!--<button class="score-button" onclick="updateShotClock(1)">+</button>-->
+                <div class="middle-section">
+
+                    <div class="shot-clock-control">
+                        <button class="score-button" onclick="startShotClock()"><i class="fas fa-play"></i></button>
+                        <button class="score-button" onclick="pauseShotClock()"><i class="fas fa-pause"></i></button>
+                        <button class="score-button" onclick="resetShotClock()"><i class="fas fa-redo"></i></button>
+                    </div>
+                    <div class="shot-clock-control">
+                        <!-- <button class="score-button" onclick="updateShotClock(-1)">-</button> -->
+                        <div class="shot-clock" id="shotClock">24</div>
+                        <!--<button class="score-button" onclick="updateShotClock(1)">+</button>-->
+                    </div>
+                    <div class="label">SHOT CLOCK</div>
                 </div>
             </div>
         </div> <!-- Closing .control-container -->
