@@ -656,14 +656,14 @@ include '../navbar/navbar.php';
                                                 <div class="match-card-type">
                                                     <?php
                                                     switch ($row['match_type']) {
-                                                        case 'final':
+                                                        case 'Finals':
                                                             echo '<span class="badge bg-warning">Finals</span>';
                                                             break;
-                                                        case 'semifinal':
-                                                            echo '<span class="badge bg-info">Semifinals</span>';
+                                                        case 'Semi-Finals':
+                                                            echo '<span class="badge bg-info">Semi-Finals</span>';
                                                             break;
-                                                        case 'third_place':
-                                                            echo '<span class="badge bg-secondary">Battle for Third</span>';
+                                                        case 'Third Place':
+                                                            echo '<span class="badge bg-secondary">Third Place</span>';
                                                             break;
                                                         default:
                                                             echo '<span class="badge bg-primary">Round ' . htmlspecialchars($row['round']) . '</span>';
@@ -693,43 +693,44 @@ include '../navbar/navbar.php';
                                                 </div>
                                                 <div class="detail-item">
                                                     <span class="detail-label">Status</span>
-                                                    <span class="status-badge <?= $row['status'] === 'Upcoming' ? 'status-upcoming' : ($row['status'] === 'Ongoing' ? 'status-ongoing' : 'status-finished') ?>">
-                                                        <?= htmlspecialchars($row['status']) ?>
+                                                    <span class="detail-value">
+                                                        <span class="status-badge <?= $row['status'] == 'Upcoming' ? 'status-upcoming' : 'status-finished' ?>">
+                                                            <?= $row['status'] ?>
+                                                        </span>
                                                     </span>
                                                 </div>
-                                                <?php if ($row['status'] === 'Finished'): ?>
+                                                <?php if ($row['status'] == 'Finished'): ?>
                                                     <div class="detail-item">
                                                         <span class="detail-label">Score</span>
-                                                        <span class="detail-value"><?= $row['teamA_score'] ?? '0' ?> - <?= $row['teamB_score'] ?? '0' ?></span>
+                                                        <span class="detail-value">
+                                                            <?= $row['teamA_score'] ?? '0' ?> - <?= $row['teamB_score'] ?? '0' ?>
+                                                        </span>
                                                     </div>
                                                 <?php endif; ?>
                                             </div>
 
-                                            <!-- Action Buttons -->
                                             <div class="match-card-actions">
-                                                <?php if ($row['status'] === 'Upcoming'): ?>
+                                                <?php if ($row['status'] == 'Upcoming'): ?>
                                                     <button class="btn btn-primary" onclick="startMatch(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>, <?= $row['game_id'] ?>)">
                                                         <i class="fas fa-play"></i> Start Match
                                                     </button>
                                                     <button class="btn btn-info" onclick="notifyPlayers(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>)">
-                                                        <i class="fas fa-bell"></i> Notify Players
+                                                        <i class="fas fa-bell"></i> Notify
                                                     </button>
-                                                <?php elseif ($row['status'] === 'Ongoing'): ?>
+                                                <?php elseif ($row['status'] == 'Ongoing'): ?>
                                                     <button class="btn btn-success" onclick="startMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
                                                         <i class="fas fa-play"></i> Continue Match
                                                     </button>
-                                                    <button class="btn btn-warning" onclick="joinMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
+                                                    <button class="btn btn-info" onclick="joinMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
                                                         <i class="fas fa-clipboard-list"></i> Record Stats
                                                     </button>
-                                                    <a href="live-stream.php?schedule_id=<?= $row['schedule_id']; ?>&teamA_id=<?= $row['teamA_id']; ?>&teamB_id=<?= $row['teamB_id']; ?>&game_id=<?= $row['game_id']; ?>" class="btn btn-danger">
-                                                        <i class="fas fa-video"></i> Live Stream
-                                                    </a>
-                                                <?php elseif ($row['status'] === 'Finished'): ?>
+                                                <?php elseif ($row['status'] == 'Finished'): ?>
                                                     <a href="match_summary.php?match_id=<?= $row['match_id']; ?>" class="btn btn-secondary">
                                                         <i class="fas fa-eye"></i> View Summary
                                                     </a>
                                                 <?php endif; ?>
                                             </div>
+
                                         </div>
                                     <?php endwhile; ?>
                                 </div>
