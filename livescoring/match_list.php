@@ -103,8 +103,7 @@ $sql = "
     AND tB.team_name NOT IN ('TBD', 'To Be Determined')
     AND b.is_archived = 0
     AND g.is_archived = 0
-    AND tA.is_archived = 0
-    AND tB.is_archived = 0
+    
 ";
 
 

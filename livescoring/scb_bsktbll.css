@@ -508,3 +508,26 @@ small {
         display: none !important;
     }
 }
+
+/* Adjustments for landscape phones with height of 360px */
+@media (max-height: 360px) {
+    .control-container {
+        gap: 5.5px; /* Reduce gap between elements */
+    }
+
+    .timer-wrapper {
+        font-size: 3.5rem; /* Reduce font size for timer */
+    }
+
+    .score-wrapper button {
+        font-size: 3.5vw;
+    }
+   
+    .score-button {
+        font-size: 1.8vw; /* Adjust button size */
+    }
+
+    .team-name, .team-score, .fouls, .timeouts, .period, .shot-clock {
+        font-size: 5vw; /* Adjust sizes for better fit */
+    }
+}

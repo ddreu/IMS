@@ -1045,9 +1045,23 @@ html {
         .team {
             width: 95%;
         }
+/* .teams-container {
+
+} */
+
+.card {
+    height: 27vh;
+}
 
         .timeout-container {
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            flex-direction: row;
+            margin: 0 0;
+        }
+        .timeout-container button {
+            font-size: 1.5vw;
+            width: 2vw;
+            height: 2vh;
         }
     }
 
@@ -1086,12 +1100,13 @@ html {
         /* 🏅 Teams & Scores */
         .teams-container {
             display: flex;
+            flex-direction: row;
             flex-wrap: nowrap;
             justify-content: space-around;
             align-items: center;
             gap: 10px;
             max-width: 100%;
-            overflow: hidden;
+            overflow: visible;
         }
     
         /* 🔢 Score Containers */
