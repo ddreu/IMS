@@ -24,7 +24,7 @@ function executeQuery($conn, $sql, $params, $paramTypes)
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     header('Content-Type: application/json');
-    
+
     $firstname = ucwords(strtolower(trim($_POST['firstname'])));
     $lastname = ucwords(strtolower(trim($_POST['lastname'])));
     $middleinitial = ucwords(strtolower(trim($_POST['middleinitial'])));
@@ -33,16 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);
     $role = $_POST['role'];
     $school_id = $_POST['school_id'];
-    
+
     // Set department and game_id to NULL by default
     $department = null;
     $game_id = null;
-    
+
     // Only set values if they exist and are not empty
     if (isset($_POST['department']) && !empty($_POST['department'])) {
         $department = $_POST['department'];
     }
-    
+
     if (isset($_POST['game_id']) && !empty($_POST['game_id'])) {
         $game_id = $_POST['game_id'];
     }
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         // Check if email already exists
-        $check_email_sql = "SELECT * FROM Users WHERE email = ?";
+        $check_email_sql = "SELECT * FROM users WHERE email = ?";
         $stmt = executeQuery($conn, $check_email_sql, [$email], "s");
         $result = $stmt->get_result();
 
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // Get school code for password generation
-        $fetch_school_sql = "SELECT school_code FROM schools WHERE school_id = ?";
+        $fetch_school_sql = "SELECT school_code, school_name FROM schools WHERE school_id = ?";
         $stmt_fetch_school = executeQuery($conn, $fetch_school_sql, [$school_id], "i");
         $result_school = $stmt_fetch_school->get_result();
 
@@ -92,10 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $school_data = $result_school->fetch_assoc();
         $school_code = $school_data['school_code'];
+        $school_name = $school_data['school_name'];
 
         // Generate secure password using the utility function
-        $password_to_use = generateSecurePassword($school_code, $role);
-        $hashed_password = password_hash($password_to_use, PASSWORD_DEFAULT);
+        $password = generateSecurePassword($school_code, $role);
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
         $conn->begin_transaction();
 
@@ -113,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Send registration email
         require_once('../send-registration-email.php');
-        $emailResult = sendUserRegistrationEmail($email, $firstname, $lastname, $role, $password_to_use);
+        $emailResult = sendUserRegistrationEmail($email, $firstname, $password, $role, $school_name);
 
         if ($emailResult['success']) {
             echo json_encode([
@@ -126,7 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 "message" => "User added successfully but there was an issue sending the email: " . $emailResult['message']
             ]);
         }
-
     } catch (Exception $e) {
         if ($conn->inTransaction()) {
             $conn->rollback();
@@ -137,4 +137,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ]);
     }
 }
-?>

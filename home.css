@@ -196,7 +196,7 @@ header {
   height: 600px;
   padding-top: 40px;
   /* clip-path: ellipse(100% 80% at 50% 100%); */
-  clip-path: ellipse(110% 100% at 50% -10%);
+  clip-path: ellipse(110% 110% at 50% -10%);
 }
 
 /* .hero-overlay {

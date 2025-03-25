@@ -6,7 +6,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Helper functions for badge classes
-function getRoleBadgeClass($role) {
+function getRoleBadgeClass($role)
+{
     switch ($role) {
         case 'School Admin':
             return 'bg-primary';
@@ -74,7 +75,7 @@ mysqli_stmt_execute($stmt);
 $users_result = mysqli_stmt_get_result($stmt);
 
 // Fetch all schools for the filter
-$schools_query = "SELECT school_id, school_name FROM schools ORDER BY school_name";
+$schools_query = "SELECT school_id, school_name FROM schools WHERE school_id != 0 ORDER BY school_name";
 $schools_result = mysqli_query($conn, $schools_query);
 $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
 
@@ -93,6 +94,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -101,6 +103,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="../styles/dashboard.css">
 </head>
+
 <body>
     <div class="wrapper">
         <?php
@@ -108,7 +111,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
         include '../navbar/navbar.php';
         include '../super_admin/sa_sidebar.php';
         ?>
-        
+
         <div class="content ms-5 ms-lg-6 ps-5 p-4">
             <div class="container-fluid mt-4">
                 <div class="container-fluid">
@@ -171,7 +174,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                         <?php
                                         if ($users_result && mysqli_num_rows($users_result) > 0) {
                                             while ($row = mysqli_fetch_assoc($users_result)) {
-                                                echo '<tr>';
+                                                echo '<tr data-school-id="' . htmlspecialchars($row['school_id']) . '">';
                                                 echo '<td class="px-4">';
                                                 echo '<div class="d-flex align-items-center">';
                                                 echo '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 45px; height: 45px;">';
@@ -220,7 +223,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
     <!-- Include modals -->
     <?php include 'admin_addusermodal.php'; ?>
     <?php include 'admin_updateusermodal.php'; ?>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -231,14 +234,14 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
         document.getElementById('roleFilter').addEventListener('change', filterTable);
 
         function filterTable() {
-            const schoolFilter = document.getElementById('schoolFilter').value.toLowerCase();
+            const schoolFilter = document.getElementById('schoolFilter').value;
             const roleFilter = document.getElementById('roleFilter').value.toLowerCase();
             const rows = document.querySelectorAll('tbody tr');
 
             rows.forEach(row => {
-                const school = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                const schoolId = row.getAttribute('data-school-id');
                 const role = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-                const schoolMatch = !schoolFilter || school.includes(schoolFilter);
+                const schoolMatch = !schoolFilter || schoolId === schoolFilter;
                 const roleMatch = !roleFilter || role.includes(roleFilter);
                 row.style.display = schoolMatch && roleMatch ? '' : 'none';
             });
@@ -258,40 +261,40 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                 if (result.isConfirmed) {
                     const formData = new FormData();
                     formData.append('user_id', userId);
-                    
+
                     fetch('delete_user.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted!',
-                                text: data.message,
-                                showConfirmButton: true
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    location.reload();
-                                }
-                            });
-                        } else {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: data.message,
+                                    showConfirmButton: true
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.reload();
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: data.message
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error!',
-                                text: data.message
+                                text: 'An error occurred while deleting the user.'
                             });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'An error occurred while deleting the user.'
                         });
-                    });
                 }
             });
         }
@@ -299,23 +302,24 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
         function handleFormSubmit(form, actionUrl) {
             const formData = new FormData(form);
             fetch(actionUrl, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing your request');
-            });
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing your request');
+                });
             return false;
         }
     </script>
 </body>
+
 </html>
