@@ -145,6 +145,12 @@ $stmt->close();
                 <?php } ?>
             </ul>
         </li>
+        <li class="nav-item">
+            <a href="../school-profile/school_profile.php" class="<?php echo ($current_page == 'schedule') ? 'active' : ''; ?>">
+                <i class="fas fa-image"></i>
+                <span>School Profile</span>
+            </a>
+        </li>
     </ul>
 </nav>
 

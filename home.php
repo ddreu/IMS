@@ -42,6 +42,34 @@ if (!isset($_GET['department_id']) || empty($_GET['department_id']) || $_GET['de
         exit();
     }
 }
+
+$school_id = $_GET['school_id'];
+
+
+// Fetch school data
+$query = "SELECT image, title, description FROM school_profile WHERE school_id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $school_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($row = $result->fetch_assoc()) {
+    // If data exists, use it
+    $hero_image = $row['image'] ? 'school-profile/' . $row['image'] : 'images/intrams1.png';
+    $title = $row['title'] ?: 'Welcome to our Annual Intramurals!';
+    $description = $row['description'] ?: "It's time to unleash your inner athlete, build new friendships, and celebrate the thrill of competition. Let's make this year's event a true showcase of teamwork, sportsmanship, and fun. Get ready to play, cheer, and create unforgettable memories. Let the games begin!";
+} else {
+    // Fallback to default values if no data is found
+    $hero_image = 'images/intrams1.png';
+    $title = 'Welcome to our Annual Intramurals!';
+    $description = "It's time to unleash your inner athlete, build new friendships, and celebrate the thrill of competition. Let's make this year's event a true showcase of teamwork, sportsmanship, and fun. Get ready to play, cheer, and create unforgettable memories. Let the games begin!";
+}
+
+$logoResult = $conn->query("SELECT logo FROM schools WHERE school_id = $school_id");
+
+$logoRow = $logoResult->fetch_assoc();
+$logo = 'uploads/logos/' . ($logoRow['logo'] ?? 'default-logo.png');
+
 include 'navbarhome.php';
 ?>
 
@@ -225,7 +253,7 @@ include 'navbarhome.php';
 <body>
 
     <!-- Header -->
-    <section class="welcome-hero">
+    <!-- <section class="welcome-hero" style="background-image: url('images/intrams1.png'); background-size: cover; background-position: center;">
         <div class="hero-overlay">
             <div class="hero-content">
                 <h1>Welcome to our Annual Intramurals!</h1>
@@ -233,10 +261,37 @@ include 'navbarhome.php';
                     It's time to unleash your inner athlete, build new friendships,
                     and celebrate the thrill of competition. Let's make this year's event
                     a true showcase of teamwork, sportsmanship, and fun. Get ready to play,
-                    cheer, and create unforgettable memories. Let the games begin!</p>
+                    cheer, and create unforgettable memories. Let the games begin!
+                </p>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- <section class="welcome-hero" style="background-image: url('<?= $hero_image ?>'); background-size: cover; background-position: center;">
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <h1><?= htmlspecialchars($title) ?></h1>
+                <p>
+                    <?= htmlspecialchars($description) ?>
+                </p>
+            </div>
+        </div>
+    </section> -->
+
+    <section class="welcome-hero" style="background-image: url('<?= $hero_image ?>'); background-size: cover; background-position: center;">
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <h1><?= htmlspecialchars($title) ?></h1>
+                <p>
+                    <?= htmlspecialchars($description) ?>
+                </p>
+            </div>
+            <div class="hero-logo">
+                <img src="<?= $logo ?>" alt="School Logo">
             </div>
         </div>
     </section>
+
 
 
     <div class="announcement-section py-5 bg-light">
@@ -397,22 +452,22 @@ include 'navbarhome.php';
     </div>
 
     <!-- Carousel Indicators -->
-    <div class="carousel-indicators">
+    <!-- <div class="carousel-indicators">
         <?php
-        if (isset($card_groups)) {
-            foreach ($card_groups as $index => $group) {
-                echo '<button type="button" 
-                                         data-bs-target="#announcementCarousel" 
-                                         data-bs-slide-to="' . $index . '" 
-                                         ' . ($index === 0 ? 'class="active"' : '') . '
-                                         aria-label="Slide ' . ($index + 1) . '"></button>';
-            }
-        }
+        // if (isset($card_groups)) {
+        //     foreach ($card_groups as $index => $group) {
+        //         echo '<button type="button" 
+        //                                  data-bs-target="#announcementCarousel" 
+        //                                  data-bs-slide-to="' . $index . '" 
+        //                                  ' . ($index === 0 ? 'class="active"' : '') . '
+        //                                  aria-label="Slide ' . ($index + 1) . '"></button>';
+        //     }
+        // }
         ?>
+    </div> -->
+    <!-- </div>
     </div>
-    </div>
-    </div>
-    </div>
+    </div> -->
 
 
 
