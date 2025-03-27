@@ -14,7 +14,7 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="updateUserForm" method="POST" action="update_user.php">
+                <form id="updateUserForm" method="POST">
                     <input type="hidden" id="update_user_id" name="user_id">
 
                     <div class="row g-3">
@@ -210,6 +210,8 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
         document.getElementById('update_email').value = email;
         document.getElementById('update_role').value = role;
         document.getElementById('update_school').value = schoolId;
+        document.getElementById('update_game').value = gameId;
+
 
         // Handle role-specific fields
         handleUpdateRoleSelection(role);

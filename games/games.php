@@ -475,24 +475,31 @@ include '../navbar/navbar.php';
                                                 }
 
                                                 // Delete Button
-                                                echo '<li>';
-                                                echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST">';
+                                                echo '<li style="margin: 0; padding: 0; list-style: none;">'; // Remove margin, padding, and list style
+                                                echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" style="margin: 0; padding: 0;">';
                                                 echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
                                                 echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
-                                                    'class="dropdown-item" style="padding: 4px 12px; line-height: 1.2;">';
+                                                    'class="dropdown-item" style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">'; // Ensure full width to avoid shifting
                                                 echo 'Delete';
                                                 echo '</button>';
                                                 echo '</form>';
                                                 echo '</li>';
 
                                                 // Archive/Unarchive Button
-                                                echo '<li>';
+                                                echo '<li style="margin: 0; padding: 0; list-style: none;">'; // Remove margin, padding, and list style
                                                 echo '<button type="button" class="dropdown-item archive-btn" ' .
                                                     'data-id="' . htmlspecialchars($game['game_id']) . '" ' .
                                                     'data-table="games" ' .
                                                     'data-operation="' . ($game['is_archived'] == 1 ? 'unarchive' : 'archive') . '" ' .
-                                                    'style="padding: 4px 12px; line-height: 1.2;">';
+                                                    'style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">'; // Ensure full width to avoid shifting
                                                 echo ($game['is_archived'] == 1 ? 'Unarchive' : 'Archive');
+                                                echo '</button>';
+                                                echo '</li>';
+
+                                                //"Open as Committee" Button
+                                                echo '<li>';
+                                                echo '<button type="button" class="dropdown-item" onclick="openAsCommittee(' . htmlspecialchars($game['game_id']) . ')">';
+                                                echo 'Open as Committee';
                                                 echo '</button>';
                                                 echo '</li>';
 
@@ -716,6 +723,7 @@ include '../navbar/navbar.php';
         }
     </script>
     <script src="../archive/js/archive.js"></script>
+    <script src="js/games.js"></script>
 </body>
 
 </html>

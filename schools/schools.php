@@ -7,6 +7,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'superadmin') {
     header("Location: ../login.php");
     exit(); // Ensure no further code is executed
 }
+
+$departments = [];
+$query = "SELECT id, department_name, school_id FROM departments WHERE is_archived = 0";
+$result = $conn->query($query);
+while ($dept = $result->fetch_assoc()) {
+    $departments[] = $dept;
+}
+
+$games = [];
+$query = "SELECT game_id, game_name, school_id FROM games WHERE is_archived = 0";
+$result = $conn->query($query);
+while ($game = $result->fetch_assoc()) {
+    $games[] = $game;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,29 +84,33 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'superadmin') {
                                 echo "<td>" . htmlspecialchars($row['school_code']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['address']) . "</td>";
                                 echo "<td>
-                                <div class='dropdown'>
-                                    <button class='btn btn-secondary btn-sm dropdown-toggle' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
-                                        Actions
-                                    </button>
-                                    <ul class='dropdown-menu'>
-                                        <li>
-                                            <a class='dropdown-item' href='school-dashboard-process.php?id={$row['school_id']}'>
-                                                 Open School
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <button class='dropdown-item edit-btn' data-id='{$row['school_id']}'>
-                                                 Edit
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <a class='dropdown-item text-danger' href='javascript:void(0)' onclick='deleteSchool(" . $row['school_id'] . ", \"" . htmlspecialchars($row['school_name']) . "\")'>
-                                                 Delete
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                              </td>";
+    <div class='dropdown'>
+        <button class='btn btn-secondary btn-sm dropdown-toggle' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
+            Actions
+        </button>
+        <ul class='dropdown-menu'>
+            <li>
+                <button class='dropdown-item' 
+                    data-bs-toggle='modal' 
+                    data-bs-target='#openSchoolModal'
+                    data-school-id='{$row['school_id']}'>
+                    Open School
+                </button>
+            </li>
+            <li>
+                <button class='dropdown-item edit-btn' data-id='{$row['school_id']}'>
+                    Edit
+                </button>
+            </li>
+            <li>
+                <a class='dropdown-item text-danger' href='javascript:void(0)' onclick='deleteSchool({$row['school_id']}, \"" . htmlspecialchars($row['school_name']) . "\")'>
+                    Delete
+                </a>
+            </li>
+        </ul>
+    </div>
+</td>";
+
                                 echo "</tr>";
                             }
                         } else {
@@ -104,6 +122,60 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'superadmin') {
             </div>
         </div>
     </div>
+
+    <!-- Open School Modal -->
+    <div class="modal fade" id="openSchoolModal" tabindex="-1" aria-labelledby="openSchoolModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="openSchoolModalLabel">Open School</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="openSchoolForm" method="POST" action="school-dashboard-process.php">
+                        <input type="hidden" id="selectedSchoolId" name="school_id">
+
+                        <!-- Dashboard Type -->
+                        <div class="mb-3">
+                            <label for="dashboardType" class="form-label">Select Dashboard:</label>
+                            <select class="form-select" id="dashboardType" name="dashboard_type" required>
+                                <option value="">Select Type</option>
+                                <option value="school_admin">School Admin</option>
+                                <option value="dept_admin">Department Admin</option>
+                                <option value="committee">Committee</option>
+                            </select>
+                        </div>
+
+                        <!-- Department Selection (for Dept Admin) -->
+                        <div class="mb-3 d-none" id="departmentSelection">
+                            <label for="department" class="form-label">Select Department:</label>
+                            <select class="form-select" id="department" name="department_id">
+                                <!-- Options will be populated by JS -->
+                            </select>
+                        </div>
+
+                        <!-- Game Selection (for Committee) -->
+                        <div class="mb-3 d-none" id="gameSelection">
+                            <label for="game" class="form-label">Select Game:</label>
+                            <select class="form-select" id="game" name="game_id">
+                                <!-- Options will be populated by JS -->
+                            </select>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" id="openDashboardBtn" class="btn btn-primary">
+                                Open Dashboard
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 
     <?php if (isset($_SESSION['error_message'])): ?>
         <script>
@@ -187,7 +259,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'superadmin') {
             });
         }
     </script>
-
+    <script>
+        const departments = <?php echo json_encode($departments); ?>;
+        const games = <?php echo json_encode($games); ?>;
+    </script>
+    <script src="js/schools.js"></script>
 </body>
 
 </html>

@@ -48,6 +48,7 @@ $sql = "
         u.role,
         u.department,
         u.school_id,
+        u.game_id,
         d.department_name,
         s.school_name
     FROM 
@@ -191,7 +192,17 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                 echo '<td class="px-4">' . htmlspecialchars($row['department_name'] ?? 'N/A') . '</td>';
                                                 echo '<td class="px-4">';
                                                 echo '<div class="d-flex gap-2">';
-                                                echo '<button type="button" class="btn btn-sm btn-outline-primary" onclick="openUpdateModal(\'' . $row['id'] . '\', \'' . $row['firstname'] . '\', \'' . $row['lastname'] . '\', \'' . $row['middleinitial'] . '\', \'' . $row['age'] . '\', \'' . $row['gender'] . '\', \'' . $row['email'] . '\', \'' . $row['role'] . '\', \'' . $row['school_id'] . '\', \'' . $row['department'] . '\')">';
+                                                echo '<button type="button" class="btn btn-sm btn-outline-primary" onclick="openUpdateModal(\'' . $row['id'] . '\', \'' .
+                                                    $row['firstname'] . '\', \'' .
+                                                    $row['lastname'] . '\', \'' .
+                                                    $row['middleinitial'] . '\', \'' .
+                                                    $row['age'] . '\', \'' .
+                                                    $row['gender'] . '\', \'' .
+                                                    $row['email'] . '\', \'' .
+                                                    $row['role'] . '\', \'' .
+                                                    $row['school_id'] . '\', \'' .
+                                                    $row['department'] . '\', \'' .
+                                                    ($row['game_id'] ?? '') . '\')">';
                                                 echo '<i class="fas fa-edit"></i>';
                                                 echo '</button>';
                                                 echo '<a href="javascript:void(0)" onclick="deleteUser(' . $row['id'] . ', \'' . htmlspecialchars($row['firstname'] . ' ' . $row['lastname']) . '\')" class="btn btn-sm btn-danger">';
