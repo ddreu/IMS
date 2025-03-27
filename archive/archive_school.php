@@ -74,6 +74,12 @@ class SchoolArchiver
             $excel_url = $protocol . $host . $base_path . ltrim($excel_file, '/');
 
             // Commit transaction
+            $sql = "INSERT INTO archives (school_id, archived_at) VALUES (?, ?)";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param("is", $this->school_id, $current_timestamp);
+            $stmt->execute();
+            $stmt->close();
+
             $this->conn->commit();
 
             // Log the archiving action

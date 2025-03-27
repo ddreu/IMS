@@ -14,7 +14,7 @@
 //       // Use event delegation on tbody
 //       tableBody.querySelectorAll("tr").forEach((row) => {
 //         if (
-//           category === "all" || 
+//           category === "all" ||
 //           row.getAttribute("data-category") === category
 //         ) {
 //           row.style.display = "";
@@ -113,7 +113,7 @@ document.addEventListener("click", function (event) {
               setTimeout(() => {
                 location.reload();
               }, 1200);
-             } else {
+            } else {
               Swal.fire({
                 title: "Error!",
                 text:
@@ -185,6 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .then((data) => {
             Swal.close(); // Close loading alert
             if (data.success) {
+              /*
               // Create and trigger download of Excel file
               const downloadExcel = () => {
                 const link = document.createElement('a');
@@ -194,6 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 link.click();
                 document.body.removeChild(link);
               };
+              */
 
               Swal.fire({
                 title: "Archived!",
@@ -201,14 +203,92 @@ document.addEventListener("DOMContentLoaded", () => {
                 icon: "success",
                 confirmButtonColor: "#198754",
                 showDenyButton: true,
-                confirmButtonText: "Download Report",
+                // confirmButtonText: "Download Report",
                 denyButtonText: "Close",
               }).then((result) => {
+                /*
                 if (result.isConfirmed) {
                   downloadExcel();
                 }
+                */
                 // Reload the page after download or close
                 location.reload();
+              });
+            } else {
+              Swal.fire({
+                title: "Error!",
+                text: data.message,
+                icon: "error",
+                confirmButtonColor: "#dc3545",
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire({
+              title: "Error!",
+              text: "Something went wrong. Please try again.",
+              icon: "error",
+              confirmButtonColor: "#dc3545",
+            });
+          });
+      }
+    });
+  });
+});
+
+/* UNARCHIVE SCHOOL DATA */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const unarchiveForm = document.getElementById("UnarchiveSchoolForm");
+
+  unarchiveForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    // Show confirmation alert
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to unarchive this school's data?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#198754",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, unarchive it!",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Show loading alert
+        Swal.fire({
+          title: "Unarchiving...",
+          text: "Please wait while the school is being restored.",
+          icon: "info",
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          willOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        // Prepare form data
+        const formData = new FormData(unarchiveForm);
+
+        // Send AJAX request
+        fetch("../archive/unarchiver.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            Swal.close();
+            if (data.success) {
+              Swal.fire({
+                title: "Unarchived!",
+                text: data.message,
+                icon: "success",
+                confirmButtonColor: "#198754",
+              }).then(() => {
+                location.reload(); // Reload after successful unarchive
               });
             } else {
               Swal.fire({

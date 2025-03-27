@@ -338,12 +338,21 @@ if (isset($_SESSION['success_message'])) {
                         </button>
 
                         <!-- Archive Button -->
-                        <!-- <form id="archiveSchoolForm">
+                        <form id="archiveSchoolForm">
                             <input type="hidden" name="school_id" value="<?= htmlspecialchars($_SESSION['school_id']); ?>">
                             <button type="submit" class="btn btn-warning btn-circle text-white" title="Archive School">
                                 <i class="fas fa-archive"></i> Archive
                             </button>
-                        </form> -->
+                        </form>
+
+                        <!-- Unarchive Button -->
+                        <form id="UnarchiveSchoolForm">
+                            <input type="hidden" name="school_id" value="<?= htmlspecialchars($_SESSION['school_id']); ?>">
+                            <button type="submit" class="btn btn-secondary btn-circle text-white" title="Unarchive School">
+                                <i class="fas fa-box-open"></i> Unarchive
+                            </button>
+                        </form>
+
 
                         <!-- Generate Report Button -->
                         <button type="button" id="generateReportBtn" class="btn btn-success btn-circle text-white" title="Generate Report">
