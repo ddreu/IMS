@@ -6,28 +6,25 @@ $conn = con();
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve and sanitize input data
     $user_id = intval($_POST['user_id']);
-// Sanitize and format input data
-$firstname = ucwords(strtolower(trim($_POST['firstname'])));
-$lastname = ucwords(strtolower(trim($_POST['lastname'])));
 
-// Ensure middle initial is a single uppercase letter
-$middleinitial = strtoupper(trim($_POST['middleinitial'])); // Convert to uppercase
-if (strlen($middleinitial) > 1) {
-    $middleinitial = strtoupper(substr($middleinitial, 0, 1)); // Take only the first character
-}
+    // Sanitize and format input data
+    $firstname = ucwords(strtolower(trim($_POST['firstname'])));
+    $lastname = ucwords(strtolower(trim($_POST['lastname'])));
+    $middleinitial = strtoupper(trim($_POST['middleinitial']));
+    if (strlen($middleinitial) > 1) {
+        $middleinitial = strtoupper(substr($middleinitial, 0, 1));
+    }
     $age = intval($_POST['age']);
     $gender = trim($_POST['gender']);
     $email = trim($_POST['email']);
     $role = trim($_POST['role']);
-    $department = intval($_POST['department']);
-    
-    // Determine assigned game based on role
-    $games = ($role === "Department Admin") ? null : (isset($_POST['game_id']) ? intval($_POST['game_id']) : null);
+    $department = !empty($_POST['department']) ? intval($_POST['department']) : null;
+    $school_id = !empty($_POST['school_id']) ? intval($_POST['school_id']) : null;
+    $games = ($role === "Department Admin") ? null : (!empty($_POST['game_id']) ? intval($_POST['game_id']) : null);
 
-    // Check required fields
-    if (empty($firstname) || empty($lastname) || empty($email) || empty($department)) {
+    // Validate required fields
+    if (empty($firstname) || empty($lastname) || empty($email) || empty($school_id)) {
         echo json_encode([
             "status" => "error",
             "message" => "Please fill in all required fields."
@@ -35,8 +32,8 @@ if (strlen($middleinitial) > 1) {
         exit;
     }
 
-    // Email validation
-    $check_email_sql = "SELECT * FROM users WHERE email = ? AND id != ?";
+    // Check if email is already taken
+    $check_email_sql = "SELECT id FROM users WHERE email = ? AND id != ?";
     $stmt_check = $conn->prepare($check_email_sql);
     $stmt_check->bind_param("si", $email, $user_id);
     $stmt_check->execute();
@@ -50,24 +47,32 @@ if (strlen($middleinitial) > 1) {
         exit;
     }
 
-    // Prepare the SQL update statement
-    if (strtolower($role) === "department admin") {
-        // If the role is Department Admin, we set game_id to NULL
-        $sql_update = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ?, role = ?, department = ?, game_id = NULL WHERE id = ?";
-        $stmt_update = $conn->prepare($sql_update);
-        $stmt_update->bind_param("sssissssi", $firstname, $lastname, $middleinitial, $age, $gender, $email, $role, $department, $user_id);
-    } else {
-        // For other roles, we update game_id with the provided value
-        $sql_update = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ?, role = ?, game_id = ?, department = ? WHERE id = ?";
-        $stmt_update = $conn->prepare($sql_update);
-        $stmt_update->bind_param("sssisssiii", $firstname, $lastname, $middleinitial, $age, $gender, $email, $role, $games, $department, $user_id);
-    }
+    // Update query
+    $sql_update = "UPDATE users 
+                   SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, 
+                       email = ?, role = ?, department = ?, school_id = ?, game_id = ?
+                   WHERE id = ?";
 
-    // Execute the prepared statement
+    $stmt_update = $conn->prepare($sql_update);
+    $stmt_update->bind_param(
+        "sssisssiiii",
+        $firstname,
+        $lastname,
+        $middleinitial,
+        $age,
+        $gender,
+        $email,
+        $role,
+        $department,
+        $school_id,
+        $games,
+        $user_id
+    );
+
     if ($stmt_update->execute()) {
         echo json_encode([
             "status" => "success",
-            "message" => "User  updated successfully."
+            "message" => "User updated successfully."
         ]);
     } else {
         echo json_encode([
@@ -76,4 +81,3 @@ if (strlen($middleinitial) > 1) {
         ]);
     }
 }
-?>

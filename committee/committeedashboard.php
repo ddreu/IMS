@@ -13,10 +13,10 @@ if (!isset($_SESSION['user_id'])) {
 // echo "Welcome, " . $_SESSION['user_id'] . "!";
 
 // Check the user's role using the session data
-if ($_SESSION['role'] !== 'Committee') {
-    header('Location: ../login.php');
-    exit();
-}
+// if ($_SESSION['role'] !== 'Committee') {
+//     header('Location: ../login.php');
+//     exit();
+// }
 
 // Use `game_id` and `game_name` directly from session
 $assigned_game_id = $_SESSION['game_id'] ?? null;

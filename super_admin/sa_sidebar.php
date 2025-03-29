@@ -5,7 +5,7 @@
     <ul class="custom-navbar__menu">
         <li class="custom-navbar__item">
             <a href="../super_admin/sa_dashboard.php" class="custom-navbar__link <?php echo ($current_page == 'dashboard') ? 'active' : ''; ?>">
-                <i class="fas fa-th-large"></i><span>Dashboard</span></a>
+                <i data-feather="grid"></i><span>Dashboard</span></a>
         </li>
         <li class="custom-navbar__item">
             <a href="../schools/schools.php" class="custom-navbar__link <?php echo ($current_page == 'schools') ? 'active' : ''; ?>">
@@ -18,10 +18,10 @@
         <li class="custom-navbar__item">
             <a href="../announcements/sa_announcement.php" class="custom-navbar__link"><i data-feather="message-square"></i><span>Announcements</span></a>
         </li>
-         <li class="custom-navbar__item">
+        <li class="custom-navbar__item">
             <a href="../user_logs/admin_user_logs.php" class="custom-navbar__link"><i data-feather="clock"></i><span>Activity Logs</span></a>
         </li>
-       <li class="custom-navbar__item">
+        <!-- <li class="custom-navbar__item">
             <a href="#" class="custom-navbar__link"><i data-feather="archive"></i><span>Resources</span></a>
         </li>
         <li class="custom-navbar__item">
@@ -29,7 +29,7 @@
         </li>
         <li class="custom-navbar__item">
             <a href="#" class="custom-navbar__link"><i data-feather="settings"></i><span>Settings</span></a>
-        </li>
+        </li> -->
 
     </ul>
 </nav>
