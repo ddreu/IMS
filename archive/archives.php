@@ -2,19 +2,11 @@
 session_start();
 require_once '../connection/conn.php';
 $conn = con();
+$role = $_SESSION['role'];
 
-$table = isset($_GET['page']) ? $_GET['page'] : 'announcement';
-
-// Validate table name to prevent SQL injection
-$allowedTables = ['announcement', 'events', 'news'];
-if (!in_array($table, $allowedTables)) {
-    die("Invalid table name.");
-}
-
-// Fetch archived records from the selected table
-$query = "SELECT * FROM `$table` WHERE is_archived = 1";
-$result = $conn->query($query);
-
+$allowedTables = ['announcements', 'games', 'schedules', 'teams', 'department-teams'];
+$table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : null;
+$year = isset($_GET['year']) ? $_GET['year'] : '';
 include '../navbar/navbar.php';
 ?>
 
@@ -26,120 +18,146 @@ include '../navbar/navbar.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Archived Items</title>
 
-    <!-- Bootstrap CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <!-- Font Awesome CDN for Icons -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles/dashboard.css">
-    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body {
-            background-color: #f8f9fa;
-            color: #343a40;
-            font-family: Arial, sans-serif;
-        }
-
-        h2 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #212529;
-        }
-
-        .table {
-            background-color: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        th {
-            background-color: #e9ecef;
-            color: #495057;
-            font-weight: 600;
-            text-align: center;
-            padding: 12px;
-        }
-
-        td {
-            padding: 12px;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .btn {
-            border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-            border-color: #218838;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
-        }
-    </style>
 </head>
 
 <body>
+    <?php
+    $current_page = 'archives';
 
+    if ($role == 'Committee') {
+        include 'csidebar.php';
+    } elseif ($role == 'superadmin') {
+        include '../superadmin/sa_sidebar.php';
+    } else {
+        include '../department_admin/sidebar.php';
+    }
+    ?>
 
     <div class="container mt-5">
-        <h2 class="mb-4">Archived Items (<?= ucfirst($table) ?>)</h2>
+        <div class="flex-container d-flex justify-content-between align-items-center mb-4">
+            <!-- Heading (Left side) -->
+            <h2 class="mb-0">Archived Items <?= $table ? ucfirst($table) : '' ?> for Year <?= $year ?></h2>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <?php
-                        // Get the column names dynamically
-                        $fields = $result->fetch_fields();
-                        foreach ($fields as $field) {
-                            echo "<th>" . htmlspecialchars(ucwords(str_replace('_', ' ', $field->name))) . "</th>";
-                        }
-                        ?>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $result->fetch_assoc()) : ?>
-                        <tr>
-                            <?php foreach ($fields as $field) : ?>
-                                <td><?= htmlspecialchars($row[$field->name]) ?></td>
-                            <?php endforeach; ?>
-                            <td>
-                                <button class="btn btn-success btn-sm unarchive-btn"
-                                    data-id="<?= $row['id'] ?>"
-                                    data-table="<?= $table ?>">
-                                    <i class="fas fa-box-open"></i> Unarchive
-                                </button>
-                                <button class="btn btn-danger btn-sm delete-btn"
-                                    data-id="<?= $row['id'] ?>"
-                                    data-table="<?= $table ?>">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+            <!-- Dropdown (Right side in a card) -->
+            <div class="card shadow-lg border-0 rounded-3 mb-0">
+                <div class="card-body">
+                    <!-- School Dropdown inside a flex container -->
+                    <div class="d-flex align-items-center">
+                        <label for="school" class="form-label mb-0 me-2">School:</label>
+                        <select class="form-select" id="school" name="school_id">
+                            <option value="">Select School</option>
+                            <?php
+                            $schools = $conn->query("SELECT school_id, school_name FROM schools WHERE school_id != 0");
+                            while ($row = $schools->fetch_assoc()) {
+                                $selected = (isset($_GET['school_id']) && $_GET['school_id'] == $row['school_id']) ? 'selected' : '';
+                                echo "<option value='{$row['school_id']}' $selected>{$row['school_name']}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
+
+
+        <div class="card shadow-sm border-0 rounded-3 mb-3">
+            <div class="card-body">
+                <form class="mb-0">
+                    <div class="row g-3 justify-content-center">
+
+
+                        <!-- Table Dropdown -->
+                        <div class="col-md-3">
+                            <label for="table" class="form-label">Table</label>
+                            <select class="form-select" name="table" id="table">
+                                <option value="">Select Table</option>
+                                <?php foreach ($allowedTables as $option) : ?>
+                                    <option value="<?= $option ?>" <?= $table === $option ? 'selected' : '' ?>>
+                                        <?= ucfirst($option) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <!-- Archive Year Dropdown -->
+                        <div class="col-md-3">
+                            <label for="archive_year" class="form-label">Year</label>
+                            <select class="form-select" id="archive_year" name="year" disabled>
+                                <option value="">Select Year</option>
+                            </select>
+                        </div>
+                        <!-- Department Dropdown -->
+                        <div class="col-md-3">
+                            <label for="department" class="form-label">Department</label>
+                            <select class="form-select" id="department" name="department_id" disabled>
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                        <!-- Grade/Section/Course Dropdown -->
+                        <div class="col-md-3">
+                            <label for="course" class="form-label">Grade</label>
+                            <select class="form-select" id="course" name="course_id" disabled>
+                                <option value="">Select Grade</option>
+                            </select>
+                        </div>
+
+                    </div>
+            </div>
+        </div>
+
+        <!-- New Row -->
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-body">
+                <div class="row g-3">
+                    <!-- Game Dropdown -->
+                    <div class="col-md-3">
+                        <label for="game" class="form-label">Game</label>
+                        <select class="form-select" id="game" name="game_id" disabled>
+                            <option value="">Select Game</option>
+                        </select>
+                    </div>
+
+                    <div class="col">
+                        <label for="search" class="form-label">Search</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="search" placeholder="Search...">
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Section to Load the Archive Table -->
+        <div id="archiveTableContainer" class="card shadow-sm border-0 rounded-3 mt-3">
+            <div class="card-body text-center">
+                <?php
+                $allowedTables = ['announcements', 'games', 'schedules', 'teams', 'department-teams'];
+                $table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : null;
+
+                if ($table) {
+                    include "archive-pages/{$table}.php";
+                } else {
+                    echo "<p class='text-muted'>Select a table to view its content.</p>";
+                }
+                ?>
+            </div>
+        </div>
+
+
+
+
     </div>
+    <script src="js/utils.js"></script>
+    <!-- <script src="../js/archive.js"></script> -->
+</body>
+
+</html>

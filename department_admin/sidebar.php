@@ -19,6 +19,10 @@ $stmt->execute();
 $result = $stmt->get_result();
 $departments = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
+
+
+$showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['department_id'], $_SESSION['department_name']);
+
 ?>
 <!-- Sidebar -->
 <nav id="sidebar" class="mt-0 mt-sm-2 mt-md-3 mt-lg-4 mt-xl-5 overflow-auto">
@@ -43,10 +47,99 @@ $stmt->close();
     </div>
 
     <ul class="list-unstyled components">
+
+
+        <?php if ($showGameLinks): ?>
+            <li class="nav-item">
+                <a href="#gameSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle <?php echo ($current_page == 'Dashboard') ? 'active' : ''; ?>">
+                    <i class="fas fa-user"></i>
+                    <span>
+                        <?php echo htmlspecialchars($_SESSION['game_name']); ?><br>
+                        <?php echo htmlspecialchars($_SESSION['department_name']); ?>
+                    </span>
+                </a>
+                <ul class="collapse list-unstyled" id="gameSubmenu">
+                    <li>
+                        <a class="submenu-item <?php echo ($current_page == 'Dashboard') ? 'active' : ''; ?>" href="../committee/committeedashboard.php">
+                            <i class="fas fa-th-large"></i>
+                            Game <br>Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a class="submenu-item <?php echo ($current_page == 'Teams') ? 'active' : ''; ?>" href="../teams/teams.php">
+                            <i class="fas fa-users"></i>
+                            Teams
+                        </a>
+                    </li>
+                    <li>
+                        <a class="submenu-item <?php echo ($current_page == 'Scoring Rules') ? 'active' : ''; ?>" href="../scoring_rules/scoring_rules_form.php">
+                            <i class="fas fa-book-open"></i>
+                            Scoring Rules
+                        </a>
+                    </li>
+                    <li>
+                        <a class="submenu-item <?php echo ($current_page == 'Brackets') ? 'active' : ''; ?>" href="../brackets/brackets.php">
+                            <i class="fas fa-sitemap"></i>
+                            Brackets
+                        </a>
+                    </li>
+                    <!-- <li>
+                        <a class="submenu-item <?php echo ($current_page == 'Schedules') ? 'active' : ''; ?>" href="../schedule/schedule.php">
+                            <i class="fas fa-calendar-alt"></i>
+                            Schedules
+                        </a>
+                    </li> -->
+                    <li>
+                        <a class="submenu-item <?php echo ($current_page == 'Match') ? 'active' : ''; ?>" href="../livescoring/match_list.php">
+                            <i class="fas fa-play-circle"></i>
+                            Match
+                        </a>
+                    </li>
+                    <li>
+                        <a class="submenu-item <?php echo ($current_page == 'Rankings') ? 'active' : ''; ?>" href="../rankings/leaderboards.php">
+                            <i class="fas fa-chart-bar"></i>
+                            Rankings
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        <?php endif; ?>
+
+
+
+        <li class="nav-item">
+            <a class="fw-bold small text-muted px-3 mt-3">
+                <i class="fas fa-user-tie"></i>
+                <span> Admin</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <hr class="my-2 mx-3 border-top border-secondary">
+        </li>
         <li class="<?php echo ($current_page == 'admindashboard') ? 'active' : ''; ?>">
             <a href="<?php echo ($role === 'School Admin') ? '../school_admin/schooladmindashboard.php' : '../department_admin/departmentadmindashboard.php'; ?>">
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
+            </a>
+        </li>
+
+
+        <li class="<?php echo ($current_page == 'games') ? 'active' : ''; ?>">
+            <a href="../games/games.php">
+                <i class="fas fa-basketball-ball"></i>
+                <span>Games</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="../archive/archives.php" class="<?php echo ($current_page == 'archives') ? 'active' : ''; ?>">
+                <i class="fas fa-archive"></i>
+                <span>Archives</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="../school-profile/school_profile.php" class="<?php echo ($current_page == 'school_profile') ? 'active' : ''; ?>">
+                <i class="fas fa-image"></i>
+                <span>School Profile</span>
             </a>
         </li>
         <li class="<?php echo ($current_page == 'Logs') ? 'active' : ''; ?>">
@@ -108,12 +201,7 @@ $stmt->close();
             </a>
         </li>
 
-        <li class="<?php echo ($current_page == 'games') ? 'active' : ''; ?>">
-            <a href="../games/games.php">
-                <i class="fas fa-basketball-ball"></i>
-                <span>Games</span>
-            </a>
-        </li>
+
         <li class="nav-item">
             <a href="../brackets/admin_brackets.php" class="<?php echo ($current_page == 'Brackets') ? 'active' : ''; ?>">
                 <i class="fas fa-sitemap"></i>
@@ -145,12 +233,7 @@ $stmt->close();
                 <?php } ?>
             </ul>
         </li>
-        <li class="nav-item">
-            <a href="../school-profile/school_profile.php" class="<?php echo ($current_page == 'schedule') ? 'active' : ''; ?>">
-                <i class="fas fa-image"></i>
-                <span>School Profile</span>
-            </a>
-        </li>
+
     </ul>
 </nav>
 

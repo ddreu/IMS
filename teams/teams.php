@@ -21,8 +21,32 @@ $department_name = $_SESSION['department_name'];
 $grade_section_course_id = isset($_GET['grade_section_course_id']) ? intval($_GET['grade_section_course_id']) : null;
 
 // Fetch teams based on role
-if ($role == 'Committee') {
-    // Original query for Committee role
+// if ($role == 'Committee') {
+//     // Original query for Committee role
+//     $sql = "
+//         SELECT t.team_id, t.team_name, gsc.section_name, gsc.grade_level, gsc.course_name, gsc.strand
+//         FROM teams AS t
+//         JOIN grade_section_course AS gsc ON t.grade_section_course_id = gsc.id
+//         JOIN departments AS d ON gsc.department_id = d.id
+//         WHERE t.game_id = ? AND gsc.department_id = ? AND d.school_id = ?
+//         ORDER BY gsc.grade_level, gsc.section_name, gsc.course_name";
+//     $stmt = $conn->prepare($sql);
+//     $stmt->bind_param("iii", $game_id, $department_id, $school_id);
+// } else {
+//     // Query for School Admin and Department Admin
+//     $sql = "
+//         SELECT t.team_id, t.team_name, gsc.section_name, gsc.grade_level, gsc.course_name, gsc.strand
+//         FROM teams AS t
+//         JOIN grade_section_course AS gsc ON t.grade_section_course_id = gsc.id
+//         WHERE t.grade_section_course_id = ?";
+//     $stmt = $conn->prepare($sql);
+//     $stmt->bind_param("i", $grade_section_course_id);
+// }
+
+
+// Fetch teams based on role
+if ($role == 'Committee' || ($role != 'Committee' && isset($game_id))) {
+    // Use the same query for Committee and other roles if game_id is available
     $sql = "
         SELECT t.team_id, t.team_name, gsc.section_name, gsc.grade_level, gsc.course_name, gsc.strand
         FROM teams AS t
@@ -33,7 +57,7 @@ if ($role == 'Committee') {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("iii", $game_id, $department_id, $school_id);
 } else {
-    // Query for School Admin and Department Admin
+    // Query for School Admin and Department Admin without game_id
     $sql = "
         SELECT t.team_id, t.team_name, gsc.section_name, gsc.grade_level, gsc.course_name, gsc.strand
         FROM teams AS t
@@ -42,6 +66,7 @@ if ($role == 'Committee') {
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $grade_section_course_id);
 }
+
 
 $stmt->execute();
 $result = $stmt->get_result();
@@ -92,8 +117,8 @@ $conn->close();
             font-size: 0.95rem;
             margin-bottom: 0;
         }
-        
-        .table > :not(caption) > * > * {
+
+        .table> :not(caption)>*>* {
             padding: 0.85rem;
         }
 
@@ -194,7 +219,7 @@ $conn->close();
             border-radius: 10px;
             margin-bottom: 1rem;
         }
-        
+
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -203,7 +228,7 @@ $conn->close();
         .card-header {
             padding: 0.75rem;
             background-color: white;
-            border-bottom: 1px solid rgba(0,0,0,.125);
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
         }
 
         .card-body {
@@ -230,11 +255,16 @@ $conn->close();
 <body>
     <!-- Sidebar -->
     <nav>
-        <?php if ($role == 'Committee') {
-        include '../committee/csidebar.php';
-    } else {
-        include '../department_admin/sidebar.php'; // fallback for other roles
-    } ?>
+        <?php
+        $current_page = 'teams';
+        if ($role == 'Committee') {
+            include '../committee/csidebar.php';
+        } else if ($role == 'superdmin') {
+            include '../superadmin/sa_sidebar.php';
+        } else {
+            include '../department_admin/sidebar.php';
+        }
+        ?>
     </nav>
     <!-- Main Content -->
     <div class="mt-4">
@@ -243,7 +273,7 @@ $conn->close();
                 <div class="main-top d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
                     <?php if ($role != 'Committee'): ?>
                         <h2 class="mb-3 mb-md-0">
-                            <?php 
+                            <?php
                             if ($grade_section_course_id) {
                                 $sql = "SELECT gsc.*, d.department_name 
                                         FROM grade_section_course gsc
@@ -267,7 +297,7 @@ $conn->close();
                     <?php else: ?>
                         <h2 class="mb-3 mb-md-0">Teams for <?= htmlspecialchars($game_name) ?> - <?= htmlspecialchars($department_name) ?></h2>
                     <?php endif; ?>
-                    
+
                     <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTeamModal">Add Team</button>
                 </div>
 
@@ -315,9 +345,9 @@ $conn->close();
                                                         <div class="d-flex flex-column flex-md-row gap-2">
                                                             <a href="../player/view_roster.php?team_id=<?= htmlspecialchars($row['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-info btn-sm">View Roster</a>
                                                             <a href="../player/player_registration.php?team_id=<?= htmlspecialchars($row['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" class="btn btn-primary btn-sm">Register Player</a>
-                                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editTeamModal" 
-                                                            data-team-id="<?= htmlspecialchars($row['team_id']) ?>" 
-                                                            data-team-name="<?= htmlspecialchars($row['team_name']) ?>">
+                                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editTeamModal"
+                                                                data-team-id="<?= htmlspecialchars($row['team_id']) ?>"
+                                                                data-team-name="<?= htmlspecialchars($row['team_name']) ?>">
                                                                 Edit
                                                             </button>
                                                             <button type="button" class="btn btn-danger btn-sm" onclick="confirmDeletion(<?= htmlspecialchars($row['team_id']) ?>)">Delete</button>
@@ -339,7 +369,7 @@ $conn->close();
             </section>
         </div>
     </div>
-   
+
     <?php include "addteam_modal.php"; ?>
     <?php include "edit_team_modal.php"; ?>
     <script>
@@ -352,157 +382,157 @@ $conn->close();
         });
 
         document.addEventListener("DOMContentLoaded", () => {
-        const departmentId = <?= $_SESSION['department_id']; ?>; // Replace with actual session variable
-        const gscDropdown = document.getElementById("gscDropdown");
+            const departmentId = <?= $_SESSION['department_id']; ?>; // Replace with actual session variable
+            const gscDropdown = document.getElementById("gscDropdown");
 
-        // Fetch data from the server
-        fetch(`fetch_gsc.php?department_id=${departmentId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.length > 0) {
-                    data.forEach(item => {
+            // Fetch data from the server
+            fetch(`fetch_gsc.php?department_id=${departmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            const option = document.createElement("option");
+                            option.value = item.id; // Use the appropriate ID field
+                            option.textContent = `${item.grade_level || ''} ${item.strand || ''} ${item.section_name || ''} ${item.course_name || ''}`.trim();
+                            gscDropdown.appendChild(option);
+                        });
+                    } else {
                         const option = document.createElement("option");
-                        option.value = item.id; // Use the appropriate ID field
-                        option.textContent = `${item.grade_level || ''} ${item.strand || ''} ${item.section_name || ''} ${item.course_name || ''}`.trim();
+                        option.value = "";
+                        option.textContent = "No entries available";
                         gscDropdown.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement("option");
-                    option.value = "";
-                    option.textContent = "No entries available";
-                    gscDropdown.appendChild(option);
-                }
-            })
-            .catch(error => console.error("Error fetching GSC data:", error));
-    });
-
-    document.getElementById("saveTeamBtn").addEventListener("click", function() {
-    const formData = new FormData(document.getElementById("addTeamForm"));
-
-    fetch('team_op.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: data.message,
-                showConfirmButton: false,
-                timer: 1500
-            }).then(() => {
-                // Optionally, reload the page or update the UI
-                location.reload();
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: data.message,
-                showConfirmButton: true
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'An unexpected error occurred.',
-            showConfirmButton: true
+                    }
+                })
+                .catch(error => console.error("Error fetching GSC data:", error));
         });
-    });
-});
 
+        document.getElementById("saveTeamBtn").addEventListener("click", function() {
+            const formData = new FormData(document.getElementById("addTeamForm"));
+
+            fetch('team_op.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            // Optionally, reload the page or update the UI
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: data.message,
+                            showConfirmButton: true
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'An unexpected error occurred.',
+                        showConfirmButton: true
+                    });
+                });
+        });
     </script>
     <script>
-function confirmDeletion(teamId) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = `delete_team.php?team_id=${teamId}`;
+        function confirmDeletion(teamId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `delete_team.php?team_id=${teamId}`;
+                }
+            });
         }
-    });
-}
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    <?php if (isset($_SESSION['success_message'])): ?>
-        Swal.fire({
-            icon: 'success',
-            title: '<?= $_SESSION['success_message'] ?>',
-            showConfirmButton: false,
-            timer: 1500
-        });
-        <?php unset($_SESSION['success_message']); // Clear the session message ?>
-    <?php endif; ?>
-
-    <?php if (isset($_SESSION['error_message'])): ?>
-        Swal.fire({
-            icon: 'error',
-            title: '<?= $_SESSION['error_message'] ?>',
-            showConfirmButton: true
-        });
-        <?php unset($_SESSION['error_message']); // Clear the session message ?>
-    <?php endif; ?>
-});
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-    // Populate modal with the current team name
-    document.querySelectorAll("[data-bs-target='#editTeamModal']").forEach(button => {
-        button.addEventListener("click", function() {
-            document.getElementById("editTeamId").value = this.getAttribute("data-team-id");
-            document.getElementById("editTeamName").value = this.getAttribute("data-team-name");
-        });
-    });
-
-    // Handle form submission for renaming the team
-    document.getElementById("editTeamForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-
-        fetch('edit_team.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            <?php if (isset($_SESSION['success_message'])): ?>
                 Swal.fire({
                     icon: 'success',
-                    title: data.message,
+                    title: '<?= $_SESSION['success_message'] ?>',
                     showConfirmButton: false,
                     timer: 1500
-                }).then(() => {
-                    location.reload();
                 });
-            } else {
+                <?php unset($_SESSION['success_message']); // Clear the session message 
+                ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['error_message'])): ?>
                 Swal.fire({
                     icon: 'error',
-                    title: data.message,
+                    title: '<?= $_SESSION['error_message'] ?>',
                     showConfirmButton: true
                 });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'An unexpected error occurred.',
-                showConfirmButton: true
+                <?php unset($_SESSION['error_message']); // Clear the session message 
+                ?>
+            <?php endif; ?>
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Populate modal with the current team name
+            document.querySelectorAll("[data-bs-target='#editTeamModal']").forEach(button => {
+                button.addEventListener("click", function() {
+                    document.getElementById("editTeamId").value = this.getAttribute("data-team-id");
+                    document.getElementById("editTeamName").value = this.getAttribute("data-team-name");
+                });
+            });
+
+            // Handle form submission for renaming the team
+            document.getElementById("editTeamForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch('edit_team.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: data.message,
+                                showConfirmButton: true
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'An unexpected error occurred.',
+                            showConfirmButton: true
+                        });
+                    });
             });
         });
-    });
-});
-
-</script>    
+    </script>
 </body>
 
 </html>

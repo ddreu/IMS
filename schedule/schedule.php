@@ -226,11 +226,12 @@ include '../navbar/navbar.php';
 
     <?php
     $current_page = 'schedule';
-
     if ($role == 'Committee') {
         include '../committee/csidebar.php';
+    } else if ($role == 'superdmin') {
+        include '../superadmin/sa_sidebar.php';
     } else {
-        include '../department_admin/sidebar.php'; // fallback for other roles
+        include '../department_admin/sidebar.php';
     }
     ?>
 

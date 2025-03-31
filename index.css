@@ -108,7 +108,26 @@ body {
   font-weight: 700;
   margin-bottom: 1rem;
   transition: all 0.3s ease;
-  color: #4500b5;
+  /* color: #4500b5; */
+
+  /* #ffcc00 0%,  
+  #ff9800 10%,  
+  #8c43cf 25%,  
+  #ff9800 50%,  
+  #8a2be2 75%,  
+  #8a2be2 100%   */
+  
+ background: linear-gradient(135deg, 
+  #ffcc00 0%,   /* Bright Yellow */
+  #ff9800 25%,  /* Smooth transition to Orange */
+  #ff6a00 40%,  /* Deeper Orange */
+  #8c43cf 60%,  /* Start blending with Violet */
+  #8a2be2 80%,  /* Stronger Violet */
+  #6d23b6 100%  /* Deep Violet */
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-content h1:hover {
@@ -253,6 +272,7 @@ body {
 .cta-btn:hover {
   background: #4500b5;
 }
+
 
 .close-btn {
   position: absolute;

@@ -8,7 +8,7 @@ $assigned_game_id = $_SESSION['game_id'];
 $assigned_department_id = $_SESSION['department_id'];
 $game_name = $_SESSION['game_name'];
 $department_name = $_SESSION['department_name'];
-
+$role = $_SESSION['role'];
 
 
 // Fetch the school_id linked to the assigned game
@@ -115,15 +115,22 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> <!-- Bootstrap JS -->
     <link rel="stylesheet" href="../styles/committee.css">
     <link rel="stylesheet" href="../styles/brackets.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     <nav>
         <?php
-        $current_page = 'gamerules';
-
-        include '../committee/csidebar.php';
+        $current_page = 'scoring_rules';
+        if ($role == 'Committee') {
+            include '../committee/csidebar.php';
+        } else if ($role == 'superdmin') {
+            include '../superadmin/sa_sidebar.php';
+        } else {
+            include '../department_admin/sidebar.php';
+        }
         ?>
     </nav>
 

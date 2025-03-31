@@ -448,7 +448,7 @@ include '../navbar/navbar.php';
                                             echo '<td data-label="Environment" class="px-4">' . htmlspecialchars($game['environment']) . '</td>';
 
 
-                                            if ($user['role'] === 'School Admin') {
+                                            if ($user['role'] === 'School Admin' || $user['role'] === 'Department Admin' || $user['role'] === 'superadmin') {
                                                 echo '<td data-label="Actions" class="px-4 text-center">';
                                                 echo '<div class="btn-group">';
 
@@ -460,8 +460,8 @@ include '../navbar/navbar.php';
                                                 // Dropdown Menu
                                                 echo '<ul class="dropdown-menu">';
 
-                                                // Edit Button (Only show if not archived)
-                                                if ($game['is_archived'] != 1) {
+                                                // Edit Button (Accessible for School Admin and Super Admin if not archived)
+                                                if (($user['role'] === 'School Admin' || $user['role'] === 'superadmin') && $game['is_archived'] != 1) {
                                                     echo '<li>';
                                                     echo '<button onclick="openUpdateModal(' . htmlspecialchars($game['game_id']) . ', \'' .
                                                         htmlspecialchars($game['game_name']) . '\', ' .
@@ -474,39 +474,56 @@ include '../navbar/navbar.php';
                                                     echo '</li>';
                                                 }
 
-                                                // Delete Button
-                                                echo '<li style="margin: 0; padding: 0; list-style: none;">'; // Remove margin, padding, and list style
-                                                echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" style="margin: 0; padding: 0;">';
-                                                echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
-                                                echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
-                                                    'class="dropdown-item" style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">'; // Ensure full width to avoid shifting
-                                                echo 'Delete';
-                                                echo '</button>';
-                                                echo '</form>';
-                                                echo '</li>';
+                                                // Delete Button (Accessible for School Admin and Super Admin)
+                                                if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') {
+                                                    echo '<li style="margin: 0; padding: 0; list-style: none;">';
+                                                    echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" style="margin: 0; padding: 0;">';
+                                                    echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
+                                                    echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
+                                                        'class="dropdown-item" style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">';
+                                                    echo 'Delete';
+                                                    echo '</button>';
+                                                    echo '</form>';
+                                                    echo '</li>';
+                                                }
 
-                                                // Archive/Unarchive Button
-                                                echo '<li style="margin: 0; padding: 0; list-style: none;">'; // Remove margin, padding, and list style
-                                                echo '<button type="button" class="dropdown-item archive-btn" ' .
-                                                    'data-id="' . htmlspecialchars($game['game_id']) . '" ' .
-                                                    'data-table="games" ' .
-                                                    'data-operation="' . ($game['is_archived'] == 1 ? 'unarchive' : 'archive') . '" ' .
-                                                    'style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">'; // Ensure full width to avoid shifting
-                                                echo ($game['is_archived'] == 1 ? 'Unarchive' : 'Archive');
-                                                echo '</button>';
-                                                echo '</li>';
+                                                // Archive/Unarchive Button (Accessible for School Admin and Super Admin)
+                                                if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') {
+                                                    echo '<li style="margin: 0; padding: 0; list-style: none;">';
+                                                    echo '<button type="button" class="dropdown-item archive-btn" ' .
+                                                        'data-id="' . htmlspecialchars($game['game_id']) . '" ' .
+                                                        'data-table="games" ' .
+                                                        'data-operation="' . ($game['is_archived'] == 1 ? 'unarchive' : 'archive') . '" ' .
+                                                        'style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">';
+                                                    echo ($game['is_archived'] == 1 ? 'Unarchive' : 'Archive');
+                                                    echo '</button>';
+                                                    echo '</li>';
+                                                }
 
-                                                //"Open as Committee" Button
+                                                // "Open as Committee" Button (Accessible for School Admin, Department Admin, and Super Admin)
                                                 echo '<li>';
-                                                echo '<button type="button" class="dropdown-item" onclick="openAsCommittee(' . htmlspecialchars($game['game_id']) . ')">';
-                                                echo 'Open as Committee';
-                                                echo '</button>';
+                                                echo '<button 
+                                                    type="button" 
+                                                    class="dropdown-item open-committee-btn" 
+                                                    data-game-id="' . htmlspecialchars($game['game_id']) . '"';
+
+                                                if (isset($_SESSION['role'])) {
+                                                    echo ' data-role="' . htmlspecialchars($_SESSION['role']) . '"';
+                                                }
+                                                if (isset($_SESSION['department_id'])) {
+                                                    echo ' data-department-id="' . htmlspecialchars($_SESSION['department_id']) . '"';
+                                                }
+
+                                                echo '>Open as Committee</button>';
                                                 echo '</li>';
 
-                                                echo '</ul>'; // Close dropdown menu
-                                                echo '</div>'; // Close btn-group
+
+
+                                                echo '</ul>';
+                                                echo '</div>';
                                                 echo '</td>';
                                             }
+
 
                                             echo '</tr>';
                                         }
@@ -527,6 +544,57 @@ include '../navbar/navbar.php';
             </div>
         </div>
     </div>
+
+
+
+
+    <!-- Select Department Modal -->
+    <div class="modal fade" id="selectDepartmentModal" tabindex="-1" aria-labelledby="selectDepartmentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectDepartmentModalLabel">Select Department</h5>
+                    <!-- Removed close button to prevent closing -->
+                </div>
+                <?php
+                if (isset($_SESSION['user_id'], $_SESSION['role'], $_SESSION['school_id'])) {
+                    $role = strtolower($_SESSION['role']);
+                    $school_id = $_SESSION['school_id'];
+
+                    // Always load departments for School Admin and Super Admin
+                    if ($role === 'school admin' || $role === 'superadmin') {
+                        $stmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0");
+                        $stmt->bind_param("i", $school_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                    }
+                }
+                ?>
+                <div class="modal-body">
+                    <select id="departmentDropdown" class="form-select">
+                        <option value="" disabled selected>Select a department</option>
+                        <?php
+                        if (!empty($result) && $result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo '<option value="' . htmlspecialchars($row['id']) . '" data-name="' . htmlspecialchars($row['department_name']) . '">' . htmlspecialchars($row['department_name']) . '</option>';
+                            }
+                        } else {
+                            echo '<option value="" disabled>No departments available</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmOpenCommittee">Open</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
 
     <!-- Update Game Modal -->
     <div class="modal fade" id="updateGameModal" tabindex="-1" aria-labelledby="updateGameModalLabel" aria-hidden="true">

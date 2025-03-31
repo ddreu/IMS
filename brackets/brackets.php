@@ -14,6 +14,7 @@ $department_id = $_SESSION['department_id'] ?? null;
 $school_id = $_SESSION['school_id'] ?? null;
 $game_id = $_SESSION['game_id'] ?? null;
 $grade_level = $_SESSION['grade_level'] ?? null;
+$role = $_SESSION['role'];
 
 if (!$department_id || !$school_id) {
     die('Error: Required session data is missing.');
@@ -71,6 +72,7 @@ include '../navbar/navbar.php';
     <!-- ✅ Other Styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="../styles/committee.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.css" rel="stylesheet">
     <style>
         /* Loading and error states */
@@ -177,7 +179,16 @@ include '../navbar/navbar.php';
 
 <body>
     <nav>
-        <?php include '../committee/csidebar.php'; ?>
+        <?php
+        $current_page = 'brackets';
+        if ($role == 'Committee') {
+            include '../committee/csidebar.php';
+        } else if ($role == 'superdmin') {
+            include '../superadmin/sa_sidebar.php';
+        } else {
+            include '../department_admin/sidebar.php';
+        }
+        ?>
     </nav>
 
     <div class="main">

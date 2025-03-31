@@ -18,7 +18,8 @@ $url_params = array_filter([
 ]);
 
 // Function to build URLs with parameters
-function buildUrl($base, $params) {
+function buildUrl($base, $params)
+{
     return $base . '?' . http_build_query($params);
 }
 
@@ -74,6 +75,7 @@ $players_stmt = $conn->prepare($players_query);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -85,51 +87,61 @@ $players_stmt = $conn->prepare($players_query);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <style>
-        body {
+        /* body {
             background-color: #f5f7fa;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
+        } */
         .page-header {
             background: #673ab7;
             color: white;
             padding: 1.5rem 0;
             margin-bottom: 2rem;
         }
+
         .section-info {
             background: white;
             border-radius: 12px;
             padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
+
         .team-card {
             background: white;
             border-radius: 12px;
-            border: 1px solid rgba(0,0,0,0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             margin-bottom: 1.5rem;
             transition: all 0.3s ease;
         }
+
         .team-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         .team-header {
             padding: 1.25rem;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 1;
+
         }
+
         .team-header:hover {
             background: #f8f9fa;
         }
+
         .team-name {
             font-size: 1.1rem;
             font-weight: 600;
             color: #2c3e50;
             margin: 0;
         }
+
         .game-badge {
             background: #e9ecef;
             padding: 0.25rem 0.75rem;
@@ -137,11 +149,13 @@ $players_stmt = $conn->prepare($players_query);
             font-size: 0.9rem;
             color: #495057;
         }
+
         .player-list {
             padding: 1.25rem;
             background: #f8f9fa;
             display: none;
         }
+
         .player-item {
             display: flex;
             align-items: center;
@@ -153,10 +167,12 @@ $players_stmt = $conn->prepare($players_query);
             text-decoration: none;
             color: inherit;
         }
+
         .player-item:hover {
             background: #e9ecef;
             transform: translateX(5px);
         }
+
         .jersey-number {
             background: #673ab7;
             color: white;
@@ -169,6 +185,7 @@ $players_stmt = $conn->prepare($players_query);
             margin-right: 1rem;
             font-weight: 600;
         }
+
         .back-link {
             color: white;
             text-decoration: none;
@@ -176,12 +193,15 @@ $players_stmt = $conn->prepare($players_query);
             align-items: center;
             margin-bottom: 1rem;
         }
+
         .back-link:hover {
-            color: rgba(255,255,255,0.9);
+            color: rgba(255, 255, 255, 0.9);
         }
+
         .back-link i {
             margin-right: 0.5rem;
         }
+
         .strand-badge {
             display: inline-block;
             padding: 0.25rem 0.5rem;
@@ -191,6 +211,7 @@ $players_stmt = $conn->prepare($players_query);
             font-size: 0.85rem;
             margin-left: 1rem;
         }
+
         .record-badge {
             font-size: 0.9rem;
             color: #666;
@@ -198,15 +219,16 @@ $players_stmt = $conn->prepare($players_query);
         }
     </style>
 </head>
+
 <body>
     <div class="page-header mt-5">
         <div class="container mt-5 pt-4 pb-4 text-center">
-           <!-- <?php
-            // Remove section_id from back link parameters
-            $back_params = $url_params;
-            unset($back_params['section_id']);
-            $back_url = buildUrl('teams.php', $back_params);
-            ?>
+            <!-- <?php
+                    // Remove section_id from back link parameters
+                    $back_params = $url_params;
+                    unset($back_params['section_id']);
+                    $back_url = buildUrl('teams.php', $back_params);
+                    ?>
             <a href="<?= $back_url ?>" class="back-link">
                 <i class="fas fa-arrow-left"></i>
                 Back to Sections
@@ -226,17 +248,17 @@ $players_stmt = $conn->prepare($players_query);
                         <p class="mb-1"><strong>Department:</strong> <?= htmlspecialchars($section['department_name']) ?></p>
                     </div>
                     <?php if ($section['department_name'] !== 'College'): ?>
-                    <div class="col-md-4">
-                        <p class="mb-1"><strong>Grade Level:</strong> <?= htmlspecialchars($section['grade_level']) ?></p>
-                    </div>
-                    <div class="col-md-4">
-                        <p class="mb-1"><strong>Section:</strong> <?= htmlspecialchars($section['section_name']) ?></p>
-                    </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Grade Level:</strong> <?= htmlspecialchars($section['grade_level']) ?></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1"><strong>Section:</strong> <?= htmlspecialchars($section['section_name']) ?></p>
+                        </div>
                     <?php endif; ?>
                 </div>
                 <?php if (!empty($section['strand'])): ?>
                     <div class="mt-2">
-                        <strong>Strand:</strong> 
+                        <strong>Strand:</strong>
                         <span class="strand-badge"><?= htmlspecialchars($section['strand']) ?></span>
                     </div>
                 <?php endif; ?>
@@ -289,7 +311,7 @@ $players_stmt = $conn->prepare($players_query);
             </div>
         <?php endif; ?>
     </div>
-<?php include 'footerhome.php' ?>
+    <?php include 'footerhome.php' ?>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
@@ -308,4 +330,5 @@ $players_stmt = $conn->prepare($players_query);
         }
     </script>
 </body>
+
 </html>

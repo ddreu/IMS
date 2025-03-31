@@ -5,20 +5,23 @@ $conn = con();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $game_id = intval($_POST['game_id']);
+    $department_id = isset($_POST['department_id']) ? intval($_POST['department_id']) : null;
+    $department_name = isset($_POST['department_name']) ? trim($_POST['department_name']) : null;
 
     if ($game_id) {
-        // Fetch game details
         $stmt = $conn->prepare("SELECT * FROM games WHERE game_id = ?");
         $stmt->bind_param("i", $game_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($row = $result->fetch_assoc()) {
-            // Set session data for committee view
             $_SESSION['game_id'] = $row['game_id'];
             $_SESSION['game_name'] = $row['game_name'];
-            $_SESSION['success_message'] = "Welcome to " . $row['game_name'] . " Committee Dashboard!";
-            $_SESSION['success_type'] = 'Committee';
+
+            if ($department_id && $department_name) {
+                $_SESSION['department_id'] = $department_id;
+                $_SESSION['department_name'] = $department_name;
+            }
 
             echo json_encode(['success' => true]);
             exit;

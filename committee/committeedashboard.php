@@ -18,6 +18,8 @@ if (!isset($_SESSION['user_id'])) {
 //     exit();
 // }
 
+$role = $_SESSION['role'];
+
 // Use `game_id` and `game_name` directly from session
 $assigned_game_id = $_SESSION['game_id'] ?? null;
 $assigned_game_name = $_SESSION['game_name'] ?? 'Committee Dashboard'; // Default name
@@ -145,6 +147,8 @@ include '../navbar/navbar.php';
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../styles/dashboard.css">
+
 
     <link rel="stylesheet" href="../styles/committee.css">
     <style>
@@ -626,7 +630,13 @@ include '../navbar/navbar.php';
     <nav>
         <?php
         $current_page = 'committeedashboard';
-        include 'csidebar.php';
+        if ($role == 'Committee') {
+            include 'csidebar.php';
+        } else if ($role == 'superdmin') {
+            include '../superadmin/sa_sidebar.php';
+        } else {
+            include '../department_admin/sidebar.php';
+        }
         ?>
     </nav>
     <div class="mt-4">

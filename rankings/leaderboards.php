@@ -134,14 +134,14 @@ include '../navbar/navbar.php';
                 margin-bottom: 1rem;
                 background: #fff;
                 border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             }
 
             #rankTable tbody td {
                 display: flex;
                 text-align: left;
                 padding: 0.75rem 1rem;
-                border-bottom: 1px solid rgba(0,0,0,0.1);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
                 align-items: center;
             }
 
@@ -222,11 +222,12 @@ include '../navbar/navbar.php';
     <?php
     $current_page = 'leaderboards';
 
-
     if ($role == 'Committee') {
         include '../committee/csidebar.php';
+    } else if ($role == 'superdmin') {
+        include '../superadmin/sa_sidebar.php';
     } else {
-        include '../department_admin/sidebar.php'; // fallback for other roles
+        include '../department_admin/sidebar.php';
     }
     ?>
 

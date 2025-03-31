@@ -355,9 +355,9 @@ if (isset($_SESSION['success_message'])) {
 
 
                         <!-- Generate Report Button -->
-                        <button type="button" id="generateReportBtn" class="btn btn-success btn-circle text-white" title="Generate Report">
+                        <!-- <button type="button" id="generateReportBtn" class="btn btn-success btn-circle text-white" title="Generate Report">
                             <i class="fas fa-file-alt"></i> Generate Report
-                        </button>
+                        </button> -->
 
                     </div>
                 </div>
@@ -577,7 +577,7 @@ if (isset($_SESSION['success_message'])) {
             setInterval(fetchRecentActivities, 300000);
         </script>
         <script src="../archive/js/archive.js"></script>
-        <script src="../reports/js/reports.js"></script>
+        <!-- <script src="../reports/js/reports.js"></script> -->
 </body>
 
 </html>

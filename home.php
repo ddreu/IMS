@@ -433,9 +433,6 @@ include 'navbarhome.php';
                     ?>
                 </div>
 
-
-
-
                 <!-- Carousel Controls -->
 
                 <button class="carousel-control-prev" type="button" data-bs-target="#announcementCarousel" data-bs-slide="prev">
@@ -486,6 +483,7 @@ include 'navbarhome.php';
 
 
     <!-- First Ranking Table -->
+
     <div class="rankings-card-home">
         <div class="rankings-header">
             <h5>Current Standings</h5>
@@ -501,7 +499,7 @@ include 'navbarhome.php';
             </div>
         </div>
     </div>
-    </div>
+
 
 
     <!-- Events Section -->
@@ -510,11 +508,11 @@ include 'navbarhome.php';
         <div class="row g-4">
             <div class="col-12">
                 <!-- Card for Schedules -->
-                <div class="card">
-                    <div class="card-header text-center">
-                        <h4 class="mb-0">Events</h4>
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4 text-primary">Upcoming Events</h4>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="row g-4">
                             <?php
                             // Fetch `department_id` and `grade_level` from the URL, if available
@@ -523,21 +521,21 @@ include 'navbarhome.php';
 
                             // Build the query dynamically based on the parameters
                             $query = "
-                            SELECT DISTINCT 
-                                g.game_name,
-                                m.match_type,
-                                tA.team_name as teamA_name,
-                                tB.team_name as teamB_name,
-                                s.schedule_date,
-                                s.schedule_time,
-                                s.venue
-                            FROM schedules s
-                            JOIN matches m ON s.match_id = m.match_id
-                            JOIN brackets b ON m.bracket_id = b.bracket_id
-                            JOIN games g ON b.game_id = g.game_id
-                            JOIN teams tA ON m.teamA_id = tA.team_id
-                            JOIN teams tB ON m.teamB_id = tB.team_id
-                            WHERE s.schedule_date >= CURDATE()
+                        SELECT DISTINCT 
+                            g.game_name,
+                            m.match_type,
+                            tA.team_name as teamA_name,
+                            tB.team_name as teamB_name,
+                            s.schedule_date,
+                            s.schedule_time,
+                            s.venue
+                        FROM schedules s
+                        JOIN matches m ON s.match_id = m.match_id
+                        JOIN brackets b ON m.bracket_id = b.bracket_id
+                        JOIN games g ON b.game_id = g.game_id
+                        JOIN teams tA ON m.teamA_id = tA.team_id
+                        JOIN teams tB ON m.teamB_id = tB.team_id
+                        WHERE s.schedule_date >= CURDATE()
                         ";
 
                             // Add conditions for `department_id` and `grade_level` if they are set
@@ -550,8 +548,8 @@ include 'navbarhome.php';
 
                             // Append ordering and limiting
                             $query .= " 
-                            ORDER BY s.schedule_date ASC, s.schedule_time ASC 
-                            LIMIT 5
+                        ORDER BY s.schedule_date ASC, s.schedule_time ASC 
+                        LIMIT 5
                         ";
 
                             // Prepare the query
@@ -578,34 +576,32 @@ include 'navbarhome.php';
                                 while ($row = $resultUpcoming->fetch_assoc()) {
                                     echo '
                                 <div class="col-md-6 col-lg-4">
-                                    <div class="event-card">
-                                        <div class="event-header">
-                                            <div class="d-flex align-items-center">
-                                                <span class="game-icon">
+                                    <div class="card shadow-sm border-0 rounded-3 event-card">
+                                        <div class="card-body p-3">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <span class="me-2 text-warning">
                                                     <i class="fas fa-trophy"></i>
                                                 </span>
-                                                <h5 class="event-title">' . htmlspecialchars($row['game_name']) . '</h5>
+                                                <h5 class="card-title mb-0">' . htmlspecialchars($row['game_name']) . '</h5>
                                             </div>
-                                            <div class="event-date">
-                                                <i class="far fa-calendar-alt"></i>
-                                                ' . date('M d, Y', strtotime($row['schedule_date'])) . '
+                                            <div class="d-flex align-items-center text-muted">
+                                                <i class="far fa-calendar-alt me-2"></i>
+                                                <span>' . date('M d, Y', strtotime($row['schedule_date'])) . '</span>
                                             </div>
-                                        </div>
-                                        <div class="event-body">
-                                            <div class="teams-section">
-                                                <div class="team-vs">
+                                            <div class="teams-section mt-3">
+                                                <div class="team-vs d-flex justify-content-between">
                                                     <div class="team-name">' . htmlspecialchars($row['teamA_name']) . '</div>
-                                                    <span class="vs-badge">VS</span>
+                                                    <span class="vs-badge text-muted">VS</span>
                                                     <div class="team-name">' . htmlspecialchars($row['teamB_name']) . '</div>
                                                 </div>
                                             </div>
-                                            <div class="event-info">
-                                                <div class="info-item">
-                                                    <i class="far fa-clock"></i>
+                                            <div class="event-info mt-3 text-muted">
+                                                <div class="info-item d-flex align-items-center mb-2">
+                                                    <i class="far fa-clock me-2"></i>
                                                     <span>' . date('g:i A', strtotime($row['schedule_time'])) . '</span>
                                                 </div>
-                                                <div class="info-item">
-                                                    <i class="fas fa-map-marker-alt"></i>
+                                                <div class="info-item d-flex align-items-center">
+                                                    <i class="fas fa-map-marker-alt me-2"></i>
                                                     <span>' . htmlspecialchars($row['venue']) . '</span>
                                                 </div>
                                             </div>
@@ -616,8 +612,8 @@ include 'navbarhome.php';
                             } else {
                                 echo '
                             <div class="col-12">
-                                <div class="no-events">
-                                    <i class="far fa-calendar-times opacity-50"></i>
+                                <div class="no-events text-center p-4">
+                                    <i class="far fa-calendar-times opacity-50 mb-3" style="font-size: 2rem;"></i>
                                     <h3 class="h5 mb-2">No Upcoming Events</h3>
                                     <p class="text-muted mb-0" style="font-size: 0.9rem;">Check back later for new event schedules.</p>
                                 </div>
@@ -625,7 +621,7 @@ include 'navbarhome.php';
                             }
                             ?>
                         </div>
-                        <a href="events.php?school_id=<?php echo $_GET['school_id']; ?>&department_id=<?php echo $_GET['department_id']; ?>" class="view-all-link">View All Events</a>
+                        <a href="events.php?school_id=<?php echo $_GET['school_id']; ?>&department_id=<?php echo $_GET['department_id']; ?>" class="btn btn-link text-decoration-none text-primary mt-3 d-block">View All Events</a>
                     </div>
                 </div>
             </div>
@@ -634,14 +630,18 @@ include 'navbarhome.php';
 
 
 
+
     <!-- Match Results Section -->
     <div class="container pb-4">
         <div class="row g-4">
             <div class="col-12">
 
-                <div class="card">
-                    <div class="card-header text-center">
-                        <h4 class="mb-0">Recent Match Results</h4>
+                <div class="card shadow-lg border-0 rounded-4">
+
+                    <!-- <div class="card-header text-center text-white"> -->
+
+                    <div class="card-body p-4">
+                        <h4 class="mb-0 text-primary">Recent Match Results</h4>
                     </div>
                     <div class="card-body">
                         <div class="row g-4">
@@ -654,49 +654,49 @@ include 'navbarhome.php';
 
                             // Base query to fetch match results
                             $query = "
-            SELECT 
-                mr.result_id,
-                mr.match_id,
-                mr.game_id,
-                mr.team_A_id,
-                mr.team_B_id,
-                mr.score_teamA,
-                mr.score_teamB,
-                mr.winning_team_id,
-                s.schedule_date,
-                s.schedule_time,
-                s.venue,
-                tA.team_name AS teamA_name,
-                tB.team_name AS teamB_name,
-                gscA.grade_level AS teamA_grade_level,
-                gscB.grade_level AS teamB_grade_level,
-                dA.department_name AS teamA_department,
-                dB.department_name AS teamB_department,
-                g.game_name  -- Add this line to fetch the game_name from the games table
-            FROM 
-                match_results mr
-            JOIN 
-                matches m ON mr.match_id = m.match_id
-            JOIN 
-                schedules s ON m.match_id = s.match_id
-            JOIN 
-                teams tA ON mr.team_A_id = tA.team_id
-            JOIN 
-                teams tB ON mr.team_B_id = tB.team_id
-            JOIN 
-                grade_section_course gscA ON tA.grade_section_course_id = gscA.id
-            JOIN 
-                grade_section_course gscB ON tB.grade_section_course_id = gscB.id
-            JOIN 
-                departments dA ON gscA.department_id = dA.id
-            JOIN 
-                departments dB ON gscB.department_id = dB.id
-            JOIN 
-                games g ON mr.game_id = g.game_id  -- Add this JOIN to link to the games table
-            WHERE 
-                dA.school_id = ? 
-                AND dB.school_id = ?
-        ";
+                            SELECT 
+                                mr.result_id,
+                                mr.match_id,
+                                mr.game_id,
+                                mr.team_A_id,
+                                mr.team_B_id,
+                                mr.score_teamA,
+                                mr.score_teamB,
+                                mr.winning_team_id,
+                                s.schedule_date,
+                                s.schedule_time,
+                                s.venue,
+                                tA.team_name AS teamA_name,
+                                tB.team_name AS teamB_name,
+                                gscA.grade_level AS teamA_grade_level,
+                                gscB.grade_level AS teamB_grade_level,
+                                dA.department_name AS teamA_department,
+                                dB.department_name AS teamB_department,
+                                g.game_name
+                            FROM 
+                                match_results mr
+                            JOIN 
+                                matches m ON mr.match_id = m.match_id
+                            JOIN 
+                                schedules s ON m.match_id = s.match_id
+                            JOIN 
+                                teams tA ON mr.team_A_id = tA.team_id
+                            JOIN 
+                                teams tB ON mr.team_B_id = tB.team_id
+                            JOIN 
+                                grade_section_course gscA ON tA.grade_section_course_id = gscA.id
+                            JOIN 
+                                grade_section_course gscB ON tB.grade_section_course_id = gscB.id
+                            JOIN 
+                                departments dA ON gscA.department_id = dA.id
+                            JOIN 
+                                departments dB ON gscB.department_id = dB.id
+                            JOIN 
+                                games g ON mr.game_id = g.game_id
+                            WHERE 
+                                dA.school_id = ? 
+                                AND dB.school_id = ?
+                        ";
 
                             // Initialize parameters array
                             $params = [$_GET['school_id'], $_GET['school_id']];
@@ -732,66 +732,66 @@ include 'navbarhome.php';
                                         $teamAWon = $row['score_teamA'] > $row['score_teamB'];
                                         $teamBWon = $row['score_teamB'] > $row['score_teamA'];
                                         echo '
-                    <div class="col-lg-6 mb-3">
-                        <div class="card match-card">
-                            <div class="game-header">
-                                <div class="d-flex align-items-center">
-                                    <span class="game-icon">
-                                        <i class="fas fa-trophy"></i>
-                                    </span>
-                                    <h5 class="game-title">' . htmlspecialchars($row['game_name']) . '</h5>
-                                </div>
-                                <span class="date-badge">
-                                    <i class="far fa-calendar-alt"></i>
-                                    ' . htmlspecialchars(date('M d, Y', strtotime($row['schedule_date']))) . '
-                                </span>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="team-info ' . ($teamAWon ? 'winner' : '') . '">
-                                        <div class="team-name">' . htmlspecialchars($row['teamA_name']) . '</div>
-                                        <div class="department-name">' . htmlspecialchars($row['teamA_department']) . '</div>
-                                    </div>
-                                    <div class="score-display">
-                                        ' . htmlspecialchars($row['score_teamA']) . '
-                                        <span class="vs-badge">vs</span>
-                                        ' . htmlspecialchars($row['score_teamB']) . '
-                                    </div>
-                                    <div class="team-info ' . ($teamBWon ? 'winner' : '') . '">
-                                        <div class="team-name">' . htmlspecialchars($row['teamB_name']) . '</div>
-                                        <div class="department-name">' . htmlspecialchars($row['teamB_department']) . '</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>';
+                                        <div class="col-lg-6 mb-3">
+                                            <div class="card match-card shadow-sm rounded">
+                                                <div class="game-header d-flex justify-content-between align-items-center px-3 py-2 bg-light rounded-top">
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="game-icon me-2">
+                                                            <i class="fas fa-trophy"></i>
+                                                        </span>
+                                                        <h5 class="game-title mb-0 text-uppercase">' . htmlspecialchars($row['game_name']) . '</h5>
+                                                    </div>
+                                                    <span class="date-badge text-muted">
+                                                        <i class="far fa-calendar-alt"></i>
+                                                        ' . htmlspecialchars(date('M d, Y', strtotime($row['schedule_date']))) . '
+                                                    </span>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div class="team-info ' . ($teamAWon ? 'text-primary fw-bold' : '') . '">
+                                                            <div class="team-name">' . htmlspecialchars($row['teamA_name']) . '</div>
+                                                            <div class="department-name text-muted">' . htmlspecialchars($row['teamA_department']) . '</div>
+                                                        </div>
+                                                        <div class="score-display text-center">
+                                                            <span class="score">' . htmlspecialchars($row['score_teamA']) . '</span>
+                                                            <span class="vs-badge">vs</span>
+                                                            <span class="score">' . htmlspecialchars($row['score_teamB']) . '</span>
+                                                        </div>
+                                                        <div class="team-info ' . ($teamBWon ? 'text-primary fw-bold' : '') . '">
+                                                            <div class="team-name">' . htmlspecialchars($row['teamB_name']) . '</div>
+                                                            <div class="department-name text-muted">' . htmlspecialchars($row['teamB_department']) . '</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>';
                                     }
                                 } else {
                                     echo '<div class="col-12">
-                        <div class="no-results">
-                            <i class="fas fa-trophy opacity-50"></i>
-                            <h3 class="h5 mb-2">No Match Results Yet</h3>
-                            <p class="text-muted mb-0" style="font-size: 0.9rem;">Check back later for match results and scores.</p>
-                        </div>
-                    </div>';
+                                        <div class="no-results text-center py-5">
+                                            <i class="fas fa-trophy opacity-50 mb-3" style="font-size: 3rem;"></i>
+                                            <h3 class="h5 mb-2">No Match Results Yet</h3>
+                                            <p class="text-muted mb-0" style="font-size: 0.9rem;">Check back later for match results and scores.</p>
+                                        </div>
+                                    </div>';
                                 }
                             } else {
                                 echo '<div class="col-12">
-                    <div class="no-results">
-                        <i class="fas fa-trophy opacity-50"></i>
-                        <h3 class="h5 mb-2">An error occurred while fetching match results.</h3>
-                    </div>
-                </div>';
+                                    <div class="no-results text-center py-5">
+                                        <i class="fas fa-trophy opacity-50 mb-3" style="font-size: 3rem;"></i>
+                                        <h3 class="h5 mb-2">An error occurred while fetching match results.</h3>
+                                    </div>
+                                </div>';
                             }
                             ?>
                         </div>
-                        <a href="results.php?school_id=<?php echo $_GET['school_id']; ?>&department_id=<?php echo $_GET['department_id']; ?>" class="view-all-link">View All Results</a>
+                        <a href="results.php?school_id=<?php echo $_GET['school_id']; ?>&department_id=<?php echo $_GET['department_id']; ?>" class="view-all-link text-decoration-none text-primary d-block text-center mt-3">View All Results</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
+
 
 
 
