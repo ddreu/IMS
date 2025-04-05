@@ -46,9 +46,9 @@ $conn->close();
         </video>
 
         <div class="hero-content">
-            <h1>Elevate the Game.</h1>
-            <p>Take control of your intramurals. Manage schedules, track scores, and lead your teams to success—all in one place.</p>
-            <button class="cta-btn" id="open-schools-btn">Select School</button>
+            <h1>Enhance Your Sports Experience <span class="highlight">Elevate the Game.</span></h1>
+            <p>Effortlessly manage your intramurals optimize you workflow track scores, organize schedules, and streamline operations. Take control, stay ahead, and lead your teams to victory—all in one powerful platform.</p>
+            <button class="cta-btn" id="open-schools-btn">Select Your School</button>
         </div>
     </section>
 

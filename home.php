@@ -68,7 +68,8 @@ if ($row = $result->fetch_assoc()) {
 $logoResult = $conn->query("SELECT logo FROM schools WHERE school_id = $school_id");
 
 $logoRow = $logoResult->fetch_assoc();
-$logo = 'uploads/logos/' . ($logoRow['logo'] ?? 'default-logo.png');
+$logo = !empty($logoRow['logo']) ? 'uploads/logos/' . $logoRow['logo'] : null; // If no logo, set to NULL
+
 
 include 'navbarhome.php';
 ?>
@@ -286,11 +287,14 @@ include 'navbarhome.php';
                     <?= htmlspecialchars($description) ?>
                 </p>
             </div>
-            <div class="hero-logo">
-                <img src="<?= $logo ?>" alt="School Logo">
-            </div>
+            <?php if (!empty($logo)): ?>
+                <div class="hero-logo">
+                    <img src="<?= $logo ?>" alt="School Logo">
+                </div>
+            <?php endif; ?>
         </div>
     </section>
+
 
 
 
