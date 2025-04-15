@@ -236,52 +236,57 @@ include '../navbar/navbar.php';
     <div class="main">
         <div class="container">
             <h2 class="text-center mt-4">Leaderboards</h2>
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <label for="departmentFilter" class="form-label">Department</label>
-                    <select id="departmentFilter" class="form-select">
-                        <option value="" selected>Select Department</option>
-                        <!-- Department options populated dynamically -->
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="gradeLevelFilter" class="form-label">Grade Level</label>
-                    <select id="gradeLevelFilter" class="form-select" disabled>
-                        <option value="" selected>Select Grade Level</option>
-                        <!-- Grade level options populated dynamically -->
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="gameFilter" class="form-label">Game</label>
-                    <select id="gameFilter" class="form-select">
-                        <option value="" selected>Select Game</option>
-                        <option value="">Overall</option>
-                        <!-- Game options populated dynamically -->
-                    </select>
+            <div class="card shadow-sm rounded-3 mb-0">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="departmentFilter" class="form-label">Department</label>
+                            <select id="departmentFilter" class="form-select">
+                                <option value="" selected>Select Department</option>
+                                <!-- Department options populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="gradeLevelFilter" class="form-label">Grade Level</label>
+                            <select id="gradeLevelFilter" class="form-select" disabled>
+                                <option value="" selected>Select Grade Level</option>
+                                <!-- Grade level options populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="gameFilter" class="form-label">Game</label>
+                            <select id="gameFilter" class="form-select">
+                                <option value="" selected>Select Game</option>
+                                <option value="">Overall</option>
+                                <!-- Game options populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+
             <!-- Rankings Table -->
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card shadow mt-3">
-                            <div class="row align-items-center">
-                                <div class="col d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0 font-weight-bold text-primary p-3">Rankings</h4>
-                                    <?php if ($role !== 'Committee'): ?>
-                                        <button id="resetLeaderboardBtn" class="btn btn-danger me-3">Reset Leaderboard</button>
-                                    <?php endif; ?>
-                                </div>
+            <!-- <div class="container-fluid"> -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow mt-3">
+                        <div class="row align-items-center">
+                            <div class="col d-flex justify-content-between align-items-center">
+                                <h4 class="m-0 font-weight-bold text-primary p-3">Rankings</h4>
+                                <?php if ($role !== 'Committee'): ?>
+                                    <button id="resetLeaderboardBtn" class="btn btn-danger me-3">Reset Leaderboard</button>
+                                <?php endif; ?>
                             </div>
-                            <div class="card-body">
-                                <div id="rankingsTable" class="table-responsive">
-                                    <p class="text-center text-muted">Please select a department to view rankings.</p>
-                                </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="rankingsTable" class="table-responsive">
+                                <p class="text-center text-muted">Please select a department to view rankings.</p>
                             </div>
                         </div>
                     </div>
                 </div>
+                <!-- </div> -->
             </div>
         </div>
     </div>
@@ -492,14 +497,18 @@ include '../navbar/navbar.php';
                     Swal.fire({
                         title: 'Reset Options',
                         html: `
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-danger" id="resetAllBtn">
-                                    Reset All Leaderboards
-                                </button>
-                                <button type="button" class="btn btn-primary" id="resetSelectiveBtn">
-                                    Reset Specific Leaderboards
-                                </button>
-                            </div>
+                           <div class="d-grid gap-2">
+    <button type="button" class="btn btn-danger" id="resetAllBtn">
+        Reset All Leaderboards
+    </button>
+    <button type="button" class="btn btn-primary" id="resetSelectiveBtn">
+        Reset Specific Leaderboards
+    </button>
+    <button type="button" class="btn btn-warning" id="resetOverallBtn">
+        Reset Overall Points
+    </button>
+</div>
+
                         `,
                         showConfirmButton: false,
                         showCancelButton: true,
@@ -745,6 +754,121 @@ include '../navbar/navbar.php';
                                         });
                                     });
                             });
+
+                            // Reset Overall Points handler
+                            document.getElementById('resetOverallBtn').addEventListener('click', function() {
+                                fetch('fetch_departments.php')
+                                    .then(response => response.json())
+                                    .then(departments => {
+                                        Swal.fire({
+                                            title: 'Reset Overall Points',
+                                            html: `
+                    <form id="resetOverallForm" class="text-start">
+                        <div class="mb-3">
+                            <label for="overallDept" class="form-label">Department</label>
+                            <select class="form-select" id="overallDept" required>
+                                <option value="">Select Department</option>
+                                ${departments.map(dept =>
+                                    `<option value="${dept.id}">${dept.department_name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="mb-3" id="overallGradeContainer">
+                            <label for="overallGrade" class="form-label">Grade Level</label>
+                            <select class="form-select" id="overallGrade">
+                                <option value="">Select Grade Level</option>
+                            </select>
+                        </div>
+                    </form>`,
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Reset Points',
+                                            cancelButtonText: 'Cancel',
+                                            didOpen: () => {
+                                                const deptSelect = document.getElementById('overallDept');
+                                                const gradeSelect = document.getElementById('overallGrade');
+                                                const gradeContainer = document.getElementById('overallGradeContainer');
+
+                                                deptSelect.addEventListener('change', function() {
+                                                    const selectedText = deptSelect.options[deptSelect.selectedIndex].text;
+
+                                                    if (selectedText === 'College') {
+                                                        gradeContainer.style.display = 'none';
+                                                        gradeSelect.innerHTML = '<option value="">N/A</option>';
+                                                    } else {
+                                                        gradeContainer.style.display = 'block';
+                                                        gradeSelect.innerHTML = '<option value="">Select Grade Level</option>';
+
+                                                        fetch(`fetch_grade_levels.php?department_id=${this.value}`)
+                                                            .then(res => res.json())
+                                                            .then(data => {
+                                                                data.forEach(level => {
+                                                                    gradeSelect.innerHTML += `<option value="${level}">${level}</option>`;
+                                                                });
+                                                            });
+                                                    }
+                                                });
+                                            },
+                                            preConfirm: () => {
+                                                const departmentId = document.getElementById('overallDept')?.value;
+                                                const departmentText = document.getElementById('overallDept')?.selectedOptions[0].text;
+                                                const gradeLevel = document.getElementById('overallGrade')?.value;
+
+                                                if (!departmentId) {
+                                                    Swal.showValidationMessage('Please select a department');
+                                                    return false;
+                                                }
+
+                                                if (departmentText !== 'College' && !gradeLevel) {
+                                                    Swal.showValidationMessage('Please select a grade level');
+                                                    return false;
+                                                }
+
+                                                return {
+                                                    department_id: departmentId,
+                                                    grade_level: (departmentText === 'College') ? null : gradeLevel
+                                                };
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed && result.value) {
+                                                Swal.fire({
+                                                    title: 'Resetting Points...',
+                                                    allowOutsideClick: false,
+                                                    didOpen: () => Swal.showLoading()
+                                                });
+
+                                                fetch('reset_overall.php', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json'
+                                                        },
+                                                        body: JSON.stringify(result.value)
+                                                    })
+                                                    .then(res => res.json())
+                                                    .then(data => {
+                                                        if (data.status === 'success') {
+                                                            Swal.fire({
+                                                                icon: 'success',
+                                                                title: 'Reset Successful',
+                                                                text: data.message,
+                                                                timer: 1500,
+                                                                showConfirmButton: false
+                                                            }).then(() => loadRankings());
+                                                        } else {
+                                                            throw new Error(data.message);
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Reset Failed',
+                                                            text: error.message || 'An error occurred during reset.',
+                                                            confirmButtonColor: '#d33'
+                                                        });
+                                                    });
+                                            }
+                                        });
+                                    });
+                            });
+
                         }
                     });
                 });

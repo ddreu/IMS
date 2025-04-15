@@ -21,10 +21,10 @@
         <li class="custom-navbar__item">
             <a href="../user_logs/admin_user_logs.php" class="custom-navbar__link"><i data-feather="clock"></i><span>Activity Logs</span></a>
         </li>
-        <!-- <li class="custom-navbar__item">
-            <a href="#" class="custom-navbar__link"><i data-feather="archive"></i><span>Resources</span></a>
-        </li>
         <li class="custom-navbar__item">
+            <a href="../archive/archives.php" class="custom-navbar__link"><i data-feather="archive"></i><span>Archives</span></a>
+        </li>
+        <!-- <li class="custom-navbar__item">
             <a href="#" class="custom-navbar__link"><i data-feather="help-circle"></i><span>Help</span></a>
         </li>
         <li class="custom-navbar__item">

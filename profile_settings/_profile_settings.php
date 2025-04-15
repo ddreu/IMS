@@ -34,7 +34,7 @@ $game_id = $_SESSION['game_id'] ?? null;
 $game_name = $_SESSION['game_name'] ?? null;
 
 // Fetch the current hashed password
-$sql = "SELECT password, image FROM users WHERE id = ?";
+$sql = "SELECT password FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -43,13 +43,10 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $hashed_password = $row['password'];
-    $user_image = $row['image'] ?? null;
 } else {
     header('Location: error.php?message=User not found');
     exit();
 }
-
-
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
@@ -66,104 +63,63 @@ function updateUserProfile($conn, $user_id)
     $gender = trim($_POST['gender'] ?? '');
     $email = trim($_POST['email'] ?? '');
 
-    // Validate input
+    // Basic validation for fields
     if (empty($firstname) || empty($lastname) || empty($age) || empty($gender) || empty($email)) {
         $_SESSION['error_message'] = "All required fields must be filled out.";
-        return;
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $_SESSION['error_message'] = "Invalid email format.";
-        return;
-    }
-
-    if (!is_numeric($age) || $age < 0) {
+    } elseif (!is_numeric($age) || $age < 0) {
         $_SESSION['error_message'] = "Age must be a valid number.";
-        return;
-    }
-
-    // Handle profile picture upload
-    $image_filename = null;
-
-    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = '../uploads/users/';
-        $ext = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
-        $image_filename = 'user_' . $user_id . '_' . time() . '.' . $ext;
-
-        // Validate file type and size
-        $allowed_types = ['jpg', 'jpeg', 'png'];
-        $max_size = 2 * 1024 * 1024; // 2MB
-
-        if (!in_array(strtolower($ext), $allowed_types)) {
-            $_SESSION['error_message'] = "Invalid file type. Only JPG and PNG are allowed.";
-            return;
-        }
-
-        if ($_FILES['profile_picture']['size'] > $max_size) {
-            $_SESSION['error_message'] = "Image exceeds 2MB size limit.";
-            return;
-        }
-
-        // Move file to uploads
-        if (!move_uploaded_file($_FILES['profile_picture']['tmp_name'], $upload_dir . $image_filename)) {
-            $_SESSION['error_message'] = "Failed to upload image.";
-            return;
-        }
-    }
-
-    // SQL update with or without image
-    if ($image_filename) {
-        $sql = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ?, image = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssissi", $firstname, $lastname, $middleinitial, $age, $gender, $email, $image_filename, $user_id);
-
-        // Delete old image if exists and not default
-        $get_old = $conn->prepare("SELECT image FROM users WHERE id = ?");
-        $get_old->bind_param("i", $user_id);
-        $get_old->execute();
-        $old_result = $get_old->get_result();
-        if ($old_result && $old_data = $old_result->fetch_assoc()) {
-            $old_image = $old_data['image'];
-            if (!empty($old_image) && $old_image !== 'default-profile.jpg' && file_exists("../uploads/users/$old_image")) {
-                unlink("../uploads/users/$old_image");
-            }
-        }
-        $get_old->close();
     } else {
-        $sql = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssisi", $firstname, $lastname, $middleinitial, $age, $gender, $email, $user_id);
-    }
+        // Fetch current user details for comparison
+        $fetch_sql = "SELECT firstname, lastname, middleinitial, age, gender, email FROM users WHERE id = ?";
+        $stmt_fetch = $conn->prepare($fetch_sql);
+        $stmt_fetch->bind_param("i", $user_id);
+        $stmt_fetch->execute();
+        $current_data = $stmt_fetch->get_result()->fetch_assoc();
+        $stmt_fetch->close();
 
-    if ($stmt->execute()) {
-        $_SESSION['firstname'] = $firstname;
-        $_SESSION['lastname'] = $lastname;
-        $_SESSION['middleinitial'] = $middleinitial;
-        $_SESSION['age'] = $age;
-        $_SESSION['gender'] = $gender;
-        $_SESSION['email'] = $email;
+        // Update user profile details if validation passes
+        $update_profile_sql = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ? WHERE id = ?";
+        $stmt_update_profile = $conn->prepare($update_profile_sql);
+        $stmt_update_profile->bind_param("ssssisi", $firstname, $lastname, $middleinitial, $age, $gender, $email, $user_id);
 
-        if ($image_filename) {
-            $_SESSION['image'] = $image_filename;
+        if ($stmt_update_profile->execute()) {
+            // Update session variables
+            $_SESSION['firstname'] = $firstname;
+            $_SESSION['lastname'] = $lastname;
+            $_SESSION['middleinitial'] = $middleinitial;
+            $_SESSION['age'] = $age;
+            $_SESSION['gender'] = $gender;
+            $_SESSION['email'] = $email;
+
+            $_SESSION['success_message'] = "Profile updated successfully.";
+
+            // Prepare data for logging
+            $new_data = [
+                'firstname' => $firstname,
+                'lastname' => $lastname,
+                'middleinitial' => $middleinitial,
+                'age' => $age,
+                'gender' => $gender,
+                'email' => $email
+            ];
+            $description = "Updated user profile details.";
+
+            // Log the action
+            logUserAction(
+                $conn,
+                $user_id,
+                'Profile',
+                'UPDATE',
+                $user_id,
+                $description
+            );
+        } else {
+            $_SESSION['error_message'] = "Error updating profile: " . $stmt_update_profile->error;
         }
-
-        $_SESSION['success_message'] = "Profile updated successfully.";
-
-        // Log the update
-        $description = "Updated user profile details.";
-        logUserAction(
-            $conn,
-            $user_id,
-            'Profile',
-            'UPDATE',
-            $user_id,
-            $description
-        );
-    } else {
-        $_SESSION['error_message'] = "Error updating profile: " . $stmt->error;
+        $stmt_update_profile->close();
     }
-
-    $stmt->close();
 }
 
 // Fetch departments only if school_id is available
@@ -176,11 +132,6 @@ if ($school_id) {
         $departments = mysqli_fetch_all($department_result, MYSQLI_ASSOC);
     }
 }
-
-$profile_picture_path = !empty($user_image) && file_exists("../uploads/users/$user_image")
-    ? "../uploads/users/$user_image"
-    : "../assets/defaults/default-profile.jpg";
-
 
 $stmt->close();
 $conn->close();
@@ -200,32 +151,12 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="../styles/committee.css">
     <link rel="stylesheet" href="../styles/dashboard.css">
-    <style>
-        html,
-        body {
-            height: 100%;
-            overflow-x: hidden;
-        }
-
-        .main {
-            min-height: 100vh;
-        }
-
-
-        .navbar {
-            position: sticky !important;
-            top: 0;
-            z-index: 1050;
-        }
-    </style>
 </head>
 
-
 <body>
-    <?php include '../navbar/navbar.php'; ?>
     <nav>
         <?php
-        // include '../navbar/navbar.php';
+        include '../navbar/navbar.php';
 
         $current_page = 'user settings';
         if ($role == 'Committee') {
@@ -241,103 +172,79 @@ $conn->close();
     <div class="main">
         <div class="container mt-4">
             <h1 class="mb-4"><?php echo htmlspecialchars($role); ?> Profile</h1>
-            <div class="card mx-auto mt-5 shadow-sm" style="max-width: 960px; width: 100%;">
-                <div class="card-body p-4">
-                    <div class="d-flex flex-column align-items-center text-center mb-4">
-                        <div style="position: relative;">
-                            <img id="profileImagePreview" src="<?php echo $profile_picture_path; ?>" alt="Profile Picture" class="rounded-circle border border-3 border-white shadow" style="width: 140px; height: 140px; object-fit: cover;">
-                        </div>
-                        <!-- <div class="mt-3">
-                            <input type="file" class="form-control form-control-sm mx-auto" style="max-width: 300px;" disabled>
-                            <small class="text-muted">Profile picture upload coming soon</small>
-                        </div> -->
+            <form id="updateUserInfoForm" method="POST" action="profile_settings.php" onsubmit="event.preventDefault(); confirmUpdate('updateUserInfoForm', 'update your profile');">
+                <input type="hidden" name="update_profile" value="1"> <!-- Add this line -->
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="firstname" class="form-label">First Name:</label>
+                        <input type="text" name="firstname" class="form-control" value="<?php echo htmlspecialchars($firstname); ?>" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="lastname" class="form-label">Last Name:</label>
+                        <input type="text" name="lastname" class="form-control" value="<?php echo htmlspecialchars($lastname); ?>" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="middleinitial" class="form-label">M.I.:</label>
+                        <input type="text" name="middleinitial" class="form-control" value="<?php echo htmlspecialchars($middleinitial); ?>" maxlength="2">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="age" class="form-label">Age:</label>
+                        <input type="number" name="age" class="form-control" value="<?php echo htmlspecialchars($age); ?>" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="gender" class="form-label">Gender:</label>
+                        <select name="gender" class="form-select" required>
+                            <option value="Male" <?php if ($gender == 'Male') echo 'selected'; ?>>Male</option>
+                            <option value="Female" <?php if ($gender == 'Female') echo 'selected'; ?>>Female</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
+                </div>
+
+                <?php if ($role !== 'School Admin'): ?>
+                    <!-- Role Selection -->
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role:</label>
+                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($role); ?>" disabled>
                     </div>
 
-                    <form id="updateUserInfoForm" method="POST" action="profile_settings.php" enctype="multipart/form-data" onsubmit="event.preventDefault(); confirmUpdate('updateUserInfoForm', 'update your profile');">
-                        <input type="hidden" name="update_profile" value="1">
-                        <div class="mt-3 mb-3">
-                            <input type="file" name="profile_picture" id="profilePictureInput" accept="image/*" onchange="previewImage(event)" class="form-control form-control-sm mx-auto" style="max-width: 300px;">
-                            <!-- <small class="text-muted">Accepted formats: JPG, PNG. Max size: 2MB.</small> -->
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="firstname" class="form-label">First Name</label>
-                                <input type="text" name="firstname" class="form-control" value="<?php echo htmlspecialchars($firstname); ?>" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="lastname" class="form-label">Last Name</label>
-                                <input type="text" name="lastname" class="form-control" value="<?php echo htmlspecialchars($lastname); ?>" required>
-                            </div>
-                        </div>
+                    <!-- Department Selection -->
+                    <div class="mb-3">
+                        <label for="department" class="form-label">Department:</label>
+                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($department_name); ?>" disabled>
+                    </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="middleinitial" class="form-label">M.I.</label>
-                                <input type="text" name="middleinitial" class="form-control" value="<?php echo htmlspecialchars($middleinitial); ?>" maxlength="2">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="age" class="form-label">Age</label>
-                                <input type="number" name="age" class="form-control" value="<?php echo htmlspecialchars($age); ?>" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="gender" class="form-label">Gender</label>
-                                <select name="gender" class="form-select" required>
-                                    <option value="Male" <?php if ($gender == 'Male') echo 'selected'; ?>>Male</option>
-                                    <option value="Female" <?php if ($gender == 'Female') echo 'selected'; ?>>Female</option>
-                                </select>
-                            </div>
-                        </div>
+                    <!-- Game Selection -->
+                    <div class="mb-3">
+                        <label for="game" class="form-label">Game:</label>
+                        <input type="text" class="form-control" value="<?php echo htmlspecialchars($game_name); ?>" disabled>
+                    </div>
+                <?php endif; ?>
 
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Role</label>
-                                <input type="text" class="form-control" value="<?php echo htmlspecialchars($role); ?>" disabled>
-                            </div>
-                            <?php if (!empty($school_name)): ?>
-                                <div class="col-md-6">
-                                    <label class="form-label">School</label>
-                                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($school_name); ?>" disabled>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="row mb-3">
-                            <?php if (!empty($department_name)): ?>
-                                <div class="col-md-6">
-                                    <label class="form-label">Department</label>
-                                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($department_name); ?>" disabled>
-                                </div>
-                            <?php endif; ?>
-                            <?php if (!empty($game_name)): ?>
-                                <div class="col-md-6">
-                                    <label class="form-label">Game</label>
-                                    <input type="text" class="form-control" value="<?php echo htmlspecialchars($game_name); ?>" disabled>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="current_password" class="form-label">Current Password</label>
-                            <div class="input-group">
-                                <input type="password" name="current_password" class="form-control" required id="currentPassword">
-                                <span class="input-group-text">
-                                    <i class="fas fa-eye" id="toggleCurrentPassword" onclick="togglePasswordVisibility('currentPassword', 'toggleCurrentPassword')"></i>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
-                            <button type="submit" class="btn btn-success">Save Changes</button>
-                        </div>
-                    </form>
+                <!-- Current Password for Profile Update -->
+                <div class="mb-3">
+                    <label for="current_password" class="form-label">Current Password:</label>
+                    <div class="input-group">
+                        <input type="password" name="current_password" class="form-control" required id="currentPassword">
+                        <span class="input-group-text">
+                            <i class="fas fa-eye" id="toggleCurrentPassword" onclick="togglePasswordVisibility('currentPassword', 'toggleCurrentPassword')"></i>
+                        </span>
+                    </div>
                 </div>
-            </div>
+
+                <div class="mb-3">
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
+                    <button type="submit" class="btn btn-success">Update Profile</button>
+                </div>
+            </form>
+
 
 
             <!-- Modal for Change Password -->
@@ -491,19 +398,6 @@ $conn->close();
                         });
 
                 <?php endif; ?>
-
-                function previewImage(event) {
-                    const input = event.target;
-                    const preview = document.getElementById('profileImagePreview');
-
-                    if (input.files && input.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            preview.src = e.target.result;
-                        };
-                        reader.readAsDataURL(input.files[0]);
-                    }
-                }
             </script>
 </body>
 

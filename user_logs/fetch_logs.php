@@ -29,6 +29,36 @@ if (!in_array($sort_column, $allowed_columns)) {
 // Validate sort order
 $sort_order = strtoupper($sort_order) === 'ASC' ? 'ASC' : 'DESC';
 
+// $query = "
+//     SELECT 
+//         logs.log_id,
+//         logs.previous_data,
+//         logs.new_data,
+//         logs.timestamp AS log_time,
+//         logs.table_name AS table_name,
+//         logs.operation AS log_action,
+//         logs.record_id AS log_record_id,
+//         logs.description AS log_description,
+//         CONCAT(users.firstname, ' ', users.middleinitial, ' ', users.lastname) AS full_name,
+//         users.age,
+//         users.gender,
+//         users.email,
+//         users.role,
+//         departments.department_name AS department_name,
+//         games.game_name AS game_name,
+//         schools.school_name AS school_name
+//     FROM 
+//         logs
+//     JOIN 
+//         users ON logs.user_id = users.id
+//     LEFT JOIN 
+//         games ON users.game_id = games.game_id
+//     LEFT JOIN 
+//         schools ON users.school_id = schools.school_id
+//     LEFT JOIN 
+//         departments ON users.department = departments.id
+// ";
+
 $query = "
     SELECT 
         logs.log_id,
@@ -39,7 +69,12 @@ $query = "
         logs.operation AS log_action,
         logs.record_id AS log_record_id,
         logs.description AS log_description,
-        CONCAT(users.firstname, ' ', users.middleinitial, ' ', users.lastname) AS full_name,
+        users.id AS user_id,
+        CASE
+            WHEN users.firstname IS NULL OR users.lastname IS NULL OR users.firstname = '' OR users.lastname = ''
+            THEN users.email
+            ELSE CONCAT(users.firstname, ' ', users.middleinitial, ' ', users.lastname)
+        END AS full_name,
         users.age,
         users.gender,
         users.email,
@@ -58,6 +93,7 @@ $query = "
     LEFT JOIN 
         departments ON users.department = departments.id
 ";
+
 
 // Add WHERE clause for non-superadmin users
 if ($role !== 'superadmin') {
@@ -79,9 +115,14 @@ if (!$result) {
 $logs = [];
 while ($row = $result->fetch_assoc()) {
     // Convert UTC timestamp to Asia/Manila timezone and format as "Jan 23 2025 11:30 PM"
+    // $date = new DateTime($row['log_time'], new DateTimeZone('UTC'));
+    // $date->setTimezone(new DateTimeZone('Asia/Manila'));
+    // $row['log_time'] = $date->format('M j Y h:i A'); // Example: "Feb 4 2025 11:00 PM"
+
     $date = new DateTime($row['log_time'], new DateTimeZone('UTC'));
     $date->setTimezone(new DateTimeZone('Asia/Manila'));
-    $row['log_time'] = $date->format('M j Y h:i A'); // Example: "Feb 4 2025 11:00 PM"
+    $row['log_time'] = $date->format('Y-m-d\TH:i');
+
 
     $logs[] = $row;
 }

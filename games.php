@@ -2,6 +2,8 @@
 include_once 'connection/conn.php';
 $conn = con();
 session_start();
+$school_id = isset($_GET['school_id']) ? intval($_GET['school_id']) : 0;
+
 ?>
 
 <!doctype html>
@@ -24,6 +26,7 @@ session_start();
             background-color: #f5f7fa;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
+
         .page-header {
             background: #3949ab;
             color: white;
@@ -32,6 +35,7 @@ session_start();
             position: relative;
             overflow: hidden;
         }
+
         .page-header::after {
             content: '';
             position: absolute;
@@ -41,17 +45,20 @@ session_start();
             left: 0;
             background: linear-gradient(135deg, rgba(63, 81, 181, 0.1) 0%, rgba(63, 81, 181, 0) 100%);
         }
+
         .games-container {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             padding: 2rem;
             margin-bottom: 2rem;
         }
+
         .letter-section {
             margin-bottom: 2rem;
             position: relative;
         }
+
         .letter-header {
             font-size: 2rem;
             font-weight: 700;
@@ -60,6 +67,7 @@ session_start();
             display: inline-block;
             position: relative;
         }
+
         .letter-header::after {
             content: '';
             position: absolute;
@@ -70,6 +78,7 @@ session_start();
             background: #3949ab;
             border-radius: 2px;
         }
+
         .game-list {
             padding-left: 0;
             list-style: none;
@@ -77,6 +86,7 @@ session_start();
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1rem;
         }
+
         .game-item {
             background: #f8fafc;
             border-radius: 8px;
@@ -87,12 +97,14 @@ session_start();
             align-items: center;
             gap: 0.75rem;
         }
+
         .game-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             background: white;
             border-color: #3949ab;
         }
+
         .game-icon {
             width: 32px;
             height: 32px;
@@ -104,12 +116,14 @@ session_start();
             color: white;
             font-size: 1rem;
         }
+
         .game-name {
             color: #2d3748;
             font-weight: 500;
             font-size: 0.95rem;
             margin: 0;
         }
+
         .empty-letter {
             color: #a0aec0;
             font-style: italic;
@@ -120,10 +134,12 @@ session_start();
             border-radius: 8px;
             border: 1px dashed #e2e8f0;
         }
+
         .search-box {
             position: relative;
             margin-bottom: 2rem;
         }
+
         .search-input {
             width: 100%;
             padding: 1rem 1rem 1rem 3rem;
@@ -134,11 +150,13 @@ session_start();
             background: white;
             transition: all 0.2s ease;
         }
+
         .search-input:focus {
             outline: none;
             border-color: #3949ab;
             box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
         }
+
         .search-icon {
             position: absolute;
             left: 1rem;
@@ -146,17 +164,21 @@ session_start();
             transform: translateY(-50%);
             color: #a0aec0;
         }
+
         @media (max-width: 768px) {
             .games-container {
                 padding: 1rem;
             }
+
             .game-list {
                 grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
+
             .letter-header {
                 font-size: 1.75rem;
-                
+
             }
+
             .page-header {
                 margin-top: -1.7rem;
             }
@@ -184,13 +206,14 @@ session_start();
 
             <?php
             // Fetch games from the database, excluding game_id = 0
-            $query = "SELECT game_name FROM games WHERE game_id != 0 ORDER BY game_name ASC";
+            $query = "SELECT game_name FROM games WHERE game_id != 0 AND school_id = $school_id ORDER BY game_name ASC";
             $result = mysqli_query($conn, $query);
 
             // Function to get appropriate icon for a sport
-            function getSportIcon($gameName) {
+            function getSportIcon($gameName)
+            {
                 $gameName = strtolower($gameName);
-                
+
                 // Sport-specific icons
                 if (strpos($gameName, 'basketball') !== false) return 'basketball-ball';
                 if (strpos($gameName, 'volleyball') !== false) return 'volleyball-ball';
@@ -204,7 +227,7 @@ session_start();
                 if (strpos($gameName, 'boxing') !== false) return 'fist-raised';
                 if (strpos($gameName, 'dance') !== false) return 'music';
                 if (strpos($gameName, 'bowling') !== false) return 'bowling-ball';
-                
+
                 // Default sport icon for other games
                 return 'medal';
             }

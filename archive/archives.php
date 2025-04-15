@@ -4,7 +4,7 @@ require_once '../connection/conn.php';
 $conn = con();
 $role = $_SESSION['role'];
 
-$allowedTables = ['announcements', 'games', 'schedules', 'teams', 'department-teams'];
+$allowedTables = ['announcements', 'games', 'teams', 'department-teams', 'brackets', 'matches', 'leaderboards'];
 $table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : null;
 $year = isset($_GET['year']) ? $_GET['year'] : '';
 include '../navbar/navbar.php';
@@ -25,6 +25,11 @@ include '../navbar/navbar.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+<style>
+    .margin-start {
+        margin-left: 8vw;
+    }
+</style>
 
 <body>
     <?php
@@ -33,16 +38,16 @@ include '../navbar/navbar.php';
     if ($role == 'Committee') {
         include 'csidebar.php';
     } elseif ($role == 'superadmin') {
-        include '../superadmin/sa_sidebar.php';
+        include '../super_admin/sa_sidebar.php';
     } else {
         include '../department_admin/sidebar.php';
     }
     ?>
 
-    <div class="container mt-5">
+    <div class="container mt-5 margin-start">
         <div class="flex-container d-flex justify-content-between align-items-center mb-4">
             <!-- Heading (Left side) -->
-            <h2 class="mb-0">Archived Items <?= $table ? ucfirst($table) : '' ?> for Year <?= $year ?></h2>
+            <h2 class="mb-0">Archived Items: </br><span> <?= $table ? ucfirst($table) : '' ?> for Year <?= $year ?></span></h2>
 
             <!-- Dropdown (Right side in a card) -->
             <div class="card shadow-lg border-0 rounded-3 mb-0">
@@ -59,6 +64,12 @@ include '../navbar/navbar.php';
                                 echo "<option value='{$row['school_id']}' $selected>{$row['school_name']}</option>";
                             }
                             ?>
+                        </select>
+
+                        <!-- Archive Year Dropdown -->
+                        <label for="archive_year" class="form-label mb-0 ms-2 me-2">Year:</label>
+                        <select class="form-select" id="archive_year" name="year" disabled>
+                            <option value="">Select Year</option>
                         </select>
                     </div>
                 </div>
@@ -86,12 +97,12 @@ include '../navbar/navbar.php';
                         </div>
 
                         <!-- Archive Year Dropdown -->
-                        <div class="col-md-3">
+                        <!-- <div class="col-md-3">
                             <label for="archive_year" class="form-label">Year</label>
                             <select class="form-select" id="archive_year" name="year" disabled>
                                 <option value="">Select Year</option>
                             </select>
-                        </div>
+                        </div> -->
                         <!-- Department Dropdown -->
                         <div class="col-md-3">
                             <label for="department" class="form-label">Department</label>
@@ -107,6 +118,14 @@ include '../navbar/navbar.php';
                             </select>
                         </div>
 
+
+                        <div class="col-md-3">
+                            <label for="game" class="form-label">Game</label>
+                            <select class="form-select" id="game" name="game_id" disabled>
+                                <option value="">Select Game</option>
+                            </select>
+                        </div>
+
                     </div>
             </div>
         </div>
@@ -116,12 +135,12 @@ include '../navbar/navbar.php';
             <div class="card-body">
                 <div class="row g-3">
                     <!-- Game Dropdown -->
-                    <div class="col-md-3">
+                    <!-- <div class="col-md-3">
                         <label for="game" class="form-label">Game</label>
                         <select class="form-select" id="game" name="game_id" disabled>
                             <option value="">Select Game</option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <div class="col">
                         <label for="search" class="form-label">Search</label>
@@ -140,8 +159,8 @@ include '../navbar/navbar.php';
         <div id="archiveTableContainer" class="card shadow-sm border-0 rounded-3 mt-3">
             <div class="card-body text-center">
                 <?php
-                $allowedTables = ['announcements', 'games', 'schedules', 'teams', 'department-teams'];
-                $table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : null;
+                // $allowedTables = ['announcements', 'games', 'schedules', 'teams', 'department-teams', 'leaderboards', 'matches', 'brackets'];
+                // $table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : null;
 
                 if ($table) {
                     include "archive-pages/{$table}.php";

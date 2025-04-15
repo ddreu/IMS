@@ -49,6 +49,7 @@ $sql = "
         u.department,
         u.school_id,
         u.game_id,
+        u.image,
         d.department_name,
         s.school_name
     FROM 
@@ -178,9 +179,12 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                 echo '<tr data-school-id="' . htmlspecialchars($row['school_id']) . '">';
                                                 echo '<td class="px-4">';
                                                 echo '<div class="d-flex align-items-center">';
-                                                echo '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 45px; height: 45px;">';
-                                                echo '<i class="fas fa-user fa-lg text-white"></i>';
-                                                echo '</div>';
+                                                $image_path = (!empty($row['image']) && file_exists("../uploads/users/" . $row['image']))
+                                                    ? "../uploads/users/" . $row['image']
+                                                    : "../assets/defaults/default-profile.jpg";
+
+                                                echo '<img src="' . $image_path . '" alt="User Image" class="rounded-circle shadow-sm flex-shrink-0" style="width: 45px; height: 45px; object-fit: cover;">';
+
                                                 echo '<div class="ms-3">';
                                                 echo '<div class="fw-bold mb-1">' . htmlspecialchars($row['firstname'] . ' ' . $row['middleinitial'] . ' ' . $row['lastname']) . '</div>';
                                                 echo '</div>';

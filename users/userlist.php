@@ -97,6 +97,7 @@ $sql = "
         u.department,
         u.game_id,
         u.is_archived,
+        u.image,
         d.department_name, 
         g.game_name
     FROM 
@@ -629,9 +630,12 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                     echo '<tr data-category="' . htmlspecialchars($row['is_archived']) . '">';
                                                     echo '<td class="px-4" data-label="Name">';
                                                     echo '<div class="d-flex align-items-center gap-3">';
-                                                    echo '<div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">';
-                                                    echo '<i class="fas fa-user text-white"></i>';
-                                                    echo '</div>';
+                                                    $image_path = (!empty($row['image']) && file_exists("../uploads/users/" . $row['image']))
+                                                        ? "../uploads/users/" . $row['image']
+                                                        : "../assets/defaults/default-profile.jpg";
+
+                                                    echo '<img src="' . $image_path . '" alt="User Image" class="rounded-circle border shadow-sm" style="width: 40px; height: 40px; object-fit: cover;">';
+
                                                     echo '<div>';
                                                     echo '<div class="fw-medium">' . htmlspecialchars($row['firstname'] . ' ' . $row['middleinitial'] . ' ' . $row['lastname']) . '</div>';
                                                     echo '</div>';

@@ -33,7 +33,7 @@ $conn = con();
                 display: block;
                 margin-bottom: 1rem;
                 background: #fff;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
                 border-radius: 4px;
             }
 
@@ -135,7 +135,7 @@ $conn = con();
                 <thead class="thead-dark">
                     <tr>
                         <th>User</th>
-                       <!--<th>Action</th>-->
+                        <!--<th>Action</th>-->
                         <th>Operation</th>
                         <!--<th>Record ID</th>-->
                         <th>Description</th>
@@ -188,10 +188,23 @@ $conn = con();
     </div>
 
     <script>
+        let usersList = [];
+
+        async function fetchUsers() {
+            const res = await fetch('fetch_users_by_school.php');
+            const result = await res.json();
+
+            if (result.status === 'success') {
+                usersList = result.users;
+            } else {
+                console.error('Failed to load users');
+            }
+        }
+
         let currentPage = 1;
         let totalPages = 1;
 
-         async function fetchLogs() {
+        async function fetchLogs() {
             try {
                 const sortColumn = document.getElementById('sortColumn').value;
                 const sortOrder = document.getElementById('sortOrder').value;
@@ -214,15 +227,39 @@ $conn = con();
                     result.data.forEach(log => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                    <td data-label="User">${log.full_name}</td>
+                    <!-- <td data-label="User">${log.full_name}</td> -->
+
+                    <td data-label="User">
+    <select class="form-select form-select-sm" onchange="updateLogUser(${log.log_id}, this.value)">
+        ${usersList.map(user => `
+            <option value="${user.id}" ${log.user_id == user.id ? 'selected' : ''}>
+                ${user.full_name}
+            </option>
+        `).join('')}
+    </select>
+</td>
+
                     <td data-label="Operation">${log.table_name}</td>
                     <td data-label="Description">${log.log_description}</td>
-                    <td data-label="Timestamp">${log.log_time}</td> <!-- Directly using formatted date from PHP -->
-                    <td data-label="Details">
+                  <td data-label="Timestamp">
+    <input type="datetime-local" class="form-control form-control-sm"
+           value="${log.log_time}"
+           onchange="updateLogTimestamp(${log.log_id}, this.value)">
+</td>
+
+
+                    <!-- <td data-label="Timestamp">${log.log_time}</td> -->
+                   <!-- <td data-label="Details">
                         <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">
                             View Details
                         </button>
-                    </td>
+                    </td> -->
+
+                    <td data-label="Details">
+    <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">View</button>
+    <button class="btn btn-sm btn-danger" onclick="deleteLog(${log.log_id})">Delete</button>
+</td>
+
                 `;
                         logsTable.appendChild(row);
                     });
@@ -237,7 +274,7 @@ $conn = con();
         document.getElementById('searchInput').addEventListener('input', function() {
             const searchText = this.value.toLowerCase();
             const rows = document.querySelectorAll('#logsTable tr');
-            
+
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(searchText) ? '' : 'none';
@@ -283,7 +320,102 @@ $conn = con();
         });
 
         // Initial fetch
-        fetchLogs();
+        // fetchLogs();
+
+
+        //edit logs function
+
+        async function updateLogTimestamp(logId, newTimestamp) {
+            try {
+                const response = await fetch('update_log_time.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        log_id: logId,
+                        timestamp: newTimestamp
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    Swal.fire('Success', 'Timestamp updated.', 'success');
+                } else {
+                    Swal.fire('Error', result.message || 'Failed to update timestamp.', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Network error occurred.', 'error');
+            }
+        }
+
+        //update user
+
+        async function updateLogUser(logId, userId) {
+            try {
+                const response = await fetch('update_log_user.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        log_id: logId,
+                        user_id: userId
+                    })
+                });
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    Swal.fire('Updated!', 'User has been updated.', 'success');
+                } else {
+                    Swal.fire('Error!', result.message || 'Update failed.', 'error');
+                }
+            } catch (err) {
+                Swal.fire('Error!', 'Network error.', 'error');
+            }
+        }
+
+        //delete log
+        async function deleteLog(logId) {
+            const confirmation = await Swal.fire({
+                title: 'Are you sure?',
+                text: "This will permanently delete the log.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            });
+
+            if (confirmation.isConfirmed) {
+                try {
+                    const response = await fetch('delete_log.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            log_id: logId
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        Swal.fire('Deleted!', 'The log has been removed.', 'success');
+                        fetchLogs(); // Refresh the table
+                    } else {
+                        Swal.fire('Error!', result.message || 'Delete failed.', 'error');
+                    }
+                } catch (err) {
+                    Swal.fire('Error!', 'Network error occurred.', 'error');
+                }
+            }
+        }
+
+
+        // Load users first, then logs
+        fetchUsers().then(fetchLogs);
     </script>
 </body>
 
