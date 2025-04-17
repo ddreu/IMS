@@ -299,10 +299,12 @@ $conn->close();
         <script>
             Swal.fire({
                 icon: 'success',
-                title: 'Welcome!',
-                text: '<?php echo $_SESSION['success_message']; ?>',
+                title: '<?php echo addslashes($_SESSION['success_message']); ?>',
+                toast: true,
+                position: 'top-end',
                 timer: 2000,
-                showConfirmButton: false
+                showConfirmButton: false,
+                timerProgressBar: true
             });
         </script>
         <?php
@@ -310,6 +312,7 @@ $conn->close();
         unset($_SESSION['success_type']);
         ?>
     <?php endif; ?>
+
 </body>
 
 </html>
