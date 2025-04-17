@@ -47,6 +47,8 @@ $conn->close();
     <link rel="stylesheet" href="scb_bsktbll.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+
 
     <audio id="buzzerSound" src="buzzer/buzzer.mp3"></audio>
 
@@ -222,10 +224,20 @@ $conn->close();
                 <label style="color: white;">Shot Clock Duration</label>
                 <input type="number" id="shotClockDuration" value="24" min="1" max="60" style="width: 60px; margin-left: 10px;">
             </div>
+            <button class="score-button fullscreen-button" onclick="toggleFullscreen()">
+                <i class="fas fa-expand"></i>
+            </button>
+
+            <button class="score-button cast-button" onclick="requestCast()">
+                <i class="fas fa-tv"></i> Cast
+            </button>
+
             <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
                 <button class="score-button" onclick="saveSettings()">Save</button>
                 <button class="score-button" onclick="closeSettings()">Cancel</button>
             </div>
+
+
         </div>
     </div>
 
@@ -312,6 +324,84 @@ $conn->close();
 
             // Existing loadState logic
             loadState();
+        });
+
+        function toggleFullscreen() {
+            const docElm = document.documentElement;
+
+            if (!document.fullscreenElement) {
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen();
+                } else if (docElm.mozRequestFullScreen) {
+                    /* Firefox */
+                    docElm.mozRequestFullScreen();
+                } else if (docElm.webkitRequestFullscreen) {
+                    /* Chrome, Safari & Opera */
+                    docElm.webkitRequestFullscreen();
+                } else if (docElm.msRequestFullscreen) {
+                    /* IE/Edge */
+                    docElm.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // screen cast
+        // Flag for Cast readiness
+        window.castReady = false;
+
+        // Google Cast SDK will call this when available
+        window.__onGCastApiAvailable = function(isAvailable) {
+            if (isAvailable) {
+                const context = cast.framework.CastContext.getInstance();
+
+                context.setOptions({
+                    receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+                });
+
+                console.log("✅ Cast API initialized");
+                window.castReady = true;
+
+                // Enable the Cast button if you want (optional)
+                const castBtn = document.querySelector(".cast-button");
+                if (castBtn) castBtn.disabled = false;
+            }
+        };
+
+        function requestCast() {
+            if (!window.castReady) {
+                console.warn(" Cast API not ready yet.");
+                return;
+            }
+
+            const context = cast.framework.CastContext.getInstance();
+            const session = context.getCurrentSession();
+
+            if (!session) {
+                context.requestSession().then(() => {
+                    console.log("✅ Cast session started.");
+                }).catch(err => {
+                    console.error(" Cast session failed:", err);
+                });
+            } else {
+                console.log("ℹ️ Already casting.");
+            }
+        }
+
+        // Optional: disable button until Cast API is ready
+        document.addEventListener("DOMContentLoaded", () => {
+            const castBtn = document.querySelector(".cast-button");
+            if (castBtn) castBtn.disabled = true;
         });
     </script>
 </body>

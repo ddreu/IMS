@@ -239,26 +239,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* UNARCHIVE SCHOOL DATA */
 
+
 document.addEventListener("DOMContentLoaded", () => {
   const unarchiveForm = document.getElementById("UnarchiveSchoolForm");
 
-  unarchiveForm.addEventListener("submit", (e) => {
+  unarchiveForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Show confirmation alert
+    // 🔄 Fetch available archived years first
+    const yearResponse = await fetch("../archive/get_archive_years.php");
+    const yearData = await yearResponse.json();
+
+    if (!yearData.success || !Array.isArray(yearData.years) || yearData.years.length === 0) {
+      Swal.fire({
+        title: "No Archived Data",
+        text: "No archived data found for this school.",
+        icon: "info",
+        confirmButtonColor: "#6c757d",
+      });
+      return;
+    }
+
+    // 🔽 Build dropdown options
+    const yearOptions = yearData.years.map((year) => `<option value="${year}">${year}</option>`).join("");
+
+    // 🔔 Ask user to pick a year to unarchive
     Swal.fire({
-      title: "Are you sure?",
-      text: "You want to unarchive this school's data?",
+      title: "Select Year to Unarchive",
+      html: `
+        <p>Please select the year to restore data from:</p>
+        <select id="archiveYear" class="swal2-input" required>
+          <option value="">--Select Year--</option>
+          ${yearOptions}
+        </select>
+      `,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#198754",
       cancelButtonColor: "#6c757d",
-      confirmButtonText: "Yes, unarchive it!",
+      confirmButtonText: "Unarchive",
       cancelButtonText: "Cancel",
-      reverseButtons: true,
+      preConfirm: () => {
+        const selectedYear = document.getElementById("archiveYear").value;
+        if (!selectedYear) {
+          Swal.showValidationMessage("Please select a year.");
+        }
+        return selectedYear;
+      }
     }).then((result) => {
-      if (result.isConfirmed) {
-        // Show loading alert
+      if (result.isConfirmed && result.value) {
+        const selectedYear = result.value;
+
+        // ⏳ Show loading alert
         Swal.fire({
           title: "Unarchiving...",
           text: "Please wait while the school is being restored.",
@@ -270,10 +302,11 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         });
 
-        // Prepare form data
+        // 📨 Prepare form data with year
         const formData = new FormData(unarchiveForm);
+        formData.append("year", selectedYear);
 
-        // Send AJAX request
+        // 🔁 Send AJAX request to PHP backend
         fetch("../archive/unarchiver.php", {
           method: "POST",
           body: formData,
@@ -288,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 icon: "success",
                 confirmButtonColor: "#198754",
               }).then(() => {
-                location.reload(); // Reload after successful unarchive
+                location.reload();
               });
             } else {
               Swal.fire({
@@ -312,6 +345,80 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   const unarchiveForm = document.getElementById("UnarchiveSchoolForm");
+
+//   unarchiveForm.addEventListener("submit", (e) => {
+//     e.preventDefault();
+
+//     // Show confirmation alert
+//     Swal.fire({
+//       title: "Are you sure?",
+//       text: "You want to unarchive this school's data?",
+//       icon: "warning",
+//       showCancelButton: true,
+//       confirmButtonColor: "#198754",
+//       cancelButtonColor: "#6c757d",
+//       confirmButtonText: "Yes, unarchive it!",
+//       cancelButtonText: "Cancel",
+//       reverseButtons: true,
+//     }).then((result) => {
+//       if (result.isConfirmed) {
+//         // Show loading alert
+//         Swal.fire({
+//           title: "Unarchiving...",
+//           text: "Please wait while the school is being restored.",
+//           icon: "info",
+//           allowOutsideClick: false,
+//           showConfirmButton: false,
+//           willOpen: () => {
+//             Swal.showLoading();
+//           },
+//         });
+
+//         // Prepare form data
+//         const formData = new FormData(unarchiveForm);
+
+//         // Send AJAX request
+//         fetch("../archive/unarchiver.php", {
+//           method: "POST",
+//           body: formData,
+//         })
+//           .then((response) => response.json())
+//           .then((data) => {
+//             Swal.close();
+//             if (data.success) {
+//               Swal.fire({
+//                 title: "Unarchived!",
+//                 text: data.message,
+//                 icon: "success",
+//                 confirmButtonColor: "#198754",
+//               }).then(() => {
+//                 location.reload(); // Reload after successful unarchive
+//               });
+//             } else {
+//               Swal.fire({
+//                 title: "Error!",
+//                 text: data.message,
+//                 icon: "error",
+//                 confirmButtonColor: "#dc3545",
+//               });
+//             }
+//           })
+//           .catch((error) => {
+//             console.error("Error:", error);
+//             Swal.fire({
+//               title: "Error!",
+//               text: "Something went wrong. Please try again.",
+//               icon: "error",
+//               confirmButtonColor: "#dc3545",
+//             });
+//           });
+//       }
+//     });
+//   });
+// });
 
 /* UNARCHIVE */
 

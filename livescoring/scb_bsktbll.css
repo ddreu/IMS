@@ -9,6 +9,17 @@
   src: url("fonts/digital-7.ttf") format("truetype");
 }
 
+html:-webkit-full-screen,
+body:-webkit-full-screen,
+.scoreboard:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+}
+
+.control-container:-webkit-full-screen {
+  gap: 20vw;
+}
+
 body {
   background-color: black;
   color: white;
@@ -38,7 +49,8 @@ body {
   align-items: center;
   justify-content: center;
   align-self: center;
-  gap: 10px;
+  /* gap: 10px; */
+  gap: 9vh;
 }
 
 .middle-container {
@@ -126,7 +138,7 @@ body {
 }
 
 .timer {
-  font-size: 12vw;
+  font-size: 16vw;
   color: red;
   font-weight: bold;
   text-shadow: 4px 4px 8px rgba(255, 0, 0, 0.9);
@@ -192,7 +204,7 @@ body {
 }
 .fouls,
 .timeouts {
-  font-size: 5vw;
+  font-size: 7vw;
   color: orange;
   font-weight: bold;
   background: black;
@@ -214,7 +226,7 @@ body {
   border-radius: 10px;
 }
 .period {
-  font-size: 8vw;
+  font-size: 10vw;
   font-weight: bold;
   color: white;
   background: black;
@@ -229,7 +241,7 @@ body {
   gap: 5px;
 }
 .shot-clock {
-  font-size: 8vw;
+  font-size: 11vw;
   font-weight: bold;
   color: limegreen;
   background: black;
@@ -321,7 +333,7 @@ body {
 }
 
 .team-score {
-  font-size: 9vw;
+  font-size: 11vw;
 }
 
 @media screen and (max-width: 768px) {

@@ -82,91 +82,119 @@ $sets_won_query->close();
         <i class="fas fa-stop-circle"></i> End Match
     </button>
 
+    <!-- <div class="set-container">
+
+        <div class="team-sets-container">
+            <span class="team-label"><?php echo htmlspecialchars($match['teamA_name']); ?> Sets:</span>
+            <span id="teamA-sets"
+                class="sets-display"
+                data-team="A"
+                style="user-select: none; pointer-events: none;"><?php echo $teamA_sets; ?></span>
+        </div>
+    </div> -->
+
+
     <div class="scoreboard">
-        <!-- 🔹 Row 1: Timeouts & Set -->
-        <div class="row row-top">
-            <!-- Team A Timeouts -->
-            <div class="timeout-box">
-                <!-- <div class="digit-label"><?php echo htmlspecialchars($match['teamA_name']); ?> TO</div> -->
-                <div class="digit-label">Timeout:</div>
-                <div class="timeout-buttons">
-                    <button id="teamA-timeouts-minus" onclick="updateTimeouts('A', -1)">-</button>
-                    <div class="digit" id="teamA-timeouts">0</div>
-                    <button id="teamA-timeouts-plus" onclick="updateTimeouts('A', 1)">+</button>
+        <!-- Teams & Scores -->
+
+        <!-- Ongoing Set Control -->
+        <div class="set-control-row">
+            <div class="team-sets-container">
+                <span class="team-label"><?php echo htmlspecialchars($match['teamA_name']); ?> Sets:</span>
+                <span id="teamA-sets" class="sets-display" data-team="A"
+                    style="user-select: none; pointer-events: none;"><?php echo $teamA_sets; ?></span>
+            </div>
+
+            <div class="ongoing-set">
+                <h3>Ongoing Set</h3>
+                <div class="set-buttons">
+                    <button onclick="updateSet(-1)">-</button>
+                    <span id="currentSet">1</span>
+                    <button onclick="updateSet(1)">+</button>
+                </div>
+                <div class="end-set-container">
+                    <button id="endSetBtn" class="btn btn-danger" onclick="ScoreManager.confirmEndSet()">End Set</button>
                 </div>
             </div>
 
-            <!-- Sets Won -->
-            <div class="sets-won-container">
-                <div class="sets-won-label">SETS WON</div>
-                <div class="sets-won-display">
-                    <div id="teamA-sets"><?php echo $teamA_sets; ?></div>
-                    <span>-</span>
-                    <div id="teamB-sets"><?php echo $teamB_sets; ?></div>
-                </div>
-
-                <!-- 🔁 Reset Button -->
-                <div class="reset-wrapper">
-                    <button class="reset-btn" onclick="resetGame()">Reset</button>
-                </div>
-            </div>
-
-
-
-
-            <!-- Team B Timeouts -->
-            <div class="timeout-box">
-                <!-- <div class="digit-label"><?php echo htmlspecialchars($match['teamB_name']); ?> TO</div> -->
-                <div class="digit-label">Timeout:</div>
-
-                <div class="timeout-buttons">
-                    <button id="teamB-timeouts-minus" onclick="updateTimeouts('B', -1)">-</button>
-                    <div class="digit" id="teamB-timeouts">0</div>
-                    <button id="teamB-timeouts-plus" onclick="updateTimeouts('B', 1)">+</button>
-                </div>
+            <div class="team-sets-container">
+                <span class="team-label"><?php echo htmlspecialchars($match['teamB_name']); ?> Sets:</span>
+                <span id="teamB-sets" class="sets-display" data-team="B"
+                    style="user-select: none; pointer-events: none;"><?php echo $teamB_sets; ?></span>
             </div>
         </div>
 
-        <!-- 🔸 Row 2: Scores -->
-        <div class="row row-bottom">
-            <!-- Team A Score -->
+        <div class="teams-container">
+
+            <!-- Team A -->
             <div class="team" id="teamA">
-                <div class=" digit-label">
-                    <h2><?php echo htmlspecialchars($match['teamA_name']); ?></h2>
-                </div>
+
+
+                <h2><?php echo htmlspecialchars($match['teamA_name']); ?></h2>
                 <div class="score-wrapper">
                     <button onclick="updateScore('A', -1)">-</button>
-                    <div class="digit score" id="scoreA"><?php echo $match['teamA_score'] ?? 0; ?></div>
+                    <span id="scoreA"><?php echo $match['teamA_score'] ?? 0; ?></span>
                     <button onclick="updateScore('A', 1)">+</button>
                 </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Timeouts
+                        </div>
+                        <div class="card-body">
+                            <div class="timeout-container">
+                                <button id="teamA-timeouts-minus" class="btn btn-sm btn-outline-danger" onclick="updateTimeouts('A', -1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span id="teamA-timeouts" class="h4 mb-0">0</span>
+                                <button id="teamA-timeouts-plus" class="btn btn-sm btn-outline-success" onclick="updateTimeouts('A', 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <button class="reset-btn" onclick="resetGame()">Reset</button>
 
-            <!-- Current Set -->
-            <div class="set-center">
-                <div class="digit-label"> CURRENT SET</div>
-                <div class="digit c-set" id="currentSet">1</div>
-                <div class="set-buttons">
-                    <!-- <button onclick="updateSet(-1)">-</button>
-                    <button onclick="updateSet(1)">+</button> -->
-                    <button id="endSetBtn" onclick="ScoreManager.confirmEndSet()">End Set</button>
-                </div>
-            </div>
-            <!-- Team B Score -->
+            <!-- Team B -->
             <div class="team" id="teamB">
-                <div class="digit-label">
-                    <h2><?php echo htmlspecialchars($match['teamB_name']); ?></h2>
-                </div>
+                <h2><?php echo htmlspecialchars($match['teamB_name']); ?></h2>
                 <div class="score-wrapper">
                     <button onclick="updateScore('B', -1)">-</button>
-                    <div class="digit score" id="scoreB"><?php echo $match['teamB_score'] ?? 0; ?></div>
+                    <span id="scoreB"><?php echo $match['teamB_score'] ?? 0; ?></span>
                     <button onclick="updateScore('B', 1)">+</button>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Timeouts
+                        </div>
+                        <div class="card-body">
+                            <div class="timeout-container">
+                                <button id="teamB-timeouts-minus" class="btn btn-sm btn-outline-danger" onclick="updateTimeouts('B', -1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span id="teamB-timeouts" class="h4 mb-0">0</span>
+                                <button id="teamB-timeouts-plus" class="btn btn-sm btn-outline-success" onclick="updateTimeouts('B', 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-
     </div>
-
+    <!-- <div class="set-container">
+        <div class="team-sets-container">
+            <span class="team-label"><?php echo htmlspecialchars($match['teamB_name']); ?> Sets:</span>
+            <span id="teamB-sets"
+                class="sets-display"
+                data-team="B"
+                style="user-select: none; pointer-events: none;"><?php echo $teamB_sets; ?></span>
+        </div>
+    </div> -->
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

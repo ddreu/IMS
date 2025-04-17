@@ -121,18 +121,17 @@ body {
   #ff9800 50%,  
   #8a2be2 75%,  
   #8a2be2 100%   */
-  
-
 }
 
 .highlight {
-  background: linear-gradient(135deg, 
-  #ffcc00 0%,   /* Bright Yellow */
-  #ff9800 25%,  /* Smooth transition to Orange */
-  #ff6a00 40%,  /* Deeper Orange */
-  #8c43cf 60%,  /* Start blending with Violet */
-  #8a2be2 80%,  /* Stronger Violet */
-  #6d23b6 100%  /* Deep Violet */
+  background: linear-gradient(
+    135deg,
+    #ffcc00 0%,
+    /* Bright Yellow */ #ff9800 25%,
+    /* Smooth transition to Orange */ #ff6a00 40%,
+    /* Deeper Orange */ #8c43cf 60%,
+    /* Start blending with Violet */ #8a2be2 80%,
+    /* Stronger Violet */ #6d23b6 100% /* Deep Violet */
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -169,18 +168,16 @@ body {
   color: #fff;
 }
 
-/* INFO CARDS */  
-
-
+/* INFO CARDS */
 
 /* School Section Container */
-.schools-section {
-  display: none; /* Initially hide the overlay */
+/* .schools-section {
+  display: none;
   position: fixed;
-  bottom: -100%; /* Hide initially */
+  bottom: -100%;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.95); /* Dark background for overlay effect */
+  background: rgba(0, 0, 0, 0.95); 
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -189,13 +186,47 @@ body {
   overflow-y: auto;
   transition: bottom 0.5s ease;
   z-index: 999;
+} */
+
+.schools-section {
+  visibility: hidden; /* Hide visually but reserve space */
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  z-index: 999;
+  transition: opacity 0.4s ease;
 }
 
-/* Show class to slide up */
-.schools-section.show {
-  display: flex; /* Show the overlay */
-  bottom: 0; /* Slide up */
+.schools-section {
+  backdrop-filter: blur(20px);
+  background: linear-gradient(
+    145deg,
+    rgba(10, 10, 10, 0.7),
+    /* rgba(30, 0, 60, 0.6) */
+  );
+  box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.schools-section.active {
+  visibility: visible;
+  opacity: 1;
+}
+/* Show class to slide up */
+/* .schools-section.show {
+  display: flex; 
+  bottom: 0; 
+} */
 
 /* Grid Layout for Cards */
 .school-cards-container {
@@ -216,29 +247,30 @@ body {
 
 /* Individual School Card */
 .school-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1rem;
-  text-align: center;
-  transition: transform 0.3s ease, background 0.3s ease;
-  cursor: pointer;
   height: 90vh;
+  background: radial-gradient(
+    circle at top center,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-
-
 .school-card:hover {
-  transform: translateY(-5px);
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.15),
-    rgba(255, 255, 255, 0.3)
-  );
+  transform: scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
 
 /* Card Content */
@@ -246,15 +278,24 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  padding-top: 20vh; /* shifts logo+name down into aligned zone */
+  gap: 1rem;
+  position: relative;
+  z-index: 2;
 }
 
 /* School Logo */
 .school-logo {
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 0.5rem;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   transition: transform 0.3s ease;
 }
 
@@ -264,9 +305,30 @@ body {
 
 /* School Name */
 .school-name {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  min-height: 1.5em;
+  text-align: center;
+}
+
+.school-card:hover::after {
+  content: "";
+  position: absolute;
+  border-radius: 16px;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.05),
+    transparent 70%
+  );
+  z-index: 0;
 }
 
 /* Button Styling */
@@ -287,7 +349,6 @@ body {
   background: #4500b5;
 }
 
-
 .close-btn {
   position: absolute;
   top: 10px;
@@ -306,6 +367,154 @@ body {
 
 .close-btn:hover {
   background-color: #ff1c1c;
+}
+
+.school-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-overlay {
+  position: absolute;
+  top: 50%;
+  right: -800px; /* Hidden off-screen */
+  width: 500px; /* Much bigger now */
+  height: 500px;
+  border-radius: 50%;
+  background-image: var(--logo-url);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.45; /* More visible now */
+  transform: translateY(-50%);
+  transition: right 0.5s ease, opacity 0.4s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.school-card:hover .logo-overlay {
+  right: -300px;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.school-card:focus-within,
+.school-card:hover {
+  outline: 2px solid rgba(255, 255, 255, 0.2);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.08),
+    0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.transition-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+  z-index: 2000;
+  display: none;
+}
+
+.transition-layer.active {
+  display: block;
+}
+
+.transition-layer .layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: translateY(100%);
+}
+
+.layer.translucent {
+  background: rgba(138, 43, 226, 0.3);
+  animation: slideUpTranslucent 0.6s cubic-bezier(0.55, 0.05, 0.675, 0.19)
+    forwards;
+}
+
+.layer.solid {
+  background: #6d23b6;
+  animation: slideUpSolid 0.6s cubic-bezier(0.55, 0.05, 0.675, 0.19) forwards;
+  animation-delay: 0.15s;
+}
+@keyframes slideUpTranslucent {
+  0% {
+    transform: translateY(100%);
+  }
+  30% {
+    transform: translateY(90%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes slideUpSolid {
+  0% {
+    transform: translateY(100%);
+  }
+  30% {
+    transform: translateY(90%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+/* .school-card {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: revealFade 0.6s ease forwards;
+} */
+
+.school-card {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.school-card.fade-in-card {
+  animation: revealFade 0.6s ease forwards;
+}
+
+@keyframes revealFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.school-card.reveal-1 {
+  animation-delay: 0.2s;
+}
+.school-card.reveal-2 {
+  animation-delay: 0.4s;
+}
+.school-card.reveal-3 {
+  animation-delay: 0.6s;
+}
+.school-card.reveal-4 {
+  animation-delay: 0.8s;
+}
+.school-card.reveal-5 {
+  animation-delay: 1s;
+}
+/* Add more reveal-X as needed */
+
+/* Fade-in for school section */
+.schools-section.fade-in {
+  animation: fadeInSchools 1s ease-in-out;
+}
+
+@keyframes fadeInSchools {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive */

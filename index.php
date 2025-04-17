@@ -39,6 +39,12 @@ $conn->close();
         <?php endif; ?>
     </header>
 
+    <div class="transition-layer" id="transition-layer">
+        <div class="layer translucent"></div>
+        <div class="layer solid"></div>
+    </div>
+
+
     <section class="hero-section">
         <video autoplay muted loop playsinline id="hero-video">
             <source src="assets/vid/hero-vid.mp4" type="video/mp4">
@@ -61,12 +67,17 @@ $conn->close();
                 while ($row = $result->fetch_assoc()) {
                     $logoPath = !empty($row['logo']) ? "uploads/logos/" . $row['logo'] : "assets/default-logo.png";
                     echo "
-                <a href='home.php?school_id=" . htmlspecialchars($row['school_id']) . "' class='school-card'>
-                    <div class='card-content'>
-                        <img src='" . htmlspecialchars($logoPath) . "' alt='" . htmlspecialchars($row['school_name']) . " Logo' class='school-logo'>
-                        <h3 class='school-name'>" . htmlspecialchars($row['school_name']) . "</h3>
-                    </div>
-                </a>";
+                <a href='home.php?school_id=" . htmlspecialchars($row['school_id']) . "' 
+   class='school-card' 
+   style=\"--logo-url: url('" . htmlspecialchars($logoPath) . "');\">
+    <div class='logo-overlay'></div>
+    <div class='card-content'>
+        <img src='" . htmlspecialchars($logoPath) . "' alt='" . htmlspecialchars($row['school_name']) . " Logo' class='school-logo'>
+        <h3 class='school-name'>" . htmlspecialchars($row['school_name']) . "</h3>
+
+    </div>
+</a>
+";
                 }
             } else {
                 echo "<p class='no-schools'>No schools available at the moment. Please check back later.</p>";
@@ -76,6 +87,28 @@ $conn->close();
     </section>
 
     <script>
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     const openBtn = document.getElementById('open-schools-btn');
+        //     const closeBtn = document.getElementById('close-btn');
+        //     const schoolsSection = document.getElementById('schools-section');
+
+        //     // Open schools section
+        //     openBtn.addEventListener('click', () => {
+        //         schoolsSection.style.display = 'flex'; 
+        //         setTimeout(() => {
+        //             schoolsSection.classList.add('show'); 
+        //         }, 10); 
+        //     });
+
+        //     // Close schools section
+        //     closeBtn.addEventListener('click', () => {
+        //         schoolsSection.classList.remove('show'); 
+        //         setTimeout(() => {
+        //             schoolsSection.style.display = 'none'; 
+        //         }, 500); 
+        //     });
+        // });
+
         document.addEventListener('DOMContentLoaded', () => {
             const openBtn = document.getElementById('open-schools-btn');
             const closeBtn = document.getElementById('close-btn');
@@ -83,20 +116,45 @@ $conn->close();
 
             // Open schools section
             openBtn.addEventListener('click', () => {
-                schoolsSection.style.display = 'flex'; // Set display to flex when showing
+                const transitionLayer = document.getElementById('transition-layer');
+                const cards = document.querySelectorAll('.school-card');
+
+                // Immediately show section (behind transition)
+                schoolsSection.classList.add('active');
+
+                // Start the slide-up transition
+                transitionLayer.classList.add('active');
+
+                // After the slide-up, remove the transition layer
                 setTimeout(() => {
-                    schoolsSection.classList.add('show'); // Add show class after display is set
-                }, 10); // Small timeout to allow display to take effect
+                    transitionLayer.classList.remove('active');
+
+                    // Fade in school cards with delay
+                    cards.forEach((card, index) => {
+                        card.style.animationDelay = `${0.15 * index}s`;
+                        card.classList.add('fade-in-card');
+                    });
+                }, 700); // Matches slide duration
             });
+
+
 
             // Close schools section
             closeBtn.addEventListener('click', () => {
-                schoolsSection.classList.remove('show'); // Remove show class
-                setTimeout(() => {
-                    schoolsSection.style.display = 'none'; // Set display to none after transition
-                }, 500); // Match this timeout with the CSS transition duration
+                schoolsSection.classList.remove('active');
+
+                // Reset each card
+                document.querySelectorAll('.school-card').forEach(card => {
+                    card.classList.remove('fade-in-card');
+                    card.style.animationDelay = '';
+                });
             });
+
         });
+
+
+
+
 
         // document.addEventListener('DOMContentLoaded', () => {
         //     const openBtn = document.getElementById('open-schools-btn');
