@@ -4,6 +4,210 @@
         opacity: 0.85;
         transition: opacity 0.2s ease-in-out;
     }
+
+    /* loader */
+
+    .loader-container {
+        position: fixed;
+        inset: 0;
+        z-index: 999999 !important;
+        pointer-events: none;
+    }
+
+    .loader-in-transition {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        overflow: hidden;
+        z-index: 999999 !important;
+        pointer-events: auto;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.2s ease-in;
+    }
+
+    .loader-in-transition.show {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .loader-in-transition::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300vmax;
+        height: 300vmax;
+        background: #111;
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        z-index: 999998 !important;
+        opacity: 1;
+    }
+
+    .loader-in-transition.show::after {
+        animation: expandCircleInward 1s ease-in-out forwards;
+    }
+
+    @keyframes expandCircleInward {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+        }
+
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+    }
+
+    .basketball-svg {
+        width: 200px;
+        height: 200px;
+        z-index: 999999 !important;
+        /* make sure it stays above the shrinking black circle */
+    }
+
+    .seam {
+        fill: none;
+        stroke: orange;
+        stroke-width: 2.5;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: seamFill 1.8s ease-in-out forwards infinite;
+    }
+
+    @keyframes seamFill {
+        0% {
+            stroke-dashoffset: 100;
+        }
+
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    .basketball-svg {
+        width: 200px;
+        height: 200px;
+        animation: fillBasketball 2s ease-in-out forwards;
+        stroke: orange;
+        fill: transparent;
+        stroke-width: 3px;
+        z-index: 999999 !important;
+
+    }
+
+    @keyframes fillBasketball {
+        0% {
+            stroke-dasharray: 0, 100;
+            fill: transparent;
+        }
+
+        50% {
+            stroke-dasharray: 100, 0;
+            fill: transparent;
+        }
+
+        100% {
+            stroke-dasharray: 100, 0;
+            fill: orange;
+        }
+    }
+
+    .basketball-line {
+        stroke-linecap: round;
+        fill: none;
+        stroke: orange;
+        /* stroke-width: 2.5; */
+        stroke-width: 4;
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+    }
+
+    .basketball-line.animate {
+        animation: drawBasketball 3s cubic-bezier(0.7, 0.4, 0.1, 1) forwards;
+    }
+
+    @keyframes drawBasketball {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    .loader-container {
+        pointer-events: auto;
+        /* allow blocking interaction */
+    }
+
+    .loader-container * {
+        pointer-events: none;
+        /* prevent inner SVG or content from being clickable */
+    }
+
+    .logout-text {
+        position: relative;
+        margin-top: 1rem;
+        /* Adjust spacing as needed */
+        font-size: 1.25rem;
+        color: white;
+        font-weight: 500;
+        z-index: 999999 !important;
+        font-family: 'Poppins', sans-serif;
+        text-align: center;
+        animation: fadeInText 0.5s ease-in-out forwards;
+    }
+
+
+    @keyframes fadeInText {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .dots::after {
+        content: '';
+        display: inline-block;
+        animation: dotsAnimation 1.5s infinite steps(3);
+        width: 1em;
+        overflow: hidden;
+        vertical-align: bottom;
+    }
+
+    @keyframes dotsAnimation {
+        0% {
+            content: '';
+        }
+
+        33% {
+            content: '.';
+        }
+
+        66% {
+            content: '..';
+        }
+
+        100% {
+            content: '...';
+        }
+    }
+
+    .loader-content {
+        z-index: 999999 !important;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 </style>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=home" />
@@ -265,6 +469,38 @@
 
 
 </nav>
+
+<div id="loader" class="loader-container loader-in-transition">
+    <div class="loader-content">
+        <svg class="basketball-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 400 400" fill="none">
+            <path class="basketball-line"
+                d="M386.546,128.301c-19.183-49.906-56.579-89.324-105.302-110.99C255.513,5.868,228.272,0.065,200.28,0.065 
+      c-79.087,0-150.907,46.592-182.972,118.693c-21.668,48.723-23.036,103.041-3.854,152.944 
+      c19.181,49.905,56.578,89.324,105.299,110.992c25.726,11.438,52.958,17.238,80.949,17.24c0.008,0,0.008,0,0.016,0 
+      c64.187,0,124.602-30.795,162.104-82.505l3.967-5.719c6.559-9.743,12.238-19.979,16.9-30.469 
+      C404.359,232.521,405.728,178.206,386.546,128.301z M306.656,67.229c29.342,23.576,50.05,56.346,58.89,93.178 
+      c-26.182,14.254-115.898,58.574-227.678,63.936c-0.22-6.556-0.188-13.204,0.095-19.894c3.054,0.258,6.046,0.392,8.957,0.392 
+      c48.011,0,72.144-34.739,95.479-68.341C258.911,112.729,277.523,85.931,306.656,67.229z M200.322,29.683 
+      c23.826,0,47.004,4.939,68.891,14.682c3.611,1.607,7.234,3.381,10.836,5.309c-27.852,20.82-45.873,46.773-61.961,69.941 
+      c-22.418,32.272-38.612,55.592-71.058,55.592c-2.009,0-4.09-0.088-6.231-0.264c10.624-71.404,45.938-128.484,57.204-145.242 
+      C198.778,29.688,199.552,29.683,200.322,29.683z M83.571,75.701c21.39-19.967,48.144-34.277,76.704-41.215 
+      c-16.465,28.652-38.163,74.389-47.548,128.982C90.537,147.617,65.38,118.793,83.571,75.701z M44.354,130.786 
+      c1.519-3.414,3.15-6.779,4.895-10.094c0.915,4.799,2.234,9.52,3.96,14.139c12.088,32.377,40.379,52.406,55.591,61.219 
+      c-0.654,9.672-0.84,19.303-0.548,28.762c-26.46-0.441-52.557-3.223-77.752-8.283C27.604,187.29,32.359,157.756,44.354,130.786z 
+      M69.818,288.907c-2.943,3.579-5.339,7.495-7.178,11.717c-11.635-15.948-20.479-33.894-26.052-52.862 
+      c24.227,4.182,49.111,6.424,74.187,6.678c0.554,3.955,1.199,7.906,1.931,11.828C99.568,268.702,81.578,274.605,69.818,288.907z 
+      M130.784,355.646c-15.528-6.904-29.876-16.063-42.687-27.244c-1.059-8.738,0.472-15.68,4.558-20.658 
+      c6.582-8.028,18.771-11.321,27.153-12.666c7.324,23.808,18.148,46.728,32.287,68.381 
+      C144.818,361.331,137.693,358.722,130.784,355.646z M193.648,370.185c-19.319-23.783-33.777-49.438-43.082-76.426 
+      c22.608,1.221,42.078,8.045,62.571,15.227c25.484,8.926,51.84,18.158,85.997,18.158c4.938,0,9.874-0.189,14.856-0.574 
+      C281.376,355.896,238.354,371.788,193.648,370.185z M355.648,269.22c-3.43,7.703-7.519,15.278-12.173,22.555 
+      c-15.463,3.785-29.923,5.625-44.119,5.625c-29.753,0-53.479-8.311-76.427-16.35c-23.997-8.41-48.813-17.107-79.65-17.107 
+      c-0.267,0-0.534,0-0.802,0.002c-0.686-3.381-1.293-6.764-1.823-10.137c49.176-2.496,99.361-12.211,149.312-28.91 
+      c35.29-11.799,62.965-24.643,80.103-33.42C371.438,218.101,366.516,244.771,355.648,269.22z" />
+        </svg>
+        <div class="logout-text" id="logoutText">Logging you out <span class="dots"></span></div>
+    </div>
+</div>
 <script>
     // // Handle button visibility based on role
     // document.addEventListener("DOMContentLoaded", function() {
@@ -386,8 +622,8 @@
 
     // Logout functionality
     document.getElementById('logoutBtn').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default anchor action
-        // Show SweetAlert2 confirmation dialog
+        event.preventDefault();
+
         Swal.fire({
             title: "Are you sure?",
             text: "You will be logged out of your account.",
@@ -398,16 +634,40 @@
             confirmButtonText: 'Yes, logout!'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Show success message
-                Swal.fire({
-                    icon: "success",
-                    title: "Successfully logged out!",
-                    showConfirmButton: false,
-                    timer: 1000
-                }).then(() => {
-                    // After 1 second, redirect to logout.php
-                    window.location.href = '../logout.php';
-                });
+                // Show the loader
+                const loader = document.getElementById('loader');
+                loader.classList.add('show');
+                const line = loader.querySelector('.basketball-line');
+                if (line) {
+                    line.classList.add('animate');
+                }
+
+                // Send AJAX request to logout
+                fetch('../logout.php', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 1500);
+                    })
+                    .catch(error => {
+                        loader.classList.remove('show');
+                        console.error('Logout error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Logout failed!',
+                            text: 'Please try again.',
+                            toast: true,
+                            timer: 2500,
+                            position: 'top-end',
+                            showConfirmButton: false
+                        });
+                    });
             }
         });
     });
