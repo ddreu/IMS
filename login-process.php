@@ -61,12 +61,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             switch ($row['role']) {
                 case 'superadmin':
+                    $_SESSION['success_message'] = "Welcome Super Admin!";
+                    $_SESSION['success_type'] = "superadmin";
                     $redirect = 'super_admin/sa_dashboard.php';
                     break;
                 case 'School Admin':
+                    $_SESSION['success_message'] = "Welcome School Admin!";
+                    $_SESSION['success_type'] = "School Admin";
                     $redirect = 'school_admin/schooladmindashboard.php';
                     break;
                 case 'Department Admin':
+                    $_SESSION['success_message'] = "Welcome Department Admin!";
+                    $_SESSION['success_type'] = "Department Admin";
                     $redirect = 'department_admin/departmentadmindashboard.php';
                     break;
                 case 'Committee':
@@ -85,10 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     if (mysqli_num_rows($gameResult) > 1) {
                         $_SESSION['success_message'] = "Please select your game.";
+                        $_SESSION['success_type'] = "login";
                         $redirect = 'select_dashboard.php';
                     } elseif ($rowGame = mysqli_fetch_assoc($gameResult)) {
                         $_SESSION['game_id'] = $rowGame['game_id'];
                         $_SESSION['game_name'] = $rowGame['game_name'];
+                        $_SESSION['success_message'] = "Welcome to Committee Dashboard!";
+                        $_SESSION['success_type'] = "login";
                         $redirect = 'committee/committeedashboard.php';
                     } else {
                         $_SESSION['error_message'] = "No game assigned.";
@@ -96,9 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
                 default:
+                    $_SESSION['success_message'] = "Welcome to User Dashboard!";
+                    $_SESSION['success_type'] = "login";
                     $redirect = 'userdashboard.php';
                     break;
             }
+
 
             echo json_encode(['success' => true, 'redirect' => $redirect]);
             exit;
