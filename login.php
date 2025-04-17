@@ -438,6 +438,10 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
                     sendBtn.textContent = 'Send';
                 });
         });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loginFormContainer.classList.add('animate-on-load');
+        });
     </script>
 </body>
 

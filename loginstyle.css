@@ -203,6 +203,23 @@ body {
   display: none;
 } */
 
+/* animation for login */
+
+@keyframes fadeSlideInStrong {
+  from {
+    opacity: 0;
+    transform: translateY(40px); /* Was 20px */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-on-load {
+  animation: fadeSlideInStrong 0.7s ease-out forwards; /* Was 0.4s */
+}
+
 /* forgot password and the animation */
 
 .fade-slide-in {
