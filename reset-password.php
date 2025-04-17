@@ -10,7 +10,7 @@ session_start();
 
 date_default_timezone_set('Asia/Manila'); // Set timezone to Philippine Standard Time
 
-include_once 'connection/conn.php'; 
+include_once 'connection/conn.php';
 $conn = con();
 
 $message = '';
@@ -82,6 +82,7 @@ if (isset($_SESSION['message'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -91,14 +92,17 @@ if (isset($_SESSION['message'])) {
         .success {
             color: green;
         }
+
         .error {
             color: red;
         }
+
         .login-link {
             margin-top: 20px;
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -122,12 +126,11 @@ if (isset($_SESSION['message'])) {
             </form>
         <?php endif; ?>
 
-        <?php if ($message_class === 'success'): ?>
-            <div class="login-link">
-                <a href="intrasports.net/login.php">Go to Login Page</a>
-            </div>
-        <?php endif; ?>
+        <div class="login-link">
+            <a href="login.php">Go to Login Page</a>
+        </div>
     </div>
 
 </body>
+
 </html>

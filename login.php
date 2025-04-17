@@ -170,27 +170,46 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
         <div class="login-left"></div>
         <div class="login-right">
             <a href="home.php<?php echo $urlParams ? '?' . htmlspecialchars($urlParams) : ''; ?>" class="back-button">Back to Homepage</a>
-            <h1>Hello, welcome!</h1>
-            <form id="loginForm" method="POST">
-                <label class="email-label" for="email">Email:</label>
-                <input type="email" name="email" placeholder="Email address" required>
+            <!-- Login Form -->
+            <div id="loginFormContainer">
+                <h1>Hello, welcome!</h1>
+                <form id="loginForm" method="POST">
+                    <label class="email-label" for="email">Email:</label>
+                    <input type="email" name="email" placeholder="Email address" required>
 
-                <label class="password-label" for="password">Password:</label>
-                <div class="password-field-container">
-                    <input type="password" id="passwordField" name="password" placeholder="Password" required>
-                    <button type="button" id="togglePassword">
-                        <i class="fa fa-eye"></i>
-                    </button>
+                    <label class="password-label" for="password">Password:</label>
+                    <div class="password-field-container">
+                        <input type="password" id="passwordField" name="password" placeholder="Password" required>
+                        <button type="button" id="togglePassword">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <div id="loginError" class="login-error"></div>
+                    <button class="login-btn" type="submit">Login</button>
+                </form>
+
+                <div class="extra-options">
+                    <a href="#" id="showForgotPassword">Forgot password?</a>
+                    <span>|</span>
+                    <a href="qr-login.php">Log in using QR</a>
                 </div>
-                <div id="loginError" class="login-error"></div>
-
-                <button class="login-btn" type="submit">Login</button>
-            </form>
-
-            <div class="extra-options">
-                <!-- <p>Don't have an account? <a href="register.php" style="color: #007bff;">Sign up</a></p>-->
-                <a href="forgot-password.php">Forgot password?</a>
             </div>
+
+            <!-- Forgot Password Form -->
+            <div id="forgotPasswordFormContainer" style="display: none;">
+                <h1>Forgot Password</h1>
+                <p>Enter your email to reset your password</p>
+                <form id="forgotPasswordForm" method="post">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" placeholder="Enter your email" required>
+                    <button type="submit" class="login-btn">Send</button>
+                </form>
+                <div class="extra-options">
+                    <a href="#" id="backToLogin">Back to Login</a>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -329,6 +348,95 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
         passwordInput.addEventListener('input', () => {
             passwordInput.classList.remove('input-error');
             errorDiv.style.display = 'none';
+        });
+
+        // log in - forgot password
+
+        const loginFormContainer = document.getElementById('loginFormContainer');
+        const forgotPasswordFormContainer = document.getElementById('forgotPasswordFormContainer');
+        const showForgotPassword = document.getElementById('showForgotPassword');
+        const backToLogin = document.getElementById('backToLogin');
+
+        // Show forgot password form
+        showForgotPassword.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginFormContainer.classList.add('fade-slide-out');
+
+            setTimeout(() => {
+                loginFormContainer.style.display = 'none';
+                loginFormContainer.classList.remove('fade-slide-out');
+
+                forgotPasswordFormContainer.style.display = 'block';
+                forgotPasswordFormContainer.classList.add('fade-slide-in');
+            }, 300);
+        });
+
+        // Back to login form
+        backToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            forgotPasswordFormContainer.classList.add('fade-slide-out');
+
+            setTimeout(() => {
+                forgotPasswordFormContainer.style.display = 'none';
+                forgotPasswordFormContainer.classList.remove('fade-slide-out');
+
+                loginFormContainer.style.display = 'block';
+                loginFormContainer.classList.add('fade-slide-in');
+            }, 300);
+        });
+
+        document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const email = form.email.value.trim();
+            const sendBtn = form.querySelector('button');
+
+            if (!email) return;
+
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+
+            fetch('send-password-reset.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        email
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: data.status,
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 2500,
+                        timerProgressBar: true
+                    });
+
+                    if (data.status === 'success') {
+                        form.reset();
+                    }
+                })
+                .catch(() => {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'error',
+                        title: 'Something went wrong. Please try again.',
+                        showConfirmButton: false,
+                        timer: 2500,
+                        timerProgressBar: true
+                    });
+                })
+                .finally(() => {
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'Send';
+                });
         });
     </script>
 </body>

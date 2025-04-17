@@ -372,10 +372,13 @@ $conn->close();
                                     <label for="confirm_new_password" class="form-label">Confirm New Password:</label>
                                     <div class="input-group">
                                         <input type="password" name="confirm_new_password" class="form-control" id="confirmNewPassword" required>
+
                                         <span class="input-group-text">
                                             <i class="fas fa-eye" id="toggleConfirmNewPassword" onclick="togglePasswordVisibility('confirmNewPassword', 'toggleConfirmNewPassword')"></i>
                                         </span>
                                     </div>
+                                    <small id="passwordMatchMessage" class="text-danger mt-1"></small>
+
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -411,7 +414,11 @@ $conn->close();
                                     confirmButtonText: 'Okay'
                                 }).then(() => {
                                     // Close the modal
-                                    $('#changePasswordModal').modal('hide');
+                                    const modalElement = document.getElementById('changePasswordModal');
+                                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                                    modalInstance.hide();
+                                    resetPasswordFormVisuals();
+
                                     // Reset the form fields
                                     this.reset(); // Clear the form fields
                                 });
@@ -503,6 +510,51 @@ $conn->close();
                         };
                         reader.readAsDataURL(input.files[0]);
                     }
+                }
+
+                const newPassword = document.getElementById('newPassword');
+                const confirmNewPassword = document.getElementById('confirmNewPassword');
+                const matchMessage = document.getElementById('passwordMatchMessage');
+
+                function checkPasswordMatch() {
+                    const newVal = newPassword.value;
+                    const confirmVal = confirmNewPassword.value;
+
+                    if (confirmVal === "") {
+                        matchMessage.textContent = "";
+                        confirmNewPassword.classList.remove("is-valid", "is-invalid");
+                        return;
+                    }
+
+                    if (newVal === confirmVal) {
+                        confirmNewPassword.classList.remove("is-invalid");
+                        confirmNewPassword.classList.add("is-valid");
+                        newPassword.classList.remove("is-invalid");
+                        newPassword.classList.add("is-valid");
+                        matchMessage.textContent = "Passwords match.";
+                        matchMessage.classList.remove("text-danger");
+                        matchMessage.classList.add("text-success");
+                    } else {
+                        confirmNewPassword.classList.remove("is-valid");
+                        confirmNewPassword.classList.add("is-invalid");
+                        newPassword.classList.remove("is-valid");
+                        newPassword.classList.add("is-invalid");
+                        matchMessage.textContent = "Passwords do not match.";
+                        matchMessage.classList.remove("text-success");
+                        matchMessage.classList.add("text-danger");
+                    }
+                }
+
+                newPassword.addEventListener('input', checkPasswordMatch);
+                confirmNewPassword.addEventListener('input', checkPasswordMatch);
+
+                function resetPasswordFormVisuals() {
+                    document.getElementById('changePasswordForm').reset();
+                    [newPassword, confirmNewPassword].forEach(input => {
+                        input.classList.remove("is-valid", "is-invalid");
+                    });
+                    matchMessage.textContent = "";
+                    matchMessage.classList.remove("text-success", "text-danger");
                 }
             </script>
 </body>
