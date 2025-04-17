@@ -1,10 +1,10 @@
 <?php
 // session_start();
-// include_once 'connection/conn.php';
+include_once 'connection/conn.php';
 // include_once 'user_logs/logger.php';
 // $conn = con();
 
-// $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
+$urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
 
 // $error = []; // Initialize the error array
 

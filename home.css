@@ -243,8 +243,10 @@ header {
 }
 
 .hero-logo img {
-  width: 370px;
-  height: 370px;
+  /* width: 370px;
+  height: 370px; */
+  width: 25vw;
+  height: 25vw;
   margin-top: -15px;
   border-radius: 50%;
   object-fit: cover;
@@ -278,6 +280,33 @@ header {
   letter-spacing: 0.5px;
   margin-bottom: 0;
   text-align: justify;
+}
+
+@media (max-width: 768px) {
+  .hero-overlay {
+    flex-direction: column-reverse;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .hero-content {
+    max-width: 90%;
+    padding-left: 0;
+    padding-top: 20px;
+  }
+
+  .hero-logo {
+    padding-right: 0;
+    margin-bottom: 0;
+    margin-top: 20px;
+  }
+
+  .hero-logo img {
+    width: 40vw;
+    height: 40vw;
+  }
 }
 
 /* livematches  */
