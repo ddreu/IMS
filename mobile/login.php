@@ -170,7 +170,7 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
     <div class="login-container">
         <div class="login-left"></div>
         <div class="login-right">
-            <a href="home.php<?php echo $urlParams ? '?' . htmlspecialchars($urlParams) : ''; ?>" class="back-button">Back to Homepage</a>
+            <a href="index.php" class="back-button">Back to Homepage</a>
             <!-- Login Form -->
             <div id="loginFormContainer">
                 <h1>Hello, welcome!</h1>
