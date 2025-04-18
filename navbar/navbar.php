@@ -388,6 +388,16 @@
             </ul>
         </div>
 
+        <!-- scan qr -->
+
+        <!-- QR Scan Button -->
+        <!-- QR Scan Icon (like Inbox/Notifications) -->
+        <div class="dropdown me-3 position-relative">
+            <a href="#" class="text-secondary position-relative" id="openQRScanner" title="Scan QR" style="text-decoration: none;">
+                <i class="fas fa-qrcode fa-lg"></i>
+            </a>
+        </div>
+
 
 
 
@@ -501,6 +511,47 @@
         <div class="logout-text" id="logoutText">Logging you out <span class="dots"></span></div>
     </div>
 </div>
+
+<!-- scanner modal -->
+
+<!-- Hidden fullscreen overlay -->
+<!-- Fullscreen QR Scanner Overlay -->
+<div id="qrFullScreenScanner" style="display: none; position: fixed; inset: 0; background: #000; z-index: 9999;">
+    <div id="html5qr-code" style="width: 100%; height: 100%; position: relative;"></div>
+    <!-- Success/Error Message UI -->
+    <div id="qrStatusMessage" style="
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.5rem;
+    display: none;
+    z-index: 10001;
+    text-align: center;">
+    </div>
+
+    <div style="position: absolute; top: 50%; left: 50%; width: 250px; height: 250px; border: 2px solid #fff; transform: translate(-50%, -50%); z-index: 9999;"></div>
+    <button id="closeQRScanner" style="position: absolute; top: 15px; right: 15px; z-index: 10000; background: rgba(0,0,0,0.7); color: white; border: none; padding: 10px 15px; border-radius: 5px;">Close</button>
+</div>
+
+
+
+<!-- QR Scanner Modal -->
+<!-- <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrScannerModalLabel">Scan QR Code</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <video id="qrVideo" width="100%" height="auto" autoplay></video>
+            </div>
+        </div>
+    </div>
+</div> -->
+
 <script>
     // // Handle button visibility based on role
     // document.addEventListener("DOMContentLoaded", function() {
@@ -617,6 +668,103 @@
                 togglerButton.setAttribute('aria-expanded', isExpanded);
             });
         }
+
+
+        // scan fucntion
+
+        // Fullscreen-style QR scanner
+        const openQRScanner = document.getElementById('openQRScanner');
+        const scannerOverlay = document.getElementById('qrFullScreenScanner');
+        const closeScannerBtn = document.getElementById('closeQRScanner');
+        let html5Qr;
+
+        openQRScanner.addEventListener('click', function(e) {
+            e.preventDefault();
+            scannerOverlay.style.display = 'block';
+
+            html5Qr = new Html5Qrcode("html5qr-code");
+
+            Html5Qrcode.getCameras().then(cameras => {
+                if (cameras && cameras.length) {
+                    html5Qr.start({
+                            facingMode: "environment"
+                        }, {
+                            fps: 10,
+                            qrbox: {
+                                width: 250,
+                                height: 250
+                            }
+                        },
+                        (qrCodeMessage) => {
+                            html5Qr.stop().then(() => {
+                                html5Qr.clear();
+
+                                // UI update starts
+                                const statusBox = document.getElementById('qrStatusMessage');
+                                statusBox.style.display = 'block';
+                                statusBox.innerHTML = `<div style="font-size: 3rem;">✅</div><div>QR Scanned Successfully</div>`;
+
+                                // Make scanner frame dim
+                                document.getElementById('html5qr-code').style.opacity = '0.2';
+
+                                // Send scanned token
+                                fetch(`../qr-code/use-qr-token.php`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            token: qrCodeMessage
+                                        })
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            statusBox.innerHTML = `<div style="font-size: 3rem;">✅</div><div>User has been logged in!</div>`;
+                                            setTimeout(() => {
+                                                scannerOverlay.style.display = 'none';
+                                                statusBox.style.display = 'none';
+                                                document.getElementById('html5qr-code').style.opacity = '1';
+                                            }, 2500);
+                                        } else {
+                                            statusBox.innerHTML = `<div style="font-size: 3rem;">❌</div><div>${data.message || 'Invalid or expired QR'}</div>`;
+                                            setTimeout(() => {
+                                                statusBox.style.display = 'none';
+                                                scannerOverlay.style.display = 'none';
+                                                document.getElementById('html5qr-code').style.opacity = '1';
+                                            }, 2500);
+                                        }
+                                    });
+                            });
+                        },
+
+                        (err) => {
+                            const statusBox = document.getElementById('qrStatusMessage');
+                            statusBox.style.display = 'block';
+                            statusBox.innerHTML = `<div style="font-size: 3rem;">⚠️</div><div>Scanning failed. Try again.</div>`;
+                        }
+
+                    );
+                }
+            }).catch(err => {
+                console.error("Camera error: ", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Camera not available',
+                    text: 'Please allow camera access or use a supported device.'
+                });
+            });
+        });
+
+        closeScannerBtn.addEventListener('click', () => {
+            if (html5Qr) {
+                html5Qr.stop().then(() => {
+                    html5Qr.clear();
+                    scannerOverlay.style.display = 'none';
+                });
+            }
+        });
+
     });
 
 
@@ -696,3 +844,4 @@
         });
     }
 </script>
+<script src="https://unpkg.com/html5-qrcode"></script>

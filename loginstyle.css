@@ -17,7 +17,9 @@ body {
   display: flex;
   width: 80%;
   max-width: 1200px;
-  height: 500px;
+  height: 550px;
+  /* height: 75vh; */
+  /* min-height: 600px; */
   background: #ffffff;
   border-radius: 15px;
   overflow: hidden;
@@ -40,7 +42,9 @@ body {
 
 .login-right {
   flex: 1;
-  padding: 35px 40px;
+  padding: 50px 40px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .login-right h1 {
@@ -139,8 +143,8 @@ body {
 }
 
 .password-field-container input[type="password"] {
-  flex: 1; /* Allow input to take up available space */
-  padding: 15px 50px 15px 15px; /* Padding adjusted for space */
+  flex: 1;
+  padding: 15px 15px 15px 15px; /* Padding adjusted for space */
   border: 2px solid #ddd; /* Same as other inputs */
   border-radius: 10px; /* Match other input styles */
   font-size: 16px; /* Consistent font size */

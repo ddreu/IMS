@@ -210,6 +210,16 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
                 </div>
             </div>
 
+            <div id="qrLoginFormContainer" style="display: none;">
+                <h1>Scan to Login</h1>
+                <p>Scan this QR code</p>
+                <div id="qrCodeDisplay" style="margin: 20px auto; width: 200px; height: 200px;"></div>
+                <div class="extra-options">
+                    <a href="#" id="backToLoginFromQR">Back to Login</a>
+                </div>
+            </div>
+
+
         </div>
 
     </div>
@@ -439,10 +449,44 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
                 });
         });
 
+        const qrLoginFormContainer = document.getElementById('qrLoginFormContainer');
+        const showQRLogin = document.querySelector('a[href="qr-login.php"]'); // Update if button ID changes
+        const backToLoginFromQR = document.getElementById('backToLoginFromQR');
+
+        showQRLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginFormContainer.classList.add('fade-slide-out');
+            setTimeout(() => {
+                loginFormContainer.style.display = 'none';
+                loginFormContainer.classList.remove('fade-slide-out');
+
+                qrLoginFormContainer.style.display = 'block';
+                qrLoginFormContainer.classList.add('fade-slide-in');
+
+                generateQRCode();
+            }, 300);
+        });
+
+        backToLoginFromQR.addEventListener('click', (e) => {
+            e.preventDefault();
+            qrLoginFormContainer.classList.add('fade-slide-out');
+            setTimeout(() => {
+                qrLoginFormContainer.style.display = 'none';
+                qrLoginFormContainer.classList.remove('fade-slide-out');
+
+                loginFormContainer.style.display = 'block';
+                loginFormContainer.classList.add('fade-slide-in');
+            }, 300);
+        });
+
+
         window.addEventListener('DOMContentLoaded', () => {
             loginFormContainer.classList.add('animate-on-load');
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="login.js"></script>
+
 </body>
 
 </html>
