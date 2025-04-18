@@ -718,23 +718,39 @@
                                         })
                                     })
                                     .then(res => res.json())
+                                    // .then(data => {
+                                    //     if (data.success) {
+                                    //         statusBox.innerHTML = `<div style="font-size: 3rem;">✅</div><div>User has been logged in!</div>`;
+                                    //         setTimeout(() => {
+                                    //             scannerOverlay.style.display = 'none';
+                                    //             statusBox.style.display = 'none';
+                                    //             document.getElementById('html5qr-code').style.opacity = '1';
+                                    //         }, 2500);
+                                    //     } else {
+                                    //         statusBox.innerHTML = `<div style="font-size: 3rem;">❌</div><div>${data.message || 'Invalid or expired QR'}</div>`;
+                                    //         setTimeout(() => {
+                                    //             statusBox.style.display = 'none';
+                                    //             scannerOverlay.style.display = 'none';
+                                    //             document.getElementById('html5qr-code').style.opacity = '1';
+                                    //         }, 2500);
+                                    //     }
+                                    // });
+
                                     .then(data => {
-                                        if (data.success) {
-                                            statusBox.innerHTML = `<div style="font-size: 3rem;">✅</div><div>User has been logged in!</div>`;
-                                            setTimeout(() => {
-                                                scannerOverlay.style.display = 'none';
-                                                statusBox.style.display = 'none';
-                                                document.getElementById('html5qr-code').style.opacity = '1';
-                                            }, 2500);
-                                        } else {
-                                            statusBox.innerHTML = `<div style="font-size: 3rem;">❌</div><div>${data.message || 'Invalid or expired QR'}</div>`;
-                                            setTimeout(() => {
-                                                statusBox.style.display = 'none';
-                                                scannerOverlay.style.display = 'none';
-                                                document.getElementById('html5qr-code').style.opacity = '1';
-                                            }, 2500);
-                                        }
+                                        const icon = data.success ? '✅' : '❌';
+                                        const message = data.success ?
+                                            'User has been logged in!' :
+                                            (data.message || 'Invalid, used, or expired QR code.');
+
+                                        statusBox.innerHTML = `<div style="font-size: 3rem;">${icon}</div><div>${message}</div>`;
+
+                                        setTimeout(() => {
+                                            statusBox.style.display = 'none';
+                                            scannerOverlay.style.display = 'none';
+                                            document.getElementById('html5qr-code').style.opacity = '1';
+                                        }, 2500);
                                     });
+
                             });
                         },
 
