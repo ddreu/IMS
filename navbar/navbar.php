@@ -5,32 +5,34 @@
         transition: opacity 0.2s ease-in-out;
     }
 
-    /* Fix Bootstrap collapse sidebar issues */
-    #sidebar.collapse {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 250px;
-        /* adjust to your layout */
-        height: 100vh;
-        z-index: 1040;
-        overflow-y: auto;
-        background-color: #fff;
-        /* or whatever matches your sidebar */
-        transition: transform 0.3s ease-in-out;
+    @media (max-width: 991.98px) {
+
+        /* Fix Bootstrap collapse sidebar issues on mobile only */
+        #sidebar.collapse {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            z-index: 1040;
+            overflow-y: auto;
+            background-color: #fff;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #sidebar.collapse:not(.show) {
+            transform: translateX(-100%);
+        }
+
+        #sidebar.collapse.show {
+            transform: translateX(0);
+        }
+
+        #sidebar {
+            margin-top: 0 !important;
+        }
     }
 
-    #sidebar.collapse:not(.show) {
-        transform: translateX(-100%);
-    }
-
-    #sidebar.collapse.show {
-        transform: translateX(0);
-    }
-
-    #sidebar {
-        margin-top: 0 !important;
-    }
 
     /* loader */
 
