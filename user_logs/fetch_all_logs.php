@@ -26,6 +26,39 @@ if (!in_array($sort_column, $allowed_columns)) {
 // Validate sort order
 $sort_order = strtoupper($sort_order) === 'ASC' ? 'ASC' : 'DESC';
 
+// $query = "
+//     SELECT 
+//         logs.log_id,
+//         logs.previous_data,
+//         logs.new_data,
+//         logs.timestamp AS log_time,
+//         logs.table_name AS table_name,
+//         logs.operation AS log_action,
+//         logs.record_id AS log_record_id,
+//         logs.description AS log_description,
+//         CONCAT(users.firstname, ' ', users.middleinitial, ' ', users.lastname) AS full_name,
+//         users.age,
+//         users.gender,
+//         users.email,
+//         users.role,
+//         departments.department_name AS department_name,
+//         games.game_name AS game_name,
+//         schools.school_name AS school_name
+//     FROM 
+//         logs
+//     JOIN 
+//         users ON logs.user_id = users.id
+//     LEFT JOIN 
+//         games ON users.game_id = games.game_id
+//     LEFT JOIN 
+//         schools ON users.school_id = schools.school_id
+//     LEFT JOIN 
+//         departments ON users.department = departments.id
+//     ORDER BY 
+//         $sort_column $sort_order
+//     LIMIT $offset, $limit
+// ";
+
 $query = "
     SELECT 
         logs.log_id,
@@ -36,7 +69,12 @@ $query = "
         logs.operation AS log_action,
         logs.record_id AS log_record_id,
         logs.description AS log_description,
-        CONCAT(users.firstname, ' ', users.middleinitial, ' ', users.lastname) AS full_name,
+        CASE 
+            WHEN users.firstname IS NULL OR users.lastname IS NULL 
+                 OR users.firstname = '' OR users.lastname = '' 
+            THEN users.email
+            ELSE CONCAT(users.firstname, ' ', users.middleinitial, ' ', users.lastname)
+        END AS full_name,
         users.age,
         users.gender,
         users.email,
@@ -58,6 +96,7 @@ $query = "
         $sort_column $sort_order
     LIMIT $offset, $limit
 ";
+
 
 $result = $conn->query($query);
 

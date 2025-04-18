@@ -5,6 +5,33 @@
         transition: opacity 0.2s ease-in-out;
     }
 
+    /* Fix Bootstrap collapse sidebar issues */
+    #sidebar.collapse {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        /* adjust to your layout */
+        height: 100vh;
+        z-index: 1040;
+        overflow-y: auto;
+        background-color: #fff;
+        /* or whatever matches your sidebar */
+        transition: transform 0.3s ease-in-out;
+    }
+
+    #sidebar.collapse:not(.show) {
+        transform: translateX(-100%);
+    }
+
+    #sidebar.collapse.show {
+        transform: translateX(0);
+    }
+
+    #sidebar {
+        margin-top: 0 !important;
+    }
+
     /* loader */
 
     .loader-container {
@@ -217,7 +244,7 @@
         <!-- <div class="container-fluid d-flex align-items-center"> -->
 
         <!-- Toggle button -->
-        <button
+        <!-- <button
             id="committeeSidebarToggle"
             class="navbar-toggler"
             type="button"
@@ -238,7 +265,18 @@
             aria-expanded="false"
             aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
+        </button> -->
+
+        <button
+            id="sidebarToggle"
+            class="navbar-toggler"
+            type="button"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
+
+
 
         <!-- Toggle button -->
         <!-- <button
@@ -607,68 +645,44 @@
 
     // Handle button visibility based on role and screen size
     document.addEventListener("DOMContentLoaded", function() {
-        const userRole = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : ''; ?>";
-        const committeeSidebarToggle = document.getElementById('committeeSidebarToggle');
-        const sidebarToggle = document.getElementById('sidebarToggle');
+        const userRole = "<?php echo $_SESSION['role'] ?? ''; ?>";
+        const togglerButton = document.getElementById('sidebarToggle');
 
-        // Function to check if it's a mobile screen
-        function isMobileScreen() {
-            return window.innerWidth < 992; // Mobile screens are less than 992px wide
-        }
-
-        // Initially hide both buttons if it's not a mobile screen
-        if (!isMobileScreen()) {
-            if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'none';
-            if (sidebarToggle) sidebarToggle.style.display = 'none';
-        } else {
-            // Show the appropriate button based on role on mobile screens
-            if (userRole === 'Committee' || userRole === 'superadmin') {
-                if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'block';
-            } else {
-                if (sidebarToggle) sidebarToggle.style.display = 'block';
-            }
-        }
-
-        // Adjust visibility on screen resize (in case user resizes window)
-        window.addEventListener('resize', function() {
-            if (!isMobileScreen()) {
-                if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'none';
-                if (sidebarToggle) sidebarToggle.style.display = 'none';
-            } else {
-                if (userRole === 'Committee' || userRole === 'superadmin') {
-                    if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'block';
-                } else {
-                    if (sidebarToggle) sidebarToggle.style.display = 'block';
-                }
-            }
-        });
-
-        // Your existing toggle functionality
-        const sidebarId = (userRole === 'Committee') ? '#csidebar' : '#sidebar';
+        const isCommittee = userRole === 'Committee' || userRole === 'superadmin';
+        const sidebarId = isCommittee ? '#csidebar' : '#sidebar';
         const sidebar = document.querySelector(sidebarId);
-        const togglerButton = document.querySelector('.navbar-toggler');
 
         if (togglerButton) {
             togglerButton.setAttribute('data-bs-target', sidebarId);
+            togglerButton.setAttribute('aria-controls', sidebarId.substring(1));
+
+            if (isCommittee) {
+                // Committee uses custom manual toggling
+                togglerButton.removeAttribute('data-bs-toggle');
+            } else {
+                // School/Dept Admin uses Bootstrap collapse
+                togglerButton.setAttribute('data-bs-toggle', 'collapse');
+            }
         }
 
-        if (togglerButton && sidebar) {
+        // Optional: Custom toggle logic if Committee role
+        if (isCommittee && togglerButton && sidebar) {
             togglerButton.addEventListener('click', function(event) {
                 event.preventDefault();
-                event.stopPropagation();
-
-                // Toggle the 'active' class on the sidebar
                 sidebar.classList.toggle('active');
-
-                // Add/remove 'sidebar-active' class to body for overlay
                 document.body.classList.toggle('sidebar-active');
+                togglerButton.setAttribute('aria-expanded', sidebar.classList.contains('active'));
+            });
 
-                // Update aria-expanded attribute
-                const isExpanded = sidebar.classList.contains('active');
-                togglerButton.setAttribute('aria-expanded', isExpanded);
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!sidebar.contains(event.target) && !togglerButton.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                    document.body.classList.remove('sidebar-active');
+                    togglerButton.setAttribute('aria-expanded', 'false');
+                }
             });
         }
-
 
         // scan fucntion
 

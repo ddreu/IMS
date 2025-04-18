@@ -331,7 +331,7 @@ if (isset($_SESSION['success_message'])) {
                         <div class="school-code">School Code: <?php echo htmlspecialchars($school_info['school_code']); ?></div>
                     </div>
 
-                    <div class="d-flex gap-2">
+                    <div class="d-flex flex-wrap gap-2">
                         <!-- Info Button -->
                         <button type="button" class="btn btn-info btn-circle text-white" data-bs-toggle="modal" data-bs-target="#manualModal" title="Read Manual">
                             <i class="fas fa-info-circle"></i> Manual
