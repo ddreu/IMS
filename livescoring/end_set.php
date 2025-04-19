@@ -174,12 +174,18 @@ try {
                 $total_matches_stmt->close();
 
                 // Identify the final match (highest match_number in bracket)
+                //         $get_final_match = "
+                // SELECT match_id, teamA_id, teamB_id 
+                // FROM matches 
+                // WHERE bracket_id = ? 
+                // ORDER BY match_number DESC 
+                // LIMIT 1";
+
                 $get_final_match = "
-        SELECT match_id, teamA_id, teamB_id 
-        FROM matches 
-        WHERE bracket_id = ? 
-        ORDER BY match_number DESC 
-        LIMIT 1";
+    SELECT match_id, teamA_id, teamB_id 
+    FROM matches 
+    WHERE bracket_id = ? AND match_type = 'final'";
+
                 $final_match_stmt = $conn->prepare($get_final_match);
                 $final_match_stmt->bind_param("i", $match_result['bracket_id']);
                 $final_match_stmt->execute();
@@ -187,12 +193,17 @@ try {
                 $final_match_stmt->close();
 
                 // Identify Semifinals (Last 2 matches before the final)
+                //         $get_semifinals = "
+                // SELECT match_id, match_number 
+                // FROM matches 
+                // WHERE bracket_id = ? 
+                // ORDER BY match_number DESC 
+                // LIMIT 2";
                 $get_semifinals = "
-        SELECT match_id, match_number 
-        FROM matches 
-        WHERE bracket_id = ? 
-        ORDER BY match_number DESC 
-        LIMIT 2";
+    SELECT match_id, match_number 
+    FROM matches 
+    WHERE bracket_id = ? AND match_type = 'semifinal'";
+
                 $semifinals_stmt = $conn->prepare($get_semifinals);
                 $semifinals_stmt->bind_param("i", $match_result['bracket_id']);
                 $semifinals_stmt->execute();
@@ -200,17 +211,29 @@ try {
                 $semifinals_stmt->close();
 
                 // Identify Third Place Match (if it exists)
+                //         $get_third_place = "
+                // SELECT match_id, teamA_id, teamB_id 
+                // FROM matches 
+                // WHERE bracket_id = ? 
+                // AND match_number = ?";
+                //         $third_place_match_number = $total_matches - 1; 
+                //         $third_place_stmt = $conn->prepare($get_third_place);
+                //         $third_place_stmt->bind_param("ii", $match_result['bracket_id'], $third_place_match_number);
+                //         $third_place_stmt->execute();
+                //         $third_place_match = $third_place_stmt->get_result()->fetch_assoc();
+                //         $third_place_stmt->close();
+
+                // Identify Third Place Match (if it exists)
                 $get_third_place = "
-        SELECT match_id, teamA_id, teamB_id 
-        FROM matches 
-        WHERE bracket_id = ? 
-        AND match_number = ?";
-                $third_place_match_number = $total_matches - 1; // Typically one match before the final
+SELECT match_id, teamA_id, teamB_id 
+FROM matches 
+WHERE bracket_id = ? AND match_type = 'third_place'";
                 $third_place_stmt = $conn->prepare($get_third_place);
-                $third_place_stmt->bind_param("ii", $match_result['bracket_id'], $third_place_match_number);
+                $third_place_stmt->bind_param("i", $match_result['bracket_id']);
                 $third_place_stmt->execute();
                 $third_place_match = $third_place_stmt->get_result()->fetch_assoc();
                 $third_place_stmt->close();
+
 
                 // ✅ **Update Final Match with Semifinal Winners**
                 if ($final_match && in_array($match_result['match_id'], array_column($semifinals, 'match_id'))) {
@@ -282,7 +305,8 @@ try {
             }
 
             // Function to insert match period information
-            function insertMatchPeriodInfo($conn, $match_id, $period_number, $teamA_id, $teamB_id, $scoreA, $scoreB) {
+            function insertMatchPeriodInfo($conn, $match_id, $period_number, $teamA_id, $teamB_id, $scoreA, $scoreB)
+            {
                 $insert_period_query = "
                     INSERT INTO match_periods_info (
                         match_id, 
@@ -296,12 +320,12 @@ try {
 
                 $period_stmt = $conn->prepare($insert_period_query);
                 $period_stmt->bind_param(
-                    "iiiidd", 
-                    $match_id, 
-                    $period_number, 
-                    $teamA_id, 
-                    $teamB_id, 
-                    $scoreA, 
+                    "iiiidd",
+                    $match_id,
+                    $period_number,
+                    $teamA_id,
+                    $teamB_id,
+                    $scoreA,
                     $scoreB
                 );
 
@@ -317,12 +341,12 @@ try {
             try {
                 // Insert period info for the current set/period
                 insertMatchPeriodInfo(
-                    $conn, 
-                    $row['match_id'], 
-                    $row['teamA_sets_won'] + $row['teamB_sets_won'], 
-                    $row['teamA_id'], 
-                    $row['teamB_id'], 
-                    $row['teamA_sets_won'], 
+                    $conn,
+                    $row['match_id'],
+                    $row['teamA_sets_won'] + $row['teamB_sets_won'],
+                    $row['teamA_id'],
+                    $row['teamB_id'],
+                    $row['teamA_sets_won'],
                     $row['teamB_sets_won']
                 );
             } catch (Exception $e) {

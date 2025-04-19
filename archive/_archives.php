@@ -79,53 +79,54 @@ include '../navbar/navbar.php';
 
         <div class="card shadow-sm border-0 rounded-3 mb-3">
             <div class="card-body">
-                <div class="row g-3 justify-content-center">
+                <form class="mb-0">
+                    <div class="row g-3 justify-content-center">
 
 
-                    <!-- Table Dropdown -->
-                    <div class="col-md-3">
-                        <label for="table" class="form-label">Table</label>
-                        <select class="form-select" name="table" id="table">
-                            <option value="">Select Table</option>
-                            <?php foreach ($allowedTables as $option) : ?>
-                                <option value="<?= $option ?>" <?= $table === $option ? 'selected' : '' ?>>
-                                    <?= ucfirst($option) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                        <!-- Table Dropdown -->
+                        <div class="col-md-3">
+                            <label for="table" class="form-label">Table</label>
+                            <select class="form-select" name="table" id="table">
+                                <option value="">Select Table</option>
+                                <?php foreach ($allowedTables as $option) : ?>
+                                    <option value="<?= $option ?>" <?= $table === $option ? 'selected' : '' ?>>
+                                        <?= ucfirst($option) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <!-- Archive Year Dropdown -->
-                    <!-- <div class="col-md-3">
+                        <!-- Archive Year Dropdown -->
+                        <!-- <div class="col-md-3">
                             <label for="archive_year" class="form-label">Year</label>
                             <select class="form-select" id="archive_year" name="year" disabled>
                                 <option value="">Select Year</option>
                             </select>
                         </div> -->
-                    <!-- Department Dropdown -->
-                    <div class="col-md-3">
-                        <label for="department" class="form-label">Department</label>
-                        <select class="form-select" id="department" name="department_id" disabled>
-                            <option value="">Select Department</option>
-                        </select>
-                    </div>
-                    <!-- Grade/Section/Course Dropdown -->
-                    <div class="col-md-3">
-                        <label for="course" class="form-label">Grade</label>
-                        <select class="form-select" id="course" name="course_id" disabled>
-                            <option value="">Select Grade</option>
-                        </select>
-                    </div>
+                        <!-- Department Dropdown -->
+                        <div class="col-md-3">
+                            <label for="department" class="form-label">Department</label>
+                            <select class="form-select" id="department" name="department_id" disabled>
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                        <!-- Grade/Section/Course Dropdown -->
+                        <div class="col-md-3">
+                            <label for="course" class="form-label">Grade</label>
+                            <select class="form-select" id="course" name="course_id" disabled>
+                                <option value="">Select Grade</option>
+                            </select>
+                        </div>
 
 
-                    <div class="col-md-3">
-                        <label for="game" class="form-label">Game</label>
-                        <select class="form-select" id="game" name="game_id" disabled>
-                            <option value="">Select Game</option>
-                        </select>
-                    </div>
+                        <div class="col-md-3">
+                            <label for="game" class="form-label">Game</label>
+                            <select class="form-select" id="game" name="game_id" disabled>
+                                <option value="">Select Game</option>
+                            </select>
+                        </div>
 
-                </div>
+                    </div>
             </div>
         </div>
 
@@ -156,74 +157,26 @@ include '../navbar/navbar.php';
 
         <!-- Section to Load the Archive Table -->
         <div id="archiveTableContainer" class="card shadow-sm border-0 rounded-3 mt-3">
-            <div class="card-body text-center" id="archiveTableContent">
-                <p class="text-muted">Select a table and year to view its content.</p>
-            </div>
+            <div class="card-body text-center">
+                <?php
+                // $allowedTables = ['announcements', 'games', 'schedules', 'teams', 'department-teams', 'leaderboards', 'matches', 'brackets'];
+                // $table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : null;
 
+                if ($table) {
+                    include "archive-pages/{$table}.php";
+                } else {
+                    echo "<p class='text-muted'>Select a table to view its content.</p>";
+                }
+                ?>
+            </div>
         </div>
 
+
+
+
     </div>
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="js/utils.js"></script>
     <!-- <script src="../js/archive.js"></script> -->
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const tableSelect = document.getElementById("table");
-            const yearSelect = document.getElementById("archive_year");
-            const contentContainer = document.getElementById("archiveTableContent");
-
-            function loadArchivePage() {
-                const table = tableSelect.value;
-                const year = yearSelect.value;
-
-                if (!table || !year) {
-                    contentContainer.innerHTML = `<p class="text-muted">Select a table and year to view content.</p>`;
-                    return;
-                }
-
-                const url = `archive-pages/${table}.php?year=${encodeURIComponent(year)}`;
-
-                fetch(url)
-                    .then(res => {
-                        if (!res.ok) throw new Error("Failed to load page.");
-                        return res.text();
-                    })
-                    .then(html => {
-                        contentContainer.innerHTML = html;
-
-                        // Optional: dynamically load external script if needed
-                        const scriptPath = `archive-page-js/${table}.js`;
-                        loadScript(scriptPath);
-                    })
-                    .catch(err => {
-                        contentContainer.innerHTML = `<p class="text-danger">Error loading archive page: ${err.message}</p>`;
-                    });
-            }
-
-            function loadScript(src) {
-                const existing = document.querySelector(`script[src="${src}"]`);
-                if (existing) existing.remove(); // reload script if needed
-
-                const script = document.createElement('script');
-                script.src = src;
-                script.defer = true;
-                document.body.appendChild(script);
-            }
-
-            // Trigger when either dropdown changes
-            tableSelect.addEventListener('change', loadArchivePage);
-            yearSelect.addEventListener('change', loadArchivePage);
-
-            // Auto-load if preselected
-            if (tableSelect.value && yearSelect.value) {
-                loadArchivePage();
-            }
-        });
-    </script> -->
-
 </body>
 
 </html>

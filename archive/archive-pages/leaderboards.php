@@ -232,7 +232,7 @@ $conn = con();
 </div>
 
 
-<script>
+<!-- <script>
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const department = urlParams.get('department_id');
@@ -312,4 +312,4 @@ $conn = con();
                 rankingsDiv.innerHTML = '<p class="text-center text-danger">Error loading rankings. Please try again.</p>';
             });
     });
-</script>
+</script> -->

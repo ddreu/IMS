@@ -1,7 +1,8 @@
 <?php
-include_once '../connection/conn.php';
-include '../user_logs/logger.php'; // Include the logger file
+include_once '../../connection/conn.php';
+include '../../user_logs/logger.php'; // Include the logger file
 $conn = con();
+session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {

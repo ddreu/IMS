@@ -153,7 +153,3 @@ $conn->close();
         <?php endforeach; ?>
     </div>
 </div>
-
-<script>
-
-</script>
