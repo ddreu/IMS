@@ -21,7 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role = trim($_POST['role']);
     $department = !empty($_POST['department']) ? intval($_POST['department']) : null;
     $school_id = !empty($_POST['school_id']) ? intval($_POST['school_id']) : null;
-    $games = ($role === "Department Admin") ? null : (!empty($_POST['game_id']) ? intval($_POST['game_id']) : null);
+    // $games = ($role === "Department Admin") ? null : (!empty($_POST['game_id']) ? intval($_POST['game_id']) : null);
+    $game_ids = isset($_POST['game_ids']) && is_array($_POST['game_ids']) ? array_filter($_POST['game_ids']) : [];
+    $main_game_id = count($game_ids) > 0 ? intval($game_ids[0]) : null;
+
 
     // Validate required fields
     if (empty($firstname) || empty($lastname) || empty($email) || empty($school_id)) {
@@ -49,9 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Update query
     $sql_update = "UPDATE users 
-                   SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, 
-                       email = ?, role = ?, department = ?, school_id = ?, game_id = ?
-                   WHERE id = ?";
+    SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, 
+        email = ?, role = ?, department = ?, school_id = ?, game_id = ?
+    WHERE id = ?";
+
 
     $stmt_update = $conn->prepare($sql_update);
     $stmt_update->bind_param(
@@ -65,9 +69,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $role,
         $department,
         $school_id,
-        $games,
+        $main_game_id,
         $user_id
     );
+    if ($role === 'Committee') {
+        $conn->query("DELETE FROM committee_games WHERE committee_id = $user_id");
+
+        $extra_game_ids = array_filter($game_ids, fn($gid) => intval($gid) !== intval($main_game_id));
+
+        if (count($extra_game_ids) > 0) {
+            $stmt = $conn->prepare("INSERT INTO committee_games (committee_id, game_id, assigned_at) VALUES (?, ?, NOW())");
+            foreach ($extra_game_ids as $gid) {
+                $stmt->bind_param("ii", $user_id, $gid);
+                $stmt->execute();
+            }
+            $stmt->close();
+        }
+    }
+
 
     if ($stmt_update->execute()) {
         echo json_encode([

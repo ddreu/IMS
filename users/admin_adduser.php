@@ -36,16 +36,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Set department and game_id to NULL by default
     $department = null;
-    $game_id = null;
+    // $game_id = null;
+    $game_ids = [];
 
     // Only set values if they exist and are not empty
     if (isset($_POST['department']) && !empty($_POST['department'])) {
         $department = $_POST['department'];
     }
 
-    if (isset($_POST['game_id']) && !empty($_POST['game_id'])) {
-        $game_id = $_POST['game_id'];
+    // if (isset($_POST['game_id']) && !empty($_POST['game_id'])) {
+    //     $game_id = $_POST['game_id'];
+    // }
+
+    if (isset($_POST['game_ids']) && is_array($_POST['game_ids'])) {
+        $game_ids = array_filter($_POST['game_ids']);
     }
+
+    $main_game_id = count($game_ids) > 0 ? $game_ids[0] : null;
+
 
     // Validation checks
     if (empty($firstname) || empty($lastname) || empty($email) || empty($role) || empty($school_id)) {
@@ -64,10 +72,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    if ($role === 'Committee' && (empty($department) || empty($game_id))) {
+    // if ($role === 'Committee' && (empty($department) || empty($game_id))) {
+    //     echo json_encode(["status" => "error", "message" => "Please select both department and game for Committee member."]);
+    //     exit();
+    // }
+
+    if ($role === 'Committee' && (empty($department) || count($game_ids) === 0)) {
         echo json_encode(["status" => "error", "message" => "Please select both department and game for Committee member."]);
         exit();
     }
+
 
     try {
         // Check if email already exists
@@ -101,14 +115,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $conn->begin_transaction();
 
         // Insert user
+        // $insert_user_sql = "INSERT INTO users (firstname, lastname, middleinitial, age, gender, email, password, role, department, game_id, school_id) 
+        //                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // $stmt_insert = executeQuery(
+        //     $conn,
+        //     $insert_user_sql,
+        //     [$firstname, $lastname, $middleinitial, $age, $gender, $email, $hashed_password, $role, $department, $game_id, $school_id],
+        //     "sssissssiis"
+        // );
+
         $insert_user_sql = "INSERT INTO users (firstname, lastname, middleinitial, age, gender, email, password, role, department, game_id, school_id) 
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_insert = executeQuery(
             $conn,
             $insert_user_sql,
-            [$firstname, $lastname, $middleinitial, $age, $gender, $email, $hashed_password, $role, $department, $game_id, $school_id],
+            [$firstname, $lastname, $middleinitial, $age, $gender, $email, $hashed_password, $role, $department, $main_game_id, $school_id],
             "sssissssiis"
         );
+        $user_id = $stmt_insert->insert_id;
+
+        if ($role === 'Committee' && count($game_ids) > 0) {
+            // Exclude main game from insertion into committee_games
+            $extra_game_ids = array_filter($game_ids, fn($gid) => intval($gid) !== intval($main_game_id));
+
+            if (count($extra_game_ids) > 0) {
+                $insert_committee_game = $conn->prepare("INSERT INTO committee_games (committee_id, game_id, assigned_at) VALUES (?, ?, NOW())");
+
+                foreach ($extra_game_ids as $gid) {
+                    $insert_committee_game->bind_param("ii", $user_id, $gid);
+                    $insert_committee_game->execute();
+                }
+
+                $insert_committee_game->close();
+            }
+        }
+
 
         $conn->commit();
 

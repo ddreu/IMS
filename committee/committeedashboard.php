@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+// echo "Current Department: " . ($_SESSION['department_name'] ?? 'Not set');
+// echo "Current Department: " . ($_SESSION['department_id'] ?? 'Not set');
+
+
+
 include_once '../connection/conn.php';
 $conn = con();
 

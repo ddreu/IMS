@@ -55,18 +55,22 @@
                         </div>
                         <div class="col-md-4" id="update_assignGameDiv" style="display: none;">
                             <label for="update_assign_game" class="form-label">Assign Game</label>
-                            <select class="form-select" id="update_assign_game" name="assign_game">
+                            <select class="form-select" id="update_assign_game" name="assign_game[]" multiple>
                                 <option value="">Select Game</option>
                                 <?php foreach ($games as $game): ?>
-                                    <option value="<?php echo htmlspecialchars($game['game_id'], ENT_QUOTES, 'UTF-8'); ?>">
-                                        <?php echo htmlspecialchars($game['game_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                    <option value="<?= htmlspecialchars($game['game_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <?= htmlspecialchars($game['game_name'], ENT_QUOTES, 'UTF-8'); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                            <!-- <div id="updateSelectedGamesContainer" class="mt-2 d-flex flex-wrap gap-2"></div> -->
+
                         </div>
                         <div class="col-md-4">
                             <label for="update_dept_level" class="form-label">Department</label>
-                            <select class="form-select" id="update_dept_level" name="department" required>
+                            <select class="form-select" id="update_dept_level" name="assign_department[]" multiple required>
+                                <!-- <div id="updateSelectedDeptsContainer" class="mt-2 d-flex flex-wrap gap-2"></div> -->
+
                                 <option value="">Select Department</option>
                                 <?php
                                 $query = "SELECT id, department_name FROM departments WHERE school_id = ?";
@@ -76,7 +80,7 @@
                                 $result = mysqli_stmt_get_result($stmt);
                                 if ($result) {
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        echo '<option value="' . htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8') . '">' 
+                                        echo '<option value="' . htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8') . '">'
                                             . htmlspecialchars($row['department_name'], ENT_QUOTES, 'UTF-8') . '</option>';
                                     }
                                 } else {
@@ -84,6 +88,8 @@
                                 }
                                 ?>
                             </select>
+                            <!-- <div id="updateSelectedDeptsContainer" class="mt-2 d-flex flex-wrap gap-2"></div> -->
+
                         </div>
                     </div>
                     <button type="button" id="confirmUpdateBtn" class="btn btn-primary mt-3">Update User</button> <!-- Changed type to button to prevent immediate submission -->

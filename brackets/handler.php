@@ -89,9 +89,20 @@
                     matchMargin: 50,
                     roundMargin: 50,
                     init: initialBracketData,
+                    // save: async function(data, userData) {
+                    //     generatedStructure = bracketManager.convertBracketData(data, teams, rounds);
+                    // },
                     save: async function(data, userData) {
-                        generatedStructure = bracketManager.convertBracketData(data, teams, rounds);
+                        // Rebuild teams based on current UI state
+                        const cleanedTeams = teams.map(team => ({
+                            team_id: team.team_id,
+                            team_name: team.team_name
+                        }));
+
+                        // ✅ This ensures previous BYE-advancement logic is not reused
+                        generatedStructure = bracketManager.convertBracketData(data, cleanedTeams, rounds);
                     },
+
                     decorator: {
                         edit: function(container, data, doneCb) {
                             const input = $('<select>').addClass('form-control form-control-sm');

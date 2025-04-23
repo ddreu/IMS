@@ -73,22 +73,26 @@
                     </div>
 
                     <div class="mb-3" id="add_assignGameDiv" style="display: none;">
+                        <label for="assign_game">Assign Game</label>
                         <div class="form-floating">
-                            <select class="form-select" name="assign_game" id="assign_game">
+                            <select class="form-select" id="assign_game" name="assign_game[]" multiple required>
                                 <option value="">Select Game</option>
                                 <?php foreach ($games as $game): ?>
-                                    <option value="<?php echo htmlspecialchars($game['game_id'], ENT_QUOTES, 'UTF-8'); ?>">
-                                        <?php echo htmlspecialchars($game['game_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                    <option value="<?= htmlspecialchars($game['game_id']) ?>">
+                                        <?= htmlspecialchars($game['game_name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="assign_game">Assign Game</label>
+                            <div id="addSelectedGamesContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
+
+                            <!-- <label for="assign_game">Assign Game</label> -->
                         </div>
                     </div>
 
                     <div class="mb-3">
+                        <label for="dept_level">Select Department</label>
                         <div class="form-floating">
-                            <select class="form-select" name="department" id="dept_level" required>
+                            <select class="form-select" name="assign_department[]" id="dept_level" multiple required>
                                 <option value="">Select Department</option>
                                 <?php
                                 // Fetch departments based on user's role and school_id
@@ -109,15 +113,15 @@
                                         mysqli_stmt_bind_param($dept_stmt, "ii", $user_id, $school_id);
                                         mysqli_stmt_execute($dept_stmt);
                                         $dept_result = mysqli_stmt_get_result($dept_stmt);
-                                        
+
                                         if ($dept_row = mysqli_fetch_assoc($dept_result)) {
-                                            echo '<option value="' . htmlspecialchars($dept_row['id'], ENT_QUOTES, 'UTF-8') . '">' 
+                                            echo '<option value="' . htmlspecialchars($dept_row['id'], ENT_QUOTES, 'UTF-8') . '">'
                                                 . htmlspecialchars($dept_row['department_name'], ENT_QUOTES, 'UTF-8') . '</option>';
                                         }
                                     } else {
                                         // School Admin can add users to any department in their school
                                         while ($row = mysqli_fetch_assoc($result)) {
-                                            echo '<option value="' . htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8') . '">' 
+                                            echo '<option value="' . htmlspecialchars($row['id'], ENT_QUOTES, 'UTF-8') . '">'
                                                 . htmlspecialchars($row['department_name'], ENT_QUOTES, 'UTF-8') . '</option>';
                                         }
                                     }
@@ -126,9 +130,12 @@
                                 }
                                 ?>
                             </select>
-                            <label for="dept_level">Select Department</label>
+                            <div id="addSelectedDeptsContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
+
+                            <!-- <label for="dept_level">Select Department</label> -->
                         </div>
                     </div>
+
 
                     <button type="submit" class="btn btn-primary w-100">Add User</button>
                 </form>

@@ -217,38 +217,38 @@ try {
                 $total_matches = $stmt->get_result()->fetch_assoc()['total_matches'];
                 $stmt->close();
 
-                // Identify the final match (highest match_number in bracket)
-                $get_final_match = "
+                 // Identify the final match (highest match_number in bracket)
+                 $get_final_match = "
                  SELECT match_id, teamA_id, teamB_id 
                  FROM matches 
                  WHERE bracket_id = ? AND match_type = 'final'";
-                $stmt = $conn->prepare($get_final_match);
-                $stmt->bind_param("i", $match_result['bracket_id']);
-                $stmt->execute();
-                $final_match = $stmt->get_result()->fetch_assoc();
-                $stmt->close();
-
-                // Identify Semifinals (Last 2 matches before the final)
-                $get_semifinals = "
+                         $stmt = $conn->prepare($get_final_match);
+                         $stmt->bind_param("i", $match_result['bracket_id']);
+                         $stmt->execute();
+                         $final_match = $stmt->get_result()->fetch_assoc();
+                         $stmt->close();
+         
+                         // Identify Semifinals (Last 2 matches before the final)
+                         $get_semifinals = "
                  SELECT match_id, match_number 
                  FROM matches 
                  WHERE bracket_id = ? AND match_type = 'semifinal'";
-                $stmt = $conn->prepare($get_semifinals);
-                $stmt->bind_param("i", $match_result['bracket_id']);
-                $stmt->execute();
-                $semifinals = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-                $stmt->close();
-
-                // Identify Third Place Match (if it exists)
-                $get_third_place = "
+                         $stmt = $conn->prepare($get_semifinals);
+                         $stmt->bind_param("i", $match_result['bracket_id']);
+                         $stmt->execute();
+                         $semifinals = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                         $stmt->close();
+         
+                         // Identify Third Place Match (if it exists)
+                         $get_third_place = "
                  SELECT match_id, teamA_id, teamB_id 
                  FROM matches 
                  WHERE bracket_id = ? AND match_type = 'third_place'";
-                $stmt = $conn->prepare($get_third_place);
-                $stmt->bind_param("i", $match_result['bracket_id']);
-                $stmt->execute();
-                $third_place_match = $stmt->get_result()->fetch_assoc();
-                $stmt->close();
+                         $stmt = $conn->prepare($get_third_place);
+                         $stmt->bind_param("i", $match_result['bracket_id']);
+                         $stmt->execute();
+                         $third_place_match = $stmt->get_result()->fetch_assoc();
+                         $stmt->close();
 
                 // ✅ **Update Final Match with Semifinal Winners**
                 if ($final_match && in_array($match_result['match_id'], array_column($semifinals, 'match_id'))) {

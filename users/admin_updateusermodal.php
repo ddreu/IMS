@@ -81,14 +81,25 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
                         </div>
                     </div>
 
-                    <div class="row g-3 mt-2" id="update_gamesDiv" style="display: none;">
+                    <!-- <div class="row g-3 mt-2" id="update_gamesDiv" style="display: none;">
                         <div class="col-md-12">
                             <label for="update_game" class="form-label">Assigned Game</label>
                             <select class="form-select" id="update_game" name="game_id">
                                 <option value="">Select School First</option>
                             </select>
                         </div>
+                    </div> -->
+
+                    <div class="row g-3 mt-2" id="update_gamesDiv" style="display: none;">
+                        <div class="col-md-12">
+                            <label for="update_game" class="form-label">Assigned Game</label>
+                            <select class="form-select" id="update_game">
+                                <option value="">Select a game to add</option>
+                            </select>
+                            <div id="updateSelectedGamesContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
+                        </div>
                     </div>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -100,6 +111,8 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
 </div>
 
 <script>
+    let updateSelectedGameIds = [];
+
     // Function to load departments for update form
     function loadDepartmentsForUpdate(schoolId, selectedDepartment = '') {
         const departmentSelect = document.getElementById('update_department');
@@ -110,19 +123,14 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             .then(response => response.json())
             .then(departments => {
                 departmentSelect.innerHTML = '<option value="">Select Department</option>';
-                if (departments.length > 0) {
-                    departments.forEach(dept => {
-                        const option = new Option(dept.department_name, dept.id);
-                        if (dept.id == selectedDepartment) {
-                            option.selected = true;
-                        }
-                        departmentSelect.add(option);
-                    });
-                    departmentSelect.disabled = false;
-                } else {
-                    departmentSelect.innerHTML = '<option value="">No departments found</option>';
-                    departmentSelect.disabled = true;
-                }
+                departments.forEach(dept => {
+                    const option = new Option(dept.department_name, dept.id);
+                    if (dept.id == selectedDepartment) {
+                        option.selected = true;
+                    }
+                    departmentSelect.add(option);
+                });
+                departmentSelect.disabled = false;
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -131,77 +139,60 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             });
     }
 
-    function loadGamesForUpdate(schoolId, selectedGame = '') {
+    // 🆕 Load games and restore selected
+    function loadGamesForUpdate(schoolId) {
         const gameSelect = document.getElementById('update_game');
         gameSelect.innerHTML = '<option value="">Loading games...</option>';
         gameSelect.disabled = true;
 
-        // Fetch games from the server
         fetch(`get_games.php?school_id=${schoolId}`)
             .then(response => response.json())
             .then(games => {
-                // Clear the dropdown and add a default option
-                gameSelect.innerHTML = '<option value="">Select Game</option>';
-                if (games.length > 0) {
-                    // Loop through the games and create option elements
-                    games.forEach(game => {
-                        const option = new Option(game.game_name, game.game_id);
-                        // Check if this game is the one currently selected for update
-                        if (game.game_id == selectedGame) {
-                            option.selected = true; // Mark as selected if it matches
-                        }
-                        gameSelect.add(option); // Add the option to the dropdown
-                    });
-                    gameSelect.disabled = false; // Enable the dropdown
-                } else {
-                    // If no games are found, show a message
-                    gameSelect.innerHTML = '<option value="">No games found</option>';
-                    gameSelect.disabled = true; // Keep the dropdown disabled
-                }
+                gameSelect.innerHTML = '<option value="">Select a game to add</option>';
+                games.forEach(game => {
+                    const option = new Option(game.game_name, game.game_id);
+                    gameSelect.add(option);
+                });
+                gameSelect.disabled = false;
+                updateGamesDisplay(); // render tags for selected games
             })
             .catch(error => {
-                console.error('Error:', error);
-                // Handle errors by showing an error message
+                console.error('Error loading games:', error);
                 gameSelect.innerHTML = '<option value="">Error loading games</option>';
-                gameSelect.disabled = true; // Keep the dropdown disabled
+                gameSelect.disabled = true;
             });
     }
-    // Function to handle role selection in update form
+
     function handleUpdateRoleSelection(role) {
         const departmentDiv = document.getElementById('update_departmentDiv');
         const gamesDiv = document.getElementById('update_gamesDiv');
         const departmentSelect = document.getElementById('update_department');
         const gameSelect = document.getElementById('update_game');
 
-        // Reset required attributes
         departmentSelect.required = false;
         gameSelect.required = false;
 
-        // First hide all optional divs
         departmentDiv.style.display = 'none';
         gamesDiv.style.display = 'none';
 
-        switch (role) {
-            case 'School Admin':
-                // School Admin doesn't need department or game
-                break;
-            case 'Department Admin':
-                departmentDiv.style.display = 'block';
-                departmentSelect.required = true;
-                break;
-            case 'Committee':
-                departmentDiv.style.display = 'block';
-                gamesDiv.style.display = 'block';
-                departmentSelect.required = true;
-                gameSelect.required = true;
-                break;
+        if (role === 'Department Admin') {
+            departmentDiv.style.display = 'block';
+            departmentSelect.required = true;
+        } else if (role === 'Committee') {
+            departmentDiv.style.display = 'block';
+            gamesDiv.style.display = 'block';
+            departmentSelect.required = true;
+            // gameSelect.required = true;
+            gameSelect.required = false;
         }
     }
 
-    // Function to open update modal
-    function openUpdateModal(userId, firstname, lastname, middleinitial, age, gender, email, role, schoolId, departmentId, gameId) {
-        // Set values in the form
+    function openUpdateModal(btn, userId, firstname, lastname, middleinitial, age, gender, email, role, schoolId, departmentId, gameIdsCsv) {
+        const mainGameId = btn.getAttribute('data-main-game');
+
+
         document.getElementById('update_user_id').value = userId;
+        document.getElementById('update_user_id').dataset.mainGame = mainGameId;
         document.getElementById('update_firstname').value = firstname;
         document.getElementById('update_lastname').value = lastname;
         document.getElementById('update_middleinitial').value = middleinitial;
@@ -210,95 +201,141 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
         document.getElementById('update_email').value = email;
         document.getElementById('update_role').value = role;
         document.getElementById('update_school').value = schoolId;
-        document.getElementById('update_game').value = gameId;
+
+        // updateSelectedGameIds = gameIdsCsv ? gameIdsCsv.split(',') : [];
+
+        updateSelectedGameIds = [];
+
+        if (gameIdsCsv && gameIdsCsv.trim() !== '') {
+            updateSelectedGameIds = gameIdsCsv.split(',').filter(id => id.trim() !== '');
+        }
+
+        // Always include the main game ID if not already in the list
+        if (mainGameId && !updateSelectedGameIds.includes(mainGameId)) {
+            updateSelectedGameIds.unshift(mainGameId);
+        }
 
 
-        // Handle role-specific fields
         handleUpdateRoleSelection(role);
 
-        // Load departments and games if needed
         if (schoolId) {
             if (role === 'Department Admin' || role === 'Committee') {
                 loadDepartmentsForUpdate(schoolId, departmentId);
             }
             if (role === 'Committee') {
-                loadGamesForUpdate(schoolId, gameId);
+                loadGamesForUpdate(schoolId);
             }
         }
 
-        // Show the modal
         $('#updateUserModal').modal('show');
     }
 
-    // Add event listeners for the update form
     document.getElementById('update_school').addEventListener('change', function() {
         const selectedSchoolId = this.value;
         const currentRole = document.getElementById('update_role').value;
 
         if (selectedSchoolId) {
-            if (currentRole === 'School Admin') {
-                // Don't load departments for School Admin
-                loadGamesForUpdate(selectedSchoolId);
-            } else if (currentRole === 'Department Admin') {
+            if (currentRole === 'School Admin') return;
+            if (currentRole === 'Department Admin') {
                 loadDepartmentsForUpdate(selectedSchoolId);
             } else if (currentRole === 'Committee') {
                 loadDepartmentsForUpdate(selectedSchoolId);
                 loadGamesForUpdate(selectedSchoolId);
             }
         } else {
-            const departmentSelect = document.getElementById('update_department');
-            const gameSelect = document.getElementById('update_game');
-            departmentSelect.innerHTML = '<option value="">Select School First</option>';
-            gameSelect.innerHTML = '<option value="">Select School First</option>';
-            departmentSelect.disabled = true;
-            gameSelect.disabled = true;
+            document.getElementById('update_department').innerHTML = '<option value="">Select School First</option>';
+            document.getElementById('update_game').innerHTML = '<option value="">Select School First</option>';
         }
     });
 
     document.getElementById('update_role').addEventListener('change', function() {
         handleUpdateRoleSelection(this.value);
-
-        // Reset and reload dropdowns based on role
         const schoolSelect = document.getElementById('update_school');
         if (schoolSelect.value) {
             schoolSelect.dispatchEvent(new Event('change'));
         }
     });
 
-    // Form validation and submission
+    // 🆕 Game selection add
+    document.getElementById('update_game').addEventListener('change', function() {
+        const selectedGameId = this.value;
+        if (!selectedGameId || updateSelectedGameIds.includes(selectedGameId)) return;
+
+        updateSelectedGameIds.push(selectedGameId);
+        updateGamesDisplay();
+        this.value = '';
+    });
+
+    // 🆕 Display selected games
+    function updateGamesDisplay() {
+        const container = document.getElementById('updateSelectedGamesContainer');
+        container.innerHTML = '';
+
+        // Remove previous hidden inputs
+        document.querySelectorAll('input[name="game_ids[]"]').forEach(el => el.remove());
+
+        updateSelectedGameIds.forEach(id => {
+            const option = document.querySelector(`#update_game option[value="${id}"]`);
+            const label = option ? option.textContent : 'Game';
+
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-primary rounded-pill px-3 py-2 d-flex align-items-center';
+            badge.innerHTML = `
+                ${label}
+                <button type="button" class="btn-close btn-close-white btn-sm ms-2" data-id="${id}" aria-label="Remove"></button>
+            `;
+            container.appendChild(badge);
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'game_ids[]';
+            hiddenInput.value = id;
+            document.getElementById('updateUserForm').appendChild(hiddenInput);
+        });
+    }
+
+    // 🆕 Remove selected game
+    document.getElementById('updateSelectedGamesContainer').addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-close')) {
+            const idToRemove = e.target.getAttribute('data-id');
+            updateSelectedGameIds = updateSelectedGameIds.filter(id => id !== idToRemove);
+            updateGamesDisplay();
+        }
+    });
+
     document.getElementById('updateUserForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Age validation
         const age = parseInt(document.getElementById('update_age').value);
         if (age < 18) {
             alert('Age must be 18 or older!');
             return;
         }
 
-        // Email validation
         const email = document.getElementById('update_email').value;
         if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
             alert('Please enter a valid email address!');
             return;
         }
 
-        // Role-specific validation
         const role = document.getElementById('update_role').value;
         const department = document.getElementById('update_department').value;
-        const game = document.getElementById('update_game').value;
 
         if (role === 'Department Admin' && !department) {
             alert('Please select a department for Department Admin!');
             return;
         }
 
-        if (role === 'Committee' && (!department || !game)) {
-            alert('Please select both department and game for Committee member!');
-            return;
+        // 🆕 validate game count
+        if (role === 'Committee') {
+            if (!department || updateSelectedGameIds.length === 0) {
+                alert('Please select both department and at least one game for Committee!');
+                return;
+            }
         }
 
-        // Submit form via AJAX
+        updateGamesDisplay(); // 🆕 update hidden inputs
+
         const formData = new FormData(this);
 
         fetch('admin_update_user.php', {
@@ -308,21 +345,18 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Show success message
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
                         text: data.message,
                         showConfirmButton: true
-                    }).then((result) => {
+                    }).then(result => {
                         if (result.isConfirmed) {
-                            // Close modal and refresh page
                             $('#updateUserModal').modal('hide');
                             location.reload();
                         }
                     });
                 } else {
-                    // Show error message
                     Swal.fire({
                         icon: data.status === 'warning' ? 'warning' : 'error',
                         title: data.status === 'warning' ? 'Warning' : 'Error!',

@@ -51,8 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $gender = trim($_POST['gender']);
     $email = trim($_POST['email']);
     $role = $_POST['role'];
-    $assign_game = ($role === 'Committee') ? ($_POST['assign_game'] ?? null) : null;
-    $department = $_POST['department'];
+    // $assign_game = ($role === 'Committee') ? ($_POST['assign_game'] ?? null) : null;
+    $assign_game = ($role === 'Committee') ? ($_POST['assign_game'] ?? []) : [];
+    $assign_game = is_array($assign_game) ? array_filter($assign_game) : [];
+    $main_game_id = count($assign_game) > 0 ? $assign_game[0] : null;
+
+    // $department = $_POST['department'];
+    $assign_department = ($_POST['assign_department'] ?? []);
+    $assign_department = is_array($assign_department) ? array_filter($assign_department) : [];
+    $department = count($assign_department) > 0 ? $assign_department[0] : null; // assign main department
+
+
 
     // Validation checks
     if (empty($firstname) || empty($lastname) || empty($email) || empty($role) || empty($department) || empty($school_id)) {
@@ -92,9 +101,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt_insert = executeQuery(
             $conn,
             $insert_user_sql,
-            [$firstname, $lastname, $middleinitial, $age, $gender, $email, $hashed_password, $role, $department, $assign_game, $school_id],
+            [$firstname, $lastname, $middleinitial, $age, $gender, $email, $hashed_password, $role, $department, $main_game_id, $school_id],
             "sssissssiis"
         );
+        $user_id = $stmt_insert->insert_id;
+
+
+
+        if ($role === 'Committee' && count($assign_department) > 0) {
+            $stmt_depts = $conn->prepare("INSERT INTO committee_departments (committee_id, department_id, assigned_at) VALUES (?, ?, NOW())");
+
+            foreach ($assign_department as $dept_id) {
+                // Skip inserting the main department again
+                if ($dept_id == $department) continue;
+
+                $stmt_depts->bind_param("ii", $user_id, $dept_id);
+                $stmt_depts->execute();
+            }
+
+            $stmt_depts->close();
+        }
+
+        if ($role === 'Committee' && count($assign_game) > 0) {
+            $user_id = $stmt_insert->insert_id;
+            $stmt_games = $conn->prepare("INSERT INTO committee_games (committee_id, game_id, assigned_at) VALUES (?, ?, NOW())");
+
+            foreach ($assign_game as $gid) {
+                // Skip inserting the main game again
+                if ($gid == $main_game_id) continue;
+
+                $stmt_games->bind_param("ii", $user_id, $gid);
+                $stmt_games->execute();
+            }
+
+            $stmt_games->close();
+        }
+
+
 
         $conn->commit();
 
@@ -116,7 +159,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $game_name = null;
         if ($role === 'Committee' && !empty($assign_game)) {
             $fetch_game_sql = "SELECT game_name FROM games WHERE game_id = ?";
-            $stmt_fetch_game = executeQuery($conn, $fetch_game_sql, [$assign_game], "i");
+            // $stmt_fetch_game = executeQuery($conn, $fetch_game_sql, [$assign_game], "i");
+            $stmt_fetch_game = executeQuery($conn, $fetch_game_sql, [$main_game_id], "i");
+
             $result_game = $stmt_fetch_game->get_result();
 
             if ($result_game->num_rows > 0) {

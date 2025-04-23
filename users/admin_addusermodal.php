@@ -82,9 +82,16 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
                     <div class="row g-3 mt-2" id="gamesDiv" style="display: none;">
                         <div class="col-md-12">
                             <label for="game" class="form-label">Assigned Game</label>
-                            <select class="form-select" id="game" name="game_id">
+                            <!-- <select class="form-select" id="game" name="game_id">
                                 <option value="">Select School First</option>
+                            </select> -->
+
+                            <select class="form-select" id="game">
+                                <option value="">Select a game to add</option>
                             </select>
+                            <div id="selectedGamesContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
+                            <input type="hidden" name="game_ids[]" id="game_ids_input">
+
                         </div>
                     </div>
                 </form>
@@ -98,202 +105,333 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
 </div>
 
 <script>
-// Function to load departments based on selected school
-function loadDepartmentsForAdd(schoolId) {
-    const departmentSelect = document.getElementById('department');
-    departmentSelect.innerHTML = '<option value="">Loading departments...</option>';
-    departmentSelect.disabled = true;
+    // Function to load departments based on selected school
+    function loadDepartmentsForAdd(schoolId) {
+        const departmentSelect = document.getElementById('department');
+        departmentSelect.innerHTML = '<option value="">Loading departments...</option>';
+        departmentSelect.disabled = true;
 
-    fetch(`get_departments.php?school_id=${schoolId}`)
-        .then(response => response.json())
-        .then(departments => {
-            departmentSelect.innerHTML = '<option value="">Select Department</option>';
-            if (departments.length > 0) {
-                departments.forEach(dept => {
-                    const option = new Option(dept.department_name, dept.id);
-                    departmentSelect.add(option);
-                });
-                departmentSelect.disabled = false;
-            } else {
-                departmentSelect.innerHTML = '<option value="">No departments found</option>';
+        fetch(`get_departments.php?school_id=${schoolId}`)
+            .then(response => response.json())
+            .then(departments => {
+                departmentSelect.innerHTML = '<option value="">Select Department</option>';
+                if (departments.length > 0) {
+                    departments.forEach(dept => {
+                        const option = new Option(dept.department_name, dept.id);
+                        departmentSelect.add(option);
+                    });
+                    departmentSelect.disabled = false;
+                } else {
+                    departmentSelect.innerHTML = '<option value="">No departments found</option>';
+                    departmentSelect.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading departments:', error);
+                departmentSelect.innerHTML = '<option value="">Error loading departments</option>';
                 departmentSelect.disabled = true;
-            }
-        })
-        .catch(error => {
-            console.error('Error loading departments:', error);
-            departmentSelect.innerHTML = '<option value="">Error loading departments</option>';
-            departmentSelect.disabled = true;
-        });
-}
-
-// Function to load games based on selected school
-function loadGamesForAdd(schoolId) {
-    const gameSelect = document.getElementById('game');
-    gameSelect.innerHTML = '<option value="">Loading games...</option>';
-    gameSelect.disabled = true;
-
-    fetch(`get_games.php?school_id=${schoolId}`)
-        .then(response => response.json())
-        .then(games => {
-            gameSelect.innerHTML = '<option value="">Select Game</option>';
-            if (games.length > 0) {
-                games.forEach(game => {
-                    const option = new Option(game.game_name, game.game_id);
-                    gameSelect.add(option);
-                });
-                gameSelect.disabled = false;
-            } else {
-                gameSelect.innerHTML = '<option value="">No games found</option>';
-                gameSelect.disabled = true;
-            }
-        })
-        .catch(error => {
-            console.error('Error loading games:', error);
-            gameSelect.innerHTML = '<option value="">Error loading games</option>';
-            gameSelect.disabled = true;
-        });
-}
-
-// Function to handle role selection
-function handleRoleSelection(role) {
-    const departmentDiv = document.getElementById('departmentDiv');
-    const gamesDiv = document.getElementById('gamesDiv');
-    const departmentSelect = document.getElementById('department');
-    const gameSelect = document.getElementById('game');
-
-    // Reset required attributes
-    departmentSelect.required = false;
-    gameSelect.required = false;
-
-    // First hide all optional divs
-    departmentDiv.style.display = 'none';
-    gamesDiv.style.display = 'none';
-
-    switch(role) {
-        case 'School Admin':
-            // School Admin doesn't need department or game
-            break;
-        case 'Department Admin':
-            departmentDiv.style.display = 'block';
-            departmentSelect.required = true;
-            break;
-        case 'Committee':
-            departmentDiv.style.display = 'block';
-            gamesDiv.style.display = 'block';
-            departmentSelect.required = true;
-            gameSelect.required = true;
-            break;
+            });
     }
-}
 
-// Add event listener for school selection change
-document.getElementById('school').addEventListener('change', function() {
-    const selectedSchoolId = this.value;
-    const currentRole = document.getElementById('role').value;
-    
-    if (selectedSchoolId) {
-        if (currentRole === 'School Admin') {
-            // Don't load departments for School Admin
-            loadGamesForAdd(selectedSchoolId);
-        } else if (currentRole === 'Department Admin') {
-            loadDepartmentsForAdd(selectedSchoolId);
-        } else if (currentRole === 'Committee') {
-            loadDepartmentsForAdd(selectedSchoolId);
-            loadGamesForAdd(selectedSchoolId);
-        }
-    } else {
+    // Function to load games based on selected school
+    function loadGamesForAdd(schoolId) {
+        const gameSelect = document.getElementById('game');
+        gameSelect.innerHTML = '<option value="">Loading games...</option>';
+        gameSelect.disabled = true;
+
+        fetch(`get_games.php?school_id=${schoolId}`)
+            .then(response => response.json())
+            .then(games => {
+                gameSelect.innerHTML = '<option value="">Select Game</option>';
+                if (games.length > 0) {
+                    games.forEach(game => {
+                        const option = new Option(game.game_name, game.game_id);
+                        gameSelect.add(option);
+                    });
+                    gameSelect.disabled = false;
+                } else {
+                    gameSelect.innerHTML = '<option value="">No games found</option>';
+                    gameSelect.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading games:', error);
+                gameSelect.innerHTML = '<option value="">Error loading games</option>';
+                gameSelect.disabled = true;
+            });
+    }
+
+    // Function to handle role selection
+    function handleRoleSelection(role) {
+        const departmentDiv = document.getElementById('departmentDiv');
+        const gamesDiv = document.getElementById('gamesDiv');
         const departmentSelect = document.getElementById('department');
         const gameSelect = document.getElementById('game');
-        departmentSelect.innerHTML = '<option value="">Select School First</option>';
-        gameSelect.innerHTML = '<option value="">Select School First</option>';
-        departmentSelect.disabled = true;
-        gameSelect.disabled = true;
-    }
-});
 
-// Add event listener for role selection change
-document.getElementById('role').addEventListener('change', function() {
-    handleRoleSelection(this.value);
-    
-    // Reset and reload dropdowns based on role
-    const schoolSelect = document.getElementById('school');
-    if (schoolSelect.value) {
-        schoolSelect.dispatchEvent(new Event('change'));
-    }
-});
+        // Reset required attributes
+        departmentSelect.required = false;
+        gameSelect.required = false;
 
-// Form validation and submission
-document.getElementById('addUserForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Age validation
-    const age = parseInt(document.getElementById('age').value);
-    if (age < 18) {
-        alert('Age must be 18 or older!');
-        return;
-    }
+        // First hide all optional divs
+        departmentDiv.style.display = 'none';
+        gamesDiv.style.display = 'none';
 
-    // Email validation
-    const email = document.getElementById('email').value;
-    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        alert('Please enter a valid email address!');
-        return;
-    }
-
-    // Role-specific validation
-    const role = document.getElementById('role').value;
-    const department = document.getElementById('department').value;
-    const game = document.getElementById('game').value;
-
-    if (role === 'Department Admin' && !department) {
-        alert('Please select a department for Department Admin!');
-        return;
-    }
-
-    if (role === 'Committee' && (!department || !game)) {
-        alert('Please select both department and game for Committee member!');
-        return;
-    }
-
-    // Submit form via AJAX
-    const formData = new FormData(this);
-    
-    fetch('admin_adduser.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // Show success message
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: data.message,
-                showConfirmButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Close modal and refresh page
-                    $('#addUserModal').modal('hide');
-                    location.reload();
-                }
-            });
-        } else {
-            // Show error message
-            Swal.fire({
-                icon: data.status === 'warning' ? 'warning' : 'error',
-                title: data.status === 'warning' ? 'Warning' : 'Error!',
-                text: data.message
-            });
+        switch (role) {
+            case 'School Admin':
+                // School Admin doesn't need department or game
+                break;
+            case 'Department Admin':
+                departmentDiv.style.display = 'block';
+                departmentSelect.required = true;
+                break;
+            case 'Committee':
+                departmentDiv.style.display = 'block';
+                gamesDiv.style.display = 'block';
+                departmentSelect.required = true;
+                // gameSelect.required = true;
+                break;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: 'An error occurred while processing your request.'
-        });
+    }
+
+    // Add event listener for school selection change
+    document.getElementById('school').addEventListener('change', function() {
+        const selectedSchoolId = this.value;
+        const currentRole = document.getElementById('role').value;
+
+        if (selectedSchoolId) {
+            if (currentRole === 'School Admin') {
+                // Don't load departments for School Admin
+                loadGamesForAdd(selectedSchoolId);
+            } else if (currentRole === 'Department Admin') {
+                loadDepartmentsForAdd(selectedSchoolId);
+            } else if (currentRole === 'Committee') {
+                loadDepartmentsForAdd(selectedSchoolId);
+                loadGamesForAdd(selectedSchoolId);
+            }
+        } else {
+            const departmentSelect = document.getElementById('department');
+            const gameSelect = document.getElementById('game');
+            departmentSelect.innerHTML = '<option value="">Select School First</option>';
+            gameSelect.innerHTML = '<option value="">Select School First</option>';
+            departmentSelect.disabled = true;
+            gameSelect.disabled = true;
+        }
     });
-});
+
+    // Add event listener for role selection change
+    document.getElementById('role').addEventListener('change', function() {
+        handleRoleSelection(this.value);
+
+        // Reset and reload dropdowns based on role
+        const schoolSelect = document.getElementById('school');
+        if (schoolSelect.value) {
+            schoolSelect.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // Form validation and submission
+    // document.getElementById('addUserForm').addEventListener('submit', function(e) {
+    //     e.preventDefault();
+
+    //     // Age validation
+    //     const age = parseInt(document.getElementById('age').value);
+    //     if (age < 18) {
+    //         alert('Age must be 18 or older!');
+    //         return;
+    //     }
+
+    //     // Email validation
+    //     const email = document.getElementById('email').value;
+    //     if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    //         alert('Please enter a valid email address!');
+    //         return;
+    //     }
+
+    //     // Role-specific validation
+    //     const role = document.getElementById('role').value;
+    //     const department = document.getElementById('department').value;
+    //     // const game = document.getElementById('game').value;
+
+    //     if (role === 'Department Admin' && !department) {
+    //         alert('Please select a department for Department Admin!');
+    //         return;
+    //     }
+
+    //     // if (role === 'Committee' && (!department || !game)) {
+    //     //     alert('Please select both department and game for Committee member!');
+    //     //     return;
+    //     // }
+
+    //     if (role === 'Committee') {
+    //         if (!department || selectedGameIds.length === 0) {
+    //             alert('Please select both department and at least one game for Committee!');
+    //             return;
+    //         }
+    //     }
+
+
+    //     // Submit form via AJAX
+    //     const formData = new FormData(this);
+
+    //     fetch('admin_adduser.php', {
+    //             method: 'POST',
+    //             body: formData
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.status === 'success') {
+    //                 // Show success message
+    //                 Swal.fire({
+    //                     icon: 'success',
+    //                     title: 'Success!',
+    //                     text: data.message,
+    //                     showConfirmButton: true
+    //                 }).then((result) => {
+    //                     if (result.isConfirmed) {
+    //                         // Close modal and refresh page
+    //                         $('#addUserModal').modal('hide');
+    //                         location.reload();
+    //                     }
+    //                 });
+    //             } else {
+    //                 // Show error message
+    //                 Swal.fire({
+    //                     icon: data.status === 'warning' ? 'warning' : 'error',
+    //                     title: data.status === 'warning' ? 'Warning' : 'Error!',
+    //                     text: data.message
+    //                 });
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error('Error:', error);
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Error!',
+    //                 text: 'An error occurred while processing your request.'
+    //             });
+    //         });
+    // });
+    // Form validation and submission
+    document.getElementById('addUserForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const age = parseInt(document.getElementById('age').value);
+        if (age < 18) {
+            alert('Age must be 18 or older!');
+            return;
+        }
+
+        const email = document.getElementById('email').value;
+        if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+            alert('Please enter a valid email address!');
+            return;
+        }
+
+        const role = document.getElementById('role').value;
+        const department = document.getElementById('department').value;
+
+        if (role === 'Department Admin' && !department) {
+            alert('Please select a department for Department Admin!');
+            return;
+        }
+
+        if (role === 'Committee') {
+            if (!department || selectedGameIds.length === 0) {
+                alert('Please select both department and at least one game for Committee!');
+                return;
+            }
+        }
+
+        updateSelectedGamesDisplay(); // ✅ make sure inputs are updated
+
+        const formData = new FormData(this);
+
+        fetch('admin_adduser.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        showConfirmButton: true
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            $('#addUserModal').modal('hide');
+                            location.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: data.status === 'warning' ? 'warning' : 'error',
+                        title: data.status === 'warning' ? 'Warning' : 'Error!',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while processing your request.'
+                });
+            });
+    });
+
+
+    let selectedGameIds = [];
+
+    document.getElementById('game').addEventListener('change', function() {
+        const selectedGameId = this.value;
+        const selectedGameText = this.options[this.selectedIndex].text;
+
+        if (!selectedGameId || selectedGameIds.includes(selectedGameId)) return;
+
+        selectedGameIds.push(selectedGameId);
+        updateSelectedGamesDisplay();
+        this.value = ""; // Reset dropdown
+    });
+
+    function updateSelectedGamesDisplay() {
+        const container = document.getElementById('selectedGamesContainer');
+        container.innerHTML = "";
+
+        // Remove old hidden inputs
+        document.querySelectorAll('input[name="game_ids[]"]').forEach(el => el.remove());
+
+        selectedGameIds.forEach(id => {
+            const option = document.querySelector(`#game option[value="${id}"]`);
+            const label = option ? option.textContent : 'Game';
+
+            // Create game tag
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-primary rounded-pill px-3 py-2 d-flex align-items-center';
+            badge.innerHTML = `
+            ${label}
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2" data-id="${id}" aria-label="Remove"></button>
+        `;
+            container.appendChild(badge);
+
+            // Create hidden input for each game ID
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'game_ids[]';
+            hiddenInput.value = id;
+            document.getElementById('addUserForm').appendChild(hiddenInput);
+        });
+    }
+
+
+    // Remove game on click
+    document.getElementById('selectedGamesContainer').addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-close')) {
+            const idToRemove = e.target.getAttribute('data-id');
+            selectedGameIds = selectedGameIds.filter(id => id !== idToRemove);
+            updateSelectedGamesDisplay();
+        }
+    });
 </script>

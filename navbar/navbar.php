@@ -237,6 +237,10 @@
         flex-direction: column;
         align-items: center;
     }
+
+    .dropdown-item {
+        cursor: pointer !important;
+    }
 </style>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=home" />
@@ -382,6 +386,39 @@
                 <li><a class="dropdown-item text-center text-muted" href="#">View all notifications</a></li>
             </ul>
         </div> -->
+
+        <!-- users game dropdown -->
+        <?php if ($_SESSION['role'] === 'Committee'): ?>
+            <!-- Game Dropdown -->
+            <div class="dropdown me-3">
+                <a class="text-secondary me-3 dropdown-toggle" id="navbarGameDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <?= $_SESSION['game_name'] ?? 'Games' ?>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" id="gamesDropdown" aria-labelledby="navbarGameDropdown">
+                    <li class="dropdown-item text-center text-muted">Loading...</li>
+                </ul>
+            </div>
+
+        <?php endif; ?>
+
+
+
+        <!-- User's Department Dropdown -->
+        <div class="dropdown me-3">
+            <a class="text-secondary me-3 dropdown-toggle" id="navbarDepartmentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <?= $_SESSION['department_name'] ?? 'Departments' ?>
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" id="departmentsDropdown" aria-labelledby="navbarDepartmentDropdown">
+                <!-- Departments will be dynamically inserted here -->
+                <li class="dropdown-item text-center text-muted">Loading...</li>
+            </ul>
+        </div>
+
+        <!-- Button to trigger department change (hidden) -->
+        <button id="changeDepartmentBtn" style="display: none;"></button>
+
 
         <!-- Inbox Icon -->
         <div class="dropdown me-3 inbox-dropdown position-relative">
@@ -593,58 +630,130 @@
 </div> -->
 
 <script>
-    // // Handle button visibility based on role
-    // document.addEventListener("DOMContentLoaded", function() {
-    //     const userRole = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : ''; ?>";
-    //     const committeeSidebarToggle = document.getElementById('committeeSidebarToggle');
-    //     const sidebarToggle = document.getElementById('sidebarToggle');
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fetch departments for the current user
+        fetchDepartments();
+        fetchGames();
 
-    //     // Initially hide both buttons
-    //     if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'none';
-    //     if (sidebarToggle) sidebarToggle.style.display = 'none';
+        console.log("initializing departments");
 
-    //     // Show appropriate button based on role
-    //     if (userRole === 'Committee' || userRole === 'superadmin') {
-    //         if (committeeSidebarToggle) committeeSidebarToggle.style.display = 'block';
-    //     } else {
-    //         if (sidebarToggle) sidebarToggle.style.display = 'block';
-    //     }
-    // });
+        function fetchDepartments() {
+            fetch('../multi/fetch_departments.php') // Server-side file that fetches the departments
+                .then(response => response.json())
+                .then(data => {
+                    const departmentsDropdown = document.getElementById('departmentsDropdown');
+                    departmentsDropdown.innerHTML = ''; // Clear loading text
 
-    // // Your existing toggle functionality
-    // document.addEventListener("DOMContentLoaded", function() {
-    //     const userRole = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : ''; ?>";
-    //     console.log(userRole);
+                    // Check if the data is valid and contains the departments
+                    if (data.success && data.departments.length > 0) {
+                        data.departments.forEach(department => {
+                            const departmentItem = document.createElement('li');
+                            // departmentItem.classList.add('dropdown-item', 'cursor-pointer');
+                            departmentItem.classList.add('dropdown-item');
+                            departmentItem.textContent = department.name;
 
-    //     // Determine the correct sidebar ID based on user role
-    //     const sidebarId = (userRole === 'Committee') ? '#csidebar' : '#sidebar';
-    //     const sidebar = document.querySelector(sidebarId);
-    //     const togglerButton = document.querySelector('.navbar-toggler');
+                            // Add click event to select the department
+                            departmentItem.addEventListener('click', () => {
+                                changeDepartment(department.id);
+                            });
 
-    //     // If the button is found, update the 'data-bs-target' to the correct sidebar ID
-    //     if (togglerButton) {
-    //         togglerButton.setAttribute('data-bs-target', sidebarId);
-    //     }
+                            departmentsDropdown.appendChild(departmentItem);
+                        });
+                    } else {
+                        departmentsDropdown.innerHTML = '<li class="dropdown-item text-center text-muted pointer">No departments found</li>';
+                    }
+                })
+                .catch(error => console.error('Error fetching departments:', error));
+        }
 
-    //     // Add click event listener to the toggler button to manually handle sidebar toggle
-    //     if (togglerButton && sidebar) {
-    //         togglerButton.addEventListener('click', function(event) {
-    //             event.preventDefault();
-    //             event.stopPropagation();
+        // Change department on selection
+        function changeDepartment(departmentId) {
+            fetch('../multi/change_department.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        department_id: departmentId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Force page reload to apply session changes
+                        // location.reload(true); // Bypass cache to get fresh session data
+                        window.location.href = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
 
-    //             // Toggle the 'active' class on the sidebar
-    //             sidebar.classList.toggle('active');
 
-    //             // Add/remove 'sidebar-active' class to body for overlay
-    //             document.body.classList.toggle('sidebar-active');
+                        // Alternatively, you could redirect to a different page
+                        // window.location.href = '../committee/committeedashboard.php';
+                    } else {
+                        alert(data.message || 'Failed to change department. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error changing department:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
 
-    //             // Update aria-expanded attribute
-    //             const isExpanded = sidebar.classList.contains('active');
-    //             togglerButton.setAttribute('aria-expanded', isExpanded);
-    //         });
-    //     }
-    // });
+        // function changeDepartment(departmentId) {
+        //     // Redirect to PHP script that handles session update and redirection
+        //     window.location.href = '../multi/select_department.php?department_id=' + departmentId;
+        // }
 
+        function fetchGames() {
+            fetch('../multi/multi-game/fetch_game.php') // Server-side file to fetch games
+                .then(response => response.json())
+                .then(data => {
+                    const gamesDropdown = document.getElementById('gamesDropdown');
+                    gamesDropdown.innerHTML = ''; // Clear "Loading..."
+
+                    if (data.success && data.games.length > 0) {
+                        data.games.forEach(game => {
+                            const gameItem = document.createElement('li');
+                            gameItem.classList.add('dropdown-item');
+                            // gameItem.classList.add('dropdown-item', 'cursor-pointer');
+                            gameItem.textContent = game.name;
+
+                            gameItem.addEventListener('click', () => {
+                                changeGame(game.id);
+                            });
+
+                            gamesDropdown.appendChild(gameItem);
+                        });
+                    } else {
+                        gamesDropdown.innerHTML = '<li class="dropdown-item text-center text-muted pointer">No games found</li>';
+                    }
+                })
+                .catch(error => console.error('Error fetching games:', error));
+        }
+
+        function changeGame(gameId) {
+            fetch('../multi/multi-game/change_game.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        game_id: gameId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
+                    } else {
+                        alert(data.message || 'Failed to change game. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error changing game:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+
+    });
     // Handle button visibility based on role and screen size
     document.addEventListener("DOMContentLoaded", function() {
         const userRole = "<?php echo $_SESSION['role'] ?? ''; ?>";

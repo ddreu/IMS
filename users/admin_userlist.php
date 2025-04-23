@@ -36,6 +36,35 @@ if (isset($_POST['search'])) {
 }
 
 // Modified query to show all users across all schools
+// $sql = "
+//     SELECT 
+//         u.id, 
+//         u.firstname, 
+//         u.lastname, 
+//         u.middleinitial, 
+//         u.age, 
+//         u.gender, 
+//         u.email, 
+//         u.role,
+//         u.department,
+//         u.school_id,
+//         u.game_id,
+//         u.image,
+//         d.department_name,
+//         s.school_name
+//     FROM 
+//         users u
+//     LEFT JOIN 
+//         departments d ON u.department = d.id
+//     LEFT JOIN
+//         schools s ON u.school_id = s.school_id
+//     WHERE 
+//         (u.firstname LIKE ? OR 
+//         u.lastname LIKE ? OR 
+//         u.email LIKE ?) 
+//         AND u.id != ?
+// ";
+
 $sql = "
     SELECT 
         u.id, 
@@ -51,7 +80,12 @@ $sql = "
         u.game_id,
         u.image,
         d.department_name,
-        s.school_name
+        s.school_name,
+        (
+            SELECT GROUP_CONCAT(game_id) 
+            FROM committee_games 
+            WHERE committee_id = u.id
+        ) AS game_ids
     FROM 
         users u
     LEFT JOIN 
@@ -63,7 +97,9 @@ $sql = "
         u.lastname LIKE ? OR 
         u.email LIKE ?) 
         AND u.id != ?
+        ORDER BY u.id DESC
 ";
+
 
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
@@ -196,7 +232,11 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                 echo '<td class="px-4">' . htmlspecialchars($row['department_name'] ?? 'N/A') . '</td>';
                                                 echo '<td class="px-4">';
                                                 echo '<div class="d-flex gap-2">';
-                                                echo '<button type="button" class="btn btn-sm btn-outline-primary" onclick="openUpdateModal(\'' . $row['id'] . '\', \'' .
+                                                // echo '<button type="button" class="btn btn-sm btn-outline-primary" onclick="openUpdateModal(\'' . $row['id'] . '\', \'' .
+                                                echo '<button type="button" class="btn btn-sm btn-outline-primary" 
+      data-main-game="' . $row['game_id'] . '" 
+      onclick="openUpdateModal(this, \'' . $row['id'] . '\', \'' .
+
                                                     $row['firstname'] . '\', \'' .
                                                     $row['lastname'] . '\', \'' .
                                                     $row['middleinitial'] . '\', \'' .
@@ -206,7 +246,8 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                     $row['role'] . '\', \'' .
                                                     $row['school_id'] . '\', \'' .
                                                     $row['department'] . '\', \'' .
-                                                    ($row['game_id'] ?? '') . '\')">';
+                                                    // ($row['game_id'] ?? '') . '\')">';
+                                                    ($row['game_ids'] ?? '') . '\')">';
                                                 echo '<i class="fas fa-edit"></i>';
                                                 echo '</button>';
                                                 echo '<a href="javascript:void(0)" onclick="deleteUser(' . $row['id'] . ', \'' . htmlspecialchars($row['firstname'] . ' ' . $row['lastname']) . '\')" class="btn btn-sm btn-danger">';

@@ -15,8 +15,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gender = trim($_POST['gender']);
     $email = trim($_POST['email']);
     $role = trim($_POST['role']);
-    $games = ($role === "Department Admin") ? null : (isset($_POST['assign_game']) ? intval($_POST['assign_game']) : null); // Updated to use 'assign_game'
-    $department = intval($_POST['department']);
+    // $games = ($role === "Department Admin") ? null : (isset($_POST['assign_game']) ? intval($_POST['assign_game']) : null); 
+    $assign_game = ($role === 'Committee' && isset($_POST['assign_game'])) ? $_POST['assign_game'] : [];
+    $assign_game = is_array($assign_game) ? array_filter($assign_game) : [];
+    // $main_game_id = count($assign_game) > 0 ? intval($assign_game[0]) : null;
+
+    $main_game_id = null;
+    if (!empty($assign_game)) {
+        $main_game_id = intval(array_shift($assign_game));
+    }
+
+    // $department = intval($_POST['department']);
+
+    $assign_department = isset($_POST['assign_department']) ? array_filter($_POST['assign_department']) : [];
+
+    $department = null;
+    if (!empty($assign_department)) {
+        $department = intval(array_shift($assign_department)); // Main department
+    }
+
 
     // Check required fields
     if (empty($firstname) || empty($lastname) || empty($email) || empty($department)) {
@@ -83,10 +100,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $new_game_id = ($role !== "Department Admin" && isset($_POST['assign_game'])) ? intval($_POST['assign_game']) : null;
 
         // If the new game_id is different from the current one, fetch the new game_name
+        // $new_game_name = null;
+        // if ($new_game_id && $new_game_id !== $current_game_id) {
+        //     $stmt_game = $conn->prepare("SELECT game_name FROM games WHERE game_id = ?");
+        //     $stmt_game->bind_param("i", $new_game_id);
+        //     $stmt_game->execute();
+        //     $result_game = $stmt_game->get_result();
+        //     if ($result_game->num_rows > 0) {
+        //         $new_game_name = $result_game->fetch_assoc()['game_name'];
+        //     }
+        //     $stmt_game->close();
+        // }
+
         $new_game_name = null;
-        if ($new_game_id && $new_game_id !== $current_game_id) {
+        if ($main_game_id && $main_game_id !== $current_game_id) {
             $stmt_game = $conn->prepare("SELECT game_name FROM games WHERE game_id = ?");
-            $stmt_game->bind_param("i", $new_game_id);
+            $stmt_game->bind_param("i", $main_game_id);
             $stmt_game->execute();
             $result_game = $stmt_game->get_result();
             if ($result_game->num_rows > 0) {
@@ -95,15 +124,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt_game->close();
         }
 
+
         // Prepare the SQL update statement
         if ($role === "departmentadmin") {
             $sql_update = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ?, role = ?, department = NULL, game_id = NULL WHERE id = ?";
             $stmt_update = $conn->prepare($sql_update);
             $stmt_update->bind_param("sssissssi", $firstname, $lastname, $middleinitial, $age, $gender, $email, $role, $user_id);
         } else {
+            // $sql_update = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ?, role = ?, game_id = ?, department = ? WHERE id = ?";
+            // $stmt_update = $conn->prepare($sql_update);
+            // $stmt_update->bind_param("sssisssiii", $firstname, $lastname, $middleinitial, $age, $gender, $email, $role, $new_game_id, $department, $user_id);
             $sql_update = "UPDATE users SET firstname = ?, lastname = ?, middleinitial = ?, age = ?, gender = ?, email = ?, role = ?, game_id = ?, department = ? WHERE id = ?";
             $stmt_update = $conn->prepare($sql_update);
-            $stmt_update->bind_param("sssisssiii", $firstname, $lastname, $middleinitial, $age, $gender, $email, $role, $new_game_id, $department, $user_id);
+            $stmt_update->bind_param("sssisssiii", $firstname, $lastname, $middleinitial, $age, $gender, $email, $role, $main_game_id, $department, $user_id);
         }
 
         // Execute the prepared statement
@@ -120,9 +153,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($gender !== $current_user['gender']) $changes[] = "Gender: {$current_user['gender']} → $gender";
             if ($email !== $current_user['email']) $changes[] = "Email: {$current_user['email']} → $email";
             if ($role !== $current_user['role']) $changes[] = "Role: {$current_user['role']} → $role";
-            if ($new_game_id !== $current_game_id) {
+            // if ($new_game_id !== $current_game_id) {
+            //     $changes[] = "Game: " . ($game_name ?? "None") . " → " . ($new_game_name ?? "None");
+            // }
+            if ($main_game_id !== $current_game_id) {
                 $changes[] = "Game: " . ($game_name ?? "None") . " → " . ($new_game_name ?? "None");
             }
+
             if ($old_department_name !== $department_name) {
                 $changes[] = "Department: $old_department_name → $department_name";
             }
@@ -135,20 +172,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Log the action using logUserAction
-          //  logUserAction(
-          //      $conn,
-        //        $_SESSION['user_id'], // Logged-in user performing the action
-         //       'Users',              // Table name
-          //      'UPDATE',             // Operation type
-        //        $user_id,             // Record ID of updated user
-         //       $description,         // Description of the operation
-          //      json_encode($current_user), // Previous data (before update)
-        //        json_encode($_POST)  // New data (after update)
-         //   );
+            //  logUserAction(
+            //      $conn,
+            //        $_SESSION['user_id'], // Logged-in user performing the action
+            //       'Users',              // Table name
+            //      'UPDATE',             // Operation type
+            //        $user_id,             // Record ID of updated user
+            //       $description,         // Description of the operation
+            //      json_encode($current_user), // Previous data (before update)
+            //        json_encode($_POST)  // New data (after update)
+            //   );
 
+            if ($role === 'Committee') {
+                // Remove all previous committee games
+                $conn->query("DELETE FROM committee_games WHERE committee_id = $user_id");
+
+                $committee_id_param = $user_id;
+                $game_id_param = null;
+
+                $stmt_games = $conn->prepare("INSERT INTO committee_games (committee_id, game_id, assigned_at) VALUES (?, ?, NOW())");
+
+                foreach ($assign_game as $gid) {
+                    if ((int)$gid === $main_game_id) continue;
+
+                    $gid_int = (int)$gid;
+                    $stmt_games->bind_param("ii", $committee_id_param, $gid_int);
+                    $stmt_games->execute();
+                }
+                $stmt_games->close();
+            }
+
+
+            if ($role === 'Committee' && isset($_POST['assign_department'])) {
+                $assign_department = is_array($_POST['assign_department']) ? array_filter($_POST['assign_department']) : [];
+                $main_department_id = $department; // This is already set earlier from $_POST['department']
+
+                // Delete existing committee department assignments
+                $conn->query("DELETE FROM committee_departments WHERE committee_id = $user_id");
+
+                // Re-insert all departments except the main one
+                $stmt_depts = $conn->prepare("INSERT INTO committee_departments (committee_id, department_id, assigned_at) VALUES (?, ?, NOW())");
+
+                foreach ($assign_department as $dept_id) {
+                    if ((int)$dept_id === (int)$main_department_id) continue;
+
+                    $dept_id_int = (int)$dept_id;
+                    $stmt_depts->bind_param("ii", $user_id, $dept_id_int);
+                    $stmt_depts->execute();
+                }
+
+                $stmt_depts->close();
+            }
+
+
+
+            // echo json_encode([
+            //     "status" => "success",
+            //     "message" => "User updated successfully."
+            // ]);
             echo json_encode([
                 "status" => "success",
-                "message" => "User updated successfully."
+                "message" => "User updated successfully.",
+                "debug" => [
+                    "user_id" => $user_id,
+                    "assign_game" => $assign_game,
+                    "main_game_id" => $main_game_id,
+                    "games_inserted" => array_values(array_filter($assign_game, fn($gid) => (int)$gid !== $main_game_id))
+                ]
             ]);
         } else {
             echo json_encode([

@@ -84,6 +84,48 @@ if (isset($_POST['search'])) {
     $searchQuery = mysqli_real_escape_string($conn, $_POST['search']);
 }
 
+
+
+// $sql = "
+//     SELECT 
+//         u.id, 
+//         u.firstname, 
+//         u.lastname, 
+//         u.middleinitial, 
+//         u.age, 
+//         u.gender, 
+//         u.email, 
+//         u.role,
+//         u.department,
+//         u.game_id,
+//         u.is_archived,
+//         u.image,
+//         d.department_name, 
+//         g.game_name,
+//         (
+//             SELECT GROUP_CONCAT(DISTINCT game_id)
+//             FROM committee_games
+//             WHERE committee_id = u.id
+//         ) AS game_ids
+//     FROM 
+//         users u
+//     LEFT JOIN 
+//         games g ON u.game_id = g.game_id 
+//     LEFT JOIN 
+//         departments d ON u.department = d.id  
+//     WHERE 
+//         (u.firstname LIKE ? OR 
+//          u.lastname LIKE ? OR 
+//          u.email LIKE ?) AND
+//         u.role NOT IN ('superadmin', 'School Admin') AND 
+//         u.school_id = ? 
+//         AND u.id != ? AND 
+//         (
+//             (u.role = 'committee' AND g.is_archived = 0 AND d.is_archived = 0) OR
+//             (u.role = 'department admin' AND d.is_archived = 0)
+//         )
+// ";
+
 $sql = "
     SELECT 
         u.id, 
@@ -99,7 +141,24 @@ $sql = "
         u.is_archived,
         u.image,
         d.department_name, 
-        g.game_name
+        g.game_name,
+        (
+            SELECT GROUP_CONCAT(DISTINCT game_id)
+            FROM committee_games
+            WHERE committee_id = u.id
+        ) AS game_ids,
+        (
+    SELECT GROUP_CONCAT(DISTINCT d2.department_name SEPARATOR '/')
+    FROM committee_departments cd
+    JOIN departments d2 ON cd.department_id = d2.id
+    WHERE cd.committee_id = u.id
+) AS additional_departments,
+(
+    SELECT GROUP_CONCAT(DISTINCT cd.department_id)
+    FROM committee_departments cd
+    WHERE cd.committee_id = u.id
+) AS additional_department_ids
+
     FROM 
         users u
     LEFT JOIN 
@@ -108,8 +167,8 @@ $sql = "
         departments d ON u.department = d.id  
     WHERE 
         (u.firstname LIKE ? OR 
-        u.lastname LIKE ? OR 
-        u.email LIKE ?) AND
+         u.lastname LIKE ? OR 
+         u.email LIKE ?) AND
         u.role NOT IN ('superadmin', 'School Admin') AND 
         u.school_id = ? 
         AND u.id != ? AND 
@@ -117,14 +176,21 @@ $sql = "
             (u.role = 'committee' AND g.is_archived = 0 AND d.is_archived = 0) OR
             (u.role = 'department admin' AND d.is_archived = 0)
         )
+    GROUP BY u.id
+    ORDER BY u.id DESC
 ";
 
-
 if ($selected_department_id !== null) {
-    $sql .= " AND u.department = ?";
+    // move it BEFORE the GROUP BY clause
+    $sql = str_replace('GROUP BY u.id', 'AND u.department = ? GROUP BY u.id', $sql);
 }
 
-$sql .= " GROUP BY u.id";
+// if ($selected_department_id !== null) {
+//     $sql .= " AND u.department = ?";
+// }
+
+// $sql .= " GROUP BY u.id ORDER BY u.id DESC";
+
 
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
@@ -206,6 +272,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
     unset($_SESSION['message_type']);
 
 
+
 ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -234,6 +301,10 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles/dashboard.css"> <!-- Adjust the path if needed -->
@@ -452,6 +523,13 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                 font-size: 0.75rem;
             }
         }
+
+        /* Force select to look like a dropdown even with multiple */
+        /* #assign_game[multiple] {
+            height: auto !important;
+            overflow-y: auto;
+            min-height: 38px;
+        } */
     </style>
 </head>
 
@@ -645,7 +723,15 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                     echo '<td class="px-4" data-label="Role">';
                                                     echo '<span class="badge ' . getRoleBadgeClass($row['role']) . '">' . htmlspecialchars($row['role']) . '</span>';
                                                     echo '</td>';
-                                                    echo '<td class="px-4" data-label="Department">' . htmlspecialchars($row['department_name'] ?? 'N/A') . '</td>';
+                                                    // echo '<td class="px-4" data-label="Department">' . htmlspecialchars($row['department_name'] ?? 'N/A') . '</td>';
+
+                                                    $display_departments = $row['department_name'] ?? '';
+                                                    if (!empty($row['additional_departments'])) {
+                                                        $display_departments .= '/' . $row['additional_departments'];
+                                                    }
+
+                                                    echo '<td class="px-4" data-label="Department">' . htmlspecialchars($display_departments ?: 'N/A') . '</td>';
+
                                                     echo '<td class="px-4" data-label="Actions">';
                                                     echo '<div class="d-flex gap-2 justify-content-center">';
 
@@ -657,23 +743,28 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                     echo '<ul class="dropdown-menu" style="z-index: 1050; padding: 4px 8px; line-height: 1.2; min-width: 140px;">';
 
                                                     // Edit button (only show if not archived)
+
                                                     if ($row['is_archived'] != 1) {
+
                                                         echo '<li>';
                                                         echo '<button class="dropdown-item" 
-                                                                    onclick="openUpdateModal(
-                                                                        \'' . htmlspecialchars($row['id']) . '\',
-                                                                        \'' . htmlspecialchars($row['firstname']) . '\',
-                                                                        \'' . htmlspecialchars($row['lastname']) . '\',
-                                                                        \'' . htmlspecialchars($row['middleinitial']) . '\',
-                                                                        \'' . htmlspecialchars($row['age']) . '\',
-                                                                        \'' . htmlspecialchars($row['gender']) . '\',
-                                                                        \'' . htmlspecialchars($row['email']) . '\',
-                                                                        \'' . htmlspecialchars($row['role']) . '\',
-                                                                        \'' . htmlspecialchars($row['game_id'] ?? '') . '\',
-                                                                        \'' . htmlspecialchars($row['department'] ?? '') . '\'
-                                                                    )">
-                                                                    Edit
-                                                                  </button>';
+        onclick="openUpdateModal(
+            \'' . htmlspecialchars($row['id']) . '\',
+            \'' . htmlspecialchars($row['firstname']) . '\',
+            \'' . htmlspecialchars($row['lastname']) . '\',
+            \'' . htmlspecialchars($row['middleinitial']) . '\',
+            \'' . htmlspecialchars($row['age']) . '\',
+            \'' . htmlspecialchars($row['gender']) . '\',
+            \'' . htmlspecialchars($row['email']) . '\',
+            \'' . htmlspecialchars($row['role']) . '\',
+            \'' . htmlspecialchars($row['game_ids'] ?? '') . '\',
+            \'' . htmlspecialchars($row['game_id'] ?? '') . '\',
+       \'' . htmlspecialchars($row['department'] ?? '') . '\',
+\'' . htmlspecialchars($row['additional_department_ids'] ?? '') . '\'
+
+        )">
+        Edit
+      </button>';
                                                         echo '</li>';
                                                     }
 
@@ -736,10 +827,80 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
             <!-- Include SweetAlert library -->
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <!-- Select2 JS -->
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
             <!-- Custom JS -->
             <script src="../utils.js"></script>
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
+                    $('#assign_game').select2({
+                        placeholder: 'Select Games',
+                        width: '100%'
+                    });
+
+                    $('#addCommitteeModal').on('shown.bs.modal', function() {
+                        $('#assign_game').select2({
+                            dropdownParent: $('#addCommitteeModal'),
+                            placeholder: 'Select Games',
+                            width: '100%'
+                        });
+                    });
+                    $('#updateCommitteeModal').on('shown.bs.modal', function() {
+                        $('#update_assign_game').select2({
+                            dropdownParent: $('#updateCommitteeModal'),
+                            placeholder: 'Select Games',
+                            width: '100%'
+                        });
+                    });
+                    // $('#dept_level').select2({
+                    //     placeholder: 'Select Department',
+                    //     width: '100%'
+                    // });
+
+                    $('#addCommitteeModal').on('shown.bs.modal', function() {
+                        $('#dept_level').select2({
+                            dropdownParent: $('#addCommitteeModal'),
+                            placeholder: 'Select Department',
+                            width: '100%'
+                        });
+                    });
+
+                    $('#updateCommitteeModal').on('shown.bs.modal', function() {
+                        $('#update_assign_game').select2({
+                            dropdownParent: $('#updateCommitteeModal'),
+                            placeholder: 'Select Games',
+                            width: '100%'
+                        });
+                        $('#update_dept_level').select2({
+                            dropdownParent: $('#updateCommitteeModal'),
+                            placeholder: 'Select Department',
+                            width: '100%'
+                        });
+                    });
+
+                });
+
+
+                // Function to initialize Select2 and remove placeholder if only one option is available
+                function initSelect2WithSingleOption(selectElement, placeholder) {
+                    const options = Array.from(selectElement.options);
+                    if (options.length === 2) { // One option plus the placeholder
+                        // Select the only available option and remove the placeholder
+                        selectElement.selectedIndex = 1; // Select the only available option
+                        $(selectElement).select2({
+                            placeholder: false, // Disable placeholder
+                            width: '100%' // Adjust width
+                        });
+                    } else {
+                        $(selectElement).select2({
+                            placeholder: placeholder, // Use placeholder if there are multiple options
+                            width: '100%' // Adjust width
+                        });
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+
                     // Add event listener for the role selection in the add user modal
                     const addRoleSelect = document.getElementById("role");
                     if (addRoleSelect) {
@@ -942,7 +1103,8 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                     });
                 }
 
-                function openUpdateModal(userId, firstname, lastname, middleinitial, age, gender, email, role, games, department) {
+
+                function openUpdateModal(userId, firstname, lastname, middleinitial, age, gender, email, role, gameIdsCsv, mainGameId, departmentId, additionalDepartmentIdsCsv) {
                     document.getElementById('update_user_id').value = userId;
                     document.getElementById('update_firstname').value = firstname;
                     document.getElementById('update_lastname').value = lastname;
@@ -952,20 +1114,84 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                     document.getElementById('update_email').value = email;
                     document.getElementById('update_role').value = role;
 
-                    // Prefill the game selection
-                    const updateGames = document.getElementById('update_assign_game');
-                    updateGames.value = games ? games : ""; // Ensure the game is set if provided
+                    // Check if additionalDepartmentIdsCsv is null or empty
+                    let deptIds = new Set([departmentId]);
+                    if (additionalDepartmentIdsCsv && additionalDepartmentIdsCsv.trim()) {
+                        deptIds = new Set([departmentId, ...additionalDepartmentIdsCsv.split(',')]);
+                    }
 
-                    // Prefill department selection
-                    document.getElementById('update_dept_level').value = department; // Set department
+                    const deptSelect = document.getElementById('update_dept_level');
+                    Array.from(deptSelect.options).forEach(opt => {
+                        opt.selected = deptIds.has(opt.value);
+                    });
+                    $('#update_dept_level').trigger('change'); // Trigger Select2 change event to update UI
 
-                    // Show/hide assign game based on role
-                    toggleAssignGameField(role);
+                    // Check if gameIdsCsv is null or empty
+                    let selectedGameIds = [mainGameId];
+                    if (gameIdsCsv && gameIdsCsv.trim()) {
+                        selectedGameIds = [...new Set([...gameIdsCsv.split(','), mainGameId])];
+                    }
 
-                    // Show the modal (Bootstrap modal)
+                    const updateGameSelect = document.getElementById('update_assign_game');
+                    Array.from(updateGameSelect.options).forEach(opt => {
+                        opt.selected = selectedGameIds.includes(opt.value);
+                    });
+                    $('#update_assign_game').trigger('change'); // Trigger Select2 change event to update UI
+
+                    toggleAssignGameField(role); // Toggle the game assignment field based on the role
                     const updateModal = new bootstrap.Modal(document.getElementById('updateCommitteeModal'));
                     updateModal.show();
                 }
+
+
+                // function openUpdateModal(userId, firstname, lastname, middleinitial, age, gender, email, role, gameIdsCsv, mainGameId, departmentId, additionalDepartmentIdsCsv) {
+                //     document.getElementById('update_user_id').value = userId;
+                //     document.getElementById('update_firstname').value = firstname;
+                //     document.getElementById('update_lastname').value = lastname;
+                //     document.getElementById('update_middleinitial').value = middleinitial;
+                //     document.getElementById('update_age').value = age;
+                //     document.getElementById('update_gender').value = gender;
+                //     document.getElementById('update_email').value = email;
+                //     document.getElementById('update_role').value = role;
+
+                //     // Split department IDs (main + additional)
+                //     const deptIds = new Set([departmentId, ...additionalDepartmentIdsCsv.split(',')]);
+                //     // const deptIds = new Set([departmentId]);
+
+                //     const deptSelect = document.getElementById('update_dept_level');
+                //     Array.from(deptSelect.options).forEach(opt => {
+                //         opt.selected = deptIds.has(opt.value);
+                //     });
+                //     $('#update_dept_level').trigger('change');
+
+                //     // Set games
+                //     const selectedGameIds = [...new Set([...gameIdsCsv.split(','), mainGameId])];
+                //     const updateGameSelect = document.getElementById('update_assign_game');
+                //     Array.from(updateGameSelect.options).forEach(opt => {
+                //         opt.selected = selectedGameIds.includes(opt.value);
+                //     });
+                //     $('#update_assign_game').trigger('change');
+
+                //     toggleAssignGameField(role);
+                //     const updateModal = new bootstrap.Modal(document.getElementById('updateCommitteeModal'));
+                //     updateModal.show();
+                // }
+
+
+
+
+                // document.getElementById('updateSelectedDeptsContainer').addEventListener('click', function(e) {
+                //     if (e.target.classList.contains('btn-close')) {
+                //         const idToRemove = e.target.getAttribute('data-id');
+                //         updateSelectedDeptIds = updateSelectedDeptIds.filter(id => id !== idToRemove);
+                //         document.querySelector(`#update_dept_level option[value="${idToRemove}"]`).selected = false;
+                //         $('#update_dept_level').trigger('change');
+                //         updateSelectedDeptIds = selectedDeptIds;
+                //         renderUpdateSelectedDepts();
+
+                //     }
+                // });
+
 
                 // Function to confirm update using SweetAlert
                 function confirmUpdate() {
@@ -989,8 +1215,95 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
 
                 // Event listener for update confirmation
                 document.getElementById('confirmUpdateBtn').addEventListener('click', function(event) {
-                    event.preventDefault(); // Prevent the default form submission
-                    confirmUpdate(); // Call the SweetAlert confirmation function
+                    event.preventDefault();
+                    confirmUpdate();
+                });
+
+                // document.addEventListener('DOMContentLoaded', function() {
+                //     const updateBtn = document.getElementById('confirmUpdateBtn');
+                //     if (updateBtn) {
+                //         updateBtn.addEventListener('click', function(event) {
+                //             event.preventDefault();
+                //             console.log("Update button clicked");
+
+                //             confirmUpdate();
+                //         });
+                //     }
+                // });
+
+
+
+
+                //multiple games for committee
+
+                let addSelectedGameIds = [];
+
+                document.getElementById('assign_game').addEventListener('change', function() {
+                    const selectedOptions = Array.from(this.selectedOptions).map(opt => opt.value);
+                    // addSelectedGameIds = selectedOptions.filter(id => id.trim() !== '');
+                    addSelectedGameIds = Array.from(new Set([...addSelectedGameIds, ...selectedOptions.filter(id => id.trim() !== '')]));
+
+                    renderAddSelectedGames();
+                });
+
+                function renderAddSelectedGames() {
+                    const container = document.getElementById('addSelectedGamesContainer');
+                    const select = document.getElementById('assign_game');
+                    container.innerHTML = '';
+
+                    addSelectedGameIds.forEach(id => {
+                        const label = select.querySelector(`option[value="${id}"]`)?.textContent || 'Game';
+                        const badge = document.createElement('span');
+                        badge.className = 'badge bg-primary rounded-pill px-3 py-2 d-flex align-items-center';
+                        badge.innerHTML = `
+            ${label}
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2" data-id="${id}" aria-label="Remove"></button>
+        `;
+                        container.appendChild(badge);
+                    });
+                }
+
+                document.getElementById('addSelectedGamesContainer').addEventListener('click', function(e) {
+                    if (e.target.classList.contains('btn-close')) {
+                        const idToRemove = e.target.getAttribute('data-id');
+                        addSelectedGameIds = addSelectedGameIds.filter(id => id !== idToRemove);
+                        document.querySelector(`#assign_game option[value="${idToRemove}"]`).selected = false;
+                        renderAddSelectedGames();
+                    }
+                });
+
+                let addSelectedDeptIds = [];
+
+                document.getElementById('dept_level').addEventListener('change', function() {
+                    const selectedOptions = Array.from(this.selectedOptions).map(opt => opt.value);
+                    addSelectedDeptIds = Array.from(new Set([...addSelectedDeptIds, ...selectedOptions]));
+                    renderAddSelectedDepts();
+                });
+
+                function renderAddSelectedDepts() {
+                    const container = document.getElementById('addSelectedDeptsContainer');
+                    const select = document.getElementById('dept_level');
+                    container.innerHTML = '';
+
+                    addSelectedDeptIds.forEach(id => {
+                        const label = select.querySelector(`option[value="${id}"]`)?.textContent || 'Department';
+                        const badge = document.createElement('span');
+                        badge.className = 'badge bg-success rounded-pill px-3 py-2 d-flex align-items-center';
+                        badge.innerHTML = `
+            ${label}
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2" data-id="${id}" aria-label="Remove"></button>
+        `;
+                        container.appendChild(badge);
+                    });
+                }
+
+                document.getElementById('addSelectedDeptsContainer').addEventListener('click', function(e) {
+                    if (e.target.classList.contains('btn-close')) {
+                        const idToRemove = e.target.getAttribute('data-id');
+                        addSelectedDeptIds = addSelectedDeptIds.filter(id => id !== idToRemove);
+                        document.querySelector(`#dept_level option[value="${idToRemove}"]`).selected = false;
+                        $('#dept_level').trigger('change'); // Sync Select2
+                    }
                 });
             </script>
             <script src="../archive/js/archive.js"></script>
