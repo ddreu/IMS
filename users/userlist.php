@@ -1126,7 +1126,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                     });
                     $('#update_dept_level').trigger('change'); // Trigger Select2 change event to update UI
 
-                    // Check if gameIdsCsv is null or empty
+                    // Check if gameIdsCsv is null or empty 
                     let selectedGameIds = [mainGameId];
                     if (gameIdsCsv && gameIdsCsv.trim()) {
                         selectedGameIds = [...new Set([...gameIdsCsv.split(','), mainGameId])];
