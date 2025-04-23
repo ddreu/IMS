@@ -225,6 +225,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
 
+            if ($role !== 'Committee') {
+                $conn->query("DELETE FROM committee_games WHERE committee_id = $user_id");
+                $conn->query("DELETE FROM committee_departments WHERE committee_id = $user_id");
+            }
 
             // echo json_encode([
             //     "status" => "success",

@@ -405,16 +405,18 @@
 
 
         <!-- User's Department Dropdown -->
-        <div class="dropdown me-3">
-            <a class="text-secondary me-3 dropdown-toggle" id="navbarDepartmentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <?= $_SESSION['department_name'] ?? 'Departments' ?>
-            </a>
+        <?php if ($_SESSION['role'] === 'Committee'): ?>
+            <div class="dropdown me-3">
+                <a class="text-secondary me-3 dropdown-toggle" id="navbarDepartmentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <?= $_SESSION['department_name'] ?? 'Departments' ?>
+                </a>
 
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm" id="departmentsDropdown" aria-labelledby="navbarDepartmentDropdown">
-                <!-- Departments will be dynamically inserted here -->
-                <li class="dropdown-item text-center text-muted">Loading...</li>
-            </ul>
-        </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" id="departmentsDropdown" aria-labelledby="navbarDepartmentDropdown">
+                    <!-- Departments will be dynamically inserted here -->
+                    <li class="dropdown-item text-center text-muted">Loading...</li>
+                </ul>
+            </div>
+        <?php endif; ?>
 
         <!-- Button to trigger department change (hidden) -->
         <button id="changeDepartmentBtn" style="display: none;"></button>

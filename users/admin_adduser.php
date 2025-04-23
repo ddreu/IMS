@@ -35,14 +35,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $school_id = $_POST['school_id'];
 
     // Set department and game_id to NULL by default
-    $department = null;
+    // $department = null;
+    $department_ids = [];
+
     // $game_id = null;
     $game_ids = [];
 
     // Only set values if they exist and are not empty
-    if (isset($_POST['department']) && !empty($_POST['department'])) {
-        $department = $_POST['department'];
+    // if (isset($_POST['department']) && !empty($_POST['department'])) {
+    //     $department = $_POST['department'];
+    // }
+
+
+    // $department_ids = $_POST['department'];
+    $department_ids = isset($_POST['department_ids']) ? $_POST['department_ids'] : [];
+
+    if (!is_array($department_ids)) {
+        $department_ids = [$department_ids]; // normalize single to array
     }
+
+    $main_department_id = count($department_ids) > 0 ? $department_ids[0] : null;
 
     // if (isset($_POST['game_id']) && !empty($_POST['game_id'])) {
     //     $game_id = $_POST['game_id'];
@@ -67,7 +79,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Role-specific validation
-    if ($role === 'Department Admin' && empty($department)) {
+    // if ($role === 'Department Admin' && empty($department)) {
+    if ($role === 'Department Admin' && count($department_ids) === 0) {
+
         echo json_encode(["status" => "error", "message" => "Please select a department for Department Admin."]);
         exit();
     }
@@ -77,7 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     //     exit();
     // }
 
-    if ($role === 'Committee' && (empty($department) || count($game_ids) === 0)) {
+    // if ($role === 'Committee' && (empty($department) || count($game_ids) === 0)) {
+    if ($role === 'Committee' && (count($department_ids) === 0 || count($game_ids) === 0)) {
+
         echo json_encode(["status" => "error", "message" => "Please select both department and game for Committee member."]);
         exit();
     }
@@ -129,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt_insert = executeQuery(
             $conn,
             $insert_user_sql,
-            [$firstname, $lastname, $middleinitial, $age, $gender, $email, $hashed_password, $role, $department, $main_game_id, $school_id],
+            [$firstname, $lastname, $middleinitial, $age, $gender, $email, $hashed_password, $role, $main_department_id, $main_game_id, $school_id],
             "sssissssiis"
         );
         $user_id = $stmt_insert->insert_id;
@@ -150,6 +166,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
+
+        if ($role === 'Committee' && count($department_ids) > 0) {
+            $extra_dept_ids = array_filter($department_ids, fn($id) => intval($id) !== intval($main_department_id));
+
+            if (count($extra_dept_ids) > 0) {
+                $insert_dept = $conn->prepare("INSERT INTO committee_departments (committee_id, department_id, assigned_at) VALUES (?, ?, NOW())");
+
+                foreach ($extra_dept_ids as $did) {
+                    $insert_dept->bind_param("ii", $user_id, $did);
+                    $insert_dept->execute();
+                }
+
+                $insert_dept->close();
+            }
+        }
 
         $conn->commit();
 

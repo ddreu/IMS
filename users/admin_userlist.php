@@ -85,7 +85,19 @@ $sql = "
             SELECT GROUP_CONCAT(game_id) 
             FROM committee_games 
             WHERE committee_id = u.id
-        ) AS game_ids
+        ) AS game_ids,
+         (
+    SELECT GROUP_CONCAT(department_id)
+    FROM committee_departments
+    WHERE committee_id = u.id
+) AS department_ids,
+ (
+    SELECT GROUP_CONCAT(d2.department_name SEPARATOR ', ')
+    FROM committee_departments cd
+    JOIN departments d2 ON cd.department_id = d2.id
+    WHERE cd.committee_id = u.id
+) AS committee_department_names
+
     FROM 
         users u
     LEFT JOIN 
@@ -229,27 +241,36 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                 echo '<td class="px-4">' . htmlspecialchars($row['email']) . '</td>';
                                                 echo '<td class="px-4"><span class="badge ' . getRoleBadgeClass($row['role']) . '">' . htmlspecialchars($row['role'] ?? 'N/A') . '</span></td>';
                                                 echo '<td class="px-4">' . htmlspecialchars($row['school_name'] ?? 'N/A') . '</td>';
-                                                echo '<td class="px-4">' . htmlspecialchars($row['department_name'] ?? 'N/A') . '</td>';
+                                                $deptDisplay = ($row['role'] === 'Committee')
+                                                    ? ($row['committee_department_names'] ?? 'N/A')
+                                                    : ($row['department_name'] ?? 'N/A');
+
+                                                echo '<td class="px-4">' . htmlspecialchars($deptDisplay) . '</td>';
                                                 echo '<td class="px-4">';
                                                 echo '<div class="d-flex gap-2">';
                                                 // echo '<button type="button" class="btn btn-sm btn-outline-primary" onclick="openUpdateModal(\'' . $row['id'] . '\', \'' .
-                                                echo '<button type="button" class="btn btn-sm btn-outline-primary" 
-      data-main-game="' . $row['game_id'] . '" 
-      onclick="openUpdateModal(this, \'' . $row['id'] . '\', \'' .
+                                                $dataDepartments = ($row['role'] === 'Committee')
+                                                    ? trim($row['department_ids'] . ',' . $row['department'], ',')
+                                                    : ($row['department'] ?? '');
+                                                $dataGames = ($row['role'] === 'Committee') ? ($row['game_ids'] ?? '') : ($row['game_id'] ?? '');
 
-                                                    $row['firstname'] . '\', \'' .
-                                                    $row['lastname'] . '\', \'' .
-                                                    $row['middleinitial'] . '\', \'' .
-                                                    $row['age'] . '\', \'' .
-                                                    $row['gender'] . '\', \'' .
-                                                    $row['email'] . '\', \'' .
-                                                    $row['role'] . '\', \'' .
-                                                    $row['school_id'] . '\', \'' .
-                                                    $row['department'] . '\', \'' .
-                                                    // ($row['game_id'] ?? '') . '\')">';
-                                                    ($row['game_ids'] ?? '') . '\')">';
-                                                echo '<i class="fas fa-edit"></i>';
-                                                echo '</button>';
+                                                echo '<button type="button" class="btn btn-sm btn-outline-primary" 
+                                                data-main-game="' . htmlspecialchars($row['game_id'] ?? '') . '" 
+                                                onclick="openUpdateModal(this, \'' .
+                                                    addslashes($row['id'] ?? '') . '\', \'' .
+                                                    addslashes($row['firstname'] ?? '') . '\', \'' .
+                                                    addslashes($row['lastname'] ?? '') . '\', \'' .
+                                                    addslashes($row['middleinitial'] ?? '') . '\', \'' .
+                                                    addslashes($row['age'] ?? '') . '\', \'' .
+                                                    addslashes($row['gender'] ?? '') . '\', \'' .
+                                                    addslashes($row['email'] ?? '') . '\', \'' .
+                                                    addslashes($row['role'] ?? '') . '\', \'' .
+                                                    addslashes($row['school_id'] ?? '') . '\', \'' .
+                                                    addslashes($dataDepartments) . '\', \'' .
+                                                    addslashes($dataGames) . '\')">
+                                                    <i class="fas fa-edit"></i>
+                                            </button>';
+
                                                 echo '<a href="javascript:void(0)" onclick="deleteUser(' . $row['id'] . ', \'' . htmlspecialchars($row['firstname'] . ' ' . $row['lastname']) . '\')" class="btn btn-sm btn-danger">';
                                                 echo '<i class="fas fa-trash"></i>';
                                                 echo '</a>';

@@ -77,7 +77,10 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
                             <label for="update_department" class="form-label">Department</label>
                             <select class="form-select" id="update_department" name="department">
                                 <option value="">Select School First</option>
+
                             </select>
+                            <div id="updateSelectedDepartmentsContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
+
                         </div>
                     </div>
 
@@ -104,17 +107,19 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" form="updateUserForm" class="btn btn-primary">Update User</button>
+                <button id="updateUserSubmit" type="submit" form="updateUserForm" class="btn btn-primary">Update User</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    let updateSelectedDepartmentIds = [];
+
     let updateSelectedGameIds = [];
 
     // Function to load departments for update form
-    function loadDepartmentsForUpdate(schoolId, selectedDepartment = '') {
+    function loadDepartmentsForUpdate(schoolId, selectedDepartments = []) {
         const departmentSelect = document.getElementById('update_department');
         departmentSelect.innerHTML = '<option value="">Loading departments...</option>';
         departmentSelect.disabled = true;
@@ -123,21 +128,59 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             .then(response => response.json())
             .then(departments => {
                 departmentSelect.innerHTML = '<option value="">Select Department</option>';
+
                 departments.forEach(dept => {
                     const option = new Option(dept.department_name, dept.id);
-                    if (dept.id == selectedDepartment) {
-                        option.selected = true;
-                    }
                     departmentSelect.add(option);
                 });
+
                 departmentSelect.disabled = false;
+
+                // 🔥 Wait until DOM has painted THEN call display
+                requestAnimationFrame(() => {
+                    updateSelectedDepartmentIds = selectedDepartments;
+                    updateSelectedDepartmentsDisplayUpdate();
+                });
             })
+
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error loading departments:', error);
                 departmentSelect.innerHTML = '<option value="">Error loading departments</option>';
                 departmentSelect.disabled = true;
             });
     }
+
+
+
+    function updateSelectedDepartmentsDisplayUpdate() {
+        const container = document.getElementById('updateSelectedDepartmentsContainer');
+        container.innerHTML = "";
+
+        document.querySelectorAll('input[name="department_ids[]"]').forEach(el => el.remove());
+
+        updateSelectedDepartmentIds.forEach(id => {
+            // ✅ Wait for the DOM to fully reflect the options
+            const option = document.querySelector(`#update_department option[value="${id}"]`);
+            const label = option ? option.textContent : `ID: ${id}`;
+
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-secondary rounded-pill px-3 py-2 d-flex align-items-center';
+            badge.innerHTML = `
+            ${label}
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2" data-id="${id}" aria-label="Remove"></button>
+        `;
+            container.appendChild(badge);
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'department_ids[]';
+            hiddenInput.value = id;
+            document.getElementById('updateUserForm').appendChild(hiddenInput);
+        });
+    }
+
+
+
 
     // 🆕 Load games and restore selected
     function loadGamesForUpdate(schoolId) {
@@ -177,17 +220,17 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
 
         if (role === 'Department Admin') {
             departmentDiv.style.display = 'block';
-            departmentSelect.required = true;
+            // departmentSelect.required = true;
         } else if (role === 'Committee') {
             departmentDiv.style.display = 'block';
             gamesDiv.style.display = 'block';
-            departmentSelect.required = true;
+            // departmentSelect.required = true;
             // gameSelect.required = true;
             gameSelect.required = false;
         }
     }
 
-    function openUpdateModal(btn, userId, firstname, lastname, middleinitial, age, gender, email, role, schoolId, departmentId, gameIdsCsv) {
+    function openUpdateModal(btn, userId, firstname, lastname, middleinitial, age, gender, email, role, schoolId, departmentIdCsv, gameIdsCsv) {
         const mainGameId = btn.getAttribute('data-main-game');
 
 
@@ -203,6 +246,7 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
         document.getElementById('update_school').value = schoolId;
 
         // updateSelectedGameIds = gameIdsCsv ? gameIdsCsv.split(',') : [];
+        updateSelectedDepartmentIds = departmentIdCsv ? departmentIdCsv.split(',') : [];
 
         updateSelectedGameIds = [];
 
@@ -216,16 +260,31 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
         }
 
 
+
+
         handleUpdateRoleSelection(role);
+
+        // if (schoolId) {
+        //     if (role === 'Department Admin' || role === 'Committee') {
+        //         loadDepartmentsForUpdate(schoolId, departmentId);
+        //     }
+        //     if (role === 'Committee') {
+        //         loadGamesForUpdate(schoolId);
+        //     }
+        //     if (role === 'Department Admin' || role === 'Committee') {
+        //         loadDepartmentsForUpdate(schoolId, updateSelectedDepartmentIds);
+        //     }
+        // }
 
         if (schoolId) {
             if (role === 'Department Admin' || role === 'Committee') {
-                loadDepartmentsForUpdate(schoolId, departmentId);
+                loadDepartmentsForUpdate(schoolId, updateSelectedDepartmentIds);
             }
             if (role === 'Committee') {
                 loadGamesForUpdate(schoolId);
             }
         }
+
 
         $('#updateUserModal').modal('show');
     }
@@ -248,6 +307,43 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
         }
     });
 
+    // document.getElementById('update_department').addEventListener('change', function() {
+    //     const selectedId = this.value;
+    //     if (!selectedId || updateSelectedDepartmentIds.includes(selectedId)) return;
+
+    //     updateSelectedDepartmentIds.push(selectedId);
+    //     updateSelectedDepartmentsDisplayUpdate();
+    //     this.value = "";
+    // });
+
+    document.getElementById('update_department').addEventListener('change', function() {
+        const selectedId = this.value;
+        const currentRole = document.getElementById('update_role').value;
+
+        if (!selectedId) return;
+
+        if (currentRole === 'Committee') {
+            if (!updateSelectedDepartmentIds.includes(selectedId)) {
+                updateSelectedDepartmentIds.push(selectedId);
+            }
+        } else if (currentRole === 'Department Admin') {
+            updateSelectedDepartmentIds = [selectedId]; // only one
+        }
+
+        updateSelectedDepartmentsDisplayUpdate();
+        this.value = "";
+    });
+
+
+    document.getElementById('updateSelectedDepartmentsContainer').addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-close')) {
+            const idToRemove = e.target.getAttribute('data-id');
+            updateSelectedDepartmentIds = updateSelectedDepartmentIds.filter(id => id !== idToRemove);
+            updateSelectedDepartmentsDisplayUpdate();
+        }
+    });
+
+
     document.getElementById('update_role').addEventListener('change', function() {
         handleUpdateRoleSelection(this.value);
         const schoolSelect = document.getElementById('update_school');
@@ -265,6 +361,41 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
         updateGamesDisplay();
         this.value = '';
     });
+
+    function updateDepartmentsDisplay() {
+        const container = document.getElementById('updateSelectedDepartmentsContainer');
+        container.innerHTML = '';
+
+        // Clear existing hidden inputs
+        document.querySelectorAll('input[name="department_ids[]"]').forEach(el => el.remove());
+
+        updateSelectedDepartmentIds.forEach(id => {
+            const label = document.querySelector(`#update_department option[value="${id}"]`)?.textContent || 'Department';
+
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-secondary rounded-pill px-3 py-2 d-flex align-items-center';
+            badge.innerHTML = `
+            ${label}
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2" data-id="${id}" aria-label="Remove"></button>
+        `;
+            container.appendChild(badge);
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'department_ids[]';
+            hiddenInput.value = id;
+            document.getElementById('updateUserForm').appendChild(hiddenInput);
+        });
+    }
+
+    document.getElementById('updateSelectedDepartmentsContainer').addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-close')) {
+            const idToRemove = e.target.getAttribute('data-id');
+            updateSelectedDepartmentIds = updateSelectedDepartmentIds.filter(id => id !== idToRemove);
+            updateDepartmentsDisplay();
+        }
+    });
+
 
     // 🆕 Display selected games
     function updateGamesDisplay() {
@@ -306,36 +437,59 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
     document.getElementById('updateUserForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // const updateBtn = document.querySelector('#updateUserForm button[type="submit"]');
+        const updateBtn = document.getElementById('updateUserSubmit');
+
+        updateBtn.disabled = true;
+        updateBtn.innerHTML = 'Updating...';
+
         const age = parseInt(document.getElementById('update_age').value);
         if (age < 18) {
             alert('Age must be 18 or older!');
+            updateBtn.disabled = false;
+            updateBtn.innerHTML = 'Update User';
             return;
         }
 
         const email = document.getElementById('update_email').value;
         if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
             alert('Please enter a valid email address!');
+            updateBtn.disabled = false;
+            updateBtn.innerHTML = 'Update User';
             return;
         }
 
         const role = document.getElementById('update_role').value;
         const department = document.getElementById('update_department').value;
 
-        if (role === 'Department Admin' && !department) {
-            alert('Please select a department for Department Admin!');
-            return;
-        }
-
-        // 🆕 validate game count
-        if (role === 'Committee') {
-            if (!department || updateSelectedGameIds.length === 0) {
-                alert('Please select both department and at least one game for Committee!');
+        if (role === 'Department Admin') {
+            if (updateSelectedDepartmentIds.length !== 1) {
+                alert('Please select exactly one department for Department Admin!');
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = 'Update User';
                 return;
             }
         }
 
-        updateGamesDisplay(); // 🆕 update hidden inputs
+        if (role === 'Committee') {
+            if (updateSelectedDepartmentIds.length === 0 || updateSelectedGameIds.length === 0) {
+                alert('Please select both department and at least one game for Committee!');
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = 'Update User';
+                return;
+            }
+        }
 
+        // if (role === 'Committee') {
+        //     if (!department || updateSelectedGameIds.length === 0) {
+        //         alert('Please select both department and at least one game for Committee!');
+        //         updateBtn.disabled = false;
+        //         updateBtn.innerHTML = 'Update User';
+        //         return;
+        //     }
+        // }
+
+        updateGamesDisplay(); // 🆙 update hidden inputs
         const formData = new FormData(this);
 
         fetch('admin_update_user.php', {
@@ -357,6 +511,9 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
                         }
                     });
                 } else {
+                    updateBtn.disabled = false;
+                    updateBtn.innerHTML = 'Update User';
+
                     Swal.fire({
                         icon: data.status === 'warning' ? 'warning' : 'error',
                         title: data.status === 'warning' ? 'Warning' : 'Error!',
@@ -366,6 +523,9 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             })
             .catch(error => {
                 console.error('Error:', error);
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = 'Update User';
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',

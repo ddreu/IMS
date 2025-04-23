@@ -71,12 +71,34 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-4" id="departmentDiv">
+                        <!-- <div class="col-md-4" id="departmentDiv">
                             <label for="department" class="form-label">Department</label>
                             <select class="form-select" id="department" name="department">
                                 <option value="">Select School First</option>
                             </select>
                         </div>
+
+                        <div class="col-md-12" id="departmentsDivMulti" style="display: none;">
+                            <label for="departmentMulti" class="form-label">Assigned Departments</label>
+                            <select class="form-select" id="departmentMulti">
+                                <option value="">Select a department to add</option>
+                            </select>
+                            <div id="selectedDepartmentsContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
+                        </div> -->
+
+                        <div class="col-md-4" id="departmentDiv">
+                            <label for="department" class="form-label">Department</label>
+                            <!-- <select class="form-select" id="department" name="department">
+                                <option value="">Select School First</option>
+                            </select> -->
+                            <select class="form-select" id="department">
+                                <option value="">Select a department to add</option>
+                            </select>
+
+                            <div id="selectedDepartmentsContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
+                        </div>
+
+
                     </div>
 
                     <div class="row g-3 mt-2" id="gamesDiv" style="display: none;">
@@ -98,7 +120,7 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" form="addUserForm" class="btn btn-primary">Add User</button>
+                <button type="submit" form="addUserForm" class="btn btn-primary" id="submitUserBtn">Add User</button>
             </div>
         </div>
     </div>
@@ -106,6 +128,35 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
 
 <script>
     // Function to load departments based on selected school
+    // function loadDepartmentsForAdd(schoolId) {
+    //     const departmentSelect = document.getElementById('department');
+    //     departmentSelect.innerHTML = '<option value="">Loading departments...</option>';
+    //     departmentSelect.disabled = true;
+
+    //     fetch(`get_departments.php?school_id=${schoolId}`)
+    //         .then(response => response.json())
+    //         .then(departments => {
+    //             departmentSelect.innerHTML = '<option value="">Select Department</option>';
+    //             if (departments.length > 0) {
+    //                 departments.forEach(dept => {
+    //                     const option = new Option(dept.department_name, dept.id);
+    //                     departmentSelect.add(option);
+    //                 });
+    //                 departmentSelect.disabled = false;
+    //             } else {
+    //                 departmentSelect.innerHTML = '<option value="">No departments found</option>';
+    //                 departmentSelect.disabled = true;
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error('Error loading departments:', error);
+    //             departmentSelect.innerHTML = '<option value="">Error loading departments</option>';
+    //             departmentSelect.disabled = true;
+    //         });
+    // }
+    let currentUserRole = '';
+
+
     function loadDepartmentsForAdd(schoolId) {
         const departmentSelect = document.getElementById('department');
         departmentSelect.innerHTML = '<option value="">Loading departments...</option>';
@@ -162,36 +213,78 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
     }
 
     // Function to handle role selection
+    // function handleRoleSelection(role) {
+    //     const departmentDiv = document.getElementById('departmentDiv');
+    //     const gamesDiv = document.getElementById('gamesDiv');
+    //     const departmentSelect = document.getElementById('department');
+    //     const gameSelect = document.getElementById('game');
+    //     const departmentsDivMulti = document.getElementById('departmentsDivMulti');
+
+
+    //     // Reset required attributes
+    //     departmentSelect.required = false;
+    //     gameSelect.required = false;
+
+    //     // First hide all optional divs
+    //     departmentDiv.style.display = 'none';
+    //     gamesDiv.style.display = 'none';
+    //     departmentsDivMulti.style.display = 'none';
+
+
+    //     switch (role) {
+    //         case 'School Admin':
+    //             // School Admin doesn't need department or game
+    //             break;
+    //         case 'Department Admin':
+    //             departmentDiv.style.display = 'block';
+    //             departmentSelect.required = true;
+    //             break;
+    //         case 'Committee':
+    //             departmentsDivMulti.style.display = 'block';
+
+    //             departmentDiv.style.display = 'block';
+    //             gamesDiv.style.display = 'block';
+    //             departmentSelect.required = true;
+    //             // gameSelect.required = true;
+    //             break;
+    //     }
+    // }
     function handleRoleSelection(role) {
+        currentUserRole = role;
+
         const departmentDiv = document.getElementById('departmentDiv');
-        const gamesDiv = document.getElementById('gamesDiv');
         const departmentSelect = document.getElementById('department');
         const gameSelect = document.getElementById('game');
+        const gamesDiv = document.getElementById('gamesDiv');
 
-        // Reset required attributes
         departmentSelect.required = false;
         gameSelect.required = false;
 
-        // First hide all optional divs
         departmentDiv.style.display = 'none';
         gamesDiv.style.display = 'none';
 
-        switch (role) {
-            case 'School Admin':
-                // School Admin doesn't need department or game
-                break;
-            case 'Department Admin':
-                departmentDiv.style.display = 'block';
-                departmentSelect.required = true;
-                break;
-            case 'Committee':
-                departmentDiv.style.display = 'block';
-                gamesDiv.style.display = 'block';
-                departmentSelect.required = true;
-                // gameSelect.required = true;
-                break;
+        if (role === 'Department Admin') {
+            departmentDiv.style.display = 'block';
+            // departmentSelect.required = true;
+            departmentSelect.multiple = false;
+
+
+            // 🧹 Reset to single selection
+            selectedDepartmentIds = [];
+            updateSelectedDepartmentsDisplay();
+        }
+
+        if (role === 'Committee') {
+            departmentDiv.style.display = 'block';
+            // departmentSelect.required = true;
+            gamesDiv.style.display = 'block';
+            departmentSelect.multiple = false;
+
         }
     }
+
+
+
 
     // Add event listener for school selection change
     document.getElementById('school').addEventListener('change', function() {
@@ -315,15 +408,23 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
     document.getElementById('addUserForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
+        const submitBtn = document.getElementById('submitUserBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Saving...';
+
         const age = parseInt(document.getElementById('age').value);
         if (age < 18) {
             alert('Age must be 18 or older!');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Add User';
             return;
         }
 
         const email = document.getElementById('email').value;
         if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
             alert('Please enter a valid email address!');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Add User';
             return;
         }
 
@@ -332,17 +433,21 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
 
         if (role === 'Department Admin' && !department) {
             alert('Please select a department for Department Admin!');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Add User';
             return;
         }
 
         if (role === 'Committee') {
-            if (!department || selectedGameIds.length === 0) {
-                alert('Please select both department and at least one game for Committee!');
+            if (selectedDepartmentIds.length === 0 || selectedGameIds.length === 0) {
+                alert('Please select at least one department and one game for Committee!');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Add User';
                 return;
             }
         }
 
-        updateSelectedGamesDisplay(); // ✅ make sure inputs are updated
+        updateSelectedGamesDisplay();
 
         const formData = new FormData(this);
 
@@ -352,6 +457,9 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             })
             .then(response => response.json())
             .then(data => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Add User';
+
                 if (data.status === 'success') {
                     Swal.fire({
                         icon: 'success',
@@ -374,6 +482,9 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             })
             .catch(error => {
                 console.error('Error:', error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Add User';
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
@@ -381,6 +492,7 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
                 });
             });
     });
+
 
 
     let selectedGameIds = [];
@@ -432,6 +544,60 @@ $schools = mysqli_fetch_all($schools_result, MYSQLI_ASSOC);
             const idToRemove = e.target.getAttribute('data-id');
             selectedGameIds = selectedGameIds.filter(id => id !== idToRemove);
             updateSelectedGamesDisplay();
+        }
+    });
+
+    let selectedDepartmentIds = [];
+    document.getElementById('department').addEventListener('change', function() {
+        const selectedId = this.value;
+        const selectedText = this.options[this.selectedIndex].text;
+
+        if (!selectedId) return;
+
+        if (currentUserRole === 'Committee') {
+            if (selectedDepartmentIds.includes(selectedId)) return;
+
+            selectedDepartmentIds.push(selectedId);
+            updateSelectedDepartmentsDisplay();
+            this.value = ""; // Reset for Committee
+        } else {
+            // Department Admin: just one selection
+            selectedDepartmentIds = [selectedId];
+            updateSelectedDepartmentsDisplay();
+        }
+    });
+
+    function updateSelectedDepartmentsDisplay() {
+        const container = document.getElementById('selectedDepartmentsContainer');
+        container.innerHTML = "";
+
+        document.querySelectorAll('input[name="department_ids[]"]').forEach(el => el.remove());
+
+        selectedDepartmentIds.forEach(id => {
+            const label = document.querySelector(`#department option[value="${id}"]`).textContent;
+
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-secondary rounded-pill px-3 py-2 d-flex align-items-center';
+            badge.innerHTML = `
+            ${label}
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2" data-id="${id}" aria-label="Remove"></button>
+        `;
+            container.appendChild(badge);
+
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'department_ids[]';
+            hiddenInput.value = id;
+            document.getElementById('addUserForm').appendChild(hiddenInput);
+        });
+    }
+
+
+    document.getElementById('selectedDepartmentsContainer').addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-close')) {
+            const idToRemove = e.target.getAttribute('data-id');
+            selectedDepartmentIds = selectedDepartmentIds.filter(id => id !== idToRemove);
+            updateSelectedDepartmentsDisplay();
         }
     });
 </script>
