@@ -1,8 +1,8 @@
 <?php
-require_once '../../connection/conn.php';
-$conn = con();
+// require_once '../connection/conn.php';
+// $conn = con();
 
-session_start();
+// session_start();
 $user_id = $_SESSION['user_id'];
 $role = $_SESSION['role'];
 $email = $_SESSION['email'];

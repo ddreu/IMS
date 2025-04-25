@@ -1,25 +1,29 @@
 <?php
 $conn = con();
 
-// Check if the user is logged in
+// ✅ Ensure user is authenticated
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../../login.php');
     exit();
 }
 
-// Retrieve user information from the session
-$role = $_SESSION['role'];
-$school_id = ($role === 'Super Admin' && isset($_GET['school_id'])) ? intval($_GET['school_id']) : $_SESSION['school_id'];
+// ✅ Get role and determine school_id based on access level
+$role = $_SESSION['role'] ?? '';
+$is_superadmin = $role === 'superadmin';
 
-// Get filter parameters from the URL (optional)
-$selected_department_id = isset($_GET['department_id']) ? intval($_GET['department_id']) : null;
-// $selected_grade_level = isset($_GET['grade_level']) ? intval($_GET['grade_level']) : null;
+$school_id = $is_superadmin && isset($_GET['school_id'])
+    ? intval($_GET['school_id'])
+    : ($_SESSION['school_id'] ?? null);
 
 if (!$school_id) {
-    die('Error: School ID is missing from session');
+    die('Error: School ID is missing.');
 }
 
-// Base SQL query
+// ✅ Optional filters (only usable by Super Admin)
+$selected_department_id = $is_superadmin && isset($_GET['department_id']) ? intval($_GET['department_id']) : null;
+// $selected_grade_level = $is_superadmin && isset($_GET['grade_level']) ? intval($_GET['grade_level']) : null;
+
+// ✅ Build query
 $sql = "
     SELECT 
         gsc.id, 
@@ -35,10 +39,10 @@ $sql = "
     WHERE d.school_id = ?
 ";
 
-// Add filters dynamically
 $params = [$school_id];
-$types = "i"; // School ID is an integer
+$types = "i";
 
+// ✅ Add filters
 if ($selected_department_id) {
     $sql .= " AND d.id = ?";
     $params[] = $selected_department_id;
@@ -51,20 +55,19 @@ if ($selected_department_id) {
 //     $types .= "i";
 // }
 
-// Order results
 $sql .= " ORDER BY d.department_name, gsc.grade_level, gsc.section_name, gsc.course_name";
 
-// Prepare and execute the statement
+// ✅ Prepare and execute
 $stmt = $conn->prepare($sql);
-if ($stmt === false) {
-    die('Prepare failed: ' . $conn->error);
+if (!$stmt) {
+    die('Query failed: ' . $conn->error);
 }
 
 $stmt->bind_param($types, ...$params);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Organize sections by department and grade
+// ✅ Structure results
 $sections_by_department = [];
 
 while ($row = $result->fetch_assoc()) {
@@ -72,7 +75,6 @@ while ($row = $result->fetch_assoc()) {
     $grade = $row['grade_level'];
     $name = ($department === 'College') ? $row['course_name'] : $row['section_name'];
 
-    // Ensure structure exists
     if (!isset($sections_by_department[$department])) {
         $sections_by_department[$department] = [];
     }
@@ -80,7 +82,6 @@ while ($row = $result->fetch_assoc()) {
         $sections_by_department[$department][$grade] = [];
     }
 
-    // Store complete item data
     $sections_by_department[$department][$grade][] = [
         'id' => $row['id'],
         'department_id' => $row['department_id'],
@@ -89,14 +90,14 @@ while ($row = $result->fetch_assoc()) {
         'course_name' => $row['course_name'],
         'strand' => $row['strand'] ?? '',
         'archived_at' => $row['archived_at'] ?? '',
-        'name' => $name // This is for display
+        'name' => $name
     ];
 }
 
-// Clean up
 $stmt->close();
 $conn->close();
 ?>
+
 
 <!-- HTML OUTPUT -->
 <div class="container mt-4">

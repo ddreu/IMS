@@ -614,8 +614,15 @@
     <button id="closeQRScanner" style="position: absolute; top: 15px; right: 15px; z-index: 10000; background: rgba(0,0,0,0.7); color: white; border: none; padding: 10px 15px; border-radius: 5px;">Close</button>
 </div>
 
-
-
+<?php
+if ($_SESSION['role'] !== 'superadmin') {
+    // Include the chat functionality only if the user is not a superadmin
+    include_once '../user-chat/chat.php';
+} else {
+    // For superadmin, include a different chat or no chat at all
+    // include_once '../superadmin-chat/chat.php'; // Example for superadmin-specific chat
+}
+?>
 <!-- QR Scanner Modal -->
 <!-- <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

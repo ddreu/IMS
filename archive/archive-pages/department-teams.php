@@ -1,62 +1,117 @@
 <?php
-// session_start();
-// include_once '../connection/conn.php';
 $conn = con();
 
-// Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit();
 }
 
-// Get grade_section_course_id from URL
-$selected_department_id = isset($_GET['department_id']) ? intval($_GET['department_id']) : null;
-$selected_grade_level = isset($_GET['grade_level']) ? intval($_GET['grade_level']) : null;
-$grade_section_course_id = isset($_GET['grade_section_course_id']) ? intval($_GET['grade_section_course_id']) : null;
-// $grade_section_course_id = 69;
+$role = $_SESSION['role'] ?? '';
+$is_superadmin = $role === 'Super Admin';
 
-// Fetch teams
-$sql = "
-    SELECT t.team_id, t.team_name, gsc.section_name, gsc.grade_level, gsc.course_name, gsc.strand, d.department_name
-    FROM teams AS t
-    JOIN grade_section_course AS gsc ON t.grade_section_course_id = gsc.id
-    JOIN departments AS d ON gsc.department_id = d.id
-    WHERE t.grade_section_course_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $grade_section_course_id);
-$stmt->execute();
-$result = $stmt->get_result();
+// Get base identifiers
+$school_id = $is_superadmin && isset($_GET['school_id'])
+    ? intval($_GET['school_id'])
+    : ($_SESSION['school_id'] ?? null);
 
-// Group results by grade level
+// Filters
+$selected_department_id = $_GET['department_id'] ?? null;
+$selected_grade_level   = $_GET['grade_level'] ?? null;
+$grade_section_course_id = $_GET['grade_section_course_id'] ?? null;
+
 $teams_by_grade = [];
-while ($row = $result->fetch_assoc()) {
-    $grade_level = $row['grade_level'];
-    $teams_by_grade[$grade_level][] = $row;
+$section_details = null;
+
+// Case 1: Direct section view
+if ($grade_section_course_id) {
+    $grade_section_course_id = intval($grade_section_course_id);
+
+    $stmt = $conn->prepare("
+        SELECT t.team_id, t.team_name, gsc.section_name, gsc.grade_level, gsc.course_name, gsc.strand, d.department_name
+        FROM teams AS t
+        JOIN grade_section_course AS gsc ON t.grade_section_course_id = gsc.id
+        JOIN departments AS d ON gsc.department_id = d.id
+        WHERE t.grade_section_course_id = ?
+    ");
+    $stmt->bind_param("i", $grade_section_course_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $teams_by_grade[$row['grade_level']][] = $row;
+    }
+
+    // Fetch section details
+    $stmt = $conn->prepare("
+        SELECT gsc.*, d.department_name 
+        FROM grade_section_course gsc 
+        JOIN departments d ON gsc.department_id = d.id 
+        WHERE gsc.id = ?
+    ");
+    $stmt->bind_param("i", $grade_section_course_id);
+    $stmt->execute();
+    $section_details = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+} elseif ($school_id && $selected_department_id && $selected_grade_level) {
+    // Case 2: Department + grade filter only
+    $sql = "
+        SELECT t.team_id, t.team_name, gsc.section_name, gsc.grade_level, gsc.course_name, gsc.strand, d.department_name
+        FROM teams AS t
+        JOIN grade_section_course AS gsc ON t.grade_section_course_id = gsc.id
+        JOIN departments AS d ON gsc.department_id = d.id
+        WHERE d.school_id = ? AND d.id = ? AND gsc.grade_level = ?
+    ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iii", $school_id, $selected_department_id, $selected_grade_level);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $teams_by_grade[$row['grade_level']][] = $row;
+        $section_details = $row; // Use the last row for department_name fallback
+    }
+
+    $stmt->close();
 }
 
-// Fetch department details
-$stmt = $conn->prepare("SELECT gsc.*, d.department_name FROM grade_section_course gsc JOIN departments d ON gsc.department_id = d.id WHERE gsc.id = ?");
-$stmt->bind_param("i", $grade_section_course_id);
-$stmt->execute();
-$section_details = $stmt->get_result()->fetch_assoc();
-
-$department_name = $section_details['department_name'];
-$stmt->close();
 $conn->close();
+$department_name = is_array($section_details) && isset($section_details['department_name'])
+    ? $section_details['department_name']
+    : 'Unknown';
 ?>
+
 
 <!-- Display Teams -->
 <div class="mt-4">
     <div class="container-fluid px-3 px-md-4">
         <section class="main">
             <div class="main-top d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
-                <h2 class="mb-3 mb-md-0">
+                <!-- <h2 class="mb-3 mb-md-0">
                     <?= $department_name === 'College' ? htmlspecialchars($section_details['course_name']) : htmlspecialchars($section_details['grade_level'] . ' - ' . $section_details['section_name']) ?>
                     <?php if (!empty($section_details['strand'])): ?>
                         (<?= htmlspecialchars($section_details['strand']) ?>)
                     <?php endif; ?>
                     Teams
+                </h2> -->
+                <h2 class="mb-3 mb-md-0">
+                    <?php if (!empty($section_details)): ?>
+                        <?php if (($section_details['department_name'] ?? '') === 'College' && !empty($section_details['course_name'])): ?>
+                            <?= htmlspecialchars($section_details['course_name']) ?>
+                        <?php elseif (!empty($section_details['grade_level']) && !empty($section_details['section_name'])): ?>
+                            <?= htmlspecialchars($section_details['grade_level'] . ' - ' . $section_details['section_name']) ?>
+                        <?php else: ?>
+                            <?= htmlspecialchars($section_details['department_name'] ?? 'Unknown Department') ?>
+                        <?php endif; ?>
+
+                        <?php if (!empty($section_details['strand'])): ?>
+                            (<?= htmlspecialchars($section_details['strand']) ?>)
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <?= htmlspecialchars($department_name ?? 'Unknown') ?>
+                    <?php endif; ?>
+                    Teams
                 </h2>
+
             </div>
 
             <?php if (!empty($teams_by_grade)): ?>

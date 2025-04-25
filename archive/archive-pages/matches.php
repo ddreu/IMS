@@ -68,10 +68,10 @@ $sql = "
     )
     AND tA.team_name NOT IN ('TBD', 'To Be Determined')
     AND tB.team_name NOT IN ('TBD', 'To Be Determined')
-    AND b.is_archived = 0
-    AND g.is_archived = 0
-    AND tA.is_archived = 0
-    AND tB.is_archived = 0
+    AND b.is_archived = 1
+    AND g.is_archived = 1
+    AND tA.is_archived = 1
+    AND tB.is_archived = 1
 ";
 
 

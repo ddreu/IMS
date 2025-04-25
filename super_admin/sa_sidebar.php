@@ -16,7 +16,7 @@
                 <i data-feather="users"></i><span>Users</span></a>
         </li>
         <li class="custom-navbar__item">
-            <a href="../announcements/sa_announcement.php" class="custom-navbar__link"><i data-feather="message-square"></i><span>Announcements</span></a>
+            <a href="../announcements/sa_announcement.php" class="custom-navbar__link"><i data-feather="file-text"></i><span>Announcements</span></a>
         </li>
         <li class="custom-navbar__item">
             <a href="../user_logs/admin_user_logs.php" class="custom-navbar__link"><i data-feather="clock"></i><span>Activity Logs</span></a>
@@ -24,6 +24,16 @@
         <li class="custom-navbar__item">
             <a href="../archive/archives.php" class="custom-navbar__link"><i data-feather="archive"></i><span>Archives</span></a>
         </li>
+        <li class="custom-navbar__item">
+            <a href="../admin-chat/messages.php" class="custom-navbar__link"><i data-feather="message-square"></i><span>Messages</span></a>
+        </li>
+
+        <li class="custom-navbar__item">
+            <a href="../super_admin/active-users.php" class="custom-navbar__link <?php echo ($current_page == 'active_users') ? 'active' : ''; ?>">
+                <i data-feather="circle"></i><span>Active Users</span>
+            </a>
+        </li>
+
         <!-- <li class="custom-navbar__item">
             <a href="#" class="custom-navbar__link"><i data-feather="help-circle"></i><span>Help</span></a>
         </li>

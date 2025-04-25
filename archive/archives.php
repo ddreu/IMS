@@ -4,10 +4,9 @@ require_once '../connection/conn.php';
 $conn = con();
 $role = $_SESSION['role'];
 
-$allowedTables = ['announcements', 'games', 'teams', 'department-teams', 'brackets', 'matches', 'leaderboards'];
+$allowedTables = ['announcements', 'games', 'teams', 'department-teams', 'players', 'brackets', 'matches', 'leaderboards'];
 $table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : null;
 $year = isset($_GET['year']) ? $_GET['year'] : '';
-include '../navbar/navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -33,6 +32,8 @@ include '../navbar/navbar.php';
 
 <body>
     <?php
+    include '../navbar/navbar.php';
+
     $current_page = 'archives';
 
     if ($role == 'Committee') {
@@ -95,13 +96,7 @@ include '../navbar/navbar.php';
                         </select>
                     </div>
 
-                    <!-- Archive Year Dropdown -->
-                    <!-- <div class="col-md-3">
-                            <label for="archive_year" class="form-label">Year</label>
-                            <select class="form-select" id="archive_year" name="year" disabled>
-                                <option value="">Select Year</option>
-                            </select>
-                        </div> -->
+
                     <!-- Department Dropdown -->
                     <div class="col-md-3">
                         <label for="department" class="form-label">Department</label>
@@ -133,13 +128,6 @@ include '../navbar/navbar.php';
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body">
                 <div class="row g-3">
-                    <!-- Game Dropdown -->
-                    <!-- <div class="col-md-3">
-                        <label for="game" class="form-label">Game</label>
-                        <select class="form-select" id="game" name="game_id" disabled>
-                            <option value="">Select Game</option>
-                        </select>
-                    </div> -->
 
                     <div class="col">
                         <label for="search" class="form-label">Search</label>
@@ -156,11 +144,22 @@ include '../navbar/navbar.php';
 
         <!-- Section to Load the Archive Table -->
         <div id="archiveTableContainer" class="card shadow-sm border-0 rounded-3 mt-3">
-            <div class="card-body text-center" id="archiveTableContent">
-                <p class="text-muted">Select a table and year to view its content.</p>
+            <div class="card-body" id="archiveTableContent">
+                <?php
+                if ($table && $year) {
+                    $includePath = "archive-pages/$table.php";
+                    if (file_exists($includePath)) {
+                        include $includePath;
+                    } else {
+                        echo "<p class='text-danger'>Archive page not found for selected table.</p>";
+                    }
+                } else {
+                    echo "<p class='text-muted'>Select a table and year to view its content.</p>";
+                }
+                ?>
             </div>
-
         </div>
+
 
     </div>
     <!-- jsPDF -->
@@ -168,62 +167,10 @@ include '../navbar/navbar.php';
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="js/utils.js"></script>
-    <!-- <script src="../js/archive.js"></script> -->
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const tableSelect = document.getElementById("table");
-            const yearSelect = document.getElementById("archive_year");
-            const contentContainer = document.getElementById("archiveTableContent");
-
-            function loadArchivePage() {
-                const table = tableSelect.value;
-                const year = yearSelect.value;
-
-                if (!table || !year) {
-                    contentContainer.innerHTML = `<p class="text-muted">Select a table and year to view content.</p>`;
-                    return;
-                }
-
-                const url = `archive-pages/${table}.php?year=${encodeURIComponent(year)}`;
-
-                fetch(url)
-                    .then(res => {
-                        if (!res.ok) throw new Error("Failed to load page.");
-                        return res.text();
-                    })
-                    .then(html => {
-                        contentContainer.innerHTML = html;
-
-                        // Optional: dynamically load external script if needed
-                        const scriptPath = `archive-page-js/${table}.js`;
-                        loadScript(scriptPath);
-                    })
-                    .catch(err => {
-                        contentContainer.innerHTML = `<p class="text-danger">Error loading archive page: ${err.message}</p>`;
-                    });
-            }
-
-            function loadScript(src) {
-                const existing = document.querySelector(`script[src="${src}"]`);
-                if (existing) existing.remove(); // reload script if needed
-
-                const script = document.createElement('script');
-                script.src = src;
-                script.defer = true;
-                document.body.appendChild(script);
-            }
-
-            // Trigger when either dropdown changes
-            tableSelect.addEventListener('change', loadArchivePage);
-            yearSelect.addEventListener('change', loadArchivePage);
-
-            // Auto-load if preselected
-            if (tableSelect.value && yearSelect.value) {
-                loadArchivePage();
-            }
-        });
-    </script> -->
-
+    <script src="archive-page-js/announcements.js"></script>
+    <script src="archive-page-js/brackets.js"></script>
+    <script src="archive-page-js/department-teams.js"></script>
+    <script src="archive-page-js/leaderboards.js"></script>
 </body>
 
 </html>

@@ -174,6 +174,51 @@ while ($row = $grade_result->fetch_assoc()) {
             text-align: center;
             padding: 20px;
         } */
+    /* 
+    #bracketModal .modal-dialog {
+        max-width: 95vw;
+        width: auto;
+    }
+
+    #bracketModal .modal-body {
+        overflow-x: auto;
+    }
+
+    #viewBracketModal .modal-body {
+        overflow-x: auto;
+        max-height: 90vh;
+    }
+
+    #bracketModalContainer {
+        min-height: 600px;
+    }
+
+    #bracketModalContainer .jQBracket {
+        min-height: 100% !important;
+        padding-bottom: 30px !important;
+    } */
+
+    #viewBracketModal .modal-dialog {
+        max-width: 98vw;
+        margin: 1rem auto;
+    }
+
+    #viewBracketModal .modal-content {
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #viewBracketModal .modal-body {
+        flex: 1 1 auto;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    #bracketModalContainer {
+        min-height: 800px;
+        height: 100%;
+    }
 </style>
 
 
@@ -274,6 +319,21 @@ while ($row = $grade_result->fetch_assoc()) {
 
     <div id="bracket-container" class="mt-4"></div>
 </div>
+
+<div class="modal fade" id="viewBracketModal" tabindex="-1" aria-labelledby="viewBracketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewBracketModalLabel">View Bracket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="bracketModalContainer" class="bracket-wrapper"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- <script>
     function loadBrackets(filters = {}) {

@@ -1,20 +1,20 @@
 <?php
-include_once '../../connection/conn.php';
-include '../../user_logs/logger.php'; // Include the logger file
-$conn = con();
-session_start();
+// include_once '../connection/conn.php';
+// include '../user_logs/logger.php'; // Include the logger file
+// $conn = con();
+// session_start();
 
-// Check if the user is logged in
+// Redirect to login if not logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: ../login.php'); // Adjust the path if needed
+    header('Location: ../login.php');
     exit();
 }
 
-$role = $_SESSION['role'];
 $user_id = $_SESSION['user_id'];
-$sql = "SELECT role, school_id FROM users WHERE id = ?";
-$stmt = mysqli_prepare($conn, $sql);
 
+// Get user school ID
+$sql = "SELECT school_id FROM users WHERE id = ?";
+$stmt = mysqli_prepare($conn, $sql);
 if ($stmt === false) {
     die('mysqli_prepare() failed: ' . htmlspecialchars(mysqli_error($conn)));
 }
@@ -23,113 +23,70 @@ mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
-if ($result->num_rows > 0) {
-    $user = mysqli_fetch_assoc($result);
-
-    // Check if the logged-in user is a school admin
-    if ($user['role'] === 'Committee') {
-        header('Location: 404.php'); // Redirect if the role is not school admin
-        exit();
-    }
-
-    // Retrieve the logged-in user's school ID
-    $school_id = $user['school_id'];
-} else {
-    // If the user is not found in the database
-    header('Location: ../login.php'); // Adjust the path if needed
+if ($result->num_rows === 0) {
+    header('Location: ../login.php');
     exit();
 }
 
-// Handle form submission for adding a new game
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_game'])) {
-    // Get form data
-    $game_name = mysqli_real_escape_string($conn, $_POST['game_name']);
-    $number_of_players = (int)$_POST['number_of_players'];
-    $category = mysqli_real_escape_string($conn, $_POST['category']);
-    $environment = mysqli_real_escape_string($conn, $_POST['environment']);
+$user = mysqli_fetch_assoc($result);
 
-    // Check if the game name already exists in the user's school
-    $check_sql = "SELECT * FROM games WHERE game_name = ? AND school_id = ?";
-    $stmt_check = mysqli_prepare($conn, $check_sql);
-    mysqli_stmt_bind_param($stmt_check, "si", $game_name, $school_id);
-    mysqli_stmt_execute($stmt_check);
-    $check_result = mysqli_stmt_get_result($stmt_check);
+// School ID: from GET or fallback to user's
+$school_id = isset($_GET['school_id']) ? intval($_GET['school_id']) : $user['school_id'];
 
-    if (mysqli_num_rows($check_result) > 0) {
-        $_SESSION['error_message'] = "The game is already registered in your school!"; // Set error message
-    } else {
-        // Insert the new game into the database with the user's school ID
-        $insert_sql = "INSERT INTO games (game_name, number_of_players, category, environment, school_id) VALUES (?, ?, ?, ?, ?)";
-        $stmt_insert = mysqli_prepare($conn, $insert_sql);
-        mysqli_stmt_bind_param($stmt_insert, "sissi", $game_name, $number_of_players, $category, $environment, $school_id);
+// Year: optional, from GET
+$year = isset($_GET['year']) ? intval($_GET['year']) : null;
 
-        if (mysqli_stmt_execute($stmt_insert)) {
-            // Prepare a detailed log description
-            $log_description = "Added a new game: Name = '{$game_name}', Number of Players = {$number_of_players}, Category = '{$category}', Environment = '{$environment}'.";
-
-            // Call the logUserAction function to log the action
-            logUserAction($conn, $user_id, "games", "CREATE", mysqli_insert_id($conn), $log_description);
-
-            $_SESSION['success_message'] = "Game added successfully!"; // Success message
-        } else {
-            $_SESSION['error_message'] = "Error adding game: " . mysqli_error($conn); // Error message on insert failure
-        }
-    }
-
-    // Redirect back to the game list to display messages
-    header('Location: games.php'); // Redirect to the games page
-    exit();
-}
-
-// Fetch games from the database for the logged-in user's school and based on the filter
+// Search & filter
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
-// Base SQL query for fetching games
-$game_sql = "SELECT * FROM games WHERE school_id = ?";
+// Base SQL + school ID
+$game_sql = "SELECT * FROM games WHERE school_id = ? AND is_archived = 1";
 $params = [$school_id];
+$types = "i";
 
-if ($filter == 'indoor') {
+// Optional: environment filter
+if ($filter === 'indoor') {
     $game_sql .= " AND environment = 'Indoor'";
-} elseif ($filter == 'outdoor') {
+} elseif ($filter === 'outdoor') {
     $game_sql .= " AND environment = 'Outdoor'";
 }
 
+// Optional: search term
 if (!empty($search)) {
-    $game_sql .= " AND game_name LIKE ?"; // Prepare for search
-    $params[] = "%" . $search . "%"; // Add search term
+    $game_sql .= " AND game_name LIKE ?";
+    $params[] = "%" . $search . "%";
+    $types .= "s";
 }
 
-// Add ORDER BY clause to show most recent games first
+// Optional: filter by year
+if ($year) {
+    $game_sql .= " AND YEAR(created_at) = ?";
+    $params[] = $year;
+    $types .= "i";
+}
+
+// Final sort
 $game_sql .= " ORDER BY game_id DESC";
 
-// Prepare the statement
+// Prepare and bind
 $stmt_games = mysqli_prepare($conn, $game_sql);
 if ($stmt_games === false) {
     die('mysqli_prepare() failed: ' . htmlspecialchars(mysqli_error($conn)));
 }
 
-// Bind parameters based on the number of parameters
-if (count($params) == 1) {
-    mysqli_stmt_bind_param($stmt_games, "i", $params[0]);
-} else {
-    mysqli_stmt_bind_param($stmt_games, "is", $params[0], $params[1]);
-}
-
+mysqli_stmt_bind_param($stmt_games, $types, ...$params);
 mysqli_stmt_execute($stmt_games);
 $game_result = mysqli_stmt_get_result($stmt_games);
 
-// Fetch departments only if school_id is available
+// Fetch departments
 $departments = [];
 if ($school_id) {
     $department_result = mysqli_query($conn, "SELECT id, department_name FROM departments WHERE school_id = $school_id");
-
-    // If the query is successful, fetch departments
     if ($department_result) {
         $departments = mysqli_fetch_all($department_result, MYSQLI_ASSOC);
     }
 }
-
 ?>
 
 <style>
@@ -363,15 +320,6 @@ if ($school_id) {
 
         <div class="card box">
             <div class="card-body">
-                <!-- Filter Buttons
-                    <div class="btn-group portfolio-filter mb-3 mt-0" role="group" aria-label="Portfolio Filter">
-                        <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
-                            Active
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary filter-btn" data-category="1">
-                            Archived
-                        </button>
-                    </div> -->
 
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
@@ -381,9 +329,7 @@ if ($school_id) {
                                 <th class="px-4 py-3">Players per Team</th>
                                 <th class="px-4 py-3">Category</th>
                                 <th class="px-4 py-3">Environment</th>
-                                <?php if ($user['role'] === 'School Admin'): ?>
-                                    <!-- <th class="px-4 py-3 text-center">Actions</th> -->
-                                <?php endif; ?>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -397,81 +343,7 @@ if ($school_id) {
                                     echo '<td data-label="Environment" class="px-4">' . htmlspecialchars($game['environment']) . '</td>';
 
 
-                                    // if ($user['role'] === 'School Admin' || $user['role'] === 'Department Admin' || $user['role'] === 'superadmin') {
-                                    //     echo '<td data-label="Actions" class="px-4 text-center">';
-                                    //     echo '<div class="btn-group">';
 
-                                    //     // Dropdown Toggle
-                                    //     echo '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 32px; padding: 6px 0;">';
-                                    //     echo '⋮'; // Three dots symbol
-                                    //     echo '</button>';
-
-                                    //     // Dropdown Menu
-                                    //     echo '<ul class="dropdown-menu">';
-
-                                    //     // Edit Button (Accessible for School Admin and Super Admin if not archived)
-                                    //     if (($user['role'] === 'School Admin' || $user['role'] === 'superadmin') && $game['is_archived'] != 1) {
-                                    //         echo '<li>';
-                                    //         echo '<button onclick="openUpdateModal(' . htmlspecialchars($game['game_id']) . ', \'' .
-                                    //             htmlspecialchars($game['game_name']) . '\', ' .
-                                    //             htmlspecialchars($game['number_of_players']) . ', \'' .
-                                    //             htmlspecialchars($game['category']) . '\', \'' .
-                                    //             htmlspecialchars($game['environment']) . '\')" ' .
-                                    //             'class="dropdown-item" style="padding: 4px 12px; line-height: 1.2;">';
-                                    //         echo 'Edit';
-                                    //         echo '</button>';
-                                    //         echo '</li>';
-                                    //     }
-
-                                    //     // Delete Button (Accessible for School Admin and Super Admin)
-                                    //     if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') {
-                                    //         echo '<li style="margin: 0; padding: 0; list-style: none;">';
-                                    //         echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" style="margin: 0; padding: 0;">';
-                                    //         echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
-                                    //         echo '<button type="button" onclick="confirmDelete(' . htmlspecialchars($game['game_id']) . ')" ' .
-                                    //             'class="dropdown-item" style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">';
-                                    //         echo 'Delete';
-                                    //         echo '</button>';
-                                    //         echo '</form>';
-                                    //         echo '</li>';
-                                    //     }
-
-                                    //     // Archive/Unarchive Button (Accessible for School Admin and Super Admin)
-                                    //     if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') {
-                                    //         echo '<li style="margin: 0; padding: 0; list-style: none;">';
-                                    //         echo '<button type="button" class="dropdown-item archive-btn" ' .
-                                    //             'data-id="' . htmlspecialchars($game['game_id']) . '" ' .
-                                    //             'data-table="games" ' .
-                                    //             'data-operation="' . ($game['is_archived'] == 1 ? 'unarchive' : 'archive') . '" ' .
-                                    //             'style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">';
-                                    //         echo ($game['is_archived'] == 1 ? 'Unarchive' : 'Archive');
-                                    //         echo '</button>';
-                                    //         echo '</li>';
-                                    //     }
-
-                                    //     // "Open as Committee" Button (Accessible for School Admin, Department Admin, and Super Admin)
-                                    //     echo '<li>';
-                                    //     echo '<button 
-                                    //             type="button" 
-                                    //             class="dropdown-item open-committee-btn" 
-                                    //             data-game-id="' . htmlspecialchars($game['game_id']) . '"';
-
-                                    //     if (isset($_SESSION['role'])) {
-                                    //         echo ' data-role="' . htmlspecialchars($_SESSION['role']) . '"';
-                                    //     }
-                                    //     if (isset($_SESSION['department_id'])) {
-                                    //         echo ' data-department-id="' . htmlspecialchars($_SESSION['department_id']) . '"';
-                                    //     }
-
-                                    //     echo '>Open as Committee</button>';
-                                    //     echo '</li>';
-
-
-
-                                    //     echo '</ul>';
-                                    //     echo '</div>';
-                                    //     echo '</td>';
-                                    // }
 
 
                                     echo '</tr>';
@@ -489,150 +361,6 @@ if ($school_id) {
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-</div>
-
-
-
-
-<!-- Select Department Modal -->
-<div class="modal fade" id="selectDepartmentModal" tabindex="-1" aria-labelledby="selectDepartmentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="selectDepartmentModalLabel">Select Department</h5>
-                <!-- Removed close button to prevent closing -->
-            </div>
-            <?php
-            if (isset($_SESSION['user_id'], $_SESSION['role'], $_SESSION['school_id'])) {
-                $role = strtolower($_SESSION['role']);
-                $school_id = $_SESSION['school_id'];
-
-                // Always load departments for School Admin and Super Admin
-                if ($role === 'school admin' || $role === 'superadmin') {
-                    $stmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0");
-                    $stmt->bind_param("i", $school_id);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                }
-            }
-            ?>
-            <div class="modal-body">
-                <select id="departmentDropdown" class="form-select">
-                    <option value="" disabled selected>Select a department</option>
-                    <?php
-                    if (!empty($result) && $result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            echo '<option value="' . htmlspecialchars($row['id']) . '" data-name="' . htmlspecialchars($row['department_name']) . '">' . htmlspecialchars($row['department_name']) . '</option>';
-                        }
-                    } else {
-                        echo '<option value="" disabled>No departments available</option>';
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmOpenCommittee">Open</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
-<!-- Update Game Modal -->
-<div class="modal fade" id="updateGameModal" tabindex="-1" aria-labelledby="updateGameModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="updateGameModalLabel">Update Game</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="updateGameForm" method="post" action="update_game.php">
-                <div class="modal-body">
-                    <input type="hidden" name="game_id" id="update_game_id">
-
-                    <div class="mb-3">
-                        <label for="update_game_name" class="form-label">Game Name:</label>
-                        <input type="text" class="form-control" name="game_name" id="update_game_name" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="update_number_of_players" class="form-label">Number of Players per Team:</label>
-                        <input type="number" class="form-control" name="number_of_players" id="update_number_of_players" min="1" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="update_category" class="form-label">Category:</label>
-                        <select name="category" id="update_category" class="form-select" required>
-                            <option value="Team Sports">Team Sports</option>
-                            <option value="Individual Sports">Individual Sports</option>
-                            <option value="Dual Sports">Dual Sports</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="update_environment" class="form-label">Environment:</label>
-                        <select name="environment" id="update_environment" class="form-select" required>
-                            <option value="Indoor">Indoor</option>
-                            <option value="Outdoor">Outdoor</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="updateGameBtn">Update Game</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-</div>
-
-<!-- Add Game Modal -->
-<div class="modal fade" id="addGameModal" tabindex="-1" aria-labelledby="addGameModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addGameModalLabel">Add New Game</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="post" action="games.php">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="game_name" class="form-label">Game Name:</label>
-                        <input type="text" class="form-control" name="game_name" id="game_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="number_of_players" class="form-label">Number of Players per Team:</label>
-                        <input type="number" class="form-control" name="number_of_players" id="number_of_players" min="1" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Category:</label>
-                        <select name="category" id="category" class="form-select" required>
-                            <option value="Team Sports">Team Sports</option>
-                            <option value="Individual Sports">Individual Sports</option>
-                            <option value="Dual Sports">Dual Sports</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="environment" class="form-label">Environment:</label>
-                        <select name="environment" id="environment" class="form-select" required>
-                            <option value="Indoor">Indoor</option>
-                            <option value="Outdoor">Outdoor</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" name="add_game" class="btn btn-primary">Add Game</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
