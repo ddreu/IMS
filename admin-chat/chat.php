@@ -39,7 +39,7 @@ $image_path = (!empty($row['image']) && file_exists("../uploads/users/" . $row['
     <link rel="stylesheet" href="css/chat.css">
     <link rel="stylesheet" href="../super_admin/sastyles.css">
     <style>
-        .wrapper {
+        .chat-wrapper {
             height: 80vh;
             width: 85vw;
             margin-left: 130px;
@@ -69,7 +69,7 @@ $image_path = (!empty($row['image']) && file_exists("../uploads/users/" . $row['
         <div class="row justify-content-center">
             <main id="main" class="main">
                 <section class="section">
-                    <div class="wrapper">
+                    <div class="chat-wrapper">
                         <section class="chat-area" style="padding:10px;">
                             <div class="float-end">
                                 <!-- Example single danger button -->

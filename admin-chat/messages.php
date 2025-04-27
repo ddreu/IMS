@@ -19,7 +19,7 @@ session_start();
   <link rel="stylesheet" href="css/chat.css">
   <link rel="stylesheet" href="../super_admin/sastyles.css">
   <style>
-    .wrapper {
+    .chat-wrapper {
       height: 80vh;
       width: 85vw;
       margin-left: 130px;
@@ -44,7 +44,7 @@ session_start();
       <div class="container-fluid mt-5">
         <div class="row justify-content-center">
           <!-- <div class="col-xl-10 col-lg-11 col-md-11 col-sm-12"> -->
-          <div class="wrapper">
+          <div class="chat-wrapper">
             <section class="users">
               <header>
                 <div class="content">
