@@ -75,9 +75,8 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Logout confirmation
         document.getElementById('logoutBtn').addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent default anchor action
+            event.preventDefault();
             Swal.fire({
                 title: 'Are you sure?',
                 text: 'You will be logged out of your account.',
@@ -88,10 +87,27 @@
                 confirmButtonText: 'Yes, logout!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Redirect to logout.php
-                    window.location.href = 'logout.php';
+                    fetch('logout.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.redirect) {
+                                let redirectUrl = data.redirect.replace(/^(\.\.\/)+/, ''); // Remove ../ if present
+                                window.location.href = redirectUrl;
+                            } else {
+                                Swal.fire('Error', 'Logout failed.', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire('Error', 'Something went wrong.', 'error');
+                        });
                 }
             });
         });
-    }); // Close the event listener here
+    });
 </script>
