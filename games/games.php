@@ -432,9 +432,8 @@ include '../navbar/navbar.php';
                                         <th class="px-4 py-3">Players per Team</th>
                                         <th class="px-4 py-3">Category</th>
                                         <th class="px-4 py-3">Environment</th>
-                                        <?php if ($user['role'] === 'School Admin'): ?>
-                                            <th class="px-4 py-3 text-center">Actions</th>
-                                        <?php endif; ?>
+                                        <th class="px-4 py-3 text-center">Actions</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -451,14 +450,11 @@ include '../navbar/navbar.php';
                                             if ($user['role'] === 'School Admin' || $user['role'] === 'Department Admin' || $user['role'] === 'superadmin') {
                                                 echo '<td data-label="Actions" class="px-4 text-center">';
                                                 echo '<div class="btn-group">';
-                                                if ($user['role'] === 'School Admin'):
 
-                                                    // Dropdown Toggle
-                                                    echo '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 32px; padding: 6px 0;">';
-                                                    echo '⋮'; // Three dots symbol
-                                                    echo '</button>';
-
-                                                endif;
+                                                // Dropdown Toggle
+                                                echo '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 32px; padding: 6px 0;">';
+                                                echo '⋮'; // Three dots symbol
+                                                echo '</button>';
 
                                                 // Dropdown Menu
 
