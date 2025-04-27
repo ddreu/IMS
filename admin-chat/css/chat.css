@@ -129,7 +129,7 @@
     0 32px 64px -48px rgba(0, 0, 0, 0.5);
 } */
 
-.wrapper {
+.chat-wrapper {
   background: #fff;
   width: 100%;
   /* top: 50px; */
@@ -240,7 +240,7 @@
   border-bottom: 1px solid #e6e6e6;
   justify-content: space-between;
 }
-.wrapper img {
+.chat-wrapper img {
   object-fit: cover;
   border-radius: 50%;
 }

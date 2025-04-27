@@ -55,7 +55,7 @@ if (!isset($_SESSION['unique_id'])) {
   </style>
 
   </style>
-  <div class="wrapper">
+  <div class="chat-wrapper">
     <section class="chat-area" style="padding:10px;">
       <div class="float-end">
         <!-- <a href="../user-chat-utils/end_chat.php?session_id=<?php echo $_SESSION['unique_id']; ?>" class="btn btn-danger btn-sm">End Chat</a> -->

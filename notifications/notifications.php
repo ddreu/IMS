@@ -1,8 +1,7 @@
 <?php
 $notifications = [
-    "New message from Admin",
-    "Tournament schedule updated",
-    "New event posted with a very very very long title that should wrap properly and not overflow"
+
+    "Welcome to Intramurals Management System!"
 ];
 
 $notifIcon = '<i class="fas fa-bell text-warning"></i>';

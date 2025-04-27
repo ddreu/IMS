@@ -328,16 +328,19 @@ if (isset($_SESSION['success_message'])) {
         }
     </style>
 </head>
+<?php include '../navbar/navbar.php'; ?>
 
 <body>
     <div class="wrapper">
         <?php
         $current_page = 'admindashboard';
-        include '../navbar/navbar.php';
+        // include '../navbar/navbar.php';
         include '../department_admin/sidebar.php';
+
         ?>
 
         <div id="content">
+
             <div class="container-fluid p-4">
                 <!-- Department Info Section -->
 

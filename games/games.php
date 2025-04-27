@@ -451,13 +451,17 @@ include '../navbar/navbar.php';
                                             if ($user['role'] === 'School Admin' || $user['role'] === 'Department Admin' || $user['role'] === 'superadmin') {
                                                 echo '<td data-label="Actions" class="px-4 text-center">';
                                                 echo '<div class="btn-group">';
+                                                if ($user['role'] === 'School Admin'):
 
-                                                // Dropdown Toggle
-                                                echo '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 32px; padding: 6px 0;">';
-                                                echo '⋮'; // Three dots symbol
-                                                echo '</button>';
+                                                    // Dropdown Toggle
+                                                    echo '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 38px; height: 32px; padding: 6px 0;">';
+                                                    echo '⋮'; // Three dots symbol
+                                                    echo '</button>';
+
+                                                endif;
 
                                                 // Dropdown Menu
+
                                                 echo '<ul class="dropdown-menu">';
 
                                                 // Edit Button (Accessible for School Admin and Super Admin if not archived)

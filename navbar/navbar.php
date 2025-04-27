@@ -423,7 +423,7 @@
 
 
         <!-- Inbox Icon -->
-        <div class="dropdown me-3 inbox-dropdown position-relative">
+        <!-- <div class="dropdown me-3 inbox-dropdown position-relative">
             <a
                 class="text-secondary dropdown-toggle position-relative"
                 id="inboxDropdown"
@@ -433,17 +433,14 @@
                 title="Inbox"
                 style="text-decoration: none;">
                 <i class="fas fa-inbox fa-lg"></i>
-                <!-- Optional badge if you want to show unread messages -->
                 <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
             </a>
-            <!-- Dropdown container with dynamic width and content wrapping -->
             <ul class="dropdown-menu dropdown-menu-end shadow-sm overflow-auto"
                 style="max-height: 300px; overflow-x: hidden; width: 30vw;"
                 aria-labelledby="inboxDropdown">
 
-                <?php require_once '../messages/inbox.php'; ?>
             </ul>
-        </div>
+        </div> -->
 
         <!-- Notification Icon -->
         <div class="dropdown me-3 notification-dropdown position-relative">

@@ -60,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Upload if no errors
         if ($uploadOk == 1 && move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
-            // File uploaded successfully
         } else {
             $error[] = "Sorry, there was an error uploading your file.";
         }

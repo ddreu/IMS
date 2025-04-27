@@ -23,7 +23,7 @@ if (isset($_SESSION['unique_id'])) {
     } elseif (!empty($_SESSION['email'])) {
       $fname = $_SESSION['email'];
     }  ?>
-    <div class="wrapper">
+    <div class="chat-wrapper">
       <section class="form signup">
         <header>Live Chat Support</header>
         <form action="#" method="POST" enctype="multipart/form-data" autocomplete="off">

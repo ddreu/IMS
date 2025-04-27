@@ -343,7 +343,7 @@ include '../navbar/navbar.php';
                                                             <div class="d-flex align-items-center gap-3">
                                                                 <?php if (!empty($row["image"])): ?>
                                                                     <div style="width: 40px; height: 40px; overflow: hidden;" class="rounded-circle bg-light d-flex align-items-center justify-content-center">
-                                                                        <img src="../uploads/announcements/<?php echo htmlspecialchars($row['image']); ?>" alt="Announcement Image" class="img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
+                                                                        <img src="../announcements/<?php echo htmlspecialchars($row['image']); ?>" alt="Announcement Image" class="img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
                                                                     </div>
                                                                 <?php else: ?>
                                                                     <div style="width: 40px; height: 40px;" class="rounded-circle bg-secondary d-flex align-items-center justify-content-center">
@@ -600,7 +600,7 @@ include '../navbar/navbar.php';
                             // Show current image preview if exists
                             const imagePreview = document.getElementById('imagePreview');
                             if (data.image) {
-                                imagePreview.src = `../uploads/${data.image}`;
+                                imagePreview.src = `../announcements/${data.image}`;
                                 imagePreview.style.display = 'block';
                             } else {
                                 imagePreview.style.display = 'none';
