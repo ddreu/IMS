@@ -274,18 +274,9 @@ include '../navbar/navbar.php';
                         <div class="row align-items-center">
                             <div class="col d-flex justify-content-between align-items-center">
                                 <h4 class="m-0 font-weight-bold text-primary p-3">Rankings</h4>
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check form-switch ms-auto me-3">
-                                        <input class="form-check-input" type="checkbox" id="toggleViewBtn">
-                                        <label class="form-check-label" for="toggleViewBtn" id="toggleViewLabel">Show Player Rankings</label>
-                                    </div>
-
-                                    <?php if ($role !== 'Committee'): ?>
-                                        <button id="resetLeaderboardBtn" class="btn btn-danger btn-sm px-3 py-2 shadow-sm">
-                                            <i class="fas fa-undo"></i> Reset Leaderboard
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
+                                <?php if ($role !== 'Committee'): ?>
+                                    <button id="resetLeaderboardBtn" class="btn btn-danger me-3">Reset Leaderboard</button>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <div class="card-body">
@@ -301,8 +292,6 @@ include '../navbar/navbar.php';
     </div>
 
     <script>
-        let currentView = 'team'; // default view is team
-
         document.addEventListener('DOMContentLoaded', function() {
             // Function to load departments
             function loadDepartments() {
@@ -389,174 +378,106 @@ include '../navbar/navbar.php';
 
                 if (!rankingsDiv) return;
 
+                // If no department is selected, show a message
                 if (!department) {
                     rankingsDiv.innerHTML = '<p class="text-center text-muted">Please select a department to view rankings.</p>';
                     return;
                 }
 
-                if (currentView === 'player') {
-                    fetch(`fetch_player_rankings.php?department_id=${department}&grade_level=${gradeLevel}&game_id=${game}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.error) {
-                                rankingsDiv.innerHTML = `<p class="text-center text-muted">${data.error}</p>`;
-                                return;
-                            }
+                fetch(`fetch_rankings.php?department_id=${department}&grade_level=${gradeLevel}&game_id=${game}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Check for error message
+                        if (data.error) {
+                            rankingsDiv.innerHTML = `<p class="text-center text-muted">${data.error}</p>`;
+                            return;
+                        }
 
-                            // if (!data.players || data.players.length === 0) {
-                            //     rankingsDiv.innerHTML = '<p class="text-center text-muted">No player stats available for the selected filters.</p>';
-                            //     return;
-                            // }
+                        if (data.length === 0) {
+                            rankingsDiv.innerHTML = '<p class="text-center text-muted">No rankings available for the selected filters.</p>';
+                            return;
+                        }
 
-                            if (!data.players || data.players.length === 0 || !data.stat_columns || data.stat_columns.length === 0) {
-                                rankingsDiv.innerHTML = `
-    <div class="text-center py-5">
-        <i class="fas fa-frown fa-3x mb-3" style="color: #ccc;"></i>
-        <h5 class="text-muted">No player stats available</h5>
-        <p class="text-muted">No stats were found for the selected filters. Please try again later.</p>
-    </div>`;
-                                return;
-                            }
+                        let tableHtml = `
+                            <table id="rankTable" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Rank</th>
+                                        <th>Team</th>`;
 
+                        // Check if we're showing points or wins/losses
+                        if (data.length > 0 && data[0].is_points) {
+                            tableHtml += `
+        <th>Points</th>
+        <th><i class="fas fa-medal" style="color: #FFD700;"></i> Gold</th>
+        <th><i class="fas fa-medal" style="color: #C0C0C0;"></i> Silver</th>
+        <th><i class="fas fa-medal" style="color: #CD7F32;"></i> Bronze</th>`;
+                        } else {
+                            tableHtml += `
+        <th>Wins</th>
+        <th>Losses</th>
+        <th>Win Rate</th>`;
+                        }
 
-                            let tableHtml = `
-                <table id="rankTable" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Rank</th>
-                            <th>Player</th>`;
+                        tableHtml += `
+                                    </tr>
+                                </thead>
+                                <tbody>`;
 
-                            // Dynamically add stat columns
-                            data.stat_columns.forEach(stat => {
-                                tableHtml += `<th>${stat}</th>`;
-                            });
+                        data.forEach((team, index) => {
+                            const rowClass = index === 0 ? 'table-gold' :
+                                index === 1 ? 'table-silver' :
+                                index === 2 ? 'table-bronze' : '';
 
-                            tableHtml += `</tr></thead><tbody>`;
-
-                            data.players.forEach((player, index) => {
-                                const rowClass = index === 0 ? 'table-gold' :
-                                    index === 1 ? 'table-silver' :
-                                    index === 2 ? 'table-bronze' : '';
-
-                                let rankDisplay = (index === 0) ? '<i class="fas fa-trophy" style="color: #FFD700;"></i>' :
-                                    (index === 1) ? '<i class="fas fa-medal" style="color: #C0C0C0;"></i>' :
-                                    (index === 2) ? '<i class="fas fa-medal" style="color: #CD7F32;"></i>' :
-                                    (index + 1);
-
-                                tableHtml += `<tr class="${rowClass}">
-                    <td class="text-center">${rankDisplay}</td>
-                    <td>${player.player_name}</td>`;
-
-                                // Dynamically fill stat values
-                                data.stat_columns.forEach(stat => {
-                                    tableHtml += `<td>${player.stats[stat] ?? 0}</td>`;
-                                });
-
-                                tableHtml += `</tr>`;
-                            });
-
-                            tableHtml += `</tbody></table>`;
-                            rankingsDiv.innerHTML = tableHtml;
-                        })
-                        .catch(error => {
-                            console.error('Error loading player rankings:', error);
-                            rankingsDiv.innerHTML = '<p class="text-center text-danger">Error loading player rankings. Please try again.</p>';
-                        });
-                } else {
-                    // ORIGINAL TEAM RANKINGS (your full working code stays here)
-                    fetch(`fetch_rankings.php?department_id=${department}&grade_level=${gradeLevel}&game_id=${game}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.error) {
-                                rankingsDiv.innerHTML = `<p class="text-center text-muted">${data.error}</p>`;
-                                return;
-                            }
-                            if (data.length === 0) {
-                                rankingsDiv.innerHTML = '<p class="text-center text-muted">No rankings available for the selected filters.</p>';
-                                return;
-                            }
-
-                            let tableHtml = `
-                    <table id="rankTable" class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th class="text-center">Rank</th>
-                                <th>Team</th>`;
-
-                            if (data[0].is_points) {
-                                tableHtml += `
-                        <th>Points</th>
-                        <th><i class="fas fa-medal" style="color: #FFD700;"></i> Gold</th>
-                        <th><i class="fas fa-medal" style="color: #C0C0C0;"></i> Silver</th>
-                        <th><i class="fas fa-medal" style="color: #CD7F32;"></i> Bronze</th>`;
+                            // Create rank display with icons
+                            let rankDisplay;
+                            if (index === 0) {
+                                rankDisplay = '<i class="fas fa-trophy" style="color: #FFD700;"></i>';
+                            } else if (index === 1) {
+                                rankDisplay = '<i class="fas fa-medal" style="color: #C0C0C0;"></i>';
+                            } else if (index === 2) {
+                                rankDisplay = '<i class="fas fa-medal" style="color: #CD7F32;"></i>';
                             } else {
-                                tableHtml += `
-                        <th>Wins</th>
-                        <th>Losses</th>
-                        <th>Win Rate</th>`;
+                                rankDisplay = index + 1;
                             }
 
-                            tableHtml += `</tr></thead><tbody>`;
+                            tableHtml += `
+                                <tr class="${rowClass}">
+                                    <td class="text-center">${rankDisplay}</td>
+                                    <td>${team.team_name}</td>`;
 
-                            data.forEach((team, index) => {
-                                const rowClass = index === 0 ? 'table-gold' :
-                                    index === 1 ? 'table-silver' :
-                                    index === 2 ? 'table-bronze' : '';
-
-                                let rankDisplay = (index === 0) ? '<i class="fas fa-trophy" style="color: #FFD700;"></i>' :
-                                    (index === 1) ? '<i class="fas fa-medal" style="color: #C0C0C0;"></i>' :
-                                    (index === 2) ? '<i class="fas fa-medal" style="color: #CD7F32;"></i>' : (index + 1);
-
+                            if (team.is_points) {
                                 tableHtml += `
-                        <tr class="${rowClass}">
-                            <td class="text-center">${rankDisplay}</td>
-                            <td>${team.team_name}</td>`;
+        <td>${team.wins}</td>
+        <td>${team.gold}</td>
+        <td>${team.silver}</td>
+        <td>${team.bronze}</td>`;
+                            } else {
+                                const winRate = team.total_matches > 0 ? ((team.wins / team.total_matches) * 100).toFixed(1) : '0.0';
+                                tableHtml += `
+        <td>${team.wins}</td>
+        <td>${team.losses}</td>
+        <td>${winRate}%</td>`;
+                            }
 
-                                if (team.is_points) {
-                                    tableHtml += `
-                            <td>${team.wins}</td>
-                            <td>${team.gold}</td>
-                            <td>${team.silver}</td>
-                            <td>${team.bronze}</td>`;
-                                } else {
-                                    const winRate = team.total_matches > 0 ? ((team.wins / team.total_matches) * 100).toFixed(1) : '0.0';
-                                    tableHtml += `
-                            <td>${team.wins}</td>
-                            <td>${team.losses}</td>
-                            <td>${winRate}%</td>`;
-                                }
-
-                                tableHtml += `</tr>`;
-                            });
-
-                            tableHtml += `</tbody></table>`;
-                            rankingsDiv.innerHTML = tableHtml;
-                        })
-                        .catch(error => {
-                            console.error('Error loading team rankings:', error);
-                            rankingsDiv.innerHTML = '<p class="text-center text-danger">Error loading rankings. Please try again.</p>';
+                            tableHtml += `</tr>`;
                         });
-                }
-            }
 
+                        tableHtml += `</tbody></table>`;
+                        rankingsDiv.innerHTML = tableHtml;
+                    })
+                    .catch(error => {
+                        console.error('Error loading rankings:', error);
+                        document.getElementById('rankingsTable').innerHTML =
+                            '<p class="text-center text-danger">Error loading rankings. Please try again.</p>';
+                    });
+            }
 
             // Add event listeners with null checks
             const departmentFilter = document.getElementById('departmentFilter');
             const gradeLevelFilter = document.getElementById('gradeLevelFilter');
             const gameFilter = document.getElementById('gameFilter');
             const resetButton = document.getElementById('resetLeaderboardBtn');
-            const toggleViewBtn = document.getElementById('toggleViewBtn');
-            const toggleViewLabel = document.getElementById('toggleViewLabel');
-
-            if (toggleViewBtn) {
-                toggleViewBtn.addEventListener('change', function() {
-                    currentView = this.checked ? 'player' : 'team';
-                    toggleViewLabel.textContent = this.checked ? 'Show Team Rankings' : 'Show Player Rankings';
-                    loadRankings();
-                });
-            }
-
-
 
             if (departmentFilter) {
                 departmentFilter.addEventListener('change', function() {

@@ -19,6 +19,10 @@ include 'navbarhome.php';
     <link href="home.css" rel="stylesheet">
 
     <style>
+        .form-check.form-switch {
+            margin-top: 1.7rem;
+        }
+    </style>
 
     </style>
 </head>
@@ -38,9 +42,15 @@ include 'navbarhome.php';
                     <label for="gameFilter" class="form-label">Select Game</label>
                     <select id="gameFilter" class="form-select">
                         <option value="" selected>All Games</option>
-                        <!-- Game options populated dynamically -->
                     </select>
                 </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check form-switch ms-3">
+                        <input class="form-check-input" type="checkbox" id="toggleView">
+                        <label class="form-check-label" for="toggleView">Player Rankings</label>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -67,6 +77,8 @@ include 'navbarhome.php';
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+        let currentView = 'team'; // default view
+
         document.addEventListener("DOMContentLoaded", function() {
             const gameFilter = document.getElementById("gameFilter");
             const rankingsTable = document.getElementById("rankingsTable");
@@ -112,15 +124,14 @@ include 'navbarhome.php';
 
             // Fetch and update the rankings table
             function updateRankings(schoolId, departmentId, gradeLevel = null, gameId = null) {
-                // Show loading state
                 rankingsTable.innerHTML = `
-                <div class="text-center">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="text-muted mt-2 mb-0">Loading rankings...</p>
-                </div>
-            `;
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2 mb-0">Loading rankings...</p>
+        </div>
+    `;
 
                 const queryParams = new URLSearchParams({
                     school_id: schoolId,
@@ -131,97 +142,121 @@ include 'navbarhome.php';
                     queryParams.append("grade_level", gradeLevel);
                 }
 
-                fetch(`rankings/fetch_rankings.php?${queryParams.toString()}`)
+                // Use different endpoints based on view
+                const endpoint = (currentView === 'player') ? 'rankings/fetch_player_rankings.php' : 'rankings/fetch_rankings.php';
+
+                fetch(`${endpoint}?${queryParams.toString()}`)
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.error) {
                             rankingsTable.innerHTML = `
-                            <div class="no-rankings">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <h3 class="h5 mb-2">${data.error}</h3>
-                                <p class="text-muted mb-0">Please try adjusting your filters.</p>
-                            </div>`;
+                <div class="no-rankings">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3 class="h5 mb-2">${data.error}</h3>
+                    <p class="text-muted mb-0">Please try adjusting your filters.</p>
+                </div>`;
                             return;
                         }
 
-
-                        // Check if the data contains rankings with all zeros
-                        const isAllZero = data.every(team => (team.wins === 0 && team.losses === 0) || team.points === 0);
-                        if (isAllZero) {
+                        if (
+                            (currentView === 'player' && (data.stat_columns.length === 0 || data.players.length === 0)) ||
+                            (currentView === 'team' && data.length === 0)
+                        ) {
                             rankingsTable.innerHTML = `
-    <div class="container">
-        <p class="text-center text-muted">
-            <i class="fas fa-trophy" style="color: #FFD700; margin-right: 10px;"></i>
-            No data available yet, comeback later.
-        </p>
-    </div>
-`;
+    <div class="no-rankings text-center py-5">
+        <i class="fas fa-trophy" style="font-size: 2rem; color: #ffd700;"></i>
+        <h3 class="h5 mt-3">No Rankings Available</h3>
+        <p class="text-muted">No data available for the selected filters.</p>
+    </div>`;
                             return;
                         }
 
-                        if (data.length === 0) {
-                            rankingsTable.innerHTML = `
-                            <div class="no-rankings">
-                                <i class="fas fa-trophy"></i>
-                                <h3 class="h5 mb-2">No Rankings Available</h3>
-                                <p class="text-muted mb-0">No rankings found for the selected filters.</p>
-                            </div>`;
-                            return;
-                        }
+
+                        //         if (data.length === 0 || (Array.isArray(data.players) && data.players.length === 0)) {
+                        //             rankingsTable.innerHTML = `
+                        // <div class="no-rankings">
+                        //     <i class="fas fa-trophy"></i>
+                        //     <h3 class="h5 mb-2">No Rankings Available</h3>
+                        //     <p class="text-muted mb-0">No rankings found for the selected filters.</p>
+                        // </div>`;
+                        //             return;
+                        //         }
 
                         let tableHtml = `
-                        <table id="rankTable" class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">Rank</th>
-                                    <th>Team</th>`;
+            <table id="rankTable" class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-center">Rank</th>`;
 
-                        if (data.length > 0 && data[0].is_points) {
-                            tableHtml += `<th class="text-end">Points</th>`;
+                        if (currentView === 'player') {
+                            tableHtml += `
+                        <th>Player</th>
+                        <th>Team</th>`;
+                            if (data.stat_columns.length > 0) {
+                                data.stat_columns.forEach(stat => {
+                                    tableHtml += `<th class="text-end">${stat}</th>`;
+                                });
+                            }
                         } else {
                             tableHtml += `
-                            <th class="text-end">Wins</th>
-                            <th class="text-end">Losses</th>
-                            <th class="text-end">Win Rate</th>`;
+                        <th>Team</th>`;
+
+                            if (data[0].is_points) {
+                                tableHtml += `
+                        <th class="text-end">Points</th>
+                        <th class="text-center"><i class="fas fa-medal" style="color: #FFD700;"></i> Gold</th>
+                        <th class="text-center"><i class="fas fa-medal" style="color: #C0C0C0;"></i> Silver</th>
+                        <th class="text-center"><i class="fas fa-medal" style="color: #CD7F32;"></i> Bronze</th>`;
+                            } else {
+                                tableHtml += `
+                        <th class="text-end">Wins</th>
+                        <th class="text-end">Losses</th>
+                        <th class="text-end">Win Rate</th>`;
+                            }
                         }
 
                         tableHtml += `</tr></thead><tbody>`;
 
-                        data.forEach((team, index) => {
-                            const rowClass = index === 0 ? 'table-gold' :
-                                index === 1 ? 'table-silver' :
-                                index === 2 ? 'table-bronze' : '';
-
-                            let rankDisplay;
-                            if (index === 0) {
-                                rankDisplay = '<i class="fas fa-trophy"></i>';
-                            } else if (index === 1) {
-                                rankDisplay = '<i class="fas fa-medal"></i>';
-                            } else if (index === 2) {
-                                rankDisplay = '<i class="fas fa-medal"></i>';
-                            } else {
-                                rankDisplay = `<span class="text-muted">${index + 1}</span>`;
-                            }
-
-                            tableHtml += `
-                            <tr class="${rowClass}">
-                                <td class="text-center">${rankDisplay}</td>
-                                <td>${team.team_name}</td>`;
-
-                            if (team.is_points) {
-                                tableHtml += `<td class="text-end fw-semibold">${team.wins}</td>`;
-                            } else {
-                                const winRate = team.total_matches > 0 ?
-                                    ((team.wins / team.total_matches) * 100).toFixed(1) :
-                                    '0.0';
+                        if (currentView === 'player') {
+                            data.players.forEach((player, index) => {
                                 tableHtml += `
-                                <td class="text-end">${team.wins}</td>
-                                <td class="text-end">${team.losses}</td>
-                                <td class="text-end fw-semibold">${winRate}%</td>`;
-                            }
+                        <tr>
+                            <td class="text-center">${index + 1}</td>
+                            <td>${player.player_name}</td>
+                            <td>${player.team_name || ''}</td>`;
 
-                            tableHtml += `</tr>`;
-                        });
+                                data.stat_columns.forEach(stat => {
+                                    tableHtml += `<td class="text-end">${player.stats[stat] || 0}</td>`;
+                                });
+
+                                tableHtml += `</tr>`;
+                            });
+                        } else {
+                            data.forEach((team, index) => {
+                                tableHtml += `
+                        <tr>
+                            <td class="text-center">${index + 1}</td>
+                            <td>${team.team_name}</td>`;
+
+                                if (team.is_points) {
+                                    tableHtml += `
+                            <td class="text-end fw-semibold">${team.wins}</td>
+                            <td class="text-center">${team.gold || 0}</td>
+                            <td class="text-center">${team.silver || 0}</td>
+                            <td class="text-center">${team.bronze || 0}</td>`;
+                                } else {
+                                    const winRate = team.total_matches > 0 ?
+                                        ((team.wins / team.total_matches) * 100).toFixed(1) :
+                                        '0.0';
+                                    tableHtml += `
+                            <td class="text-end">${team.wins}</td>
+                            <td class="text-end">${team.losses}</td>
+                            <td class="text-end fw-semibold">${winRate}%</td>`;
+                                }
+
+                                tableHtml += `</tr>`;
+                            });
+                        }
 
                         tableHtml += `</tbody></table>`;
                         rankingsTable.innerHTML = tableHtml;
@@ -229,13 +264,22 @@ include 'navbarhome.php';
                     .catch(error => {
                         console.error('Error:', error);
                         rankingsTable.innerHTML = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle mb-2" style="font-size: 1.5rem;"></i>
-                            <h3 class="h5 mb-2">Error Loading Rankings</h3>
-                            <p class="mb-0" style="font-size: 0.9rem;">Please try again later.</p>
-                        </div>`;
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle mb-2" style="font-size: 1.5rem;"></i>
+                <h3 class="h5 mb-2">Error Loading Rankings</h3>
+                <p class="mb-0" style="font-size: 0.9rem;">Please try again later.</p>
+            </div>`;
                     });
             }
+            const toggleView = document.getElementById("toggleView");
+
+            toggleView.addEventListener("change", function() {
+                currentView = this.checked ? 'player' : 'team';
+                const label = document.querySelector('label[for="toggleView"]');
+                label.textContent = this.checked ? 'Switch to Team Rankings' : 'Switch to Player Rankings';
+                updateRankings(school_id, department_id, grade_level, gameFilter.value);
+            });
+
 
             // Event listener for game filter change
             gameFilter.addEventListener("change", function() {

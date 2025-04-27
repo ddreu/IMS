@@ -157,36 +157,9 @@ $conn->close();
             <h4>Game Configuration</h4>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="card mb-4 mt-4">
-                        <div class="card-header bg-primary text-white">
-                            <h4>Game Stats Configuration</h4>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" action="game_stats.php">
-                                <div class="row">
-                                    <div class="col-md-8 mb-3">
-                                        <label class="form-label">Stat Name *</label>
-                                        <input type="text" name="stat_name" class="form-control" required
-                                            placeholder="e.g., Scores, Fouls, Assists, Rebounds">
-                                        <!-- Add hidden inputs to pass game context -->
-                                        <input type="hidden" name="game_id" value="<?php echo $assigned_game_id; ?>">
-                                        <input type="hidden" name="department_id" value="<?php echo $assigned_department_id; ?>">
-                                        <input type="hidden" name="school_id" value="<?php echo $assigned_school_id; ?>">
-                                    </div>
-                                    <div class="col-md-4 mb-3 align-self-end">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-plus-circle"></i> Add Stat
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                     <div class="card mt-4">
                         <div class="card-header bg-primary text-white">
-                            <!-- <h4>Scoring Rules Configuration</h4> -->
-                            <h4>Scoreboard Configuration</h4>
-
+                            <h4>Scoring Rules Configuration</h4>
                         </div>
                         <div class="card-body">
                             <form method="POST" action="">
@@ -200,7 +173,7 @@ $conn->close();
                                     </select>
                                 </div>
 
-                                <div class="row" style="display: none;">
+                                <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Scoring Unit</label>
                                         <input type="text" name="scoring_unit" class="form-control" value="<?php echo htmlspecialchars($scoring_rules['scoring_unit'] ?? ''); ?>" placeholder="Enter scoring unit">
@@ -247,13 +220,77 @@ $conn->close();
                             </form>
                         </div>
                     </div>
+
+                    <!--  <div class="card mt-4 mx-auto">
+                        <div class="card-header bg-primary text-white">
+                            <h4>Round Robin Tournament Points</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="scoringForm">
+                              
+                                <div class="mb-3">
+                                    <label class="form-label">Points for a Win</label>
+                                    <input type="number" name="win_points" class="form-control" value="<?php echo isset($scoring_rules['win_points']) ? $scoring_rules['win_points'] : 3; ?>" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Points for a Draw</label>
+                                    <input type="number" name="draw_points" class="form-control" value="<?php echo isset($scoring_rules['draw_points']) ? $scoring_rules['draw_points'] : 1; ?>" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Points for a Loss</label>
+                                    <input type="number" name="loss_points" class="form-control" value="<?php echo isset($scoring_rules['loss_points']) ? $scoring_rules['loss_points'] : 0; ?>" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Bonus Points (Optional)</label>
+                                    <input type="number" name="bonus_points" class="form-control" value="<?php echo isset($scoring_rules['bonus_points']) ? $scoring_rules['bonus_points'] : 0; ?>">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">Save</button>
+                            </form>
+
+                            <div id="responseMessage" class="mt-3"></div>
+                        </div>
+                    </div> -->
+
+
+
                 </div>
 
 
 
                 <div class="col-md-6">
+                    <div class="card mb-4 mt-4">
+                        <div class="card-header bg-primary text-white">
+                            <h4>Game Stats Configuration</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="game_stats.php">
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label class="form-label">Stat Name *</label>
+                                        <input type="text" name="stat_name" class="form-control" required
+                                            placeholder="e.g., Scores, Fouls, Assists, Rebounds">
+                                        <!-- Add hidden inputs to pass game context -->
+                                        <input type="hidden" name="game_id" value="<?php echo $assigned_game_id; ?>">
+                                        <input type="hidden" name="department_id" value="<?php echo $assigned_department_id; ?>">
+                                        <input type="hidden" name="school_id" value="<?php echo $assigned_school_id; ?>">
+                                    </div>
+                                    <div class="col-md-4 mb-3 align-self-end">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-plus-circle"></i> Add Stat
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
                     <!-- Existing Game Stats Display -->
-                    <div class="card mt-4">
+                    <div class="card">
                         <div class="card-header bg-secondary text-white">
                             <h4>Existing Game Stats</h4>
                         </div>
