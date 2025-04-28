@@ -136,7 +136,11 @@ $conn->close();
 
                 <!-- Left Column: Image -->
                 <div class="col-md-5">
-                    <div class="triangle-background"></div>
+                    <div class="triangle-background" data-aos="fade-up" data-aos-duration="2000"></div>
+
+
+
+
                     <img src="assets/img/12.png" alt="Intramurals Event" class="img-fluid feature-side-image" />
                 </div>
 

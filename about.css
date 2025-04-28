@@ -289,14 +289,14 @@ h3 {
   top: 0;
   left: 0;
   width: 45%;
-  height: 80%;
+  height: 65%;
   clip-path: polygon(0 0, 100% 100%, 0 100%);
   background: repeating-linear-gradient(
     135deg,
     #2a0565,
-    #2a0565 15px,
-    transparent 15px,
-    transparent 30px
+    #2a0565 20px,
+    transparent 20px,
+    transparent 50px
   );
   z-index: 0;
 }
@@ -307,6 +307,8 @@ h3 {
   border-radius: 15px;
   /* box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); */
 }
+
+/* arrows */
 
 /*about value section*/
 
