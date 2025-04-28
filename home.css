@@ -219,7 +219,9 @@ header {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(43, 43, 43, 0.514);
+  /* background-color: rgba(43, 43, 43, 0.514); */
+  background: rgba(0, 0, 0, 0.4);
+
   display: flex;
   justify-content: space-between;
   align-items: center;

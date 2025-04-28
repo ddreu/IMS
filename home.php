@@ -60,7 +60,8 @@ if ($row = $result->fetch_assoc()) {
     $description = $row['description'] ?: "It's time to unleash your inner athlete, build new friendships, and celebrate the thrill of competition. Let's make this year's event a true showcase of teamwork, sportsmanship, and fun. Get ready to play, cheer, and create unforgettable memories. Let the games begin!";
 } else {
     // Fallback to default values if no data is found
-    $hero_image = 'images/intrams1.png';
+    // $hero_image = 'images/intrams1.png';
+    $hero_image = 'images/index.png';
     $title = 'Welcome to our Annual Intramurals!';
     $description = "It's time to unleash your inner athlete, build new friendships, and celebrate the thrill of competition. Let's make this year's event a true showcase of teamwork, sportsmanship, and fun. Get ready to play, cheer, and create unforgettable memories. Let the games begin!";
 }

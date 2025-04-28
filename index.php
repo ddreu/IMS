@@ -26,25 +26,59 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Welcome to IMS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
     <link rel="stylesheet" href="index.css">
+    <style>
+
+    </style>
 </head>
 
 <body>
     <!-- Navbar -->
+    <!-- <header class="navbar">
+        <div class="logo">IMS</div>
+        <nav class="nav-links">
+            <a href="index.php">Home</a>
+            <a href="about.php">About</a>
+            <a href="contact.php">Contact</a>
+            <?php if (!$isLoggedIn):
+            ?>
+                <a href="login.php" class="login-btn">Log In</a>
+            <?php endif; ?>
+    </header> -->
+
+
     <header class="navbar">
         <div class="logo">IMS</div>
-        <?php if (!$isLoggedIn):
-        ?>
+        <nav class="nav-links">
+            <a href="index.php">Home</a>
+            <a href="about.php">About</a>
+            <a href="contact.php">Contact</a>
+        </nav>
+        <div class="social-icons d-flex gap-2 me-3">
+            <!-- <a href="https://facebook.com" class="text-white small-icon" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-facebook-f"></i>
+            </a> -->
+            <a href="mailto:andrewbucedeguzman@gmail.com" class="text-white small-icon">
+                <i class="fas fa-envelope"></i>
+            </a>
+            <a href="https://github.com/ddreu" class="text-white small-icon" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+        <?php if (!$isLoggedIn): ?>
             <a href="login.php" class="login-btn">Log In</a>
         <?php endif; ?>
     </header>
 
+
+
     <div class="transition-layer" id="transition-layer">
         <div class="layer translucent"></div>
         <div class="layer solid"></div>
-        <!-- <div id="loader" class="loader-container loader-in-transition">
-            <div class="loader"></div>
-        </div> -->
+
     </div>
 
 
@@ -53,6 +87,9 @@ $conn->close();
             <source src="assets/vid/hero-vid.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
+        <button id="play-pause-btn" class="play-pause-btn">
+            <i class="fas fa-pause"></i>
+        </button>
 
         <div class="hero-content">
             <h1>Enhance Your Sports Experience <span class="highlight">Elevate the Game.</span></h1>
@@ -88,24 +125,7 @@ $conn->close();
             ?>
         </div>
     </section>
-    <!-- 
-    <div id="loader" class="loader-container loader-in-transition">
-        <div class="loader"></div>
-    </div> -->
 
-    <!-- <div id="loader" class="loader-container loader-in-transition">
-        <i class="fas fa-basketball-ball basketball-loader"></i>
-    </div> -->
-
-    <!-- <div id="loader" class="loader-container loader-in-transition">
-        <svg class="basketball-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="500" zoomAndPan="magnify" viewBox="0 0 375 374.999991" height="500" preserveAspectRatio="xMidYMid meet" version="1.0">
-            <path class="basketball-line" d="M 187.5 375 C 84.113281 375 0 290.886719 0 187.5 C 0 84.113281 84.113281 0 187.5 0 C 290.886719 0 375 84.097656 375 187.5 C 375 290.902344 290.886719 375 187.5 375 Z M 187.5 16.304688 C 93.097656 16.304688 16.304688 93.097656 16.304688 187.5 C 16.304688 281.902344 93.097656 358.695312 187.5 358.695312 C 281.902344 358.695312 358.695312 281.902344 358.695312 187.5 C 358.695312 93.097656 281.902344 16.304688 187.5 16.304688 Z M 187.5 16.304688 " fill-opacity="1" fill-rule="nonzero" />
-            <path class="basketball-line" d="M 363.34375 160.175781 C 360.996094 160.175781 358.664062 159.164062 357.050781 157.207031 C 299.820312 87.878906 224.738281 77.121094 171.683594 80.429688 C 101.902344 84.683594 40.273438 116.199219 23.167969 142.972656 C 20.738281 146.753906 15.699219 147.863281 11.917969 145.449219 C 8.121094 143.039062 7.011719 138 9.441406 134.199219 C 28.824219 103.824219 91.941406 68.949219 170.707031 64.15625 C 250.890625 59.28125 321.585938 88.628906 369.636719 146.835938 C 372.503906 150.308594 372.015625 155.445312 368.542969 158.316406 C 367.011719 159.554688 365.167969 160.175781 363.34375 160.175781 Z M 363.34375 160.175781 " fill-opacity="1" fill-rule="nonzero" />
-            <path class="basketball-line" d="M 40.761719 293.476562 C 36.261719 293.476562 32.609375 289.824219 32.609375 285.324219 C 32.609375 265.515625 56.496094 238.175781 86.738281 203.558594 C 120.734375 164.640625 163.042969 116.234375 163.042969 81.523438 C 163.042969 62.773438 158.199219 49.15625 148.648438 41.070312 C 135.113281 29.609375 115.679688 32.476562 115.46875 32.496094 C 111.03125 33.308594 106.824219 30.226562 106.09375 25.792969 C 105.34375 21.359375 108.359375 17.152344 112.792969 16.417969 C 113.871094 16.222656 139.710938 12.148438 159.195312 28.628906 C 172.566406 39.960938 179.347656 57.75 179.347656 81.523438 C 179.347656 122.347656 136.679688 171.195312 99.015625 214.289062 C 74.398438 242.476562 48.914062 271.628906 48.914062 285.324219 C 48.914062 289.824219 45.261719 293.476562 40.761719 293.476562 Z M 40.761719 293.476562 " fill-opacity="1" fill-rule="nonzero" />
-            <path class="basketball-line" d="M 163.042969 366.847656 C 161.675781 366.847656 160.273438 366.503906 158.984375 365.773438 C 155.070312 363.523438 153.734375 358.550781 155.96875 354.636719 C 203.496094 271.957031 211.957031 239.398438 211.957031 16.304688 C 211.957031 11.789062 215.609375 8.152344 220.109375 8.152344 C 224.609375 8.152344 228.261719 11.804688 228.261719 16.304688 C 228.261719 234.082031 221.738281 272.933594 170.121094 362.753906 C 168.601562 365.378906 165.863281 366.847656 163.042969 366.847656 Z M 163.042969 366.847656 " fill-opacity="1" fill-rule="nonzero" />
-            <path class="basketball-line" d="M 309.78125 326.085938 C 308.59375 326.085938 307.386719 325.824219 306.226562 325.273438 C 302.167969 323.300781 300.488281 318.425781 302.460938 314.378906 C 321.148438 275.933594 304.648438 236.414062 287.183594 194.59375 C 274.238281 163.597656 260.871094 131.574219 260.871094 97.824219 C 260.871094 44.738281 300.554688 40.824219 300.945312 40.792969 C 305.445312 40.351562 309.375 43.746094 309.75 48.246094 C 310.125 52.726562 306.800781 56.675781 302.300781 57.050781 C 299.820312 57.292969 277.175781 60.78125 277.175781 97.824219 C 277.175781 128.316406 289.90625 158.804688 302.21875 188.300781 C 320.300781 231.636719 339 276.425781 317.121094 321.488281 C 315.699219 324.390625 312.800781 326.085938 309.78125 326.085938 Z M 309.78125 326.085938 " fill-opacity="1" fill-rule="nonzero" />
-        </svg>
-    </div> -->
     <div id="loader" class="loader-container loader-in-transition">
         <svg class="basketball-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 400 400" fill="none">
             <path class="basketball-line"
@@ -135,33 +155,7 @@ $conn->close();
         </svg>
     </div>
 
-
-
-
-
     <script>
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     const openBtn = document.getElementById('open-schools-btn');
-        //     const closeBtn = document.getElementById('close-btn');
-        //     const schoolsSection = document.getElementById('schools-section');
-
-        //     // Open schools section
-        //     openBtn.addEventListener('click', () => {
-        //         schoolsSection.style.display = 'flex'; 
-        //         setTimeout(() => {
-        //             schoolsSection.classList.add('show'); 
-        //         }, 10); 
-        //     });
-
-        //     // Close schools section
-        //     closeBtn.addEventListener('click', () => {
-        //         schoolsSection.classList.remove('show'); 
-        //         setTimeout(() => {
-        //             schoolsSection.style.display = 'none'; 
-        //         }, 500); 
-        //     });
-        // });
-
         document.addEventListener('DOMContentLoaded', () => {
             const openBtn = document.getElementById('open-schools-btn');
             const closeBtn = document.getElementById('close-btn');
@@ -240,34 +234,23 @@ $conn->close();
         });
 
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('hero-video');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const playPauseIcon = playPauseBtn.querySelector('i');
 
-
-
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     const openBtn = document.getElementById('open-schools-btn');
-        //     const closeBtn = document.getElementById('close-btn');
-        //     const schoolsSection = document.getElementById('schools-section');
-
-        //     // Open schools section
-        //     openBtn.addEventListener('click', () => {
-        //         schoolsSection.classList.add('show');
-        //     });
-
-        //     // Close schools section
-        //     closeBtn.addEventListener('click', () => {
-        //         schoolsSection.classList.remove('show');
-        //     });
-        // });
-
-        // const container = document.querySelector('.school-cards-container');
-
-        // container.addEventListener('wheel', (event) => {
-        //     event.preventDefault();
-        //     container.scrollBy({
-        //         left: event.deltaY < 0 ? -100 : 100,
-        //         behavior: 'smooth'
-        //     });
-        // });
+            playPauseBtn.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                    playPauseIcon.classList.remove('fa-play');
+                    playPauseIcon.classList.add('fa-pause');
+                } else {
+                    video.pause();
+                    playPauseIcon.classList.remove('fa-pause');
+                    playPauseIcon.classList.add('fa-play');
+                }
+            });
+        });
     </script>
 </body>
 

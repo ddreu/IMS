@@ -31,10 +31,19 @@
                 <h5 class="fw-bold mb-3">ABOUT IMS</h5>
                 <p>Intramurals Management System (IMS) simplifies sports events, team coordination, and score tracking for schools and organizations. Streamline your intramurals with ease and efficiency.</p>
                 <div class="d-flex gap-3 mt-3">
-                    <a href="#" class="text-white"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-white"><i class="fas fa-envelope"></i></a>
+                    <a href="https://facebook.com" class="text-white" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="mailto:andrewbucedeguzman@gmail.com" class="text-white">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                    <a href="https://github.com/ddreu" class="text-white" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-github"></i>
+                    </a>
                 </div>
+
             </div>
+
 
 
             <!-- Legal -->
