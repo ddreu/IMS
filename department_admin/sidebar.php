@@ -110,7 +110,7 @@ $showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['
         <li class="nav-item">
             <a class="fw-bold small text-muted px-3 mt-3">
                 <i class="fas fa-user-tie"></i>
-                <span> Admin</span>
+                <span> <?php echo $role; ?></span>
             </a>
         </li>
         <li class="nav-item">

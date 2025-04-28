@@ -20,9 +20,11 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="../styles/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <link rel="stylesheet" href="../super_admin/sastyles.css">
+
 </head>
 <style>
     .margin-start {
@@ -44,8 +46,8 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
         include '../department_admin/sidebar.php';
     }
     ?>
-
-    <div class="container mt-5 margin-start">
+    <div class="main-content">
+        <!-- <div class="container mt-5 margin-start"> -->
         <div class="flex-container d-flex justify-content-between align-items-center mb-4">
             <!-- Heading (Left side) -->
             <h2 class="mb-0">Archived Items: </br><span> <?= $table ? ucfirst($table) : '' ?> for Year <?= $year ?></span></h2>

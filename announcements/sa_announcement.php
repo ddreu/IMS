@@ -102,7 +102,7 @@ include '../navbar/navbar.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Announcements</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/ad90023682.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="../super_admin/sastyles.css">
     <style>
@@ -188,24 +188,30 @@ include '../navbar/navbar.php';
             padding: 1.5rem;
         }
     </style>
+</head>
+
+<body>
     <?php
     $current_page = 'dashboard';
 
     include '../super_admin/sa_sidebar.php';
     ?>
     <!-- Page Header and Action Button -->
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>List of Announcements</h2>
-            <button type="button" class="btn btn-primary"
-                onclick="window.location.href='announcement_details.php';">
-                <i class="fas fa-plus"></i> Add Announcement
-            </button>
+    <div class="main-content">
+        <div class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>List of Announcements</h2>
+                <button type="button" class="btn btn-primary"
+                    onclick="window.location.href='announcement_details.php';">
+                    <i class="fas fa-plus"></i> Add Announcement
+                </button>
+            </div>
         </div>
-    </div>
-    <div class="content container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-11 col-lg-10">
+        <div class="content container-fluid">
+            <!-- <div class="row justify-content-center"> -->
+            <!-- <div class="col-12 col-md-11 col-lg-10"> -->
+            <div class="col-12">
+
                 <div class="card box">
                     <div class="card-body">
                         <div class="mb-3">
@@ -375,6 +381,7 @@ include '../navbar/navbar.php';
         </div>
 
 
+
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 <?php if ($status === 'success'): ?>
@@ -443,6 +450,6 @@ include '../navbar/navbar.php';
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-        </body>
+</body>
 
 </html>

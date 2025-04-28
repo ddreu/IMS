@@ -238,14 +238,14 @@ include '../navbar/navbar.php';
 
             <!-- Filter Buttons -->
             <div class="d-flex justify-content-center mb-2 mt-3">
-                <div class="btn-group w-auto portfolio-filter" role="group" aria-label="Portfolio Filter">
+                <!-- <div class="btn-group w-auto portfolio-filter" role="group" aria-label="Portfolio Filter">
                     <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
                         Active
                     </button>
                     <button type="button" class="btn btn-outline-secondary filter-btn" data-category="1">
                         Archived
                     </button>
-                </div>
+                </div> -->
             </div>
 
 

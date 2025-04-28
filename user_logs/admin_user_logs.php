@@ -15,8 +15,10 @@ $conn = con();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="../styles/committee.css">
+    <!-- <link rel="stylesheet" href="../styles/committee.css"> -->
     <link rel="stylesheet" href="../styles/dashboard.css">
+    <link rel="stylesheet" href="../super_admin/sastyles.css">
+
     <style>
         .margin {
             margin-left: 130px;
@@ -100,7 +102,8 @@ $conn = con();
     include '../super_admin/sa_sidebar.php';
     ?>
 
-    <div class="container mt-5 margin mb-5">
+    <div class="main-content">
+        <!-- <div class="container mt-5 margin mb-5"> -->
         <h2 class="mb-4">User Logs</h2>
 
         <!-- Search and Sort Controls -->
@@ -187,7 +190,7 @@ $conn = con();
         let currentPage = 1;
         let totalPages = 1;
 
-      async function fetchLogs() {
+        async function fetchLogs() {
             try {
                 const sortColumn = document.getElementById('sortColumn').value;
                 const sortOrder = document.getElementById('sortOrder').value;

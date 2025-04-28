@@ -12,7 +12,12 @@ body {
 
 .main-content {
   padding: 20px;
-  margin-left: 130px; /* Adjust based on sidebar width */
+  margin-left: 80px;
+}
+@media screen and (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
 }
 
 .header {
@@ -166,45 +171,41 @@ body {
 /* Sidebar Container */
 .sidebar-admin-container {
   position: fixed;
-  width: 60px; /* Collapsed width */
+  width: 60px;
   height: 100vh;
   background-color: #1c1c1e;
   transition: width 0.3s ease, background-color 0.3s;
   overflow: hidden;
   color: #fff;
   display: flex;
-  flex-direction: column; /* Use flexbox for vertical alignment */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for definition */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Enhanced shadow for depth */
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
-/* Expanded Sidebar on hover */
 .sidebar-admin-container:hover {
-  width: 240px; /* Expanded width */
+  width: 240px;
   background-color: #2e2e30;
 }
 
-/* Sidebar Header */
 .sidebar-admin-header {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center the heading */
+  justify-content: center;
   padding: 20px;
   color: #fff;
   font-size: 24px;
-  transition: font-size 0.3s ease; /* Add transition for responsiveness */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Add bottom border for separation */
+  transition: font-size 0.3s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Responsive title */
 .sidebar-admin-header h1 {
-  font-size: 1.5rem; /* Responsive font size */
-  text-align: center; /* Center text */
-  margin: 0; /* Remove default margin */
-  letter-spacing: 1px; /* Slight letter spacing for elegance */
+  font-size: 1.5rem;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 1px;
 }
 
-/* Toggle Button */
 .toggle-button {
   background: none;
   border: none;
@@ -213,19 +214,16 @@ body {
   font-size: 20px;
 }
 
-/* Sidebar Menu */
 .sidebar-admin-menu {
   list-style: none;
   padding: 0;
-  flex-grow: 1; /* Allow menu to take available space */
+  flex-grow: 1;
 }
 
-/* Sidebar Item */
 .sidebar-admin-item {
   position: relative;
 }
 
-/* Links */
 .sidebar-admin-item-link {
   display: flex;
   align-items: center;
@@ -236,20 +234,17 @@ body {
   transition: color 0.2s, background 0.3s ease;
 }
 
-/* Link hover effect */
 .sidebar-admin-item-link:hover {
-  background-color: rgba(0, 170, 255, 0.1); /* Softer hover background */
+  background-color: rgba(0, 170, 255, 0.1);
   color: #00aaff;
 }
 
-/* Smaller Icons */
 .sidebar-admin-item-link-icon {
-  font-size: 18px; /* Make icons smaller */
+  font-size: 18px;
   margin-right: 0;
   transition: margin-right 0.3s ease;
 }
 
-/* Text hidden by default */
 .sidebar-text {
   opacity: 0;
   visibility: hidden;
@@ -258,7 +253,6 @@ body {
   transition: opacity 0.3s ease, visibility 0.3s;
 }
 
-/* Show text and adjust icon spacing in expanded state */
 .sidebar-admin-container:hover .sidebar-admin-item-link-icon {
   margin-right: 10px;
 }
@@ -268,15 +262,13 @@ body {
   visibility: visible;
 }
 
-/* Active item styling */
 .sidebar-admin-item.active .sidebar-admin-item-link {
-  background-color: rgba(0, 170, 255, 0.2); /* Softer active background */
+  background-color: rgba(0, 170, 255, 0.2);
   color: #00aaff;
-  border-left: 4px solid #00aaff; /* Emphasize active link */
-  padding-left: 16px; /* Adjust padding to compensate for border */
+  border-left: 4px solid #00aaff;
+  padding-left: 16px;
 }
 
-/* Logout styling */
 .logout .sidebar-admin-item-link {
   color: #ff4c4c;
 }

@@ -150,8 +150,9 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - Super Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="../styles/dashboard.css">
+    <link rel="stylesheet" href="../super_admin/sastyles.css">
 </head>
 
 <body>
@@ -161,8 +162,9 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
         include '../navbar/navbar.php';
         include '../super_admin/sa_sidebar.php';
         ?>
+        <div class="main-content">
 
-        <div class="content ms-5 ms-lg-6 ps-5 p-4">
+            <!-- <div class="content ms-5 ms-lg-6 ps-5 p-4"> -->
             <div class="container-fluid mt-4">
                 <div class="container-fluid">
                     <?php if (isset($message)): ?>
@@ -296,6 +298,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
             </div>
         </div>
     </div>
+
 
     <!-- Include modals -->
     <?php include 'admin_addusermodal.php'; ?>

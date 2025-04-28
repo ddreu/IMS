@@ -415,14 +415,14 @@ include '../navbar/navbar.php';
                 <div class="card box">
                     <div class="card-body">
                         <!-- Filter Buttons -->
-                        <div class="btn-group portfolio-filter mb-3 mt-0" role="group" aria-label="Portfolio Filter">
+                        <!-- <div class="btn-group portfolio-filter mb-3 mt-0" role="group" aria-label="Portfolio Filter">
                             <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
                                 Active
                             </button>
                             <button type="button" class="btn btn-outline-secondary filter-btn" data-category="1">
                                 Archived
                             </button>
-                        </div>
+                        </div> -->
 
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">

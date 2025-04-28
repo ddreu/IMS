@@ -41,8 +41,8 @@ $image_path = (!empty($row['image']) && file_exists("../uploads/users/" . $row['
     <style>
         .chat-wrapper {
             height: 80vh;
-            width: 85vw;
-            margin-left: 130px;
+            width: 88vw;
+            margin-left: 110px;
             margin-right: 30px;
         }
 
