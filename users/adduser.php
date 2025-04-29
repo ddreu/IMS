@@ -96,8 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $conn->begin_transaction();
 
-        $insert_user_sql = "INSERT INTO users (firstname, lastname, middleinitial, age, gender, email, password, role, department, game_id, school_id) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $insert_user_sql = "INSERT INTO users (firstname, lastname, middleinitial, age, gender, email, password, role, department, game_id, school_id, first_login) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'yes')";
         $stmt_insert = executeQuery(
             $conn,
             $insert_user_sql,

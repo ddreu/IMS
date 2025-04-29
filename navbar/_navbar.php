@@ -247,6 +247,31 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm position-sticky top-0 z-5" style="z-index: 1050;">
     <div class="container-fluid">
+        <!-- <div class="container-fluid d-flex align-items-center"> -->
+
+        <!-- Toggle button -->
+        <!-- <button
+            id="committeeSidebarToggle"
+            class="navbar-toggler"
+            type="button"
+            data-bs-target="#csidebar"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <button
+            id="sidebarToggle"
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebar"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button> -->
 
         <button
             id="sidebarToggle"
@@ -257,6 +282,31 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
+
+
+        <!-- Toggle button -->
+        <!-- <button
+            id="committeeSidebarToggle"
+            class="navbar-toggler d-block d-md-none"
+            type="button"
+            data-bs-target="#csidebar"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <button
+            id="sidebarToggle"
+            class="navbar-toggler d-block d-md-none"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#sidebar"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button> -->
 
 
         <!-- Collapsible wrapper -->
@@ -282,6 +332,60 @@
 
         </div>
 
+        <!-- Right elements 
+        <div class="d-flex align-items-center">
+
+            <div class="dropdown">
+                <a
+                    class="text-secondary me-3 dropdown-toggle hidden-arrow position-relative"
+
+                    id="navbarDropdownMenuLink"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="bottom"
+                    title="Select Game"
+                    style="text-decoration: none;">
+                    Game
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" id="gamesDropdown" aria-labelledby="navbarDropdownMenuLink">
+                     Game items will be dynamically inserted here 
+                    <li class="dropdown-item text-center text-muted">Loading...</li>
+                </ul>
+            </div>-->
+
+        <!-- notification icon -->
+
+        <!-- Notification Icon -->
+        <!-- <div class="dropdown me-3 notification-dropdown">
+            <a
+                class="text-secondary me-3 dropdown-toggle position-relative"
+                id="notificationDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Notifications"
+                style="text-decoration: none;">
+                <i class="fas fa-bell fa-lg"></i>
+                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="notificationDropdown">
+                <li class="notification-item">
+                    <a class="dropdown-item" href="#">New message from Admin</a>
+                </li>
+                <li class="notification-item">
+                    <a class="dropdown-item" href="#">Tournament schedule updated</a>
+                </li>
+                <li class="notification-item">
+                    <a class="dropdown-item" href="#">New event posted</a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item text-center text-muted" href="#">View all notifications</a></li>
+            </ul>
+        </div> -->
 
         <!-- users game dropdown -->
         <?php if ($_SESSION['role'] === 'Committee'): ?>
@@ -318,10 +422,53 @@
         <button id="changeDepartmentBtn" style="display: none;"></button>
 
 
+        <!-- Inbox Icon -->
+        <!-- <div class="dropdown me-3 inbox-dropdown position-relative">
+            <a
+                class="text-secondary dropdown-toggle position-relative"
+                id="inboxDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Inbox"
+                style="text-decoration: none;">
+                <i class="fas fa-inbox fa-lg"></i>
+                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm overflow-auto"
+                style="max-height: 300px; overflow-x: hidden; width: 30vw;"
+                aria-labelledby="inboxDropdown">
+
+            </ul>
+        </div> -->
+
+        <!-- Notification Icon -->
+        <div class="dropdown me-3 notification-dropdown position-relative">
+            <a
+                class="text-secondary me-3 dropdown-toggle position-relative"
+                id="notificationDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Notifications"
+                style="text-decoration: none;">
+                <i class="fas fa-bell fa-lg"></i>
+                <!-- Badge for unread notifications -->
+                <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+            </a>
+            <!-- Dropdown container with dynamic width and content wrapping -->
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm overflow-auto"
+                style="max-height: 300px; overflow-x: hidden; width: 30vw;"
+                aria-labelledby="notificationDropdown">
+                <?php require_once '../notifications/notifications.php'; ?>
+            </ul>
+        </div>
+
         <!-- scan qr -->
 
         <!-- QR Scan Button -->
-        <div class="dropdown me-4 position-relative">
+        <!-- QR Scan Icon (like Inbox/Notifications) -->
+        <div class="dropdown me-3 position-relative">
             <a href="#" class="text-secondary position-relative" id="openQRScanner" title="Scan QR" style="text-decoration: none;">
                 <i class="fas fa-qrcode fa-lg"></i>
             </a>
@@ -473,7 +620,20 @@ if ($_SESSION['role'] !== 'superadmin') {
     // include_once '../superadmin-chat/chat.php'; // Example for superadmin-specific chat
 }
 ?>
-
+<!-- QR Scanner Modal -->
+<!-- <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrScannerModalLabel">Scan QR Code</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <video id="qrVideo" width="100%" height="auto" autoplay></video>
+            </div>
+        </div>
+    </div>
+</div> -->
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {

@@ -56,6 +56,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             logUserAction($conn, $row['id'], 'sessions', 'Logged in', $row['id'], "User Logged in");
 
+            if ($row['first_login'] === 'yes') {
+                $redirect = '';
+
+                switch ($row['role']) {
+                    case 'School Admin':
+                        $redirect = 'multi-step-form/school-admin-onboarding.php';
+                        break;
+                    case 'Department Admin':
+                        $redirect = 'multi-step-form/department-admin-onboarding.php';
+                        break;
+                    case 'Committee':
+                        $redirect = 'multi-step-form/committee-onboarding.php';
+                        break;
+                }
+
+                if ($redirect !== '') {
+                    echo json_encode([
+                        'success' => true,
+                        'redirect' => $redirect
+                    ]);
+                    exit;
+                }
+            }
+
+
             // Redirect logic
             $redirect = '';
 

@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $school_code = $conn->real_escape_string($_POST['school_code']);
     $address = $conn->real_escape_string($_POST['address']);
     $email = $conn->real_escape_string($_POST['email']);
-    
+
     // Generate secure password
     $password_to_use = generateSecurePassword($school_code, 'School Admin');
     $hashed_password = password_hash($password_to_use, PASSWORD_DEFAULT);
@@ -93,11 +93,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $insertSchool = "INSERT INTO schools (school_name, school_code, address, logo) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($insertSchool);
         $stmt->bind_param("ssss", $school_name, $school_code, $address, $new_file_name);
-        
+
         if (!$stmt->execute()) {
             throw new Exception("Failed to insert school data");
         }
-        
+
         $school_id = $conn->insert_id;
 
         // Insert departments for the school
@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if (!$stmt_dept) {
                 throw new Exception("Failed to prepare department statement");
             }
-            
+
             foreach ($_POST['departments'] as $department) {
                 $department = trim($department);
                 if (!empty($department)) {
@@ -120,14 +120,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         // Insert school admin user
-        $insertUser = "INSERT INTO users (firstname, lastname, email, password, role, school_id) VALUES (?, ?, ?, ?, 'School Admin', ?)";
+        $insertUser = "INSERT INTO users (firstname, lastname, email, password, role, school_id, first_login) VALUES (?, ?, ?, ?, 'School Admin', ?, 'yes')";
         $stmt = $conn->prepare($insertUser);
         $name_parts = explode(' ', $school_name, 2);
         $firstname = $name_parts[0];
         $lastname = isset($name_parts[1]) ? $name_parts[1] : 'Admin';
-        
+
         $stmt->bind_param("ssssi", $firstname, $lastname, $email, $hashed_password, $school_id);
-        
+
         if (!$stmt->execute()) {
             throw new Exception("Failed to insert user data");
         }
@@ -146,7 +146,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         header("Location: register_school.php");
         exit();
-
     } catch (Exception $e) {
         $conn->rollback();
         $_SESSION['error_message'] = "Registration failed: " . $e->getMessage();
@@ -157,4 +156,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header("Location: register_school.php");
     exit();
 }
-?>
