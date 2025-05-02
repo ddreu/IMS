@@ -240,7 +240,14 @@ $conn = con();
 </td>
 
                     <td data-label="Operation">${log.table_name}</td>
-                    <td data-label="Description">${log.log_description}</td>
+<td data-label="Description">
+    <textarea class="form-control form-control-sm"
+              rows="2"
+              style="resize: vertical;"
+              onchange="updateLogDescription(${log.log_id}, this.value)">${log.log_description}</textarea>
+</td>
+
+
                   <td data-label="Timestamp">
     <input type="datetime-local" class="form-control form-control-sm"
            value="${log.log_time}"
@@ -410,6 +417,30 @@ $conn = con();
                 } catch (err) {
                     Swal.fire('Error!', 'Network error occurred.', 'error');
                 }
+            }
+        }
+        async function updateLogDescription(logId, newDescription) {
+            try {
+                const response = await fetch('update_log_description.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        log_id: logId,
+                        description: newDescription
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    Swal.fire('Success', 'Description updated.', 'success');
+                } else {
+                    Swal.fire('Error', result.message || 'Failed to update description.', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Network error occurred.', 'error');
             }
         }
 

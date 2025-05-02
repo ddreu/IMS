@@ -101,7 +101,7 @@ try {
             $stmt->execute();
 
             // Update match status
-            $update_match_status = "UPDATE matches SET status = 'finished' WHERE match_id = ?";
+            $update_match_status = "UPDATE matches SET status = 'Finished' WHERE match_id = ?";
             $stmt = $conn->prepare($update_match_status);
             $stmt->bind_param("i", $row['match_id']);
             $stmt->execute();
@@ -129,7 +129,7 @@ try {
             // Check if bracket is completed and update status
             $check_bracket_matches = "
                 SELECT COUNT(*) as total_matches, 
-                       SUM(CASE WHEN status = 'finished' THEN 1 ELSE 0 END) as finished_matches
+                       SUM(CASE WHEN status = 'Finished' THEN 1 ELSE 0 END) as finished_matches
                 FROM matches 
                 WHERE bracket_id = ?";
             $stmt = $conn->prepare($check_bracket_matches);
@@ -163,16 +163,30 @@ try {
                     throw new Exception('Pointing system not found');
                 }
 
-                // Get final standings for this bracket
-                $standings_query = "
-                    SELECT t.team_id, t.grade_section_course_id, 
-                           COUNT(CASE WHEN mr.winning_team_id = t.team_id THEN 1 END) as wins
-                    FROM teams t
-                    JOIN match_results mr ON (mr.team_A_id = t.team_id OR mr.team_B_id = t.team_id)
-                    WHERE t.bracket_id = ?
-                    GROUP BY t.team_id
-                    ORDER BY wins DESC
-                    LIMIT 3";
+
+                //             $standings_query = "
+                // SELECT 
+                //     t.team_id, 
+                //     t.grade_section_course_id, 
+                //     COUNT(CASE WHEN mr.winning_team_id = t.team_id THEN 1 END) as wins
+                // FROM match_results mr
+                // JOIN matches m ON m.match_id = mr.match_id
+                // JOIN teams t ON (mr.team_A_id = t.team_id OR mr.team_B_id = t.team_id)
+                // WHERE m.bracket_id = ?
+                // GROUP BY t.team_id
+                // ORDER BY wins DESC
+                // LIMIT 3";
+
+                // Get final standings (top 3 teams) based on total points
+                $standings_query = "SELECT t.team_id, t.grade_section_course_id, ttp.total_points,
+      ROW_NUMBER() OVER (ORDER BY ttp.total_points DESC, t.wins DESC) as rank
+      FROM team_tournament_points ttp
+      JOIN teams t ON ttp.team_id = t.team_id
+      WHERE ttp.bracket_id = ?
+      ORDER BY ttp.total_points DESC, t.wins DESC
+      LIMIT 3";
+
+
                 $standings_stmt = $conn->prepare($standings_query);
                 $standings_stmt->bind_param("i", $row['bracket_id']);
                 $standings_stmt->execute();

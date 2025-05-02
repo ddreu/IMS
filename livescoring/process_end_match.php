@@ -139,7 +139,7 @@ try {
             }
 
             // Update match status to finished
-            $update_match_status = "UPDATE matches SET status = 'finished' WHERE match_id = ?";
+            $update_match_status = "UPDATE matches SET status = 'Finished' WHERE match_id = ?";
             $stmt = $conn->prepare($update_match_status);
             $stmt->bind_param("i", $row['match_id']);
             if (!$stmt->execute()) {

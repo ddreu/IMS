@@ -529,16 +529,18 @@ include '../navbar/navbar.php';
                         departmentName = deptSelectElement.options[deptSelectElement.selectedIndex]?.text || '';
                     }
 
-                    if (departmentName.toLowerCase() === 'college') {
-                        gradeLevelContainer.style.display = 'none';
-                        gradeLevelSelectElement.removeAttribute('required');
-                        gradeLevelSelectElement.value = ''; // Reset value when hidden
-                    } else {
-                        gradeLevelContainer.style.display = 'block';
-                        if (deptSelectElement.value) {
-                            gradeLevelSelectElement.setAttribute('required', 'required');
-                        }
-                    }
+                    // if (departmentName.toLowerCase() === 'college') {
+                    //     gradeLevelContainer.style.display = 'none';
+                    //     gradeLevelSelectElement.removeAttribute('required');
+                    //     gradeLevelSelectElement.value = '';
+                    // } else {
+                    //     gradeLevelContainer.style.display = 'block';
+                    //     if (deptSelectElement.value) {
+                    //         gradeLevelSelectElement.setAttribute('required', 'required');
+                    //     }
+                    // }
+                    gradeLevelSelectElement.removeAttribute('required');
+
                 }
 
                 // Handle filter grade level visibility

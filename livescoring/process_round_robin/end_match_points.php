@@ -252,7 +252,7 @@ class RoundRobinMatchProcessor
 
     private function updateMatchStatus()
     {
-        $query = "UPDATE matches SET status = 'finished' WHERE match_id = ?";
+        $query = "UPDATE matches SET status = 'Finished' WHERE match_id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $this->match_data['match_id']);
 
@@ -265,7 +265,7 @@ class RoundRobinMatchProcessor
     {
         // Check if all matches are finished
         $query = "SELECT COUNT(*) as total_matches, 
-                  SUM(CASE WHEN status = 'finished' THEN 1 ELSE 0 END) as finished_matches
+                  SUM(CASE WHEN status = 'Finished' THEN 1 ELSE 0 END) as finished_matches
                   FROM matches 
                   WHERE bracket_id = ?";
 

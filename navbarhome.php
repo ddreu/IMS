@@ -290,6 +290,7 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
         const dropdown = document.getElementById(`gradeLevelDropdown${department_id}`);
         if (!dropdown) return;
 
+        // Show loading spinner while fetching
         dropdown.innerHTML = `
         <div class="px-3 py-2 d-flex align-items-center">
             <div class="spinner-border spinner-border-sm me-2" role="status">
@@ -300,17 +301,23 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
     `;
 
         fetch(`fetch_grade_levels.php?department_id=${department_id}`)
-            .then(async response => {
+            .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to load grade levels');
                 }
                 return response.json();
             })
             .then(data => {
-                dropdown.innerHTML = '';
+                dropdown.innerHTML = `
+                <a class="dropdown-item px-3 py-2 small" href="#" onclick="updateURL(${department_id}); return false;">
+                    View All
+                </a>
+            `;
 
                 if (!Array.isArray(data) || data.length === 0) {
-                    dropdown.innerHTML = '<div class="dropdown-item-text small text-muted px-3">No grade levels available</div>';
+                    dropdown.innerHTML += `
+                    <div class="dropdown-item-text small text-muted px-3">No grade levels available</div>
+                `;
                     return;
                 }
 
@@ -332,6 +339,53 @@ $query_string = http_build_query(array_filter($current_params)); // Remove empty
             `;
             });
     }
+
+    // function loadGradeLevels(department_id) {
+    //     const dropdown = document.getElementById(`gradeLevelDropdown${department_id}`);
+    //     if (!dropdown) return;
+
+    //     dropdown.innerHTML = `
+    //     <div class="px-3 py-2 d-flex align-items-center">
+    //         <div class="spinner-border spinner-border-sm me-2" role="status">
+    //             <span class="visually-hidden">Loading...</span>
+    //         </div>
+    //         <span class="small">Loading...</span>
+    //     </div>
+    // `;
+
+    //     fetch(`fetch_grade_levels.php?department_id=${department_id}`)
+    //         .then(async response => {
+    //             if (!response.ok) {
+    //                 throw new Error('Failed to load grade levels');
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             dropdown.innerHTML = '';
+
+    //             if (!Array.isArray(data) || data.length === 0) {
+    //                 dropdown.innerHTML = '<div class="dropdown-item-text small text-muted px-3">No grade levels available</div>';
+    //                 return;
+    //             }
+
+    //             data.forEach(grade => {
+    //                 dropdown.innerHTML += `
+    //                 <a class="dropdown-item px-3 py-2 small" href="#" onclick="updateURL(${department_id}, '${grade}'); return false;">
+    //                     ${grade}
+    //                 </a>
+    //             `;
+    //             });
+    //         })
+    //         .catch(error => {
+    //             console.error('Error loading grade levels:', error);
+    //             dropdown.innerHTML = `
+    //             <div class="dropdown-item-text px-3 py-2 small text-danger">
+    //                 <i class="fas fa-exclamation-circle me-2"></i>
+    //                 ${error.message || 'Error loading grade levels'}
+    //             </div>
+    //         `;
+    //         });
+    // }
 
     function updateURL(department_id, grade_level = null) {
         const url = new URL(window.location.href);
