@@ -223,14 +223,14 @@ try {
             $stmt->execute();
 
             // Add user action logging
-            if (isset($_SESSION['user_id'])) {
-                logUserAction(
-                    $conn,
-                    $_SESSION['user_id'],
-                    'match_end',
-                    "Ended set-based match {$row['match_id']} (Schedule: $schedule_id)"
-                );
-            }
+            // if (isset($_SESSION['user_id'])) {
+            //     logUserAction(
+            //         $conn,
+            //         $_SESSION['user_id'],
+            //         'match_end',
+            //         "Ended set-based match {$row['match_id']} (Schedule: $schedule_id)"
+            //     );
+            // }
 
             $conn->commit();
 
