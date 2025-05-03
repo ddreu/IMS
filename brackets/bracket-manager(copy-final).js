@@ -235,26 +235,6 @@ class BracketManager {
     // ✅ Always clear previous advancement state
     const advancedTeams = new Map(); // Reset completely on new save
 
-    if (teams.length === 2 && totalRounds === 1) {
-      return {
-        teams: teams,
-        matches: [
-          {
-            match_identifier: `M${this.gameId}-D${this.departmentId}-${
-              this.gradeLevel || "ALL"
-            }-R1-1-${this.generateUniqueId()}`,
-            round: 1,
-            match_number: 1,
-            next_match_number: 0,
-            teamA_id: teams[0].team_id,
-            teamB_id: teams[1].team_id,
-            match_type: "final",
-            status: "Pending",
-          },
-        ],
-        rounds: 1,
-      };
-    }
     // Calculate base match numbers for each round
     const baseMatchNumbers = {};
     let base = 1;

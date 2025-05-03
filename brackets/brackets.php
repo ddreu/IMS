@@ -213,20 +213,21 @@ include '../navbar/navbar.php';
                 b.*, 
                 d.department_name,
                 g.game_name,
-                (
-                    SELECT COUNT(DISTINCT CASE 
-                        WHEN m.teamA_id > 0 THEN m.teamA_id 
-                        ELSE NULL 
-                    END) + 
-                    COUNT(DISTINCT CASE 
-                        WHEN m.teamB_id > 0 THEN m.teamB_id 
-                        ELSE NULL 
-                    END)
-                    FROM matches m 
-                    WHERE m.bracket_id = b.bracket_id
-                    AND m.round = 1  -- Only count teams from first round
-                    AND m.match_type = 'regular'  -- Only regular matches, not finals/third place
-                ) as total_teams,
+                -- (
+                --     SELECT COUNT(DISTINCT CASE 
+                --         WHEN m.teamA_id > 0 THEN m.teamA_id 
+                --         ELSE NULL 
+                --     END) + 
+                --     COUNT(DISTINCT CASE 
+                --         WHEN m.teamB_id > 0 THEN m.teamB_id 
+                --         ELSE NULL 
+                --     END)
+                --     FROM matches m 
+                --     WHERE m.bracket_id = b.bracket_id
+                --     AND m.round = 1
+                --     AND m.match_type = 'regular'  
+                -- ) as total_teams,
+                b.total_teams,
                 COUNT(m.match_id) as total_matches,
                 b.bracket_type 
                 FROM brackets b 
@@ -251,7 +252,7 @@ include '../navbar/navbar.php';
                     <div class="col">
                         <h3>Existing Brackets</h3>
                         <!-- Filter Buttons -->
-                        <div class="d-flex justify-content-center mb-0 mt-0">
+                        <!-- <div class="d-flex justify-content-center mb-0 mt-0">
                             <div class="btn-group w-auto portfolio-filter" role="group" aria-label="Portfolio Filter">
                                 <button type="button" class="btn btn-outline-primary active filter-btn" data-category="0">
                                     Active
@@ -260,7 +261,7 @@ include '../navbar/navbar.php';
                                     Archived
                                 </button>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="table-responsive" style="overflow: visible;">
                             <table class="table table-bordered">
                                 <thead>
@@ -342,57 +343,57 @@ include '../navbar/navbar.php';
             <?php endif; ?>
 
             <!-- New Bracket Generation Section -->
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Create New Bracket</h4>
-                                <button type="button" id="generate-bracket" class="btn btn-primary mt-3">Generate Bracket</button>
+            <!-- <div class="container-fluid"> -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Create New Bracket</h4>
+                            <button type="button" id="generate-bracket" class="btn btn-primary mt-3">Generate Bracket</button>
 
-                            </div>
-                            <div class="card-body">
-                                <form id="bracketForm">
-                                    <?php if ($department['department_name'] !== 'College'): ?>
-                                        <div class="form-group">
-                                            <label for="gradeLevel">Grade Level:</label>
-                                            <select class="form-control" id="gradeLevelSelect" name="gradeLevel">
-                                                <option value="">All Grade Levels</option>
-                                                <?php foreach ($grade_levels as $grade): ?>
-                                                    <option value="<?php echo htmlspecialchars($grade); ?>">
-                                                        <?php echo htmlspecialchars($grade); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </div>
-                                    <?php endif; ?>
+                        </div>
+                        <div class="card-body">
+                            <form id="bracketForm">
+                                <?php if ($department['department_name'] !== 'College'): ?>
                                     <div class="form-group">
-                                        <label for="bracketType">Bracket Type:</label>
-                                        <select class="form-control" id="bracketTypeSelect" name="bracketType">
-                                            <option value="single">Single Elimination</option>
-                                            <option value="double">Double Elimination</option>
-                                            <option value="single_round_robin">Single Round Robin</option>
-
+                                        <label for="gradeLevel">Grade Level:</label>
+                                        <select class="form-control" id="gradeLevelSelect" name="gradeLevel">
+                                            <option value="">All Grade Levels</option>
+                                            <?php foreach ($grade_levels as $grade): ?>
+                                                <option value="<?php echo htmlspecialchars($grade); ?>">
+                                                    <?php echo htmlspecialchars($grade); ?>
+                                                </option>
+                                            <?php endforeach; ?>
                                         </select>
                                     </div>
-                                </form>
+                                <?php endif; ?>
+                                <div class="form-group">
+                                    <label for="bracketType">Bracket Type:</label>
+                                    <select class="form-control" id="bracketTypeSelect" name="bracketType">
+                                        <option value="single">Single Elimination</option>
+                                        <option value="double">Double Elimination</option>
+                                        <option value="single_round_robin">Single Round Robin</option>
 
-                                <!-- Add a loading state -->
-                                <div id="bracket-loading" class="bracket-loading d-none">
-                                    <div class="spinner-border" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
+                                    </select>
                                 </div>
-                                <!-- Bracket container -->
-                                <div class="bracket-wrapper">
+                            </form>
 
-                                    <div id="bracket-content"></div>
+                            <!-- Add a loading state -->
+                            <div id="bracket-loading" class="bracket-loading d-none">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
                                 </div>
-
-                                <div id="bracket-container"></div>
-                                <button id="save-bracket" class="btn btn-success mb-3">Save Bracket</button>
-
                             </div>
+                            <!-- Bracket container -->
+                            <div class="bracket-wrapper">
+
+                                <div id="bracket-content"></div>
+                            </div>
+
+                            <div id="bracket-container"></div>
+                            <button id="save-bracket" class="btn btn-success mb-3">Save Bracket</button>
+
+                            <!-- </div> -->
 
 
                         </div>
