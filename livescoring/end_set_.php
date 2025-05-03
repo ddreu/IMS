@@ -95,7 +95,7 @@ try {
             }
 
             // Update match status to finished
-            $update_match_status = "UPDATE matches SET status = 'finished' WHERE match_id = ?";
+            $update_match_status = "UPDATE matches SET status = 'Finished' WHERE match_id = ?";
             $update_match_stmt = $conn->prepare($update_match_status);
             $update_match_stmt->bind_param("i", $row['match_id']);
             if (!$update_match_stmt->execute()) {
@@ -361,6 +361,7 @@ WHERE bracket_id = ? AND match_type = 'third_place'";
                 FROM matches 
                 WHERE bracket_id = ?";
             $bracket_stmt = $conn->prepare($check_bracket_matches);
+
             $bracket_stmt->bind_param("i", $row['bracket_id']);
             $bracket_stmt->execute();
             $bracket_status = $bracket_stmt->get_result()->fetch_assoc();

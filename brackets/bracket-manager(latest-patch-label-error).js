@@ -157,9 +157,7 @@ class BracketManager {
         next_match_number: Math.floor(currentMatchNumber / 2) + totalSlots / 2,
         teamA_id: teamA ? teamA.team_id : -1, // -1 for BYE
         teamB_id: teamB ? teamB.team_id : -1,
-        // match_type: "regular",
-        match_type: teams.length === 4 ? "semifinal" : "regular",
-
+        match_type: "regular",
         status: !teamA || !teamB ? "Finished" : "Pending",
       });
       currentMatchNumber++;
@@ -317,9 +315,7 @@ class BracketManager {
         next_match_number: nextMatchNumber,
         teamA_id: teamA_id,
         teamB_id: teamB_id,
-        // match_type: "regular",
-        match_type: teams.length === 4 ? "semifinal" : "regular",
-
+        match_type: "regular",
         status: status,
       });
 

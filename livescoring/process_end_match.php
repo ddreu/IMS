@@ -269,6 +269,8 @@ try {
 
                 // ✅ **Update Third Place Match with Losing Teams**
                 if ($third_place_match && in_array($match_result['match_id'], array_column($semifinals, 'match_id'))) {
+                    // if ($third_place_match && in_array((int)$match_result['match_id'], array_map('intval', array_column($semifinals, 'match_id')))) {
+
                     if ($third_place_match['teamA_id'] == -2) {
                         $update_third_place = "UPDATE matches SET teamA_id = ? WHERE match_id = ?";
                         $stmt = $conn->prepare($update_third_place);

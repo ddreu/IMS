@@ -186,7 +186,7 @@
                     </div>
 
                     <div class="modal-footer px-0 pb-0">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Create Schedule</button>
                     </div>
                 </form>
@@ -204,7 +204,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-            <p><strong>Department:</strong> <span id="detail-department"></span></p> 
+                <p><strong>Department:</strong> <span id="detail-department"></span></p>
                 <p><strong>Game:</strong> <span id="detail-game"></span></p>
                 <p><strong>Match Type:</strong> <span id="detail-match-type"></span></p>
                 <p><strong>Teams:</strong> <span id="detail-teams"></span></p>

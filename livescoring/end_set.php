@@ -167,87 +167,58 @@ try {
         SELECT COUNT(*) as total_matches 
         FROM matches 
         WHERE bracket_id = ?";
-                $total_matches_stmt = $conn->prepare($get_total_matches);
-                $total_matches_stmt->bind_param("i", $match_result['bracket_id']);
-                $total_matches_stmt->execute();
-                $total_matches = $total_matches_stmt->get_result()->fetch_assoc()['total_matches'];
-                $total_matches_stmt->close();
+                $stmt = $conn->prepare($get_total_matches);
+                $stmt->bind_param("i", $match_result['bracket_id']);
+                $stmt->execute();
+                $total_matches = $stmt->get_result()->fetch_assoc()['total_matches'];
+                $stmt->close();
 
                 // Identify the final match (highest match_number in bracket)
-                //         $get_final_match = "
-                // SELECT match_id, teamA_id, teamB_id 
-                // FROM matches 
-                // WHERE bracket_id = ? 
-                // ORDER BY match_number DESC 
-                // LIMIT 1";
-
                 $get_final_match = "
-    SELECT match_id, teamA_id, teamB_id 
-    FROM matches 
-    WHERE bracket_id = ? AND match_type = 'final'";
-
-                $final_match_stmt = $conn->prepare($get_final_match);
-                $final_match_stmt->bind_param("i", $match_result['bracket_id']);
-                $final_match_stmt->execute();
-                $final_match = $final_match_stmt->get_result()->fetch_assoc();
-                $final_match_stmt->close();
+                 SELECT match_id, teamA_id, teamB_id 
+                 FROM matches 
+                 WHERE bracket_id = ? AND match_type = 'final'";
+                $stmt = $conn->prepare($get_final_match);
+                $stmt->bind_param("i", $match_result['bracket_id']);
+                $stmt->execute();
+                $final_match = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
 
                 // Identify Semifinals (Last 2 matches before the final)
-                //         $get_semifinals = "
-                // SELECT match_id, match_number 
-                // FROM matches 
-                // WHERE bracket_id = ? 
-                // ORDER BY match_number DESC 
-                // LIMIT 2";
                 $get_semifinals = "
-    SELECT match_id, match_number 
-    FROM matches 
-    WHERE bracket_id = ? AND match_type = 'semifinal'";
-
-                $semifinals_stmt = $conn->prepare($get_semifinals);
-                $semifinals_stmt->bind_param("i", $match_result['bracket_id']);
-                $semifinals_stmt->execute();
-                $semifinals = $semifinals_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-                $semifinals_stmt->close();
-
-                // Identify Third Place Match (if it exists)
-                //         $get_third_place = "
-                // SELECT match_id, teamA_id, teamB_id 
-                // FROM matches 
-                // WHERE bracket_id = ? 
-                // AND match_number = ?";
-                //         $third_place_match_number = $total_matches - 1; 
-                //         $third_place_stmt = $conn->prepare($get_third_place);
-                //         $third_place_stmt->bind_param("ii", $match_result['bracket_id'], $third_place_match_number);
-                //         $third_place_stmt->execute();
-                //         $third_place_match = $third_place_stmt->get_result()->fetch_assoc();
-                //         $third_place_stmt->close();
+                 SELECT match_id, match_number 
+                 FROM matches 
+                 WHERE bracket_id = ? AND match_type = 'semifinal'";
+                $stmt = $conn->prepare($get_semifinals);
+                $stmt->bind_param("i", $match_result['bracket_id']);
+                $stmt->execute();
+                $semifinals = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                $stmt->close();
 
                 // Identify Third Place Match (if it exists)
                 $get_third_place = "
-SELECT match_id, teamA_id, teamB_id 
-FROM matches 
-WHERE bracket_id = ? AND match_type = 'third_place'";
-                $third_place_stmt = $conn->prepare($get_third_place);
-                $third_place_stmt->bind_param("i", $match_result['bracket_id']);
-                $third_place_stmt->execute();
-                $third_place_match = $third_place_stmt->get_result()->fetch_assoc();
-                $third_place_stmt->close();
-
+                 SELECT match_id, teamA_id, teamB_id 
+                 FROM matches 
+                 WHERE bracket_id = ? AND match_type = 'third_place'";
+                $stmt = $conn->prepare($get_third_place);
+                $stmt->bind_param("i", $match_result['bracket_id']);
+                $stmt->execute();
+                $third_place_match = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
 
                 // ✅ **Update Final Match with Semifinal Winners**
                 if ($final_match && in_array($match_result['match_id'], array_column($semifinals, 'match_id'))) {
                     if ($final_match['teamA_id'] == -2) {
                         $update_final_match = "UPDATE matches SET teamA_id = ? WHERE match_id = ?";
-                        $update_final_stmt = $conn->prepare($update_final_match);
-                        $update_final_stmt->bind_param("ii", $winning_team_id, $final_match['match_id']);
-                        $update_final_stmt->execute();
+                        $stmt = $conn->prepare($update_final_match);
+                        $stmt->bind_param("ii", $winning_team_id, $final_match['match_id']);
+                        $stmt->execute();
                         error_log("Updated Final Match: TeamA with Winner $winning_team_id");
                     } elseif ($final_match['teamB_id'] == -2) {
                         $update_final_match = "UPDATE matches SET teamB_id = ? WHERE match_id = ?";
-                        $update_final_stmt = $conn->prepare($update_final_match);
-                        $update_final_stmt->bind_param("ii", $winning_team_id, $final_match['match_id']);
-                        $update_final_stmt->execute();
+                        $stmt = $conn->prepare($update_final_match);
+                        $stmt->bind_param("ii", $winning_team_id, $final_match['match_id']);
+                        $stmt->execute();
                         error_log("Updated Final Match: TeamB with Winner $winning_team_id");
                     }
                 }
@@ -256,15 +227,15 @@ WHERE bracket_id = ? AND match_type = 'third_place'";
                 if ($third_place_match && in_array($match_result['match_id'], array_column($semifinals, 'match_id'))) {
                     if ($third_place_match['teamA_id'] == -2) {
                         $update_third_place = "UPDATE matches SET teamA_id = ? WHERE match_id = ?";
-                        $update_third_stmt = $conn->prepare($update_third_place);
-                        $update_third_stmt->bind_param("ii", $losing_team_id, $third_place_match['match_id']);
-                        $update_third_stmt->execute();
+                        $stmt = $conn->prepare($update_third_place);
+                        $stmt->bind_param("ii", $losing_team_id, $third_place_match['match_id']);
+                        $stmt->execute();
                         error_log("Updated Third Place Match: TeamA with Loser $losing_team_id");
                     } elseif ($third_place_match['teamB_id'] == -2) {
                         $update_third_place = "UPDATE matches SET teamB_id = ? WHERE match_id = ?";
-                        $update_third_stmt = $conn->prepare($update_third_place);
-                        $update_third_stmt->bind_param("ii", $losing_team_id, $third_place_match['match_id']);
-                        $update_third_stmt->execute();
+                        $stmt = $conn->prepare($update_third_place);
+                        $stmt->bind_param("ii", $losing_team_id, $third_place_match['match_id']);
+                        $stmt->execute();
                         error_log("Updated Third Place Match: TeamB with Loser $losing_team_id");
                     }
                 }
@@ -277,28 +248,26 @@ WHERE bracket_id = ? AND match_type = 'third_place'";
         FROM matches 
         WHERE bracket_id = ? 
         AND match_number = ?";
-                $next_match_stmt = $conn->prepare($get_next_match);
-                $next_match_stmt->bind_param("ii", $match_result['bracket_id'], $match_result['next_match_number']);
-                $next_match_stmt->execute();
-                $next_match = $next_match_stmt->get_result()->fetch_assoc();
-                $next_match_stmt->close();
+                $stmt = $conn->prepare($get_next_match);
+                $stmt->bind_param("ii", $match_result['bracket_id'], $match_result['next_match_number']);
+                $stmt->execute();
+                $next_match = $stmt->get_result()->fetch_assoc();
+                $stmt->close();
 
                 if ($next_match) {
                     if ($match_result['match_number'] % 2 == 1 && $next_match['teamA_id'] == -2) {
                         // Odd match number updates teamA if it's TBD (-2)
                         $update_next_match = "UPDATE matches SET teamA_id = ? WHERE match_id = ?";
-                        $update_next_stmt = $conn->prepare($update_next_match);
-                        $update_next_stmt->bind_param("ii", $winning_team_id, $next_match['match_id']);
-                        $update_next_stmt->execute();
-                        $update_next_stmt->close();
+                        $stmt = $conn->prepare($update_next_match);
+                        $stmt->bind_param("ii", $winning_team_id, $next_match['match_id']);
+                        $stmt->execute();
                         error_log("Updated Next Match TeamA with Team $winning_team_id");
                     } elseif ($match_result['match_number'] % 2 == 0 && $next_match['teamB_id'] == -2) {
                         // Even match number updates teamB if it's TBD (-2)
                         $update_next_match = "UPDATE matches SET teamB_id = ? WHERE match_id = ?";
-                        $update_next_stmt = $conn->prepare($update_next_match);
-                        $update_next_stmt->bind_param("ii", $winning_team_id, $next_match['match_id']);
-                        $update_next_stmt->execute();
-                        $update_next_stmt->close();
+                        $stmt = $conn->prepare($update_next_match);
+                        $stmt->bind_param("ii", $winning_team_id, $next_match['match_id']);
+                        $stmt->execute();
                         error_log("Updated Next Match TeamB with Team $winning_team_id");
                     }
                 }
