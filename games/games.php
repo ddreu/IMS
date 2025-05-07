@@ -385,7 +385,7 @@ include '../navbar/navbar.php';
             <div class="container mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2>List of Games</h2>
-                    <?php if ($user['role'] === 'School Admin') : ?>
+                    <?php if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') : ?>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGameModal">
                             <i class="fas fa-plus"></i> Add Game
                         </button>

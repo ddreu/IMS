@@ -139,6 +139,12 @@
                             <i class="fas fa-trophy"></i><span>School Leaderboards</span>
                         </a>
                     </li> -->
+                    <!-- Games -->
+                    <li class="nav-item">
+                        <a href="../games/games.php" class="nav-link <?php echo ($current_page == 'Games') ? 'active' : ''; ?>">
+                            <i class="fas fa-basketball-ball"></i><span>School Games</span>
+                        </a>
+                    </li>
 
                     <!-- Brackets -->
                     <li class="nav-item">
