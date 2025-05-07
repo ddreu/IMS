@@ -332,11 +332,11 @@
                     <i class="fas fa-school"></i><span>Schools</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="../archive/archives.php" class="nav-link">
                     <i class="fas fa-gamepad"></i><span>Games</span>
                 </a>
-            </li>
+            </li> -->
 
             <li class="nav-item">
                 <a href="../users/admin_userlist.php" class="nav-link">
