@@ -21,7 +21,7 @@
         <div class="content">
             <h2>IMS</h2>
             <p>Sports are meant to connect people. Let's stay connected!</p>
-            <a class="start-btn" href="#" aria-label="Start watching your school's matches">Start Watching!</a>
+            <a class="start-btn" href="pages/livescores.php" aria-label="Start watching your school's matches">Start Watching!</a>
             <a class="login-cta" href="login.php" aria-label="Log in to the Intramurals Management System">Log in</a>
         </div>
     </div>

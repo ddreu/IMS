@@ -201,7 +201,7 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
             flex: 1;
         }
 
-        @media (max-width: 800px) and (min-width: 400px) {
+        @media (max-width: 800px) and (min-width: 300px) {
             .navbar-nav {
                 display: flex;
                 flex-direction: row;

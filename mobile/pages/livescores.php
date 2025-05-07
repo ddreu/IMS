@@ -87,10 +87,11 @@ if (isset($_GET['school_id']) && !isset($_GET['department_id'])) {
         }
 
         /* Optional: Increase spacing slightly between dropdowns on small screens */
-        @media (max-width: 576px) {
+        @media (max-width: 800px) and (min-width: 300px) {
             .form-select.btn-like {
                 max-width: 100%;
             }
+
         }
 
         .navbar-bottom {
@@ -127,7 +128,7 @@ if (isset($_GET['school_id']) && !isset($_GET['department_id'])) {
             flex: 1;
         }
 
-        @media (max-width: 800px) and (min-width: 400px) {
+        @media (max-width: 800px) and (min-width: 300px) {
             .navbar-nav {
                 display: flex;
                 flex-direction: row;
@@ -160,7 +161,7 @@ if (isset($_GET['school_id']) && !isset($_GET['department_id'])) {
             <p class="mb-0" style="font-size: 0.9rem; opacity: 0.9;">Watch matches as they happen in real-time</p>
         </div>
         <div class="container mt-4">
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <div class="d-flex justify-content-center gap-2">
                 <!-- School Dropdown -->
                 <select id="school_select" class="form-select btn-like">
                     <option value="">Select School</option>
