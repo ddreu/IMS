@@ -92,6 +92,8 @@ $query = "
         schools ON users.school_id = schools.school_id
     LEFT JOIN 
         departments ON users.department = departments.id
+        WHERE
+        table_name != 'sessions'
     ORDER BY 
         $sort_column $sort_order
     LIMIT $offset, $limit

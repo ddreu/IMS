@@ -92,12 +92,18 @@ $query = "
         schools ON users.school_id = schools.school_id
     LEFT JOIN 
         departments ON users.department = departments.id
+        WHERE
+        table_name != 'sessions'
 ";
 
 
 // Add WHERE clause for non-superadmin users
+// if ($role !== 'superadmin') {
+//     $query .= " WHERE users.school_id = " . (int)$school_id;
+// }
+
 if ($role !== 'superadmin') {
-    $query .= " WHERE users.school_id = " . (int)$school_id;
+    $query .= " AND users.school_id = " . (int)$school_id;
 }
 
 $query .= "
