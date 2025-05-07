@@ -10,7 +10,7 @@ if (!isset($department_id) || empty($department_id)) {
     exit;
 }
 
-$query = "SELECT DISTINCT grade_level FROM grade_section_course WHERE department_id = ?";
+$query = "SELECT DISTINCT grade_level FROM grade_section_course WHERE department_id = ? AND is_archived = 0";
 $stmt = $conn->prepare($query);
 $stmt->bind_param('i', $department_id);
 

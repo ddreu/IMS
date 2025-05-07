@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_game'])) {
     $environment = mysqli_real_escape_string($conn, $_POST['environment']);
 
     // Check if the game name already exists in the user's school
-    $check_sql = "SELECT * FROM games WHERE game_name = ? AND school_id = ?";
+    $check_sql = "SELECT * FROM games WHERE game_name = ? AND school_id = ? AND is_archived = 0";
     $stmt_check = mysqli_prepare($conn, $check_sql);
     mysqli_stmt_bind_param($stmt_check, "si", $game_name, $school_id);
     mysqli_stmt_execute($stmt_check);
@@ -86,7 +86,7 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
 // Base SQL query for fetching games
-$game_sql = "SELECT * FROM games WHERE school_id = ?";
+$game_sql = "SELECT * FROM games WHERE school_id = ? AND is_archived = 0";
 $params = [$school_id];
 
 if ($filter == 'indoor') {
@@ -140,6 +140,7 @@ include '../navbar/navbar.php';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List of Games</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -148,6 +149,10 @@ include '../navbar/navbar.php';
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <!-- DataTables JS (place after jQuery) -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles/dashboard.css">
     <style>
@@ -343,7 +348,11 @@ include '../navbar/navbar.php';
 <body>
     <div class="wrapper">
         <?php $current_page = 'games';
-        include '../department_admin/sidebar.php'; ?>
+        if ($_SESSION['role'] == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';  // Sidebar for superadmin
+        } else {
+            include '../department_admin/sidebar.php';  // Sidebar for other roles
+        } ?>
         <div id="content">
             <?php
             // Display success message
@@ -384,32 +393,16 @@ include '../navbar/navbar.php';
                 </div>
 
                 <div class="filter-section">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="btn-group w-100" role="group">
-                                <a href="?filter=all<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"
-                                    class="btn btn-outline-primary <?= $filter === 'all' ? 'active' : '' ?>">
-                                    All Games
-                                </a>
-                                <a href="?filter=indoor<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"
-                                    class="btn btn-outline-primary <?= $filter === 'indoor' ? 'active' : '' ?>">
-                                    Indoor
-                                </a>
-                                <a href="?filter=outdoor<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>"
-                                    class="btn btn-outline-primary <?= $filter === 'outdoor' ? 'active' : '' ?>">
-                                    Outdoor
-                                </a>
+                    <div class="row g-3 justify-content-center text-center">
+                        <div class="col-md-6 d-flex justify-content-center">
+                            <div class="btn-group" role="group">
+                                <a href="?filter=all<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>" class="btn btn-outline-primary <?= $filter === 'all' ? 'active' : '' ?>">All Games</a>
+                                <a href="?filter=indoor<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>" class="btn btn-outline-primary <?= $filter === 'indoor' ? 'active' : '' ?>">Indoor</a>
+                                <a href="?filter=outdoor<?= !empty($search) ? '&search=' . urlencode($search) : '' ?>" class="btn btn-outline-primary <?= $filter === 'outdoor' ? 'active' : '' ?>">Outdoor</a>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <form method="GET" action="games.php" class="d-flex gap-2">
-                                <input type="text" name="search" class="form-control" placeholder="Search games..." value="<?php echo htmlspecialchars($search ?? ''); ?>">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </form>
-                        </div>
                     </div>
+
                 </div>
 
                 <div class="card box">
@@ -425,7 +418,7 @@ include '../navbar/navbar.php';
                         </div> -->
 
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table id="gamesTable" class="table table-hover align-middle mb-0">
                                 <thead class="bg-light">
                                     <tr>
                                         <th class="px-4 py-3">Game Name</th>
@@ -488,17 +481,17 @@ include '../navbar/navbar.php';
                                                 }
 
                                                 // Archive/Unarchive Button (Accessible for School Admin and Super Admin)
-                                                if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') {
-                                                    echo '<li style="margin: 0; padding: 0; list-style: none;">';
-                                                    echo '<button type="button" class="dropdown-item archive-btn" ' .
-                                                        'data-id="' . htmlspecialchars($game['game_id']) . '" ' .
-                                                        'data-table="games" ' .
-                                                        'data-operation="' . ($game['is_archived'] == 1 ? 'unarchive' : 'archive') . '" ' .
-                                                        'style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">';
-                                                    echo ($game['is_archived'] == 1 ? 'Unarchive' : 'Archive');
-                                                    echo '</button>';
-                                                    echo '</li>';
-                                                }
+                                                // if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') {
+                                                //     echo '<li style="margin: 0; padding: 0; list-style: none;">';
+                                                //     echo '<button type="button" class="dropdown-item archive-btn" ' .
+                                                //         'data-id="' . htmlspecialchars($game['game_id']) . '" ' .
+                                                //         'data-table="games" ' .
+                                                //         'data-operation="' . ($game['is_archived'] == 1 ? 'unarchive' : 'archive') . '" ' .
+                                                //         'style="padding: 4px 12px; line-height: 1.2; margin: 0; width: 100%;">';
+                                                //     echo ($game['is_archived'] == 1 ? 'Unarchive' : 'Archive');
+                                                //     echo '</button>';
+                                                //     echo '</li>';
+                                                // }
 
                                                 // "Open as Committee" Button (Accessible for School Admin, Department Admin, and Super Admin)
                                                 echo '<li>';
@@ -689,7 +682,7 @@ include '../navbar/navbar.php';
     </div>
 
     <!-- Bootstrap and jQuery Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.bundle.min.js"></script>
     <!-- Include SweetAlert library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -789,6 +782,31 @@ include '../navbar/navbar.php';
                 }
             });
         }
+        $(document).ready(function() {
+            const $table = $('#gamesTable');
+
+            // Only initialize DataTable if tbody row count is zero or all rows match column count
+            const headerCount = $table.find('thead th').length;
+            const isValid = $table.find('tbody tr').toArray().every(row => {
+                return $(row).find('td').length === headerCount;
+            });
+
+            if (isValid) {
+                $table.DataTable({
+                    pageLength: 10,
+                    lengthMenu: [5, 10, 25, 50, 100],
+                    order: [
+                        [0, 'asc']
+                    ],
+                    columnDefs: [{
+                        orderable: false,
+                        targets: -1
+                    }]
+                });
+            } else {
+                console.warn("Skipped DataTable initialization: mismatched column count.");
+            }
+        });
     </script>
     <script src="../archive/js/archive.js"></script>
     <script src="js/games.js"></script>

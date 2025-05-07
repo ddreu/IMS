@@ -17,7 +17,9 @@ $department_id = isset($_SESSION['department_id']) ? $_SESSION['department_id'] 
 $game_id = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : null;
 
 if ($user_role === 'Committee') {
-    include '../committee/csidebar.php'; // Sidebar for committee
+    include '../committee/csidebar.php';
+} elseif ($user_role === 'superadmin') {
+    include '../super_admin/sa_sidebar.php';
 } else {
     include '../department_admin/sidebar.php';
 }
@@ -194,12 +196,21 @@ if ($selected_department_id) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Match List</title>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- jQuery (if not already included) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="stylesheet" href="../styles/committee.css">
     <link rel="stylesheet" href="../styles/dashboard.css">
+    <link rel="stylesheet" href="../super_admin/sidebar.css">
+
     <style>
         /* Base styles */
         .match-list-container {
@@ -419,10 +430,10 @@ if ($selected_department_id) {
             <!-- Filter Form -->
             <div class="filter-section">
                 <div class="filter-row">
-                    <div class="filter-group">
+                    <!-- <div class="filter-group">
                         <label class="filter-label" for="searchInput">Search</label>
                         <input type="text" id="searchInput" class="filter-input" placeholder="Search matches...">
-                    </div>
+                    </div> -->
                     <div class="filter-group">
                         <label class="filter-label" for="filterGame">Game</label>
                         <select id="filterGame" class="filter-select">
@@ -484,86 +495,95 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
             <?php endif; ?>
 
             <!-- Desktop Table View -->
-            <div class="table-responsive d-none d-md-block">
-                <table class="match-table table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Game Name</th>
-                            <th>Match Type</th>
-                            <th>Team A Name</th>
-                            <th>Team B Name</th>
-                            <th>Schedule Date & Time</th>
-                            <th>Venue</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($row['game_name']); ?></td>
-                                <td>
-                                    <?php
-                                    switch ($row['match_type']) {
-                                        case 'semifinal':
-                                            echo 'Semifinals';
-                                            break;
-                                        case 'final':
-                                            echo 'Finals';
-                                            break;
-                                        case 'third_place':
-                                            echo 'Battle for Third';
-                                            break;
-                                        default:
-                                            echo "Round {$row['round']}";
-                                    }
-                                    ?>
-                                </td>
-                                <td><?= htmlspecialchars($row['teamA_name']); ?></td>
-                                <td><?= htmlspecialchars($row['teamB_name']); ?></td>
-                                <td>
-                                    <?= htmlspecialchars(date("M d, Y", strtotime($row['schedule_date'])) . ', ' . date("g:i A", strtotime($row['schedule_time']))); ?>
-                                </td>
-                                <td><?= htmlspecialchars($row['venue']); ?></td>
-                                <td><?= htmlspecialchars($row['status']); ?></td>
-                                <td>
-                                    <?php if (!empty($row['schedule_id'])): ?>
-                                        <!-- Dropdown Menu -->
-                                        <div class="dropdown">
-                                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton<?= $row['schedule_id']; ?>"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                Actions
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?= $row['schedule_id']; ?>">
-                                                <?php if ($row['status'] === 'Upcoming'): ?>
-                                                    <!-- Notify Players action -->
-                                                    <li>
-                                                        <button class="dropdown-item" onclick="notifyPlayers(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>)">
-                                                            Notify Players
-                                                        </button>
-                                                    </li>
-                                                    <!-- Start Match action -->
-                                                    <!-- <li>
+            <!-- <div class="table-responsive d-none d-md-block"> -->
+            <div class="card d-none d-md-block">
+                <!-- <div class="card-header">
+                    <h5 class="mb-0">Match Schedule Table</h5>
+                </div> -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="matchTable" class="match-table table table-bordered table-hover">
+                            <!-- <table id="matchTable" class="match-table table table-bordered"> -->
+                            <thead>
+                                <tr>
+                                    <th>Game Name</th>
+                                    <th>Match Type</th>
+                                    <th>Team A Name</th>
+                                    <th>Team B Name</th>
+                                    <th>Schedule Date & Time</th>
+                                    <th>Venue</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = $result->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($row['game_name']); ?></td>
+                                        <td>
+                                            <?php
+                                            switch ($row['match_type']) {
+                                                case 'semifinal':
+                                                    echo 'Semifinals';
+                                                    break;
+                                                case 'final':
+                                                    echo 'Finals';
+                                                    break;
+                                                case 'third_place':
+                                                    echo 'Battle for Third';
+                                                    break;
+                                                default:
+                                                    echo "Round {$row['round']}";
+                                            }
+                                            ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($row['teamA_name']); ?></td>
+                                        <td><?= htmlspecialchars($row['teamB_name']); ?></td>
+                                        <td>
+                                            <?= htmlspecialchars(date("M d, Y", strtotime($row['schedule_date'])) . ', ' . date("g:i A", strtotime($row['schedule_time']))); ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($row['venue']); ?></td>
+                                        <td><?= htmlspecialchars($row['status']); ?></td>
+                                        <td>
+                                            <?php if (!empty($row['schedule_id'])): ?>
+                                                <!-- Dropdown Menu -->
+                                                <div class="dropdown">
+                                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton<?= $row['schedule_id']; ?>"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Actions
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton<?= $row['schedule_id']; ?>">
+                                                        <?php if ($row['status'] === 'Upcoming'): ?>
+                                                            <!-- Notify Players action -->
+                                                            <li>
+                                                                <button class="dropdown-item" onclick="notifyPlayers(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>)">
+                                                                    Notify Players
+                                                                </button>
+                                                            </li>
+                                                            <!-- Start Match action -->
+                                                            <!-- <li>
                                                         <button class="dropdown-item" onclick="startMatch(<?= $row['schedule_id']; ?>, <?= $row['teamA_id']; ?>, <?= $row['teamB_id']; ?>, <?= $row['game_id']; ?>)">
                                                             Start Match
                                                         </button>
                                                     </li>-->
-                                                <?php elseif ($row['status'] === 'Finished'): ?>
-                                                    <!-- View Summary action -->
-                                                    <li>
-                                                        <a class="dropdown-item" href="match_summary.php?match_id=<?= $row['match_id']; ?>">
-                                                            <i class="fas fa-eye"></i> View Summary
-                                                        </a>
-                                                    </li>
-                                                <?php endif; ?>
-                                            </ul>
-                                        </div>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
+                                                        <?php elseif ($row['status'] === 'Finished'): ?>
+                                                            <!-- View Summary action -->
+                                                            <li>
+                                                                <a class="dropdown-item" href="match_summary.php?match_id=<?= $row['match_id']; ?>">
+                                                                    <i class="fas fa-eye"></i> View Summary
+                                                                </a>
+                                                            </li>
+                                                        <?php endif; ?>
+                                                    </ul>
+                                                </div>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- Mobile Card View -->
@@ -723,54 +743,14 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
             <script>
                 let filterTimeout;
                 let lastSearchValue = '';
+                let searchInput; // Declare this outside to make it available globally.
 
-                function applyFilters() {
-                    // Clear any existing timeout
-                    clearTimeout(filterTimeout);
-
-                    // Set a new timeout
-                    filterTimeout = setTimeout(() => {
-                        const gameId = document.getElementById('filterGame').value;
-                        const gradeLevel = document.getElementById('filterGradeLevel').value;
-                        const status = document.getElementById('filterStatus').value;
-                        const search = document.getElementById('searchInput').value;
-
-                        // Check if search value has changed
-                        if (search === lastSearchValue && search.length > 0) {
-                            return; // Don't submit if the search value hasn't changed
-                        }
-                        lastSearchValue = search;
-
-                        // Get the current URL without query parameters
-                        let url = window.location.href.split('?')[0];
-
-                        // Build query parameters
-                        const params = new URLSearchParams();
-                        if (gameId) params.append('game_id', gameId);
-                        if (gradeLevel) params.append('grade_level', gradeLevel);
-                        if (status) params.append('status', status);
-                        if (search) params.append('search', search);
-
-                        // Get department_id from URL if it exists
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const deptId = urlParams.get('selected_department_id');
-                        if (deptId) params.append('selected_department_id', deptId);
-
-                        // Only redirect if we have actual filter values
-                        if (gameId || gradeLevel || status || search || deptId) {
-                            window.location.href = url + '?' + params.toString();
-                        }
-                    }, 1000); // Increased timeout to 1 second
-                }
-
-                // Add event listeners when document is ready
                 document.addEventListener('DOMContentLoaded', function() {
+                    // Initialize searchInput once the document is ready.
+                    searchInput = document.getElementById('searchInput');
+
                     // Add change event listeners for dropdowns
-                    const filterInputs = [
-                        'filterGame',
-                        'filterGradeLevel',
-                        'filterStatus'
-                    ];
+                    const filterInputs = ['filterGame', 'filterStatus'];
 
                     filterInputs.forEach(id => {
                         const element = document.getElementById(id);
@@ -780,7 +760,6 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
                     });
 
                     // Add input event for search with minimum length
-                    const searchInput = document.getElementById('searchInput');
                     if (searchInput) {
                         searchInput.addEventListener('input', function(e) {
                             const value = e.target.value.trim();
@@ -821,6 +800,57 @@ Number of results: <?= ($result ? $result->num_rows : 0) ?>
                             window.location.href = window.location.href.split('?')[0];
                         });
                     }
+                });
+
+                function applyFilters() {
+                    const searchInput = document.getElementById('searchInput');
+                    const gameId = document.getElementById('filterGame').value;
+                    const status = document.getElementById('filterStatus').value;
+
+                    // Check if search value has changed
+                    if (searchInput) {
+                        const search = searchInput.value.trim();
+                        if (search === lastSearchValue && search.length > 0) {
+                            return; // Don't submit if the search value hasn't changed.
+                        }
+                        lastSearchValue = search;
+                    }
+
+                    // Get the current URL without query parameters
+                    let url = window.location.href.split('?')[0];
+
+                    // Build query parameters
+                    const params = new URLSearchParams();
+                    if (gameId) params.append('game_id', gameId);
+                    if (status) params.append('status', status);
+                    if (searchInput && searchInput.value) params.append('search', searchInput.value);
+
+                    // Get department_id from URL if it exists
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const deptId = urlParams.get('selected_department_id');
+                    if (deptId) params.append('selected_department_id', deptId);
+
+                    // Only redirect if we have actual filter values
+                    if (gameId || status || searchInput.value || deptId) {
+                        window.location.href = url + '?' + params.toString(); // Apply the filters immediately.
+                    }
+                }
+
+                $(document).ready(function() {
+                    $('#matchTable').DataTable({
+                        responsive: true,
+                        ordering: true,
+                        pageLength: 10,
+                        lengthChange: true,
+                        searching: true, // Disable built-in search since you use your own
+                        language: {
+                            emptyTable: "No matches found",
+                            paginate: {
+                                previous: "&laquo;",
+                                next: "&raquo;"
+                            }
+                        }
+                    });
                 });
             </script>
 

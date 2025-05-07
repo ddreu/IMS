@@ -8,12 +8,17 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$school_id = $_SESSION['school_id'];
-$school_name = $_SESSION['school_name'];
-$user_id = $_SESSION['user_id'];
-$user_role = $_SESSION['role'];
-$department_id = isset($_SESSION['department_id']) ? $_SESSION['department_id'] : null;
-$game_id = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : null;
+// $school_id = $_SESSION['school_id'];
+// $school_name = $_SESSION['school_name'];
+// $user_id = $_SESSION['user_id'];
+// $user_role = $_SESSION['role'];
+// $department_id = isset($_SESSION['department_id']) ? $_SESSION['department_id'] : null;
+// $game_id = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : null;
+$school_id = $_GET['school_id'] ?? $_SESSION['school_id'];
+$school_name = $_GET['school_name'] ?? $_SESSION['school_name'];
+$department_id = $_GET['department_id'] ?? $_SESSION['department_id'] ?? null;
+$game_id = $_GET['game_id'] ?? $_SESSION['game_id'] ?? null;
+
 
 // Get department_id from URL if available, otherwise use session
 $selected_department_id = isset($_GET['selected_department_id']) ? $_GET['selected_department_id'] : $department_id;
@@ -23,6 +28,8 @@ $searchTerm = isset($_GET['search']) ? $_GET['search'] : '';
 $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
 $selected_game_id = isset($_GET['game_id']) ? $_GET['game_id'] : '';
 $selected_grade_level = isset($_GET['grade_level']) ? $_GET['grade_level'] : '';
+// $selected_year = isset($_GET['year']) ? intval($_GET['year']) : null;
+
 
 // Prepare search terms for SQL
 $searchTermWithWildcards = !empty($searchTerm) ? '%' . $searchTerm . '%' : '%';
@@ -106,6 +113,13 @@ if ($status_filter === 'upcoming') {
 } elseif ($status_filter === 'finished') {
     $sql .= " AND m.status = 'Finished'";
 }
+
+
+// if (!empty($selected_year)) {
+//     $sql .= " AND YEAR(b.archived_at) = ?";
+//     $params[] = $selected_year;
+//     $types .= "i";
+// }
 
 // Add school_id filter
 $sql .= " AND g.school_id = ? ORDER BY 
@@ -391,7 +405,7 @@ if ($selected_department_id) {
 
     <!-- Desktop Table View -->
     <div class="table-responsive d-none d-md-block">
-        <table class="match-table table table-bordered">
+        <table id="matchTable" class="match-table table table-bordered">
             <thead>
                 <tr>
                     <th>Game Name</th>
@@ -457,9 +471,10 @@ if ($selected_department_id) {
                                         <?php elseif ($row['status'] === 'Finished'): ?>
                                             <!-- View Summary action -->
                                             <li>
-                                                <a class="dropdown-item" href="match_summary.php?match_id=<?= $row['match_id']; ?>">
+                                                <button class="dropdown-item" onclick="viewMatchSummary(<?= $row['match_id'] ?>)">
                                                     <i class="fas fa-eye"></i> View Summary
-                                                </a>
+                                                </button>
+
                                             </li>
                                         <?php endif; ?>
                                     </ul>
@@ -540,12 +555,12 @@ if ($selected_department_id) {
 
                 <div class="match-card-actions">
                     <?php if ($row['status'] == 'Upcoming'): ?>
-                        <button class="btn btn-primary" onclick="startMatch(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>, <?= $row['game_id'] ?>)">
+                        <!-- <button class="btn btn-primary" onclick="startMatch(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>, <?= $row['game_id'] ?>)">
                             <i class="fas fa-play"></i> Start Match
                         </button>
                         <button class="btn btn-info" onclick="notifyPlayers(<?= $row['schedule_id'] ?>, <?= $row['teamA_id'] ?>, <?= $row['teamB_id'] ?>)">
                             <i class="fas fa-bell"></i> Notify
-                        </button>
+                        </button> -->
                     <?php else: ?>
                         <button class="btn btn-secondary" onclick="viewMatchDetails(<?= $row['match_id'] ?>)">
                             <i class="fas fa-eye"></i> View Details
@@ -554,5 +569,19 @@ if ($selected_department_id) {
                 </div>
             </div>
         <?php endwhile; ?>
+    </div>
+</div>
+
+<div class="modal fade" id="matchSummaryModal" tabindex="-1" aria-labelledby="matchSummaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="matchSummaryModalLabel">Match Summary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Summary content will be loaded here -->
+            </div>
+        </div>
     </div>
 </div>

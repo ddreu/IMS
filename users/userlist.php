@@ -691,7 +691,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                         <div class="container-fluid p-0">
                             <div class="card shadow-sm">
                                 <div class="card-body p-0">
-                                    <table class="table table-hover align-middle mb-0">
+                                    <table id="userTable" class="table table-hover align-middle mb-0">
                                         <thead class="bg-light">
                                             <tr>
                                                 <th class="px-4 py-3">Name</th>
@@ -829,6 +829,12 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <!-- Select2 JS -->
             <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <!-- DataTables CSS -->
+            <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+            <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
             <!-- Custom JS -->
             <script src="../utils.js"></script>
             <script>
@@ -1303,6 +1309,24 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                         addSelectedDeptIds = addSelectedDeptIds.filter(id => id !== idToRemove);
                         document.querySelector(`#dept_level option[value="${idToRemove}"]`).selected = false;
                         $('#dept_level').trigger('change'); // Sync Select2
+                    }
+                });
+                $(document).ready(function() {
+                    if ($('#usersTable').length) {
+                        $('#usersTable').DataTable({
+                            pageLength: 10,
+                            lengthMenu: [5, 10, 25, 50, 100],
+                            order: [
+                                [0, 'asc']
+                            ],
+                            columnDefs: [{
+                                orderable: false,
+                                targets: -1
+                            }],
+                            language: {
+                                emptyTable: "No users available"
+                            }
+                        });
                     }
                 });
             </script>

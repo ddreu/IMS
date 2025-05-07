@@ -43,7 +43,7 @@ $playersQuery = "
     WHERE d.id = ? 
       AND d.school_id = ? 
       " . ($grade_level ? "AND gsc.grade_level = ?" : "") . "
-    AND p.is_archived = 0
+    
 ";
 
 if ($grade_level) {
@@ -77,6 +77,21 @@ $statsQuery = "
     WHERE game_id = ?
     GROUP BY player_id, stat_name
 ";
+// $statsQuery = "
+//    SELECT 
+//     pms.player_id,
+//     pms.stat_name,
+//     SUM(pms.stat_value) AS total_stat
+// FROM player_match_stats pms
+// JOIN games g ON pms.game_id = g.game_id
+// WHERE pms.game_id = ? AND g.is_archived = 0
+// GROUP BY pms.player_id, pms.stat_name
+// ";
+$stmt = $conn->prepare($statsQuery);
+$stmt->bind_param('i', $game_id);
+$stmt->execute();
+$statsResult = $stmt->get_result();
+
 $stmt = $conn->prepare($statsQuery);
 $stmt->bind_param('i', $game_id);
 $stmt->execute();

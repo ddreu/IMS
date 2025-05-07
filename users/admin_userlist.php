@@ -151,6 +151,8 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
     <title>User Management - Super Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
     <link rel="stylesheet" href="../styles/dashboard.css">
     <link rel="stylesheet" href="../super_admin/sastyles.css">
 </head>
@@ -185,10 +187,10 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <form class="d-flex" method="POST">
+                                    <!-- <form class="d-flex" method="POST">
                                         <input type="text" name="search" class="form-control me-2" placeholder="Search users..." value="<?php echo htmlspecialchars($searchQuery); ?>">
                                         <button type="submit" class="btn btn-outline-primary">Search</button>
-                                    </form>
+                                    </form> -->
                                 </div>
                                 <div class="col-md-3">
                                     <select class="form-select" id="schoolFilter">
@@ -211,7 +213,7 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                             </div>
 
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
+                                <table id="usersTable" class="table table-hover align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
                                             <th class="px-4 py-3">Name</th>
@@ -308,6 +310,8 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <script>
         // Filter functionality
         document.getElementById('schoolFilter').addEventListener('change', filterTable);
@@ -399,6 +403,20 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                 });
             return false;
         }
+        $(document).ready(function() {
+            $('#usersTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50, 100],
+                order: [
+                    [0, 'asc']
+                ],
+                columnDefs: [{
+                        orderable: false,
+                        targets: -1
+                    } // Disable sorting on the Actions column
+                ]
+            });
+        });
     </script>
 </body>
 

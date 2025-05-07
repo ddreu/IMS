@@ -36,7 +36,7 @@ while ($row = mysqli_fetch_assoc($roles_result)) {
 }
 
 // Get total departments
-$dept_query = "SELECT COUNT(*) as dept_count FROM departments WHERE school_id = ?";
+$dept_query = "SELECT COUNT(*) as dept_count FROM departments WHERE school_id = ? AND is_archived = 0";
 $stmt = mysqli_prepare($conn, $dept_query);
 mysqli_stmt_bind_param($stmt, "i", $school_id);
 mysqli_stmt_execute($stmt);
@@ -52,7 +52,7 @@ $users_result = mysqli_stmt_get_result($stmt);
 $total_users = mysqli_fetch_assoc($users_result)['user_count'];
 
 // Get total games
-$games_query = "SELECT COUNT(*) as game_count FROM games WHERE school_id = ?";
+$games_query = "SELECT COUNT(*) as game_count FROM games WHERE school_id = ? AND is_archived = 0";
 $stmt = mysqli_prepare($conn, $games_query);
 mysqli_stmt_bind_param($stmt, "i", $school_id);
 mysqli_stmt_execute($stmt);
@@ -60,7 +60,7 @@ $games_result = mysqli_stmt_get_result($stmt);
 $total_games = mysqli_fetch_assoc($games_result)['game_count'];
 
 // Get total announcements
-$announcement_query = "SELECT COUNT(*) as announcement_count FROM announcement WHERE school_id = ?";
+$announcement_query = "SELECT COUNT(*) as announcement_count FROM announcement WHERE school_id = ? AND is_archived = 0";
 $stmt = mysqli_prepare($conn, $announcement_query);
 mysqli_stmt_bind_param($stmt, "i", $school_id);
 mysqli_stmt_execute($stmt);
@@ -316,10 +316,18 @@ if (isset($_SESSION['success_message'])) {
 
 <body>
     <?php
+    // Assuming you have a session or some method to get the user role
     $current_page = 'admindashboard';
     include '../navbar/navbar.php';
-    include '../department_admin/sidebar.php';
+
+    // Check if the user is a superadmin
+    if ($_SESSION['role'] == 'superadmin') {
+        include '../super_admin/sa_sidebar.php';  // Sidebar for superadmin
+    } else {
+        include '../department_admin/sidebar.php';  // Sidebar for other roles
+    }
     ?>
+
     <div id="content">
         <div class="main-content">
             <div class="container-fluid p-4">

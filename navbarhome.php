@@ -14,7 +14,7 @@ $school_id = isset($_GET['school_id']) ? (int)$_GET['school_id'] : 0;
 // Fetch departments for the school_id
 $departments = [];
 if ($school_id > 0) {
-    $query = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ?");
+    $query = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0");
     $query->bind_param("i", $school_id);
     $query->execute();
     $result = $query->get_result();

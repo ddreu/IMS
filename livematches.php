@@ -14,7 +14,11 @@ session_start();
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="home.css" rel="stylesheet">
+    <!-- <link href="home.css" rel="stylesheet"> -->
+    <link href="topnav.css" rel="stylesheet">
+    <link href="livescore.css" rel="stylesheet">
+    <link href="footer.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <!-- jQuery for AJAX -->
@@ -311,7 +315,7 @@ session_start();
         // Start fetching when document is ready
         $(document).ready(function() {
             fetchLiveScores();
-            setInterval(fetchLiveScores, 5000);
+            setInterval(fetchLiveScores, 1000);
         });
     </script>
 </body>

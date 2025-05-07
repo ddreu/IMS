@@ -11,7 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-
 // Get user school ID
 $sql = "SELECT school_id FROM users WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
@@ -61,7 +60,7 @@ if (!empty($search)) {
 
 // Optional: filter by year
 if ($year) {
-    $game_sql .= " AND YEAR(created_at) = ?";
+    $game_sql .= " AND YEAR(archived_at) = ?";
     $params[] = $year;
     $types .= "i";
 }
@@ -322,7 +321,7 @@ if ($school_id) {
             <div class="card-body">
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table id="gamesTable" class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr>
                                 <th class="px-4 py-3">Game Name</th>

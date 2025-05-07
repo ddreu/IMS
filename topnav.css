@@ -1,0 +1,114 @@
+.navbar.navbar-dark.bg-dark {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.navbar .container {
+  position: static;
+  overflow: visible;
+}
+
+.navbar .dropdown-menu {
+  position: absolute;
+  width: auto;
+  min-width: max-content;
+  transform: none;
+  margin-top: 0.5rem !important;
+}
+
+.navbar .nav-item.dropdown {
+  position: relative;
+}
+
+/* Prevent container expansion */
+#topNav {
+  position: relative;
+  overflow: visible;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10%;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+/* Main Navbar */
+#navbar {
+  position: fixed;
+  top: 26px;
+  width: 100%;
+  z-index: 999;
+  transition: background-color 0.3s ease;
+  padding-top: 20px;
+}
+
+/* Transparent background for the index page */
+.navbar-transparent {
+  background-color: transparent;
+}
+
+/* Default background color for other pages */
+.navbar-colored {
+  background-color: #24252a;
+}
+
+/* Colored navbar on scroll (for transparency effect) */
+.navbar-colored-on-scroll {
+  background-color: #24252a !important;
+}
+
+/* Mobile Nav */
+.menu {
+  display: none;
+}
+
+.overlay {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  background-color: #24252a;
+  overflow-x: hidden;
+  transition: width 0.5s ease 0s;
+}
+
+.overlay--active {
+  width: 100%;
+}
+
+.overlay__content {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay a {
+  padding: 15px;
+  font-size: 36px;
+  display: block;
+  transition: color 0.3s ease 0s;
+}
+
+.overlay a:hover,
+.overlay a:focus {
+  color: #0088a9;
+}
+
+.overlay .close {
+  position: absolute;
+  top: 20px;
+  right: 45px;
+  font-size: 60px;
+  color: #edf0f1;
+}

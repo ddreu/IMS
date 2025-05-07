@@ -59,11 +59,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $check_stmt->bind_param("isss", $school_id, $formatted_schedule_date, $formatted_schedule_time, $venue);
         $check_stmt->execute();
         $result = $check_stmt->get_result();
+        /////////////////////////
+        $schedule_conflict = false;
 
-        if ($result->num_rows > 0) {
-            // Schedule conflict exists
+        while ($row = $result->fetch_assoc()) {
+            $conflict_match_id = $row['match_id'];
+
+            // Check the match status
+            $status_stmt = $conn->prepare("SELECT status FROM matches WHERE match_id = ?");
+            $status_stmt->bind_param("i", $conflict_match_id);
+            $status_stmt->execute();
+            $status_result = $status_stmt->get_result();
+            $status_row = $status_result->fetch_assoc();
+            $status_stmt->close();
+
+            if (isset($status_row['status']) && strtolower($status_row['status']) !== 'finished') {
+                $schedule_conflict = true;
+                break;
+            }
+        }
+
+        if ($schedule_conflict) {
             throw new Exception('A match is already scheduled at this venue for the selected date and time.');
         }
+
+        // if ($result->num_rows > 0) {
+        //     // Schedule conflict exists
+        //     throw new Exception('A match is already scheduled at this venue for the selected date and time.');
+        // }
 
         // Check for existing match schedule
         $check_stmt = $conn->prepare("SELECT schedule_id FROM schedules WHERE match_id = ?");

@@ -50,4 +50,22 @@ if (document.querySelector(".fixed-plugin")) {
       buttonNavbarFixed.setAttribute("checked", "true");
     }
   }
+
+//custom wrapper show
+
+window.onload = function() {
+  const fixedPlugin = document.querySelector(".fixed-plugin");
+  const chatBoxVisible = localStorage.getItem('chatBoxVisible'); // Get the flag from localStorage
+
+  if (chatBoxVisible === 'true' && fixedPlugin) {
+    // If the flag is set, add the "show" class to make the chat box visible
+    fixedPlugin.classList.add("show");
+
+    // Optionally, remove the flag from localStorage after showing the chat box
+    localStorage.removeItem('chatBoxVisible');
+  }
+};
+
+
+
 }

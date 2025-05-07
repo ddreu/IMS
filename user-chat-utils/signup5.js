@@ -17,6 +17,11 @@ continueBtn.onclick = () => {
       if (xhr.status === 200) {
         let data = xhr.response.trim();
         if (data === "success") {
+
+          //set a flag if successful to reopen the wrapper of chat
+          localStorage.setItem('chatBoxVisible', 'true');
+
+          // reload
           window.location.reload();
         } else {
           continueBtn.removeAttribute("disabled");

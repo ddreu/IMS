@@ -89,14 +89,14 @@ while ($game = $result->fetch_assoc()) {
             Actions
         </button>
         <ul class='dropdown-menu'>
-            <li>
+           <!-- <li>
                 <button class='dropdown-item' 
                     data-bs-toggle='modal' 
                     data-bs-target='#openSchoolModal'
                     data-school-id='{$row['school_id']}'>
                     Open School
                 </button>
-            </li>
+            </li> -->
             <li>
                 <button class='dropdown-item edit-btn' data-id='{$row['school_id']}'>
                     Edit

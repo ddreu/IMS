@@ -126,8 +126,8 @@ $conn->close();
         $current_page = 'scoring_rules';
         if ($role == 'Committee') {
             include '../committee/csidebar.php';
-        } else if ($role == 'superdmin') {
-            include '../superadmin/sa_sidebar.php';
+        } else if ($role == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';
         } else {
             include '../department_admin/sidebar.php';
         }

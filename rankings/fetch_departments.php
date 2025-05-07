@@ -5,7 +5,7 @@ $conn = con();
 
 $school_id = $_SESSION['school_id']; // Assuming session stores school_id
 
-$query = "SELECT id, department_name FROM departments WHERE school_id = ?";
+$query = "SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0";
 $stmt = $conn->prepare($query);
 $stmt->bind_param('i', $school_id);
 $stmt->execute();

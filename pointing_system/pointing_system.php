@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Check if a record already exists for the school_id
     $conn = con();
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM pointing_system WHERE school_id = ?");
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM pointing_system WHERE school_id = ? AND is_archived = 0");
     $stmt->bind_param("i", $school_id);
     $stmt->execute();
     $stmt->bind_result($count);
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($count > 0) {
         // Update the existing record
-        $stmt = $conn->prepare("UPDATE pointing_system SET first_place_points = ?, second_place_points = ?, third_place_points = ? WHERE school_id = ?");
+        $stmt = $conn->prepare("UPDATE pointing_system SET first_place_points = ?, second_place_points = ?, third_place_points = ? WHERE school_id = ? AND is_archived = 0");
         $stmt->bind_param("iiii", $first_place_points, $second_place_points, $third_place_points, $school_id);
         if ($stmt->execute()) {
             $success = true; // Set success to true
@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch existing data after any changes
 $conn = con();
-$stmt = $conn->prepare("SELECT first_place_points, second_place_points, third_place_points FROM pointing_system WHERE school_id = ?");
+$stmt = $conn->prepare("SELECT first_place_points, second_place_points, third_place_points FROM pointing_system WHERE school_id = ? AND is_archived = 0");
 $stmt->bind_param("i", $school_id);
 $stmt->execute();
 $stmt->bind_result($first_place_points, $second_place_points, $third_place_points);

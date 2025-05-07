@@ -22,6 +22,10 @@ if (!$school_id) {
 // ✅ Optional filters (only usable by Super Admin)
 $selected_department_id = $is_superadmin && isset($_GET['department_id']) ? intval($_GET['department_id']) : null;
 // $selected_grade_level = $is_superadmin && isset($_GET['grade_level']) ? intval($_GET['grade_level']) : null;
+$selected_grade_level = isset($_GET['course_id']) ? trim($_GET['course_id']) : null;
+// $selected_year = isset($_GET['year']) ? intval($_GET['year']) : null;
+
+
 
 // ✅ Build query
 $sql = "
@@ -54,6 +58,18 @@ if ($selected_department_id) {
 //     $params[] = $selected_grade_level;
 //     $types .= "i";
 // }
+if ($selected_grade_level !== null && $selected_grade_level !== '') {
+    $sql .= " AND gsc.grade_level = ?";
+    $params[] = $selected_grade_level;
+    $types .= "s";
+}
+// if ($selected_year) {
+//     $sql .= " AND YEAR(gsc.archived_at) = ?";
+//     $params[] = $selected_year;
+//     $types .= "i";
+// }
+
+
 
 $sql .= " ORDER BY d.department_name, gsc.grade_level, gsc.section_name, gsc.course_name";
 
@@ -108,11 +124,15 @@ $conn->close();
                     <h5><?php echo htmlspecialchars($department_name); ?> Department</h5>
                 </div>
                 <div class="card-body">
-                    <?php foreach ($grades as $grade_level => $items): ?>
+                    <?php foreach ($grades as $grade_level => $items):
+                    ?>
+
                         <div class="mt-3 grade-section">
                             <h5><?php echo htmlspecialchars($grade_level); ?></h5>
                             <div class="table-responsive">
-                                <table id="archiveTableContainer" class="table table-striped table-bordered">
+                                <table id="datatable_<?php echo $department_name . '_' . $grade_level; ?>" class="table table-striped table-bordered">
+
+                                    <!-- <table id="archiveTableContainer" class="table table-striped table-bordered"> -->
                                     <thead class="table-light">
                                         <tr>
                                             <?php if ($department_name === 'SHS'): ?>

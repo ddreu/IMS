@@ -84,6 +84,10 @@ $department_name = is_array($section_details) && isset($section_details['departm
 <!-- Display Teams -->
 <div class="mt-4">
     <div class="container-fluid px-3 px-md-4">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary mb-3">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+
         <section class="main">
             <div class="main-top d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
                 <!-- <h2 class="mb-3 mb-md-0">
@@ -93,6 +97,7 @@ $department_name = is_array($section_details) && isset($section_details['departm
                     <?php endif; ?>
                     Teams
                 </h2> -->
+
                 <h2 class="mb-3 mb-md-0">
                     <?php if (!empty($section_details)): ?>
                         <?php if (($section_details['department_name'] ?? '') === 'College' && !empty($section_details['course_name'])): ?>
@@ -119,7 +124,7 @@ $department_name = is_array($section_details) && isset($section_details['departm
                     <div class="card shadow mt-3">
                         <div class="card-body p-3 p-md-4">
                             <div class="table-responsive">
-                                <table class="table table-striped table-hover">
+                                <table id="teamsTable_<?php echo htmlspecialchars($grade_level); ?>" class="table table-striped table-hover">
                                     <thead>
                                         <tr>
                                             <th>Team Name</th>
@@ -152,8 +157,9 @@ $department_name = is_array($section_details) && isset($section_details['departm
                                                 <?php endif; ?>
                                                 <td>
                                                     <div class="d-flex flex-column flex-md-row gap-2">
-                                                        <a href="../player/view_roster.php?team_id=<?= $row['team_id'] ?>&grade_section_course_id=<?= $grade_section_course_id ?>" class="btn btn-info btn-sm">View Roster</a>
-
+                                                        <a href="javascript:void(0);" class="btn btn-info btn-sm" onclick="viewPlayers(<?= $row['team_id']; ?>)">
+                                                            View Players
+                                                        </a>
                                                     </div>
                                                 </td>
                                             </tr>

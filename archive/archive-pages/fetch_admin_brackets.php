@@ -7,13 +7,13 @@ $conn = con();
 header('Content-Type: application/json');
 
 // Check if the user is logged in
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['school_id'])) {
-    echo json_encode(['success' => false, 'message' => 'User not logged in']);
-    exit();
-}
+// if (!isset($_SESSION['user_id']) || !isset($_SESSION['school_id'])) {
+//     echo json_encode(['success' => false, 'message' => 'User not logged in']);
+//     exit();
+// }
 
 // Retrieve the user's school ID from the session
-$school_id = $_SESSION['school_id'];
+$school_id = $_GET['school_id'] ?? $_SESSION['school_id'] ?? null;
 
 // Get filter parameters
 $department_id = isset($_GET['department_id']) ? $_GET['department_id'] : null;

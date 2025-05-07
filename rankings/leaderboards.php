@@ -224,8 +224,8 @@ include '../navbar/navbar.php';
 
     if ($role == 'Committee') {
         include '../committee/csidebar.php';
-    } else if ($role == 'superdmin') {
-        include '../superadmin/sa_sidebar.php';
+    } else if ($role == 'superadmin') {
+        include '../super_admin/sa_sidebar.php';
     } else {
         include '../department_admin/sidebar.php';
     }
@@ -281,7 +281,7 @@ include '../navbar/navbar.php';
                                     </div>
 
                                     <?php if ($role !== 'Committee'): ?>
-                                        <button id="resetLeaderboardBtn" class="btn btn-danger btn-sm px-3 py-2 shadow-sm">
+                                        <button id="resetLeaderboardBtn" class="btn btn-danger btn-sm px-3 py-2 shadow-sm me-3">
                                             <i class="fas fa-undo"></i> Reset Leaderboard
                                         </button>
                                     <?php endif; ?>

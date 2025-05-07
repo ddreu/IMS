@@ -75,7 +75,7 @@
                             <select id="department" name="department_id" class="form-select" required>
                                 <option value="">Select Department</option>
                                 <?php
-                                $departments_query = "SELECT id, department_name FROM departments WHERE school_id = ? ORDER BY department_name";
+                                $departments_query = "SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0 ORDER BY department_name";
                                 $stmt = $conn->prepare($departments_query);
                                 $stmt->bind_param("i", $school_id);
                                 $stmt->execute();
@@ -93,7 +93,7 @@
                             <select id="game" name="game_id" class="form-select" required>
                                 <option value="">Select Game</option>
                                 <?php
-                                $games_query = "SELECT game_id, game_name FROM games WHERE school_id = ? ORDER BY game_name";
+                                $games_query = "SELECT game_id, game_name FROM games WHERE school_id = ? AND is_archived = 0 ORDER BY game_name";
                                 $stmt = $conn->prepare($games_query);
                                 $stmt->bind_param("i", $school_id);
                                 $stmt->execute();
@@ -119,7 +119,7 @@
                             <select id="game" name="game_id" class="form-select" required>
                                 <option value="">Select Game</option>
                                 <?php
-                                $games_query = "SELECT game_id, game_name FROM games WHERE school_id = ? ORDER BY game_name";
+                                $games_query = "SELECT game_id, game_name FROM games WHERE school_id = ? AND is_archived = 0 ORDER BY game_name";
                                 $stmt = $conn->prepare($games_query);
                                 $stmt->bind_param("i", $school_id);
                                 $stmt->execute();

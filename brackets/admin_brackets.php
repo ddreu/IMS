@@ -181,7 +181,11 @@ include '../navbar/navbar.php';
 
 <body>
     <nav>
-        <?php include '../department_admin/sidebar.php'; ?>
+        <?php if ($_SESSION['role'] == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';  // Sidebar for superadmin
+        } else {
+            include '../department_admin/sidebar.php';  // Sidebar for other roles
+        } ?>
         <?php include 'round-robin_modal.php'; ?>
 
     </nav>
@@ -252,26 +256,34 @@ include '../navbar/navbar.php';
             <!-- Existing Brackets Table -->
             <div class="row">
                 <div class="col">
+                    <div class="card shadow-sm">
+                        <!-- <div class="card-header bg-primary text-white">
+                            <strong>Bracket List</strong>
+                        </div> -->
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <!-- <table class="table table-striped table-bordered"> -->
+                                <table id="bracketsTable" class="table table-striped table-bordered">
 
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered">
 
-                            <thead>
-                                <tr>
-                                    <th>Game</th>
-                                    <th>Department</th>
-                                    <th>Grade Level</th>
-                                    <th>Total Teams</th>
-                                    <th>Status</th>
-                                    <th>Bracket Type</th>
-                                    <th>Created At</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bracketsTableBody">
-                                <!-- Table content will be loaded dynamically -->
-                            </tbody>
-                        </table>
+                                    <thead>
+                                        <tr>
+                                            <th>Game</th>
+                                            <th>Department</th>
+                                            <th>Grade Level</th>
+                                            <th>Total Teams</th>
+                                            <th>Status</th>
+                                            <th>Bracket Type</th>
+                                            <th>Created At</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bracketsTableBody">
+                                        <!-- Table content will be loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -284,6 +296,126 @@ include '../navbar/navbar.php';
     </div>
 
     <script>
+        //         function loadBrackets(filters = {}) {
+        //             $.ajax({
+        //                 url: 'fetch_admin_brackets.php',
+        //                 method: 'GET',
+        //                 data: filters,
+        //                 // success: function(response) {
+        //                 //     if (response.success) {
+        //                 //         const brackets = response.data;
+        //                 //         const tbody = $('#bracketsTableBody');
+        //                 //         tbody.empty();
+        //                 success: function(response) {
+        //                     if (response.success) {
+        //                         const brackets = response.data;
+        //                         const table = $('#bracketsTable'); // Ensure your table has id="bracketsTable"
+        //                         const tbody = $('#bracketsTableBody');
+
+        //                         // Destroy existing DataTable before updating rows
+        //                         if ($.fn.DataTable.isDataTable(table)) {
+        //                             table.DataTable().destroy();
+        //                         }
+
+        //                         tbody.empty();
+
+        //                         if (brackets.length === 0) {
+        //                             tbody.append('<tr><td colspan="7" class="text-center">No brackets found</td></tr>');
+        //                             return;
+        //                         }
+
+        //                         brackets.forEach(bracket => {
+        //                             const row = `
+        // <tr data-category="${bracket.is_archived}">
+        //             <td>${bracket.game_name}</td>
+        //             <td>${bracket.department_name}</td>
+        //             <td>${bracket.grade_level || 'N/A'}</td>
+        //             <td>${bracket.total_teams}</td>
+        //             <td>${bracket.status}</td>
+        //             <td>${bracket.bracket_type}</td>
+        //             <td>${new Date(bracket.created_at).toLocaleDateString()}</td>
+        //             <td>
+        //                 <div class="dropdown">
+        //                     <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        //                         Actions
+        //                     </button>
+        //                     <ul class="dropdown-menu">
+        //                         ${
+        //                             bracket.is_archived == 0 
+        //                                 ? ( // If NOT archived — show view, download, archive, delete
+        //                                     bracket.bracket_type === 'round_robin'
+        //                                         ? `
+        //                                             <li>
+        //                                                 <button class="dropdown-item" onclick="viewRoundRobin(${bracket.bracket_id})">
+        //                                                     View Round Robin
+        //                                                 </button>
+        //                                             </li>
+        //                                             <li>
+        //                                                 <button class="dropdown-item" onclick="downloadBracket(${bracket.bracket_id}, 'round_robin')">
+        //                                                     Download Round Robin
+        //                                                 </button>
+        //                                             </li>
+        //                                         `
+        //                                         : bracket.bracket_type === 'double'
+        //                                             ? `
+        //                                                 <li>
+        //                                                     <button class="dropdown-item" onclick="viewDoubleElimination(${bracket.bracket_id})">
+        //                                                         View Double Elimination
+        //                                                     </button>
+        //                                                 </li>
+        //                                             `
+        //                                             : `
+        //                                                 <li>
+        //                                                     <button class="dropdown-item" onclick="viewBracket(${bracket.bracket_id})">
+        //                                                         View Bracket
+        //                                                     </button>
+        //                                                 </li>
+        //                                             `
+        //                                 )
+        //                                 : '' // If archived — don't show view and download buttons
+        //                         }
+        //                         <!--<li>
+        //                             <button type="button"
+        //                                 class="dropdown-item archive-btn"
+        //                                 data-id="${bracket.bracket_id}"
+        //                                 data-table="brackets"
+        //                                 data-operation="${bracket.is_archived == 1 ? 'unarchive' : 'archive'}"
+        //                                 style="padding: 4px 12px; line-height: 1.2;">
+        //                                 ${bracket.is_archived == 1 ? 'Unarchive' : 'Archive'}
+        //                             </button>
+        //                         </li>-->
+        //                         <li>
+        //                             <button class="dropdown-item text-danger" onclick="deleteBracket(${bracket.bracket_id})">
+        //                                 Delete
+        //                             </button>
+        //                         </li>
+        //                     </ul>
+        //                 </div>
+        //             </td>
+        //         </tr>
+
+
+        //                             `;
+        //                             tbody.append(row);
+        //                         });
+        //                     } else {
+        //                         Swal.fire({
+        //                             icon: 'error',
+        //                             title: 'Error',
+        //                             text: response.message || 'Failed to load brackets'
+        //                         });
+        //                     }
+        //                 },
+        //                 error: function(xhr, status, error) {
+        //                     console.error('Error loading brackets:', error);
+        //                     Swal.fire({
+        //                         icon: 'error',
+        //                         title: 'Error',
+        //                         text: 'Failed to load brackets. Please try again.'
+        //                     });
+        //                 }
+        //             });
+        //         }
         function loadBrackets(filters = {}) {
             $.ajax({
                 url: 'fetch_admin_brackets.php',
@@ -292,88 +424,71 @@ include '../navbar/navbar.php';
                 success: function(response) {
                     if (response.success) {
                         const brackets = response.data;
+                        const table = $('#bracketsTable');
                         const tbody = $('#bracketsTableBody');
+
+                        if ($.fn.DataTable.isDataTable(table)) {
+                            table.DataTable().destroy();
+                        }
+
                         tbody.empty();
 
                         if (brackets.length === 0) {
-                            tbody.append('<tr><td colspan="7" class="text-center">No brackets found</td></tr>');
-                            return;
+                            tbody.append('<tr><td colspan="8" class="text-center">No brackets found</td></tr>');
+                            return; // ⛔️ Don't initialize DataTable
                         }
 
                         brackets.forEach(bracket => {
                             const row = `
 <tr data-category="${bracket.is_archived}">
-            <td>${bracket.game_name}</td>
-            <td>${bracket.department_name}</td>
-            <td>${bracket.grade_level || 'N/A'}</td>
-            <td>${bracket.total_teams}</td>
-            <td>${bracket.status}</td>
-            <td>${bracket.bracket_type}</td>
-            <td>${new Date(bracket.created_at).toLocaleDateString()}</td>
-            <td>
-                <div class="dropdown">
-                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Actions
-                    </button>
-                    <ul class="dropdown-menu">
-                        ${
-                            bracket.is_archived == 0 
-                                ? ( // If NOT archived — show view, download, archive, delete
-                                    bracket.bracket_type === 'round_robin'
-                                        ? `
-                                            <li>
-                                                <button class="dropdown-item" onclick="viewRoundRobin(${bracket.bracket_id})">
-                                                    View Round Robin
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button class="dropdown-item" onclick="downloadBracket(${bracket.bracket_id}, 'round_robin')">
-                                                    Download Round Robin
-                                                </button>
-                                            </li>
-                                        `
-                                        : bracket.bracket_type === 'double'
-                                            ? `
-                                                <li>
-                                                    <button class="dropdown-item" onclick="viewDoubleElimination(${bracket.bracket_id})">
-                                                        View Double Elimination
-                                                    </button>
-                                                </li>
-                                            `
-                                            : `
-                                                <li>
-                                                    <button class="dropdown-item" onclick="viewBracket(${bracket.bracket_id})">
-                                                        View Bracket
-                                                    </button>
-                                                </li>
-                                            `
-                                )
-                                : '' // If archived — don't show view and download buttons
-                        }
-                        <li>
-                            <button type="button"
-                                class="dropdown-item archive-btn"
-                                data-id="${bracket.bracket_id}"
-                                data-table="brackets"
-                                data-operation="${bracket.is_archived == 1 ? 'unarchive' : 'archive'}"
-                                style="padding: 4px 12px; line-height: 1.2;">
-                                ${bracket.is_archived == 1 ? 'Unarchive' : 'Archive'}
-                            </button>
-                        </li>
-                        <li>
-                            <button class="dropdown-item text-danger" onclick="deleteBracket(${bracket.bracket_id})">
-                                Delete
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </td>
-        </tr>
-
-
-                            `;
+    <td>${bracket.game_name}</td>
+    <td>${bracket.department_name}</td>
+    <td>${bracket.grade_level || 'N/A'}</td>
+    <td>${bracket.total_teams}</td>
+    <td>${bracket.status}</td>
+    <td>${bracket.bracket_type}</td>
+    <td>${new Date(bracket.created_at).toLocaleDateString()}</td>
+    <td>
+        <div class="dropdown">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+            </button>
+            <ul class="dropdown-menu">
+                ${
+                    bracket.is_archived == 0 
+                        ? (bracket.bracket_type === 'round_robin'
+                            ? `
+                                <li><button class="dropdown-item" onclick="viewRoundRobin(${bracket.bracket_id})">View Round Robin</button></li>
+                                <li><button class="dropdown-item" onclick="downloadBracket(${bracket.bracket_id}, 'round_robin')">Download Round Robin</button></li>
+                              `
+                            : bracket.bracket_type === 'double'
+                                ? `
+                                    <li><button class="dropdown-item" onclick="viewDoubleElimination(${bracket.bracket_id})">View Double Elimination</button></li>
+                                  `
+                                : `
+                                    <li><button class="dropdown-item" onclick="viewBracket(${bracket.bracket_id})">View Bracket</button></li>
+                                  `
+                          )
+                        : ''
+                }
+                <li>
+                    <button class="dropdown-item text-danger" onclick="deleteBracket(${bracket.bracket_id})">Delete</button>
+                </li>
+            </ul>
+        </div>
+    </td>
+</tr>`;
                             tbody.append(row);
                         });
+
+                        // ✅ Only initialize if there's data
+                        table.DataTable({
+                            ordering: true,
+                            paging: true,
+                            searching: true,
+                            responsive: true
+                        });
+
                     } else {
                         Swal.fire({
                             icon: 'error',
@@ -392,6 +507,8 @@ include '../navbar/navbar.php';
                 }
             });
         }
+
+
 
         function applyFilters() {
             const filters = {
@@ -607,6 +724,12 @@ include '../navbar/navbar.php';
                         text: 'Failed to load bracket. Please try again.'
                     });
                 });
+
+            // Smooth scroll to bracket container
+            $('html, body').animate({
+                scrollTop: $('#bracket-container').offset().top - 100 // Adjust offset as needed
+            }, 500);
+
         }
 
 
@@ -990,6 +1113,12 @@ include '../navbar/navbar.php';
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="../archive/js/archive.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+
 </body>
 
 </html>

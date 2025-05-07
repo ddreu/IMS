@@ -789,7 +789,7 @@ $stream_details = getStreamDetails($_GET['schedule_id'] ?? 0);
                 initializeStream();
             <?php endif; ?>
             updateScores();
-            scoreUpdateInterval = setInterval(updateScores, 5000);
+            scoreUpdateInterval = setInterval(updateScores, 1000);
         });
 
         // Clean up when the page is unloaded

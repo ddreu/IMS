@@ -15,7 +15,7 @@ $school_id = intval($school_id);
 $department_id = isset($_GET['department_id']) ? intval($_GET['department_id']) : null;
 $year = isset($_GET['year']) ? trim($_GET['year']) : null;
 $game_id = isset($_GET['game_id']) ? intval($_GET['game_id']) : null;
-$course_id = isset($_GET['course_id']) ? trim($_GET['course_id']) : null;
+// $course_id = isset($_GET['course_id']) ? trim($_GET['course_id']) : null;
 
 // Pagination
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
@@ -34,7 +34,7 @@ if ($department_id) {
 }
 
 if ($year) {
-    $conditions[] = "YEAR(a.created_at) = ?";
+    $conditions[] = "YEAR(a.archived_at) = ?";
     $params[] = $year;
     $param_types .= "s";
 }
@@ -45,11 +45,11 @@ if ($game_id) {
     $param_types .= "i";
 }
 
-if ($course_id) {
-    $conditions[] = "a.course_id = ?";
-    $params[] = $course_id;
-    $param_types .= "s";
-}
+// if ($course_id) {
+//     $conditions[] = "a.course_id = ?";
+//     $params[] = $course_id;
+//     $param_types .= "s";
+// }
 
 // Archive condition
 $conditions[] = "(a.is_archived = 1 OR d.is_archived = 1)";
@@ -88,7 +88,7 @@ $result = $stmt->get_result();
 
 <!-- Table -->
 <div class="table-responsive">
-    <table class="table table-hover align-middle mb-0">
+    <table id="announcementsTable" class="table table-hover align-middle mb-0">
         <thead class="bg-light">
             <tr>
                 <th class="px-4 py-3">Title</th>

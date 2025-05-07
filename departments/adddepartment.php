@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // Check for duplicate entry in College
-        $checkDuplicateStmt = $conn->prepare("SELECT 1 FROM grade_section_course WHERE course_name = ? AND department_id = ? LIMIT 1");
+        $checkDuplicateStmt = $conn->prepare("SELECT 1 FROM grade_section_course WHERE course_name = ? AND department_id = ? AND is_archived = 0 LIMIT 1");
         $checkDuplicateStmt->bind_param("si", $course_name, $department_id);
         $checkDuplicateStmt->execute();
         $checkDuplicateStmt->store_result();
@@ -86,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               AND gsc.section_name = ? 
               AND gsc.department_id = ? 
               AND (gsc.strand = ? OR gsc.strand IS NULL)
+              AND gsc.is_archived = 0
         ");
         $checkDuplicateStmt->bind_param("ssis", $grade_level, $section_name, $department_id, $strand);
         $checkDuplicateStmt->execute();

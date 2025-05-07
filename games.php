@@ -206,7 +206,7 @@ $school_id = isset($_GET['school_id']) ? intval($_GET['school_id']) : 0;
 
             <?php
             // Fetch games from the database, excluding game_id = 0
-            $query = "SELECT game_name FROM games WHERE game_id != 0 AND school_id = $school_id ORDER BY game_name ASC";
+            $query = "SELECT game_name FROM games WHERE game_id != 0 AND school_id = $school_id AND is_archived = 0 ORDER BY game_name ASC";
             $result = mysqli_query($conn, $query);
 
             // Function to get appropriate icon for a sport

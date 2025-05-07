@@ -10,7 +10,8 @@ $query = "SELECT DISTINCT s.*,
                  d.department_name,
                  d.id as department_id,
                  d.school_id,
-                 gsc.grade_level
+                 gsc.grade_level,
+                 g.is_archived
           FROM schedules s
           JOIN matches m ON s.match_id = m.match_id
           JOIN teams ta ON m.teamA_id = ta.team_id
@@ -20,7 +21,7 @@ $query = "SELECT DISTINCT s.*,
           JOIN grade_section_course gsc ON (ta.grade_section_course_id = gsc.id 
                                       OR tb.grade_section_course_id = gsc.id)
           JOIN departments d ON gsc.department_id = d.id
-          WHERE s.schedule_date >= CURDATE()";
+          WHERE s.schedule_date >= CURDATE() AND g.is_archived = 0";
 
 // Build conditions based on URL parameters
 $conditions = [];
@@ -61,7 +62,7 @@ $result = $conn->query($query);
     <link href="home.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-      
+
     </style>
 </head>
 

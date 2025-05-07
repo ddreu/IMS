@@ -8,7 +8,6 @@ class BracketManager {
     this.gradeLevel = options.gradeLevel;
     this.bracketData = null;
   }
-
   async fetchTeams() {
     try {
       console.log("Fetching teams with params:", {
@@ -30,13 +29,25 @@ class BracketManager {
       console.log("Fetch teams response:", response);
 
       if (response.success) {
-        if (!response.teams || !response.teams.length) {
-          throw new Error("No teams found for the selected criteria");
+        // If we have teams with valid average heights, use them for seeding
+        if (
+          response.valid_teams_with_height &&
+          response.valid_teams_with_height.length > 0
+        ) {
+          // Sort teams by average height in descending order (highest first)
+          const sortedTeams = response.valid_teams_with_height.sort((a, b) => b.avg_height - a.avg_height);
+          console.log("Teams sorted by height:", sortedTeams);
+          this.teams = sortedTeams;
+        } else {
+          // If no teams with average heights, fallback to random seeding
+          console.log("Using random seeding due to missing or invalid height data.");
+          this.teams = this.shuffleTeams(response.teams);
         }
-        this.teams = this.shuffleTeams(response.teams);
         return this.teams;
       } else {
-        throw new Error(response.message || "Failed to fetch teams");
+        console.log("Using random seeding due to error or missing data.");
+        this.teams = this.shuffleTeams(response.teams);
+        return this.teams;
       }
     } catch (error) {
       console.error("Error fetching teams:", error);
@@ -121,24 +132,23 @@ class BracketManager {
     }
 
     // Function to get proper seeded position in the bracket
+    // This follows standard tournament seeding where highest seed faces lowest seed
     function getSeedPosition(seed, totalPositions) {
-      const rounds = Math.log2(totalPositions);
-      let position = 0;
-      let step = totalPositions;
-
-      for (let i = 0; i < rounds; i++) {
-        step = step / 2;
-        if (seed % 2) {
-          position += step;
-        }
-        seed = Math.ceil(seed / 2);
+      // For a power of 2 bracket size N, if seed=k, position = 2k-1
+      // For seeds above N/2, position = 2(N-k)+2
+      const N = totalPositions;
+      const k = seed;
+      
+      if (k <= N/2) {
+        return 2*k - 2;
+      } else {
+        return 2*(N-k) + 1;
       }
-      return position;
     }
 
     // Place teams in their seeded positions
     teams.forEach((team, index) => {
-      const seedNumber = index + 1;
+      const seedNumber = index + 1; // Seed number is 1-based
       const position = getSeedPosition(seedNumber, totalSlots);
       seededPositions[position] = team;
     });
@@ -157,9 +167,7 @@ class BracketManager {
         next_match_number: Math.floor(currentMatchNumber / 2) + totalSlots / 2,
         teamA_id: teamA ? teamA.team_id : -1, // -1 for BYE
         teamB_id: teamB ? teamB.team_id : -1,
-        // match_type: "regular",
         match_type: teams.length === 4 ? "semifinal" : "regular",
-
         status: !teamA || !teamB ? "Finished" : "Pending",
       });
       currentMatchNumber++;

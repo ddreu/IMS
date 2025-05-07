@@ -159,11 +159,70 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="../loginstyle.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <title>Login</title>
+    <style>
+        .navbar-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 20px;
+            /* Add some margin to the left */
+            right: 20px;
+            /* Add some margin to the right */
+            bottom: 20px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            z-index: 10;
+            border-radius: 20px;
+            /* Add border radius for rounded corners */
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            /* Stronger shadow */
+            /* Add a soft shadow for floating effect */
+        }
+
+        .navbar-bottom .nav-link {
+            text-align: center;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .navbar-bottom .nav-link i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+
+        .navbar-bottom .nav-item {
+            flex: 1;
+        }
+
+        @media (max-width: 800px) and (min-width: 400px) {
+            .navbar-nav {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                width: 100vw;
+            }
+
+            .nav-item {
+                text-align: center;
+            }
+        }
+
+        .navbar-bottom .nav-link.active {
+            color: rgb(180, 34, 8);
+        }
+
+        .navbar-bottom .nav-link:hover {
+            color: #007bff;
+        }
+    </style>
 </head>
 
 <body>
@@ -252,7 +311,27 @@ $urlParams = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
       c35.29-11.799,62.965-24.643,80.103-33.42C371.438,218.101,366.516,244.771,355.648,269.22z" />
         </svg>
     </div>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-bottom navbar-bottom">
+        <div class="container-fluid">
+            <ul class="navbar-nav d-flex justify-content-between w-100">
+                <!-- Live Scores Link -->
+                <li class="nav-item">
+                    <a class="nav-link" href="pages/livescores.php">
+                        <i class="fas fa-basketball-ball"></i>
+                        <br>Live Scores
+                    </a>
+                </li>
 
+                <!-- Login Link -->
+                <li class="nav-item">
+                    <a class="nav-link active" href="login.php">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <br>Login
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
     <script>
         const togglePassword = document.getElementById('togglePassword');

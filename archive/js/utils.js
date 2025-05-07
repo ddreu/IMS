@@ -1,12 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
   const schoolDropdown = document.getElementById("school");
+
   const tableDropdown = document.getElementById("table");
   const archiveYearDropdown = document.getElementById("archive_year");
   const departmentDropdown = document.getElementById("department");
   const courseDropdown = document.getElementById("course");
   const gameDropdown = document.getElementById("game");
   const searchInput = document.getElementById("search");
-  const contentContainer = document.getElementById("archiveTableContent");
+  // const contentContainer = document.getElementById("archiveTableContent");
+  const selectedYear = new URLSearchParams(window.location.search).get("year");
+
+  const isSuperadmin = window.userRole === "superadmin";
+
+  // If not superadmin, auto-load using their school_id
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlSchoolId = urlParams.get("school_id");
+
+  if (isSuperadmin) {
+    // If a school_id is in the URL, apply it to the dropdown
+    if (schoolDropdown && urlSchoolId) {
+      schoolDropdown.value = urlSchoolId;
+      loadDependentDropdowns();
+    }
+  } else {
+    // For regular users, use their assigned school
+    if (schoolDropdown && window.userSchoolId) {
+      schoolDropdown.value = window.userSchoolId;
+      loadDependentDropdowns();
+    }
+  }
 
   function updateURL(param, value) {
     const url = new URL(window.location.href);
@@ -93,7 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function loadDepartment() {
-    fetch(`dropdown/fetch_departments.php?school_id=${schoolDropdown.value}`)
+    fetch(
+      `dropdown/fetch_departments.php?school_id=${schoolDropdown.value}&year=${selectedYear}`
+    )
       .then((res) => res.text())
       .then((data) => {
         departmentDropdown.innerHTML = data;
@@ -112,10 +136,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function loadGames() {
-    fetch(`dropdown/fetch_games.php?school_id=${schoolDropdown.value}`)
+    fetch(
+      `dropdown/fetch_games.php?school_id=${schoolDropdown.value}&year=${selectedYear}`
+    )
       .then((res) => res.text())
       .then((data) => {
-        gameDropdown.innerHTML = data;
+        // Start with "Select Game"
+        gameDropdown.innerHTML = '<option value="">Select Game</option>';
+
+        // Append the "All" option
+        const allOption = document.createElement("option");
+        allOption.value = "__all__";
+        allOption.textContent = "All";
+        gameDropdown.appendChild(allOption);
+
+        // Append the rest of the game options
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = data;
+
+        Array.from(tempDiv.children).forEach((opt) => {
+          gameDropdown.appendChild(opt);
+        });
+
         gameDropdown.disabled = false;
         gameDropdown.value = "";
       })
@@ -142,12 +184,19 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.error) throw new Error(data.error);
 
         courseDropdown.innerHTML = '<option value="">Select Grade</option>';
+
+        const allOption = document.createElement("option");
+        allOption.value = "__all__";
+        allOption.textContent = "All";
+        courseDropdown.appendChild(allOption); // <-- append after default
+
         data.forEach((grade) => {
           const option = document.createElement("option");
           option.value = grade;
           option.textContent = grade;
           courseDropdown.appendChild(option);
         });
+
         courseDropdown.disabled = false;
       })
       .catch((err) => {
@@ -211,13 +260,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // loadArchivePage();
     window.location.reload();
   });
+  if (isSuperadmin) {
+    schoolDropdown.addEventListener("change", () => {
+      resetURLParams();
+      updateURL("school_id", schoolDropdown.value);
+      loadDependentDropdowns();
+      document.getElementById(
+        "archiveTableContent"
+      ).innerHTML = `<p class="text-muted">Select a table and year to view content.</p>`;
+    });
+  }
 
-  schoolDropdown.addEventListener("change", () => {
-    resetURLParams();
-    updateURL("school_id", schoolDropdown.value);
-    loadDependentDropdowns();
-    contentContainer.innerHTML = `<p class="text-muted">Select a table and year to view content.</p>`;
-  });
+  // schoolDropdown.addEventListener("change", () => {
+  //   resetURLParams();
+  //   updateURL("school_id", schoolDropdown.value);
+  //   loadDependentDropdowns();
+  //   contentContainer.innerHTML = `<p class="text-muted">Select a table and year to view content.</p>`;
+  // });
 
   archiveYearDropdown.addEventListener("change", () => {
     updateURL("year", archiveYearDropdown.value);
@@ -234,20 +293,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
   departmentDropdown.addEventListener("change", () => {
     updateURL("department_id", departmentDropdown.value);
-    handleGradeLevel(); // Still call it to fetch grade dropdown before reload
+    updateURL("course_id", ""); // 🔥 Remove grade level when department changes
+    handleGradeLevel(); // Refresh grade options
     setTimeout(() => {
-      window.location.reload();
-    }, 100); // Small delay to let fetch work before reload
+      window.location.reload(); // Reload with updated URL
+    }, 100);
   });
 
+  // courseDropdown.addEventListener("change", () => {
+  //   updateURL("course_id", courseDropdown.value);
+  //   // filterTable();
+  //   window.location.reload();
+  // });
   courseDropdown.addEventListener("change", () => {
-    updateURL("course_id", courseDropdown.value);
-    filterTable();
+    if (courseDropdown.value === "__all__") {
+      updateURL("course_id", ""); // Remove from URL
+    } else {
+      updateURL("course_id", courseDropdown.value);
+    }
+    window.location.reload();
   });
 
+  // gameDropdown.addEventListener("change", () => {
+  //   updateURL("game_id", gameDropdown.value);
+  //   // filterTable();
+  //   window.location.reload();
+  // });
   gameDropdown.addEventListener("change", () => {
-    updateURL("game_id", gameDropdown.value);
-    filterTable();
+    if (gameDropdown.value === "__all__") {
+      updateURL("game_id", ""); // Remove from URL
+    } else {
+      updateURL("game_id", gameDropdown.value);
+    }
+    window.location.reload();
   });
 
   searchInput.addEventListener("input", filterTable);
@@ -305,6 +383,41 @@ document.addEventListener("click", function (event) {
     showTeams(gradeSectionCourseId);
   }
 });
+
+function viewPlayers(teamId) {
+  const url = new URL(window.location.href);
+
+  // Set the correct table and team_id
+  url.searchParams.set("table", "players");
+  url.searchParams.set("team_id", teamId);
+
+  // Optional: remove unrelated params
+  // url.searchParams.delete("grade_section_course_id");
+
+  // Redirect to the correct page
+  window.location.href = url.toString();
+}
+
+function viewMatchSummary(matchId) {
+  const modal = document.getElementById("matchSummaryModal");
+  const modalBody = modal.querySelector(".modal-body");
+
+  modalBody.innerHTML = `<div class="text-center py-4">Loading...</div>`;
+
+  fetch(`archive-pages/match_summary.php?match_id=${matchId}&ajax=1`)
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch match summary");
+      return res.text();
+    })
+    .then((html) => {
+      modalBody.innerHTML = html;
+      const bsModal = new bootstrap.Modal(modal);
+      bsModal.show();
+    })
+    .catch((err) => {
+      modalBody.innerHTML = `<div class="text-danger text-center py-4">Error: ${err.message}</div>`;
+    });
+}
 
 document.addEventListener("click", function (event) {
   if (event.target.classList.contains("archive-btn")) {

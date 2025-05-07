@@ -77,7 +77,7 @@ while ($row = $result->fetch_assoc()) {
 
 // Fetch departments for sidebar filtering if the user is a School Admin
 if ($role === 'School Admin') {
-    $sql = "SELECT id, department_name FROM departments WHERE school_id = ?";
+    $sql = "SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0";
     $stmt = $conn->prepare($sql);
     if ($stmt === false) {
         die('Prepare failed: ' . $conn->error);
@@ -97,8 +97,8 @@ if ($role === 'School Admin') {
 include '../navbar/navbar.php';
 
 // Clean up
-$stmt->close();
-$conn->close();
+// $stmt->close();
+// $conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -113,6 +113,11 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <link rel="stylesheet" href="../styles/dashboard.css">
     <style>
         .section-header {
@@ -364,7 +369,11 @@ $conn->close();
     <div class="wrapper">
         <?php
         $current_page = 'departments';
-        include '../department_admin/sidebar.php';
+        if ($_SESSION['role'] == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';  // Sidebar for superadmin
+        } else {
+            include '../department_admin/sidebar.php';  // Sidebar for other roles
+        };
         ?>
 
         <div id="content">
@@ -379,6 +388,18 @@ $conn->close();
             </div>
 
             <div class="container mt-4">
+                <?php if (empty($sections_by_department)): ?>
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h5>No Data Available</h5>
+                        <p>No sections or courses have been added yet.</p>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($sections_by_department as $department_name => $grades): ?>
+                        <!-- your existing rendering logic -->
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
                 <?php foreach ($sections_by_department as $department_name => $grades): ?>
                     <div class="card">
                         <div class="card-header">
@@ -389,7 +410,9 @@ $conn->close();
                                 <div class="mt-3">
                                     <h5><?php echo htmlspecialchars($department_name === 'College' ? $grade_level : $grade_level); ?></h5>
                                     <div class="table-responsive">
-                                        <table class="table table-striped table-bordered">
+                                        <!-- <table class="table table-striped table-bordered"> -->
+                                        <table class="table table-striped table-bordered datatable">
+
                                             <thead class="table-light">
                                                 <tr>
                                                     <?php if ($department_name === 'SHS'): ?>
@@ -758,6 +781,14 @@ $conn->close();
                                 }
                             });
                         });
+                    });
+                });
+                document.querySelectorAll('.datatable').forEach(function(table) {
+                    new DataTable(table, {
+                        paging: true,
+                        searching: true,
+                        info: true,
+                        ordering: true
                     });
                 });
             </script>

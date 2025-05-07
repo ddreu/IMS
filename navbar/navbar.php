@@ -301,7 +301,25 @@
 
 
         <!-- User's Department Dropdown -->
-        <?php if ($_SESSION['role'] === 'Committee'): ?>
+        <!-- <?php if ($_SESSION['role'] === 'Committee'): ?>
+            <div class="dropdown me-3">
+                <a class="text-secondary me-3 dropdown-toggle" id="navbarDepartmentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <?= $_SESSION['department_name'] ?? 'Departments' ?>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" id="departmentsDropdown" aria-labelledby="navbarDepartmentDropdown">
+                    <li class="dropdown-item text-center text-muted">Loading...</li>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <button id="changeDepartmentBtn" style="display: none;"></button> -->
+        <!-- User's Department Dropdown -->
+        <?php if (
+            ($_SESSION['role'] === 'Committee') ||
+            ($_SESSION['role'] === 'School Admin' && isset($_SESSION['school_id']) && isset($_SESSION['game_id'])) ||
+            ($_SESSION['role'] === 'superadmin' && isset($_SESSION['school_id']) && isset($_SESSION['game_id']))
+        ): ?>
             <div class="dropdown me-3">
                 <a class="text-secondary me-3 dropdown-toggle" id="navbarDepartmentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <?= $_SESSION['department_name'] ?? 'Departments' ?>

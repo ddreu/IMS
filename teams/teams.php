@@ -89,6 +89,13 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teams for <?= htmlspecialchars($game_name) ?> - <?= htmlspecialchars($department_name) ?></title>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
@@ -259,8 +266,8 @@ $conn->close();
         $current_page = 'teams';
         if ($role == 'Committee') {
             include '../committee/csidebar.php';
-        } else if ($role == 'superdmin') {
-            include '../superadmin/sa_sidebar.php';
+        } else if ($role == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';
         } else {
             include '../department_admin/sidebar.php';
         }
@@ -306,7 +313,9 @@ $conn->close();
                         <div class="card shadow mt-3">
                             <div class="card-body p-3 p-md-4">
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-hover">
+                                    <table class="table table-striped table-hover datatable" id="table_grade_<?= md5($grade_level) ?>">
+
+                                        <!-- <table class="table table-striped table-hover"> -->
                                         <thead>
                                             <tr>
                                                 <?php if ($department_name === 'College'): ?>
@@ -530,6 +539,23 @@ $conn->close();
                             showConfirmButton: true
                         });
                     });
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize all tables with the class 'datatable'
+            $('.datatable').DataTable({
+                responsive: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: false,
+                language: {
+                    emptyTable: "No teams found",
+                    paginate: {
+                        previous: "&laquo;",
+                        next: "&raquo;"
+                    }
+                }
             });
         });
     </script>

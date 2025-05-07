@@ -63,6 +63,7 @@ $announcements_query = "SELECT a.*, d.department_name
                        LEFT JOIN departments d ON a.department_id = d.id 
                        WHERE a.school_id = ?
                        AND d.is_archived = 0
+                       AND a.is_archived = 0
                        ORDER BY a.id DESC";
 $stmt_announcements = mysqli_prepare($conn, $announcements_query);
 

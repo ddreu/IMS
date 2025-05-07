@@ -5,18 +5,34 @@ $conn = con();
 
 $school_id = $_SESSION['school_id'];
 
+// $stmt = $conn->prepare("
+//     SELECT id, 
+//     CASE 
+//         WHEN firstname IS NULL OR lastname IS NULL OR firstname = '' OR lastname = ''
+//         THEN email
+//         ELSE CONCAT(firstname, ' ', middleinitial, ' ', lastname)
+//     END AS full_name
+//     FROM users
+//     WHERE school_id = ? AND is_archived = 0
+// ");
+
 $stmt = $conn->prepare("
-    SELECT id, 
-    CASE 
-        WHEN firstname IS NULL OR lastname IS NULL OR firstname = '' OR lastname = ''
-        THEN email
-        ELSE CONCAT(firstname, ' ', middleinitial, ' ', lastname)
-    END AS full_name
-    FROM users
-    WHERE school_id = ? AND is_archived = 0
+    SELECT 
+        u.id,
+        CASE 
+            WHEN u.firstname IS NULL OR u.lastname IS NULL OR u.firstname = '' OR u.lastname = ''
+            THEN u.email
+            ELSE CONCAT(u.firstname, ' ', u.middleinitial, ' ', u.lastname)
+        END AS full_name,
+        s.school_name
+    FROM users u
+    LEFT JOIN schools s ON u.school_id = s.school_id
+    WHERE u.is_archived = 0
 ");
 
-$stmt->bind_param("i", $school_id);
+
+
+// $stmt->bind_param("i", $school_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $users = [];

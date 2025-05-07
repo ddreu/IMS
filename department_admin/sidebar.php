@@ -13,7 +13,7 @@ $result = $stmt->get_result();
 $school = $result->fetch_assoc();
 $stmt->close();
 
-$stmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ?");
+$stmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0");
 $stmt->bind_param("i", $school_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -26,7 +26,7 @@ $showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['
 ?>
 <!-- Sidebar -->
 <nav id="sidebar" class="mt-0 mt-sm-2 mt-md-3 mt-lg-4 mt-xl-5 overflow-auto">
-    <div class="sidebar-header-logo text-center p-3 bg-light bg-gradient rounded-3 mx-2">
+    <div class="sidebar-header-logo text-center p-3 bg-light bg-gradient rounded-3 mx-2 mt-4">
         <!-- Logo section always visible -->
         <div class="d-flex justify-content-center align-items-center logo-container">
             <div class="position-relative logo-wrapper">
@@ -35,9 +35,9 @@ $showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['
                     class="img-fluid rounded-circle shadow-lg border border-2 border-primary p-2 logo-image"
                     style="max-width: 110px; height: auto; object-fit: contain;">
                 <div class="position-absolute bottom-0 start-50 translate-middle-x mb-n2 badge-container">
-                    <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
+                    <!-- <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
                         <i class="fas fa-school me-1"></i>School
-                    </span>
+                    </span> -->
                 </div>
             </div>
         </div>

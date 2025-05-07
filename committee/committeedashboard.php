@@ -637,8 +637,8 @@ include '../navbar/navbar.php';
         $current_page = 'committeedashboard';
         if ($role == 'Committee') {
             include 'csidebar.php';
-        } else if ($role == 'superdmin') {
-            include '../superadmin/sa_sidebar.php';
+        } else if ($role == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';
         } else {
             include '../department_admin/sidebar.php';
         }

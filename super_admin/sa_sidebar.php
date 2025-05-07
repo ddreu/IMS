@@ -39,6 +39,285 @@
                 </a>
             </li>
             <div class="menu-category">
+                <span>Support</span>
+            </div>
+            <li class="nav-item">
+                <a href="../admin-chat/messages.php" class="nav-link">
+                    <i class="fas fa-comments"></i><span>Messages</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../super_admin/active-users.php" class="nav-link <?php echo ($current_page == 'active_users') ? 'active' : ''; ?>">
+                    <i class="fas fa-user-check"></i><span>Active Users</span>
+                </a>
+            </li>
+            <div class="menu-category">
+                <span>Access</span>
+            </div>
+
+
+            <?php
+            $conn = con();
+            $query = "SELECT school_id, school_name FROM schools WHERE is_archived = 0 AND school_id != 0"; // Modify as necessary
+            $result = $conn->query($query);
+
+            // Initialize the options array
+            $options = "";
+            $selected_school_id = isset($_SESSION['school_id']) ? $_SESSION['school_id'] : null;
+
+            // Fetch and generate options for the dropdown
+            while ($row = $result->fetch_assoc()) {
+                $selected = ($row['school_id'] == $selected_school_id) ? 'selected' : ''; // Preselect if it matches session school_id
+                $options .= '<option value="' . $row['school_id'] . '" ' . $selected . '>' . $row['school_name'] . '</option>';
+            }
+            ?>
+
+            <li class="nav-item sidebar-filter-item">
+                <label for="schoolSelect" class="sidebar-filter-label">School</label>
+                <form method="GET" action="../super_admin/set_school.php"> <!-- Form to set school -->
+                    <select id="schoolSelect" class="sidebar-dropdown" name="school_id" onchange="this.form.submit();">
+                        <option value="">Select School</option>
+                        <?php echo $options; ?> <!-- Insert dynamic options here -->
+                    </select>
+                </form>
+            </li>
+
+            <!-- Sidebar -->
+
+            <?php
+            if (!empty($_SESSION['school_id'])) {
+                $school_id = $_SESSION['school_id'];
+
+                $stmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0");
+                $stmt->bind_param("i", $school_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $departments = $result->fetch_all(MYSQLI_ASSOC);
+                $stmt->close();
+
+                $showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['department_id'], $_SESSION['department_name']);
+            }
+            ?>
+            <!-- School Access Section with Collapsible -->
+            <?php if (!empty($_SESSION['school_id'])): ?>
+
+                <div class="menu-category school-access">
+                    <a href="#schoolAccessSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="nav-link dropdown-toggle">
+                        <span>School Access</span>
+                    </a>
+                </div>
+
+                <ul class="list-unstyled components collapse" id="schoolAccessSubmenu">
+                    <!-- School Dashboard -->
+                    <li class="nav-item">
+                        <a href="../school_admin/schooladmindashboard.php" class="nav-link <?php echo ($current_page == 'admindashboard') ? 'active' : ''; ?>">
+                            <i class="fas fa-th-large"></i><span>School Dashboard</span>
+                        </a>
+                    </li>
+
+                    <!-- Departments List (Dropdown) -->
+                    <li class="nav-item">
+                        <a href="#departmentsSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="nav-link dropdown-toggle <?php echo ($current_page == 'departments') ? 'active' : ''; ?>">
+                            <i class="fas fa-school"></i><span>School Departments</span>
+                        </a>
+                        <ul class="collapse list-unstyled" id="departmentsSubmenu">
+                            <?php foreach ($departments as $department) { ?>
+                                <li>
+                                    <a class="submenu-item <?php echo (isset($_GET['selected_department_id']) && $_GET['selected_department_id'] == $department['id']) ? 'active' : ''; ?>"
+                                        href="../departments/departments.php?selected_department_id=<?php echo $department['id']; ?>">
+                                        <i class="fas fa-building fa-fw"></i>
+                                        <span><?php echo htmlspecialchars($department['department_name']); ?></span>
+                                    </a>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </li>
+
+                    <!-- Leaderboards -->
+                    <!-- <li class="nav-item">
+                        <a href="../rankings/leaderboards.php" class="nav-link <?php echo ($current_page == 'leaderboards') ? 'active' : ''; ?>">
+                            <i class="fas fa-trophy"></i><span>School Leaderboards</span>
+                        </a>
+                    </li> -->
+
+                    <!-- Brackets -->
+                    <li class="nav-item">
+                        <a href="../brackets/admin_brackets.php" class="nav-link <?php echo ($current_page == 'Brackets') ? 'active' : ''; ?>">
+                            <i class="fas fa-sitemap"></i><span>Brackets</span>
+                        </a>
+                    </li>
+
+                    <!-- Schedules -->
+                    <li class="nav-item">
+                        <a href="../schedule/schedule.php" class="nav-link <?php echo ($current_page == 'schedule') ? 'active' : ''; ?>">
+                            <i class="fas fa-calendar"></i><span>Schedules</span>
+                        </a>
+                    </li>
+
+                    <!-- Match List (Dropdown) -->
+                    <li class="nav-item">
+                        <a href="#matchlistSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="nav-link dropdown-toggle <?php echo ($current_page == 'matchlist') ? 'active' : ''; ?>">
+                            <i class="fas fa-clipboard-list"></i><span>Match List</span>
+                        </a>
+                        <ul class="collapse list-unstyled" id="matchlistSubmenu">
+                            <?php foreach ($departments as $department) { ?>
+                                <li>
+                                    <a class="submenu-item <?php echo (isset($_GET['selected_department_id']) && $_GET['selected_department_id'] == $department['id']) ? 'active' : ''; ?>"
+                                        href="../livescoring/admin_match_list.php?selected_department_id=<?php echo $department['id']; ?>">
+                                        <i class="fas fa-building fa-fw"></i>
+                                        <span><?php echo htmlspecialchars($department['department_name']); ?></span>
+                                    </a>
+                                </li>
+                            <?php } ?>
+                        </ul>
+                    </li>
+                </ul>
+
+            <?php endif; ?>
+            <?php
+            // Fetching games based on selected school_id
+            $game_options = "";
+            $selected_game_id = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : null;
+            $school_id = isset($_SESSION['school_id']) ? $_SESSION['school_id'] : null;
+
+            // Fetch games for the selected school
+            if ($school_id) {
+                $game_query = "SELECT game_id, game_name FROM games WHERE school_id = ? AND is_archived = 0";
+                $game_stmt = $conn->prepare($game_query);
+                $game_stmt->bind_param("i", $school_id);
+                $game_stmt->execute();
+                $game_result = $game_stmt->get_result();
+
+                // Fetch and generate options for the dropdown
+                while ($rowGame = $game_result->fetch_assoc()) {
+                    $selected = ($rowGame['game_id'] == $selected_game_id) ? 'selected' : ''; // Preselect if it matches session game_id
+                    $game_options .= '<option value="' . $rowGame['game_id'] . '" ' . $selected . '>' . htmlspecialchars($rowGame['game_name']) . '</option>';
+                }
+            }
+            ?>
+
+            <!-- Game Dropdown -->
+            <li class="nav-item sidebar-filter-item">
+                <label for="gameSelect" class="sidebar-filter-label">Game</label>
+                <form method="GET" action="../super_admin/set_game.php"> <!-- Form to set game -->
+                    <select id="gameSelect" class="sidebar-dropdown" name="game_id" onchange="this.form.submit();">
+                        <option value="">Select Game</option>
+                        <?php echo $game_options; ?> <!-- Insert dynamic options here -->
+                    </select>
+                </form>
+            </li>
+
+            <?php
+            // Game Access Section with Collapsible
+            if (isset($_SESSION['game_id']) && !empty($_SESSION['game_id'])):
+            ?>
+
+                <!-- Game Access Section -->
+                <div class="menu-category game-access">
+                    <a href="#gameAccessSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="nav-link dropdown-toggle">
+                        <span>Game Access</span>
+                    </a>
+                </div>
+
+                <ul class="list-unstyled components collapse" id="gameAccessSubmenu">
+                    <!-- Dashboard -->
+                    <li class="nav-item">
+                        <a href="../committee/committeedashboard.php" class="nav-link <?php echo ($current_page == 'dashboard') ? 'active' : ''; ?>">
+                            <i class="fas fa-th-large"></i><span>Game Dashboard</span>
+                        </a>
+                    </li>
+
+                    <!-- Teams -->
+                    <li class="nav-item">
+                        <a href="../teams/teams.php" class="nav-link <?php echo ($current_page == 'teams') ? 'active' : ''; ?>">
+                            <i class="fas fa-users"></i><span>Teams</span>
+                        </a>
+                    </li>
+
+                    <!-- Scoring Rules -->
+                    <li class="nav-item">
+                        <a href="../scoring_rules/scoring_rules_form.php" class="nav-link <?php echo ($current_page == 'scoring_rules') ? 'active' : ''; ?>">
+                            <i class="fas fa-book-open"></i><span>Scoring Rules</span>
+                        </a>
+                    </li>
+
+                    <!-- Brackets -->
+                    <li class="nav-item">
+                        <a href="../brackets/brackets.php" class="nav-link <?php echo ($current_page == 'brackets') ? 'active' : ''; ?>">
+                            <i class="fas fa-play-circle"></i><span>Brackets</span>
+                        </a>
+                    </li>
+
+                    <!-- Schedules -->
+                    <li class="nav-item">
+                        <a href="../schedule/schedule.php" class="nav-link <?php echo ($current_page == 'schedule') ? 'active' : ''; ?>">
+                            <i class="fas fa-calendar"></i><span>Schedules</span>
+                        </a>
+                    </li>
+
+                    <!-- Match List -->
+                    <li class="nav-item">
+                        <a href="../livescoring/match_list.php" class="nav-link <?php echo ($current_page == 'match_list') ? 'active' : ''; ?>">
+                            <i class="fas fa-air-freshener"></i><span>Match</span>
+                        </a>
+                    </li>
+
+                    <!-- Rankings -->
+                    <!-- <li class="nav-item">
+                        <a href="../rankings/leaderboards.php" class="nav-link <?php echo ($current_page == 'rankings') ? 'active' : ''; ?>">
+                            <i class="fas fa-chart-bar"></i><span>Rankings</span>
+                        </a>
+                    </li> -->
+
+                    <!-- User Logs -->
+                    <!-- <li class="nav-item">
+                        <a href="../user_logs/user_logs.php" class="nav-link <?php echo ($current_page == 'user_logs') ? 'active' : ''; ?>">
+                            <i class="fas fa-clock"></i><span>User Logs</span>
+                        </a>
+                    </li> -->
+                </ul>
+
+            <?php
+            endif; // End of if checking if game_id exists in the session
+            ?>
+
+
+
+
+            <!--  <label for="roleSelect" class="sidebar-filter-label">Role</label>
+                <select id="roleSelect" class="sidebar-dropdown" disabled>
+                    <option value="">Select Role</option>
+                </select>
+            </li> -->
+            <!-- <li class="nav-item">
+                <a href="../schools/schools.php" class="nav-link <?php echo ($current_page == 'schools') ? 'active' : ''; ?>">
+                    <i class="fas fa-school"></i><span>School Leaderboards</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../users/admin_userlist.php" class="nav-link">
+                    <i class="fas fa-users"></i><span>Matches</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../announcements/sa_announcement.php" class="nav-link">
+                    <i class="fas fa-play-circle"></i><span>Ongoing Matches</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../user_logs/admin_user_logs.php" class="nav-link">
+                    <i class="fas fa-award"></i><span>School Points</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="../archive/archives.php" class="nav-link">
+                    <i class="fas fa-trophy"></i><span>Brackets</span>
+                </a>
+            </li>
+ -->
+
+
+            <div class="menu-category">
                 <span>Management</span>
             </div>
             <li class="nav-item">
@@ -46,6 +325,12 @@
                     <i class="fas fa-school"></i><span>Schools</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="../archive/archives.php" class="nav-link">
+                    <i class="fas fa-gamepad"></i><span>Games</span>
+                </a>
+            </li>
+
             <li class="nav-item">
                 <a href="../users/admin_userlist.php" class="nav-link">
                     <i class="fas fa-user-friends"></i><span>Users</span>
@@ -66,19 +351,12 @@
                     <i class="fas fa-archive"></i><span>Archives</span>
                 </a>
             </li>
-            <div class="menu-category">
-                <span>Support</span>
-            </div>
             <li class="nav-item">
-                <a href="../admin-chat/messages.php" class="nav-link">
-                    <i class="fas fa-comments"></i><span>Messages</span>
+                <a href="../archive/archives.php" class="nav-link">
+                    <i class="fas fa-trophy"></i><span>Leaderbooards</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="../super_admin/active-users.php" class="nav-link <?php echo ($current_page == 'active_users') ? 'active' : ''; ?>">
-                    <i class="fas fa-user-check"></i><span>Active Users</span>
-                </a>
-            </li>
+
         </ul>
     </nav>
 
@@ -94,9 +372,4 @@
             <i class="fas fa-power-off"></i><span>Logout</span>
         </a>
     </div> -->
-    <!-- <div class="sidebar-footer">
-        <span class="footer-text">&copy; 2025 IMS</span>
-    </div> -->
-
-
 </div>

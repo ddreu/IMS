@@ -323,7 +323,7 @@ include 'navbarhome.php';
                     $query_filtered = "SELECT a.id, a.title, a.message, a.image, a.created_at, d.department_name 
                                    FROM announcement a 
                                    LEFT JOIN departments d ON a.department_id = d.id 
-                                   WHERE 1=1"; // Start with the general query
+                                   WHERE 1=1 AND a.is_archived = 0"; // Start with the general query
 
                     // Apply filters if department_id or school_id is provided
                     if ($department_id > 0) {
@@ -526,7 +526,8 @@ include 'navbarhome.php';
 
                             // Build the query dynamically based on the parameters
                             $query = "
-                        SELECT DISTINCT 
+                        SELECT DISTINCT
+                        g.is_archived, 
                             g.game_name,
                             m.match_type,
                             tA.team_name as teamA_name,
@@ -540,7 +541,7 @@ include 'navbarhome.php';
                         JOIN games g ON b.game_id = g.game_id
                         JOIN teams tA ON m.teamA_id = tA.team_id
                         JOIN teams tB ON m.teamB_id = tB.team_id
-                        WHERE s.schedule_date >= CURDATE()
+                        WHERE s.schedule_date >= CURDATE() AND g.is_archived = 0
                         ";
 
                             // Add conditions for `department_id` and `grade_level` if they are set
@@ -677,7 +678,8 @@ include 'navbarhome.php';
                                 gscB.grade_level AS teamB_grade_level,
                                 dA.department_name AS teamA_department,
                                 dB.department_name AS teamB_department,
-                                g.game_name
+                                g.game_name,
+                                g.is_archived
                             FROM 
                                 match_results mr
                             JOIN 
@@ -701,6 +703,7 @@ include 'navbarhome.php';
                             WHERE 
                                 dA.school_id = ? 
                                 AND dB.school_id = ?
+                                AND g.is_archived = 0
                         ";
 
                             // Initialize parameters array

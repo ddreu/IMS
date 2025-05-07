@@ -96,7 +96,7 @@
                                 <option value="">Select Department</option>
                                 <?php
                                 // Fetch departments based on user's role and school_id
-                                $query = "SELECT id, department_name FROM departments WHERE school_id = ?";
+                                $query = "SELECT id, department_name, is_archived FROM departments WHERE school_id = ? AND is_archived = 0";
                                 $stmt = mysqli_prepare($conn, $query);
                                 mysqli_stmt_bind_param($stmt, "i", $school_id);
                                 mysqli_stmt_execute($stmt);
@@ -105,10 +105,10 @@
                                 if ($result) {
                                     if ($role === 'Department Admin') {
                                         // Department Admin can only add users to their own department
-                                        $dept_query = "SELECT d.id, d.department_name 
+                                        $dept_query = "SELECT d.id, d.department_name, d.is_archived 
                                                      FROM departments d 
                                                      JOIN users u ON d.id = u.department 
-                                                     WHERE u.id = ? AND d.school_id = ?";
+                                                     WHERE u.id = ? AND d.school_id = ? AND d.is_archived = 0";
                                         $dept_stmt = mysqli_prepare($conn, $dept_query);
                                         mysqli_stmt_bind_param($dept_stmt, "ii", $user_id, $school_id);
                                         mysqli_stmt_execute($dept_stmt);

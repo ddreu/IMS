@@ -20,38 +20,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->begin_transaction();
 
         // Reset Points in grade_section_course filtered by school_id
+        // $stmt1 = $conn->prepare(
+        //     "UPDATE grade_section_course gsc
+        //      JOIN departments d ON gsc.department_id = d.id
+        //      JOIN schools s ON d.school_id = s.school_id
+        //      SET gsc.Points = 0
+        //      WHERE s.school_id = ?"
+        // );
         $stmt1 = $conn->prepare(
             "UPDATE grade_section_course gsc
-             JOIN departments d ON gsc.department_id = d.id
-             JOIN schools s ON d.school_id = s.school_id
-             SET gsc.Points = 0
-             WHERE s.school_id = ?"
+JOIN departments d ON gsc.department_id = d.id
+JOIN schools s ON d.school_id = s.school_id
+SET gsc.Points = 0
+WHERE s.school_id = ?
+  AND gsc.is_archived = 0
+  AND d.is_archived = 0
+"
         );
         if (!$stmt1->execute([$school_id])) {
             throw new Exception("Failed to reset grade section course points.");
         }
 
         // Reset wins and losses in teams filtered by school_id
+        // $stmt2 = $conn->prepare(
+        //     "UPDATE teams t
+        //      JOIN grade_section_course gsc ON t.grade_section_course_id = gsc.id
+        //      JOIN departments d ON gsc.department_id = d.id
+        //      JOIN schools s ON d.school_id = s.school_id
+        //      SET t.wins = 0, 
+        //          t.losses = 0
+        //      WHERE s.school_id = ?"
+        // );
         $stmt2 = $conn->prepare(
             "UPDATE teams t
-             JOIN grade_section_course gsc ON t.grade_section_course_id = gsc.id
-             JOIN departments d ON gsc.department_id = d.id
-             JOIN schools s ON d.school_id = s.school_id
-             SET t.wins = 0, 
-                 t.losses = 0
-             WHERE s.school_id = ?"
+JOIN grade_section_course gsc ON t.grade_section_course_id = gsc.id
+JOIN departments d ON gsc.department_id = d.id
+JOIN schools s ON d.school_id = s.school_id
+SET t.wins = 0,
+    t.losses = 0
+WHERE s.school_id = ?
+  AND t.is_archived = 0
+  AND gsc.is_archived = 0
+  AND d.is_archived = 0
+"
         );
         if (!$stmt2->execute([$school_id])) {
             throw new Exception("Failed to reset team statistics.");
         }
 
         // Delete brackets and associated data filtered by school_id
+        // $stmt3 = $conn->prepare(
+        //     "DELETE b
+        //      FROM brackets b
+        //      JOIN departments d ON b.department_id = d.id
+        //      JOIN schools s ON d.school_id = s.school_id
+        //      WHERE s.school_id = ?"
+        // );
         $stmt3 = $conn->prepare(
             "DELETE b
-             FROM brackets b
-             JOIN departments d ON b.department_id = d.id
-             JOIN schools s ON d.school_id = s.school_id
-             WHERE s.school_id = ?"
+FROM brackets b
+JOIN departments d ON b.department_id = d.id
+JOIN schools s ON d.school_id = s.school_id
+WHERE s.school_id = ?
+  AND b.is_archived = 0
+  AND d.is_archived = 0
+"
         );
         if (!$stmt3->execute([$school_id])) {
             throw new Exception("Failed to delete brackets and associated data.");

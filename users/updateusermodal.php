@@ -73,7 +73,7 @@
 
                                 <option value="">Select Department</option>
                                 <?php
-                                $query = "SELECT id, department_name FROM departments WHERE school_id = ?";
+                                $query = "SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0";
                                 $stmt = mysqli_prepare($conn, $query);
                                 mysqli_stmt_bind_param($stmt, "i", $school_id);
                                 mysqli_stmt_execute($stmt);

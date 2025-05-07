@@ -19,7 +19,8 @@ $query = "
         tA.team_name AS teamA_name,
         tB.team_name AS teamB_name,
         dA.department_name AS teamA_department,
-        dB.department_name AS teamB_department
+        dB.department_name AS teamB_department,
+        g.is_archived
     FROM 
         match_results mr
     JOIN 
@@ -44,7 +45,8 @@ $query = "
         games g ON b.game_id = g.game_id
     WHERE 
         mr.score_teamA IS NOT NULL 
-        AND mr.score_teamB IS NOT NULL";
+        AND mr.score_teamB IS NOT NULL
+        AND g.is_archived = 0";
 
 // Apply filters if provided
 if ($school_id) {
@@ -81,8 +83,8 @@ if (!$result) {
     <link href="home.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        
-        
+
+
     </style>
 </head>
 
@@ -98,7 +100,7 @@ if (!$result) {
     <div class="container pb-4">
         <div class="row">
             <?php if ($result->num_rows > 0): ?>
-                <?php while ($row = $result->fetch_assoc()): 
+                <?php while ($row = $result->fetch_assoc()):
                     $teamAWon = $row['score_teamA'] > $row['score_teamB'];
                     $teamBWon = $row['score_teamB'] > $row['score_teamA'];
                 ?>
@@ -148,7 +150,7 @@ if (!$result) {
                 </div>
             <?php endif; ?>
         </div>
-            </div>
+    </div>
     <div class="mt-5">
         <?php include 'footerhome.php'; ?>
     </div>

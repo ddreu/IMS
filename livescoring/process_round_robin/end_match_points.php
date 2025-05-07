@@ -295,7 +295,7 @@ class RoundRobinMatchProcessor
 
         $query = "SELECT first_place_points, second_place_points, third_place_points 
                   FROM pointing_system 
-                  WHERE school_id = ?";
+                  WHERE school_id = ? AND is_archived = 0";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param("i", $_SESSION['school_id']);
         $stmt->execute();

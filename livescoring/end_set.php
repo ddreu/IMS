@@ -380,7 +380,7 @@ try {
                 $pointing_query = "
                     SELECT ps.first_place_points, ps.second_place_points, ps.third_place_points
                     FROM pointing_system ps
-                    WHERE ps.school_id = ?";
+                    WHERE ps.school_id = ? AND ps.is_archived = 0";
                 $pointing_stmt = $conn->prepare($pointing_query);
                 $pointing_stmt->bind_param("i", $_SESSION['school_id']);
                 $pointing_stmt->execute();

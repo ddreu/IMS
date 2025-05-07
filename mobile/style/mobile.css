@@ -5,101 +5,101 @@
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
-    align-items: center;
-    background: linear-gradient(to right, white 50%, #130031 50%);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  align-items: center;
+  background: linear-gradient(to right, white 50%, #0b1223 50%);
 }
 
 .top-card {
-    background-color: rgb(255, 255, 255);
-    height: 45vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    z-index: 2;
-    border-radius: 0 0 100px 0;
+  background-color: rgb(255, 255, 255);
+  height: 60vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  border-radius: 0 0 100px 0;
 }
 
 .image-container {
-    margin-top: 230px;
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  margin-top: 230px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .top-card img {
-    width: 90%; /* Increased from 80% */
-    max-width: 350px; /* Slightly larger */
-    height: auto;
-    object-fit: contain;
-    position: relative;
-    z-index: 2;
-    transform: scale(1.1); /* Zoom in */
+  width: 90%; /* Increased from 80% */
+  max-width: 350px; /* Slightly larger */
+  height: auto;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  transform: scale(1.1); /* Zoom in */
 }
 
 /* Background Decorative Elements */
 .image-container::before {
-    content: "";
-    position: absolute;
-    top: -20px;
-    left: 9%;
-    width: 130px;
-    height: 130px;
-    background-color: #ff4b5c;
-    border-radius: 50%;
-    z-index: 1;
-    opacity: 0.8;
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: 9%;
+  width: 130px;
+  height: 130px;
+  background-color: #ff4b5c;
+  border-radius: 50%;
+  z-index: 1;
+  opacity: 0.8;
 }
 
 .image-container::after {
-    content: "";
-    position: absolute;
-    top: 10px;
-    right: 7%;
-    width: 90px;
-    height: 90px;
-    background-color: gold;
-    border-radius: 50%;
-    z-index: 1;
-    opacity: 0.7;
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 7%;
+  width: 90px;
+  height: 90px;
+  background-color: gold;
+  border-radius: 50%;
+  z-index: 1;
+  opacity: 0.7;
 }
 
 .image-container .decorative-circle {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background-color: #ffcd4b;
-    border-radius: 50%;
-    top: -50px;
-    right: 25%;
-    opacity: 0.9;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: #ffcd4b;
+  border-radius: 50%;
+  top: -50px;
+  right: 25%;
+  opacity: 0.9;
 }
 
 .image-container .decorative-triangle {
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-left: 30px solid transparent;
-    border-right: 30px solid transparent;
-    border-bottom: 50px solid #4b9cff;
-    top: 30px;
-    left: 20%;
-    opacity: 0.8;
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+  border-bottom: 50px solid #4b9cff;
+  top: 30px;
+  left: 20%;
+  opacity: 0.8;
 }
 
 /* .bottom-card {
     background-color: #130031;
     /* background-color: #0D1F23; */
-    /*height: 55vh;
+/*height: 55vh;
     width: 100vw;
     border-radius: 100px 0 0 0;
     display: flex;
@@ -108,20 +108,19 @@ body {
     justify-content: center;
 } */
 
-
 .bottom-card {
-    background-color: #130031;
-    height: 55vh;
-    width: 100vw;
-    border-radius: 80px 0 0 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    z-index: 2;
-    /* clip-path: ellipse(100% 100% at 50% -10%); */
+  background-color: #0b1223;
+  height: 45vh;
+  width: 100vw;
+  border-radius: 80px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  /* clip-path: ellipse(100% 100% at 50% -10%); */
 }
 
 /* .bottom-card::before {
@@ -136,54 +135,118 @@ body {
     z-index: -1; 
 } */
 
-
-
 .content {
-    display: flex;
-    flex-direction: column;
-    width: 70%;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    z-index: 2;
-    margin-top: -40px;
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+  margin-top: -40px;
 }
 
 .content h2 {
-    font-size: 2.5rem;
-    color: azure;
-    margin-bottom: 30px;
-    text-align: center;
+  font-size: 2.5rem;
+  color: azure;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .content p {
-    font-size: 1.3rem;
-    color: rgb(255, 255, 255);
-    margin-bottom: 30px;
-    text-align: center;
+  font-size: 1.3rem;
+  color: rgb(255, 255, 255);
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .login-cta {
-    display: inline-block;
-    padding: 25px 62px;
-    background: linear-gradient(135deg, #ff416c, #ff4b5c);
-    color: white;
-    font-size: 1.3zrem;
-    font-weight: bold;
-    text-align: center;
-    border: none;
-    border-radius: 30px;
-    box-shadow: 0 4px 10px rgba(255, 75, 92, 0.4);
-    text-decoration: none;
-    transition: all 0.3s ease-in-out;
+  display: inline-block;
+  padding: 25px 62px;
+  background: linear-gradient(135deg, #ff416c, #ff4b5c);
+  color: white;
+  font-size: 1.3zrem;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(255, 75, 92, 0.4);
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
 }
 
 .login-cta:hover {
-    background: linear-gradient(135deg, #ff4b5c, #ff416c);
-    box-shadow: 0 6px 15px rgba(255, 75, 92, 0.6);
-    transform: translateY(-2px);
+  background: linear-gradient(135deg, #ff4b5c, #ff416c);
+  box-shadow: 0 6px 15px rgba(255, 75, 92, 0.6);
+  transform: translateY(-2px);
 }
 
 .login-cta:active {
-    transform: scale(0.95);
+  transform: scale(0.95);
+}
+/* Base button styling for both buttons */
+.login-cta,
+.start-btn {
+  display: inline-block;
+  padding: 20px 60px; /* Equal padding for both buttons */
+  background: linear-gradient(
+    135deg,
+    #ff416c,
+    #ff4b5c
+  ); /* Gradient background */
+  color: white;
+  font-size: 1.3rem; /* Same font size for consistency */
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 30px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(255, 75, 92, 0.4); /* Soft shadow effect */
+  text-decoration: none; /* Remove default link underline */
+  transition: all 0.3s ease-in-out; /* Smooth transition for hover and active states */
+  cursor: pointer; /* Pointer cursor to indicate interactivity */
+  margin-top: 20px; /* Space between buttons and other elements */
+}
+
+/* Hover effect for both buttons */
+.login-cta:hover,
+.start-btn:hover {
+  background: linear-gradient(
+    135deg,
+    #ff4b5c,
+    #ff416c
+  ); /* Reverse gradient on hover */
+  box-shadow: 0 6px 15px rgba(255, 75, 92, 0.6); /* Increase shadow intensity on hover */
+  transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Active state for both buttons */
+.login-cta:active,
+.start-btn:active {
+  transform: scale(0.95); /* Slight shrink when clicked */
+}
+
+/* Outline style for start-btn */
+.start-btn {
+  background: transparent; /* Transparent background for outline effect */
+  color: #eaeaea; /* Set text color for outline */
+  border: 2px solid #ff416c; /* Outline border with the same color */
+}
+
+/* Hover effect for outline button */
+.start-btn:hover {
+  background: linear-gradient(
+    135deg,
+    #ff416c,
+    #ff4b5c
+  ); /* Gradient on hover for outline button */
+  color: white; /* Change text color to white on hover */
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 600px) {
+  .login-cta,
+  .start-btn {
+    padding: 18px 50px; /* Slightly smaller padding on smaller screens */
+    font-size: 1.1rem; /* Slightly smaller text */
+  }
 }

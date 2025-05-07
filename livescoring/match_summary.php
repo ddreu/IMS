@@ -211,7 +211,7 @@ $teamB_players = getPlayerStats($conn, $match['teamB_id'], $match_id);
 // Find the Player of the Game
 $all_players = array_merge($teamA_players, $teamB_players);
 $potg = null;
-$highest_score = -1;
+$highest_score = 0;
 
 foreach ($all_players as $player) {
     $player_score = calculatePlayerScore($player, $game_stats);
@@ -219,6 +219,10 @@ foreach ($all_players as $player) {
         $highest_score = $player_score;
         $potg = $player;
     }
+}
+
+if ($highest_score === 0) {
+    $potg = null;
 }
 
 // Get player's team name

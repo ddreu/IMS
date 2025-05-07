@@ -21,7 +21,7 @@ if (!$conn) {
     die("Database connection failed: " . mysqli_connect_error());
 }
 
-$query = "SELECT game_id, game_name FROM games WHERE school_id = ?";
+$query = "SELECT game_id, game_name FROM games WHERE school_id = ? AND is_archived = 0";
 $stmt = $conn->prepare($query);
 
 if ($stmt === false) {

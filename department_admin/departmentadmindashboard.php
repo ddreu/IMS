@@ -81,7 +81,7 @@ $items_result = mysqli_stmt_get_result($stmt);
 $total_items = mysqli_fetch_assoc($items_result)['count'];
 
 // Get total games for the school
-$games_query = "SELECT COUNT(*) as games_count FROM games WHERE school_id = ?";
+$games_query = "SELECT COUNT(*) as games_count FROM games WHERE school_id = ? AND is_archived = 0";
 $stmt = mysqli_prepare($conn, $games_query);
 mysqli_stmt_bind_param($stmt, "i", $school_id);
 mysqli_stmt_execute($stmt);

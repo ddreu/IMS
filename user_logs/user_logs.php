@@ -232,9 +232,13 @@ $conn = con();
                     <td data-label="User">
     <select class="form-select form-select-sm" onchange="updateLogUser(${log.log_id}, this.value)">
         ${usersList.map(user => `
-            <option value="${user.id}" ${log.user_id == user.id ? 'selected' : ''}>
+           <!-- <option value="${user.id}" ${log.user_id == user.id ? 'selected' : ''}>
                 ${user.full_name}
-            </option>
+            </option> -->
+            <option value="${user.id}" ${log.user_id == user.id ? 'selected' : ''}>
+        ${user.full_name} - ${user.school_name}
+    </option>
+            
         `).join('')}
     </select>
 </td>

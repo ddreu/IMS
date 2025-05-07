@@ -19,14 +19,14 @@ if (!isset($_GET['school_id'])) {
 
 $school_id = intval($_GET['school_id']);
 
-$query = "SELECT id, department_name FROM departments WHERE school_id = ? ORDER BY department_name";
+$query = "SELECT id, department_name, is_archived FROM departments WHERE school_id = ? AND is_archived = 0 ORDER BY department_name";
 $stmt = mysqli_prepare($conn, $query);
 
 if ($stmt) {
     mysqli_stmt_bind_param($stmt, "i", $school_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    
+
     $departments = [];
     while ($row = mysqli_fetch_assoc($result)) {
         $departments[] = [
@@ -34,7 +34,7 @@ if ($stmt) {
             'department_name' => $row['department_name']
         ];
     }
-    
+
     echo json_encode($departments);
     mysqli_stmt_close($stmt);
 } else {
@@ -43,4 +43,3 @@ if ($stmt) {
 }
 
 mysqli_close($conn);
-?>

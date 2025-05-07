@@ -34,7 +34,7 @@ try {
     $section_stmt->bind_param("i", $grade_section_course_id);
     $section_stmt->execute();
     $section_details = $section_stmt->get_result()->fetch_assoc();
-    
+
     // Fetch teams for this section
     $teams_sql = "
         SELECT t.team_id, t.team_name, gsc.section_name, gsc.grade_level, 
@@ -43,12 +43,11 @@ try {
         JOIN grade_section_course gsc ON t.grade_section_course_id = gsc.id
         WHERE t.grade_section_course_id = ?
         ORDER BY t.team_name";
-    
+
     $teams_stmt = $conn->prepare($teams_sql);
     $teams_stmt->bind_param("i", $grade_section_course_id);
     $teams_stmt->execute();
     $teams = $teams_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    
 } catch (Exception $e) {
     error_log("Error in adminteams.php: " . $e->getMessage());
 }
@@ -57,10 +56,20 @@ include '../navbar/navbar.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Teams</title>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <!-- jQuery (required) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -74,18 +83,18 @@ include '../navbar/navbar.php';
             align-items: center;
             justify-content: center;
         }
-        
+
         .card {
             border: none;
             transition: all 0.3s ease;
             border-radius: 10px;
         }
-        
+
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         }
-        
+
         .btn-sm {
             padding: 0.5rem 1.2rem;
             font-size: 0.9rem;
@@ -148,14 +157,14 @@ include '../navbar/navbar.php';
             }
         }
 
-        .table > :not(caption) > * > * {
+        .table> :not(caption)>*>* {
             padding: 0.5rem;
         }
-        
+
         .table-hover tbody tr:hover {
             background-color: rgba(0, 123, 255, 0.05);
         }
-        
+
         .badge {
             font-weight: 500;
             padding: 0.5em 1em;
@@ -208,58 +217,62 @@ include '../navbar/navbar.php';
             margin-right: 0.75rem;
             font-size: 0.875rem;
         }
-        
+
         .table {
             font-size: 0.875rem;
         }
-        
-        .table > :not(caption) > * > * {
+
+        .table> :not(caption)>*>* {
             padding: 0.5rem;
         }
-        
+
         .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.75rem;
         }
-        
+
         .table h6 {
             font-size: 0.875rem;
             margin: 0;
         }
-        
+
         .card-header {
             padding: 0.75rem;
         }
-        
+
         .card-body {
-            padding: 0.75rem;
+            /* padding: 0.75rem; */
+            padding: 35px;
+
         }
-        
+
         .table-responsive {
-            margin: -0.75rem;  /* Negative margin to counteract card-body padding */
+            margin: -0.75rem;
+            /* Negative margin to counteract card-body padding */
         }
-        
+
         .btn-sm i {
             font-size: 1.25rem;
         }
     </style>
 </head>
+
 <body>
     <div class="wrapper">
-        <?php 
+        <?php
         if ($role === 'Department Admin') {
             include '../department_admin/sidebar.php';
         } else {
             include '../department_admin/sidebar.php';
         }
         ?>
-        
+
         <div id="content">
-       <a href="../departments/departments.php" class="back-button">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
+            <a href="../departments/departments.php" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
             <div class="container-fluid">
-                
+
 
                 <div class="section-header">
                     <div class="department-badge">
@@ -286,7 +299,7 @@ include '../navbar/navbar.php';
                     </h2>
                 </div>
 
-                <div class="card shadow">
+                <div class="card shadow mb-5">
                     <div class="card-header bg-white py-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 text-primary">
@@ -297,7 +310,9 @@ include '../navbar/navbar.php';
                     <div class="card-body">
                         <?php if (!empty($teams)): ?>
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
+                                <!-- <table class="table table-hover align-middle mb-0"> -->
+                                <table id="teamsTable" class="table table-hover align-middle mb-0">
+
                                     <thead class="table-light">
                                         <tr>
                                             <th class="ps-3">Team Name</th>
@@ -316,12 +331,12 @@ include '../navbar/navbar.php';
                                                     </div>
                                                 </td>
                                                 <td class="text-end pe-3">
-                                                    <a href="../player/view_roster.php?team_id=<?= htmlspecialchars($team['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" 
-                                                       class="btn btn-outline-info btn-sm me-1">
+                                                    <a href="../player/view_roster.php?team_id=<?= htmlspecialchars($team['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>"
+                                                        class="btn btn-outline-info btn-sm me-1">
                                                         <i class="fas fa-users me-1"></i>Roster
                                                     </a>
-                                                    <a href="../player/player_registration.php?team_id=<?= htmlspecialchars($team['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>" 
-                                                       class="btn btn-outline-success btn-sm">
+                                                    <a href="../player/player_registration.php?team_id=<?= htmlspecialchars($team['team_id']) ?>&grade_section_course_id=<?= htmlspecialchars($grade_section_course_id) ?>"
+                                                        class="btn btn-outline-success btn-sm">
                                                         <i class="fas fa-user-plus me-1"></i>Register
                                                     </a>
                                                 </td>
@@ -344,6 +359,26 @@ include '../navbar/navbar.php';
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('#teamsTable').DataTable({
+                pageLength: 10,
+                responsive: true,
+                lengthChange: true,
+                ordering: true,
+                searching: true,
+                info: true,
+                language: {
+                    emptyTable: "No teams available",
+                    paginate: {
+                        previous: "&laquo;",
+                        next: "&raquo;"
+                    }
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>
 <?php $conn->close(); ?>

@@ -3,10 +3,12 @@ session_start();
 require_once '../connection/conn.php';
 $conn = con();
 $role = $_SESSION['role'];
+$school_id = $_SESSION['school_id'] ?? null;
 
 $allowedTables = ['announcements', 'games', 'teams', 'department-teams', 'players', 'brackets', 'matches', 'leaderboards'];
 $table = isset($_GET['table']) && in_array($_GET['table'], $allowedTables) ? $_GET['table'] : null;
-$year = isset($_GET['year']) ? $_GET['year'] : '';
+$year = $_GET['year'] ?? '';
+
 ?>
 
 <!DOCTYPE html>
@@ -57,17 +59,23 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
                 <div class="card-body">
                     <!-- School Dropdown inside a flex container -->
                     <div class="d-flex align-items-center">
-                        <label for="school" class="form-label mb-0 me-2">School:</label>
-                        <select class="form-select" id="school" name="school_id">
-                            <option value="">Select School</option>
-                            <?php
-                            $schools = $conn->query("SELECT school_id, school_name FROM schools WHERE school_id != 0");
-                            while ($row = $schools->fetch_assoc()) {
-                                $selected = (isset($_GET['school_id']) && $_GET['school_id'] == $row['school_id']) ? 'selected' : '';
-                                echo "<option value='{$row['school_id']}' $selected>{$row['school_name']}</option>";
-                            }
-                            ?>
-                        </select>
+                        <?php if ($role === 'superadmin'): ?>
+                            <!-- Show dropdown only for superadmin -->
+                            <label for="school" class="form-label mb-0 me-2">School:</label>
+                            <select class="form-select" id="school" name="school_id">
+                                <option value="">Select School</option>
+                                <?php
+                                $schools = $conn->query("SELECT school_id, school_name FROM schools WHERE school_id != 0");
+                                while ($row = $schools->fetch_assoc()) {
+                                    $selected = (isset($_GET['school_id']) && $_GET['school_id'] == $row['school_id']) ? 'selected' : '';
+                                    echo "<option value='{$row['school_id']}' $selected>{$row['school_name']}</option>";
+                                }
+                                ?>
+                            </select>
+                        <?php else: ?>
+                            <!-- Hidden input for School Admin and Committee -->
+                            <input type="hidden" id="school" name="school_id" value="<?= htmlspecialchars($school_id) ?>">
+                        <?php endif; ?>
 
                         <!-- Archive Year Dropdown -->
                         <label for="archive_year" class="form-label mb-0 ms-2 me-2">Year:</label>
@@ -91,10 +99,13 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
                         <select class="form-select" name="table" id="table">
                             <option value="">Select Table</option>
                             <?php foreach ($allowedTables as $option) : ?>
-                                <option value="<?= $option ?>" <?= $table === $option ? 'selected' : '' ?>>
-                                    <?= ucfirst($option) ?>
-                                </option>
+                                <?php if ($option !== 'department-teams' && $option !== 'players') : ?>
+                                    <option value="<?= $option ?>" <?= $table === $option ? 'selected' : '' ?>>
+                                        <?= ucfirst($option) ?>
+                                    </option>
+                                <?php endif; ?>
                             <?php endforeach; ?>
+
                         </select>
                     </div>
 
@@ -127,7 +138,7 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
         </div>
 
         <!-- New Row -->
-        <div class="card shadow-sm border-0 rounded-3">
+        <!-- <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body">
                 <div class="row g-3">
 
@@ -142,7 +153,7 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
 
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Section to Load the Archive Table -->
         <div id="archiveTableContainer" class="card shadow-sm border-0 rounded-3 mt-3">
@@ -164,15 +175,167 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
 
 
     </div>
+    <script>
+        window.userRole = <?= json_encode($role) ?>;
+        window.userSchoolId = <?= json_encode($school_id) ?>;
+    </script>
     <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+
+    <!-- jQuery (required by DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.1/jquery.bracket.min.js"></script>
+
     <script src="js/utils.js"></script>
     <script src="archive-page-js/announcements.js"></script>
     <script src="archive-page-js/brackets.js"></script>
     <script src="archive-page-js/department-teams.js"></script>
     <script src="archive-page-js/leaderboards.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Check if the table has any rows of data before initializing the DataTable
+            if ($('#matchTable tbody tr').length > 0) {
+                $('#matchTable').DataTable({
+                    pageLength: 10,
+                    lengthMenu: [5, 10, 25, 50, 100],
+                    order: [
+                        [4, 'asc']
+                    ], // Order by date/time column
+                    columnDefs: [{
+                        orderable: false,
+                        targets: -1
+                    }] // Disable sorting on 'Action' column
+                });
+            }
+        });
+
+        $(document).ready(function() {
+            // Check if the table has any rows of data before initializing the DataTable
+            if ($('#gamesTable tbody tr').length > 0) {
+                $("#gamesTable").DataTable({
+                    pageLength: 10,
+                    lengthMenu: [5, 10, 25, 50, 100],
+                    order: [
+                        [0, "asc"]
+                    ],
+                    columnDefs: [{
+                        orderable: false,
+                        targets: []
+                    }]
+                });
+            }
+        });
+
+        $(document).ready(function() {
+            // Loop through tables with IDs starting with 'datatable_' and initialize DataTable if they contain data
+            $("table[id^='datatable_']").each(function() {
+                if ($(this).find('tbody tr').length > 0) {
+                    $(this).DataTable({
+                        pageLength: 10,
+                        lengthMenu: [5, 10, 25, 50],
+                        order: [],
+                        columnDefs: [{
+                            orderable: false,
+                            targets: -1
+                        }] // Disable sorting on the action column
+                    });
+                }
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Loop through tables with IDs starting with 'teamsTable_' and initialize DataTable if they contain data
+            document.querySelectorAll('table[id^="teamsTable_"]').forEach(function(table) {
+                if (table.querySelectorAll('tbody tr').length > 0) {
+                    new DataTable(table, {
+                        pageLength: 10,
+                        lengthMenu: [5, 10, 25, 50, 100],
+                        ordering: true,
+                        columnDefs: [{
+                            targets: -1,
+                            orderable: false
+                        }]
+                    });
+                }
+            });
+        });
+
+
+
+        // $(document).ready(function() {
+        //     $('#matchTable').DataTable({
+        //         pageLength: 10,
+        //         lengthMenu: [5, 10, 25, 50, 100],
+        //         order: [
+        //             [4, 'asc']
+        //         ], // Order by date/time column
+        //         columnDefs: [{
+        //                 orderable: false,
+        //                 targets: -1
+        //             } // Disable sorting on 'Action' column
+        //         ]
+        //     });
+        // });
+        // $(document).ready(function() {
+        //     $("#gamesTable").DataTable({
+        //         pageLength: 10,
+        //         lengthMenu: [5, 10, 25, 50, 100],
+        //         order: [
+        //             [0, "asc"]
+        //         ],
+        //         columnDefs: [{
+        //             orderable: false,
+        //             targets: []
+        //         }]
+        //     });
+        // });
+        // $(document).ready(function() {
+        //     $("table[id^='datatable_']").each(function() {
+        //         $(this).DataTable({
+        //             pageLength: 10,
+        //             lengthMenu: [5, 10, 25, 50],
+        //             order: [],
+        //             columnDefs: [{
+        //                     orderable: false,
+        //                     targets: -1
+        //                 } // Disable sorting on the action column
+        //             ]
+        //         });
+        //     });
+        // });
+        // document.addEventListener("DOMContentLoaded", function() {
+        //     document.querySelectorAll('table[id^="teamsTable_"]').forEach(function(table) {
+        //         new DataTable(table, {
+        //             pageLength: 10,
+        //             lengthMenu: [5, 10, 25, 50, 100],
+        //             ordering: true,
+        //             columnDefs: [{
+        //                 targets: -1,
+        //                 orderable: false
+        //             }]
+        //         });
+        //     });
+        // });
+        // $(document).ready(function() {
+        //     $("#announcementsTable").DataTable({
+        //         pageLength: 10,
+        //         lengthMenu: [5, 10, 25, 50, 100],
+        //         columnDefs: [{
+        //             orderable: false,
+        //             targets: -1
+        //         }],
+        //     });
+        // });
+    </script>
 </body>
 
 </html>
