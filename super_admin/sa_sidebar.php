@@ -182,22 +182,22 @@
             <?php endif; ?>
             <?php
             // Fetching games based on selected school_id
-            $game_options = "";
-            $selected_game_id = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : null;
-            $school_id = isset($_SESSION['school_id']) ? $_SESSION['school_id'] : null;
+            $game_dropdown_options = "";
+            $selected_game_id_session = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : null;
+            $current_school_id = isset($_SESSION['school_id']) ? $_SESSION['school_id'] : null;
 
             // Fetch games for the selected school
-            if ($school_id) {
+            if ($current_school_id) {
                 $game_query = "SELECT game_id, game_name FROM games WHERE school_id = ? AND is_archived = 0";
                 $game_stmt = $conn->prepare($game_query);
-                $game_stmt->bind_param("i", $school_id);
+                $game_stmt->bind_param("i", $current_school_id);
                 $game_stmt->execute();
-                $game_result = $game_stmt->get_result();
+                $game_fetch_result = $game_stmt->get_result(); // Renamed from $game_result to $game_fetch_result
 
                 // Fetch and generate options for the dropdown
-                while ($rowGame = $game_result->fetch_assoc()) {
-                    $selected = ($rowGame['game_id'] == $selected_game_id) ? 'selected' : ''; // Preselect if it matches session game_id
-                    $game_options .= '<option value="' . $rowGame['game_id'] . '" ' . $selected . '>' . htmlspecialchars($rowGame['game_name']) . '</option>';
+                while ($game_row = $game_fetch_result->fetch_assoc()) {
+                    $selected_option = ($game_row['game_id'] == $selected_game_id_session) ? 'selected' : ''; // Preselect if it matches session game_id
+                    $game_dropdown_options .= '<option value="' . $game_row['game_id'] . '" ' . $selected_option . '>' . htmlspecialchars($game_row['game_name']) . '</option>';
                 }
             }
             ?>
@@ -208,10 +208,11 @@
                 <form method="GET" action="../super_admin/set_game.php"> <!-- Form to set game -->
                     <select id="gameSelect" class="sidebar-dropdown" name="game_id" onchange="this.form.submit();">
                         <option value="">Select Game</option>
-                        <?php echo $game_options; ?> <!-- Insert dynamic options here -->
+                        <?php echo $game_dropdown_options; ?> <!-- Insert dynamic options here -->
                     </select>
                 </form>
             </li>
+
 
             <?php
             // Game Access Section with Collapsible

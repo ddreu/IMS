@@ -12,33 +12,8 @@ if (!isset($_SESSION['user_id'])) {
 
 $role = $_SESSION['role'];
 $user_id = $_SESSION['user_id'];
-$sql = "SELECT role, school_id FROM users WHERE id = ?";
-$stmt = mysqli_prepare($conn, $sql);
-
-if ($stmt === false) {
-    die('mysqli_prepare() failed: ' . htmlspecialchars(mysqli_error($conn)));
-}
-
-mysqli_stmt_bind_param($stmt, "i", $user_id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-if ($result->num_rows > 0) {
-    $user = mysqli_fetch_assoc($result);
-
-    // Check if the logged-in user is a school admin
-    if ($user['role'] === 'Committee') {
-        header('Location: 404.php'); // Redirect if the role is not school admin
-        exit();
-    }
-
-    // Retrieve the logged-in user's school ID
-    $school_id = $user['school_id'];
-} else {
-    // If the user is not found in the database
-    header('Location: ../login.php'); // Adjust the path if needed
-    exit();
-}
+$school_id = $_SESSION['school_id'];
+// $school_id = 15;
 
 // Handle form submission for adding a new game
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_game'])) {
@@ -132,6 +107,7 @@ if ($school_id) {
 
 include '../navbar/navbar.php';
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -385,7 +361,7 @@ include '../navbar/navbar.php';
             <div class="container mt-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2>List of Games</h2>
-                    <?php if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') : ?>
+                    <?php if ($_SESSION['role'] === 'School Admin' || $_SESSION['role'] === 'superadmin') : ?>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGameModal">
                             <i class="fas fa-plus"></i> Add Game
                         </button>
@@ -440,7 +416,7 @@ include '../navbar/navbar.php';
                                             echo '<td data-label="Environment" class="px-4">' . htmlspecialchars($game['environment']) . '</td>';
 
 
-                                            if ($user['role'] === 'School Admin' || $user['role'] === 'Department Admin' || $user['role'] === 'superadmin') {
+                                            if ($_SESSION['role'] === 'School Admin' || $_SESSION['role'] === 'Department Admin' || $_SESSION['role'] === 'superadmin') {
                                                 echo '<td data-label="Actions" class="px-4 text-center">';
                                                 echo '<div class="btn-group">';
 
@@ -454,7 +430,7 @@ include '../navbar/navbar.php';
                                                 echo '<ul class="dropdown-menu">';
 
                                                 // Edit Button (Accessible for School Admin and Super Admin if not archived)
-                                                if (($user['role'] === 'School Admin' || $user['role'] === 'superadmin') && $game['is_archived'] != 1) {
+                                                if (($_SESSION['role'] === 'School Admin' || $_SESSION['role'] === 'superadmin') && $game['is_archived'] != 1) {
                                                     echo '<li>';
                                                     echo '<button onclick="openUpdateModal(' . htmlspecialchars($game['game_id']) . ', \'' .
                                                         htmlspecialchars($game['game_name']) . '\', ' .
@@ -468,7 +444,7 @@ include '../navbar/navbar.php';
                                                 }
 
                                                 // Delete Button (Accessible for School Admin and Super Admin)
-                                                if ($user['role'] === 'School Admin' || $user['role'] === 'superadmin') {
+                                                if ($_SESSION['role'] === 'School Admin' || $_SESSION['role'] === 'superadmin') {
                                                     echo '<li style="margin: 0; padding: 0; list-style: none;">';
                                                     echo '<form id="deleteForm_' . $game['game_id'] . '" action="delete_game.php" method="POST" style="margin: 0; padding: 0;">';
                                                     echo '<input type="hidden" name="game_id" value="' . htmlspecialchars($game['game_id']) . '">';
@@ -521,7 +497,7 @@ include '../navbar/navbar.php';
                                             echo '</tr>';
                                         }
                                     } else {
-                                        echo '<tr><td colspan="' . ($user['role'] === 'School Admin' ? '5' : '4') . '" class="text-center py-4">';
+                                        echo '<tr><td colspan="' . ($_SESSION['role'] === 'School Admin' ? '5' : '4') . '" class="text-center py-4">';
                                         echo '<div class="text-muted">';
                                         echo '<i class="fas fa-gamepad fa-3x mb-3"></i>';
                                         echo '<p class="mb-0">No games found</p>';
