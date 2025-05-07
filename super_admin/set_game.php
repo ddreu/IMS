@@ -20,28 +20,38 @@ if (isset($_GET['game_id']) && !empty($_GET['game_id'])) {
         $_SESSION['game_id'] = $game_id;  // Set game_id in session
         $_SESSION['game_name'] = $rowGame['game_name'];  // Set game_name in session
 
-        // Fetch a random department from the selected school
-        if (isset($_SESSION['school_id']) && !empty($_SESSION['school_id'])) {
-            $school_id = $_SESSION['school_id'];
+        // Check if user role is "Department Admin"
+        if ($_SESSION['role'] != 'Department Admin') {
+            // Fetch a random department from the selected school if role is not "Department Admin"
+            if (isset($_SESSION['school_id']) && !empty($_SESSION['school_id'])) {
+                $school_id = $_SESSION['school_id'];
 
-            // Fetch a random department for the school
-            $stmtDepartment = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0 ORDER BY RAND() LIMIT 1");
-            $stmtDepartment->bind_param("i", $school_id);
-            $stmtDepartment->execute();
-            $resultDepartment = $stmtDepartment->get_result();
+                // Fetch a random department for the school
+                $stmtDepartment = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0 ORDER BY RAND() LIMIT 1");
+                $stmtDepartment->bind_param("i", $school_id);
+                $stmtDepartment->execute();
+                $resultDepartment = $stmtDepartment->get_result();
 
-            if ($resultDepartment->num_rows > 0) {
-                // Set the department session variables
-                $rowDepartment = $resultDepartment->fetch_assoc();
-                $_SESSION['department_id'] = $rowDepartment['id'];  // Set department_id in session
-                $_SESSION['department_name'] = $rowDepartment['department_name'];  // Set department_name in session
+                if ($resultDepartment->num_rows > 0) {
+                    // Set the department session variables
+                    $rowDepartment = $resultDepartment->fetch_assoc();
+                    $_SESSION['department_id'] = $rowDepartment['id'];  // Set department_id in session
+                    $_SESSION['department_name'] = $rowDepartment['department_name'];  // Set department_name in session
+                } else {
+                    echo "No active department found for the selected school.";
+                    exit();
+                }
             } else {
-                echo "No active department found for the selected school.";
+                echo "School ID not found in session.";
                 exit();
             }
         } else {
-            echo "School ID not found in session.";
-            exit();
+            // Skip department assignment for Department Admin
+            if (isset($_SESSION['department_id']) && isset($_SESSION['department_name'])) {
+                // Department Admin should already have a department, no need to assign one
+                $_SESSION['department_id'] = $_SESSION['department_id'];  // Ensure existing department is kept
+                $_SESSION['department_name'] = $_SESSION['department_name'];  // Ensure existing department name is kept
+            }
         }
     } else {
         echo "No game selected or the game is archived.";

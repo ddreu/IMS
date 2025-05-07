@@ -470,21 +470,7 @@ include '../navbar/navbar.php';
                                                 // }
 
                                                 // "Open as Committee" Button (Accessible for School Admin, Department Admin, and Super Admin)
-                                                echo '<li>';
-                                                echo '<button 
-                                                    type="button" 
-                                                    class="dropdown-item open-committee-btn" 
-                                                    data-game-id="' . htmlspecialchars($game['game_id']) . '"';
 
-                                                if (isset($_SESSION['role'])) {
-                                                    echo ' data-role="' . htmlspecialchars($_SESSION['role']) . '"';
-                                                }
-                                                if (isset($_SESSION['department_id'])) {
-                                                    echo ' data-department-id="' . htmlspecialchars($_SESSION['department_id']) . '"';
-                                                }
-
-                                                echo '>Open as Committee</button>';
-                                                echo '</li>';
 
 
 

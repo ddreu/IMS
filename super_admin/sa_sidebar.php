@@ -58,19 +58,20 @@
 
             <?php
             $conn = con();
-            $query = "SELECT school_id, school_name FROM schools WHERE is_archived = 0 AND school_id != 0"; // Modify as necessary
-            $result = $conn->query($query);
+            $schoolQuery = "SELECT school_id, school_name FROM schools WHERE is_archived = 0 AND school_id != 0"; // Modify as necessary
+            $schoolResult = $conn->query($schoolQuery); // Renamed result to schoolResult for clarity
 
             // Initialize the options array
             $options = "";
-            $selected_school_id = isset($_SESSION['school_id']) ? $_SESSION['school_id'] : null;
+            $selectedSchoolId = isset($_SESSION['school_id']) ? $_SESSION['school_id'] : null;
 
             // Fetch and generate options for the dropdown
-            while ($row = $result->fetch_assoc()) {
-                $selected = ($row['school_id'] == $selected_school_id) ? 'selected' : ''; // Preselect if it matches session school_id
-                $options .= '<option value="' . $row['school_id'] . '" ' . $selected . '>' . $row['school_name'] . '</option>';
+            while ($schoolRow = $schoolResult->fetch_assoc()) { // Renamed row to schoolRow for clarity
+                $selected = ($schoolRow['school_id'] == $selectedSchoolId) ? 'selected' : ''; // Preselect if it matches session school_id
+                $options .= '<option value="' . $schoolRow['school_id'] . '" ' . $selected . '>' . htmlspecialchars($schoolRow['school_name']) . '</option>';
             }
             ?>
+
 
             <li class="nav-item sidebar-filter-item">
                 <label for="schoolSelect" class="sidebar-filter-label">School</label>
@@ -86,18 +87,20 @@
 
             <?php
             if (!empty($_SESSION['school_id'])) {
-                $school_id = $_SESSION['school_id'];
+                // Directly use $_SESSION['school_id'] in the query
+                $departmentStmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0"); // Renamed stmt to departmentStmt
+                $departmentStmt->bind_param("i", $_SESSION['school_id']);  // Use session value directly
+                $departmentStmt->execute();
+                $departmentResult = $departmentStmt->get_result(); // Renamed result to departmentResult for clarity
+                $departments = $departmentResult->fetch_all(MYSQLI_ASSOC); // Renamed result to departmentResult and used departments variable
+                $departmentStmt->close();
 
-                $stmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0");
-                $stmt->bind_param("i", $school_id);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $departments = $result->fetch_all(MYSQLI_ASSOC);
-                $stmt->close();
-
+                // Directly check if session variables for game and department are set
                 $showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['department_id'], $_SESSION['department_name']);
             }
             ?>
+
+
             <!-- School Access Section with Collapsible -->
             <?php if (!empty($_SESSION['school_id'])): ?>
 
@@ -146,6 +149,12 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="../pointing_system/pointing_system.php" class="nav-link <?php echo ($current_page == 'pointingsystem') ? 'active' : ''; ?>">
+                            <i class="fas fa-medal"></i><span>Pointing System</span>
+                        </a>
+                    </li>
+
                     <!-- Brackets -->
                     <li class="nav-item">
                         <a href="../brackets/admin_brackets.php" class="nav-link <?php echo ($current_page == 'Brackets') ? 'active' : ''; ?>">
@@ -177,30 +186,38 @@
                             <?php } ?>
                         </ul>
                     </li>
+                    <!-- Rankings -->
+                    <li class="nav-item">
+                        <a href="../rankings/admin-leaderboards.php" class="nav-link <?php echo ($current_page == 'rankings') ? 'active' : ''; ?>">
+                            <i class="fas fa-chart-bar"></i><span>Rankings</span>
+                        </a>
+                    </li>
                 </ul>
 
             <?php endif; ?>
             <?php
             // Fetching games based on selected school_id
             $game_dropdown_options = "";
-            $selected_game_id_session = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : null;
-            $current_school_id = isset($_SESSION['school_id']) ? $_SESSION['school_id'] : null;
 
             // Fetch games for the selected school
-            if ($current_school_id) {
+            if (isset($_SESSION['school_id']) && $_SESSION['school_id']) {
                 $game_query = "SELECT game_id, game_name FROM games WHERE school_id = ? AND is_archived = 0";
                 $game_stmt = $conn->prepare($game_query);
-                $game_stmt->bind_param("i", $current_school_id);
+                $game_stmt->bind_param("i", $_SESSION['school_id']);  // Directly use the session value
                 $game_stmt->execute();
-                $game_fetch_result = $game_stmt->get_result(); // Renamed from $game_result to $game_fetch_result
+                $game_fetch_result = $game_stmt->get_result();
 
                 // Fetch and generate options for the dropdown
                 while ($game_row = $game_fetch_result->fetch_assoc()) {
-                    $selected_option = ($game_row['game_id'] == $selected_game_id_session) ? 'selected' : ''; // Preselect if it matches session game_id
+                    $selected_option = ($game_row['game_id'] == $_SESSION['game_id']) ? 'selected' : ''; // Directly use the session value
                     $game_dropdown_options .= '<option value="' . $game_row['game_id'] . '" ' . $selected_option . '>' . htmlspecialchars($game_row['game_name']) . '</option>';
                 }
+
+                // Close the prepared statement after usage
+                $game_stmt->close();
             }
             ?>
+
 
             <!-- Game Dropdown -->
             <li class="nav-item sidebar-filter-item">
@@ -269,12 +286,7 @@
                         </a>
                     </li>
 
-                    <!-- Rankings -->
-                    <!-- <li class="nav-item">
-                        <a href="../rankings/leaderboards.php" class="nav-link <?php echo ($current_page == 'rankings') ? 'active' : ''; ?>">
-                            <i class="fas fa-chart-bar"></i><span>Rankings</span>
-                        </a>
-                    </li> -->
+
 
                     <!-- User Logs -->
                     <!-- <li class="nav-item">
@@ -358,11 +370,11 @@
                     <i class="fas fa-archive"></i><span>Archives</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="../archive/archives.php" class="nav-link">
+            <!-- <li class="nav-item">
+                <a href="../admin-pages/leaderboards.php" class="nav-link">
                     <i class="fas fa-trophy"></i><span>Leaderbooards</span>
                 </a>
-            </li>
+            </li> -->
 
         </ul>
     </nav>

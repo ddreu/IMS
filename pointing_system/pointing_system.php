@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php'); // Redirect to login page if not logged in
     exit();
 }
-
+$role = $_SESSION['role'];
 // Fetch the logged-in user's information
 $user_id = $_SESSION['user_id'];
 $school_id = $_SESSION['school_id'] ?? null;
@@ -178,8 +178,13 @@ $conn->close();
     <div class="wrapper">
         <?php
         $current_page = 'pointingsystem';
-        include '../department_admin/sidebar.php';
-        ?>
+        if ($role == 'Committee') {
+            include '../committee/csidebar.php';
+        } else if ($role == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';
+        } else {
+            include '../department_admin/sidebar.php';
+        }        ?>
 
         <!-- Page Content -->
         <div id="content">

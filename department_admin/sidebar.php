@@ -6,19 +6,20 @@ $role = $_SESSION['role'];
 $conn = con();
 
 // Fetch school logo
-$stmt = $conn->prepare("SELECT logo, school_name FROM schools WHERE school_id = ?");
-$stmt->bind_param("i", $school_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$school = $result->fetch_assoc();
-$stmt->close();
+$school_info_stmt = $conn->prepare("SELECT logo, school_name FROM schools WHERE school_id = ?");
+$school_info_stmt->bind_param("i", $school_id);
+$school_info_stmt->execute();
+$school_info_result = $school_info_stmt->get_result();
+$school = $school_info_result->fetch_assoc();
+$school_info_stmt->close();
 
-$stmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0");
-$stmt->bind_param("i", $school_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$departments = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+// Fetch departments for the selected school
+$department_info_stmt = $conn->prepare("SELECT id, department_name FROM departments WHERE school_id = ? AND is_archived = 0");
+$department_info_stmt->bind_param("i", $school_id);
+$department_info_stmt->execute();
+$department_info_result = $department_info_stmt->get_result();
+$departments = $department_info_result->fetch_all(MYSQLI_ASSOC);
+$department_info_stmt->close();
 
 
 $showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['department_id'], $_SESSION['department_name']);
@@ -48,16 +49,66 @@ $showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['
 
     <ul class="list-unstyled components">
 
+        <?php
+        // Fetching games based on selected school_id
+        $game_dropdown_options = "";
+        $selected_game_id_session = isset($_SESSION['game_id']) ? $_SESSION['game_id'] : null;
+        $current_school_id = isset($_SESSION['school_id']) ? $_SESSION['school_id'] : null;
+
+        // Fetch games for the selected school
+        if ($current_school_id) {
+            $game_query = "SELECT game_id, game_name FROM games WHERE school_id = ? AND is_archived = 0";
+            $game_stmt = $conn->prepare($game_query);
+            $game_stmt->bind_param("i", $current_school_id);
+            $game_stmt->execute();
+            $game_fetch_result = $game_stmt->get_result(); // Renamed from $game_result to $game_fetch_result
+
+            // Fetch and generate options for the dropdown
+            while ($game_row = $game_fetch_result->fetch_assoc()) {
+                $selected_option = ($game_row['game_id'] == $selected_game_id_session) ? 'selected' : ''; // Preselect if it matches session game_id
+                $game_dropdown_options .= '<option value="' . $game_row['game_id'] . '" ' . $selected_option . '>' . htmlspecialchars($game_row['game_name']) . '</option>';
+            }
+        }
+        ?>
+
+        <li class="nav-item">
+            <a class="fw-bold small text-muted px-3 mt-3">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Game Access</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <hr class="my-2 mx-3 border-top border-secondary">
+        </li>
+        <!-- Game Dropdown with Bootstrap - Styled like other sidebar links -->
+        <li class="nav-item sidebar-filter-item">
+            <a href="#gameDropdown" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                <i class="fas fa-gamepad"></i>
+                <span>Game</span>
+            </a>
+            <div class="collapse" id="gameDropdown">
+                <form method="GET" action="../super_admin/set_game.php">
+                    <div class="input-group mb-3">
+                        <select id="gameSelect" class="form-select" name="game_id" onchange="this.form.submit();">
+                            <option value="">Select Game</option>
+                            <?php echo $game_dropdown_options; ?> <!-- Insert dynamic options here -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </li>
 
         <?php if ($showGameLinks): ?>
             <li class="nav-item">
                 <a href="#gameSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle <?php echo ($current_page == 'Dashboard') ? 'active' : ''; ?>">
                     <i class="fas fa-user"></i>
                     <span>
-                        <?php echo htmlspecialchars($_SESSION['game_name']); ?><br>
-                        <?php echo htmlspecialchars($_SESSION['department_name']); ?>
+                        <small><?php echo htmlspecialchars($_SESSION['game_name']); ?></small><br>
+                        <!-- <?php echo htmlspecialchars($_SESSION['department_name']); ?> -->
                     </span>
                 </a>
+
                 <ul class="collapse list-unstyled" id="gameSubmenu">
                     <li>
                         <a class="submenu-item <?php echo ($current_page == 'Dashboard') ? 'active' : ''; ?>" href="../committee/committeedashboard.php">
@@ -95,17 +146,19 @@ $showGameLinks = isset($_SESSION['game_id'], $_SESSION['game_name'], $_SESSION['
                             Match
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a class="submenu-item <?php echo ($current_page == 'Rankings') ? 'active' : ''; ?>" href="../rankings/leaderboards.php">
                             <i class="fas fa-chart-bar"></i>
                             Rankings
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </li>
         <?php endif; ?>
 
-
+        <li class="nav-item">
+            <hr class="my-2 mx-3 border-top border-secondary">
+        </li>
 
         <li class="nav-item">
             <a class="fw-bold small text-muted px-3 mt-3">
