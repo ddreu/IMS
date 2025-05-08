@@ -593,6 +593,12 @@ include '../navbar/navbar.php';
                                                                             href="live-stream.php?schedule_id=<?= $row['schedule_id']; ?>&teamA_id=<?= $row['teamA_id']; ?>&teamB_id=<?= $row['teamB_id']; ?>&game_id=<?= $row['game_id']; ?>">
                                                                             Live Stream
                                                                         </a>
+                                                                    <li>
+                                                                        <button class="dropdown-item" onclick="castScoreboard(<?= $row['schedule_id']; ?>)">
+                                                                            Cast Scoreboard
+                                                                        </button>
+
+                                                                    </li>
 
                                                                     </li>
                                                                 <?php elseif ($row['status'] === 'Finished'): ?>
@@ -710,6 +716,11 @@ include '../navbar/navbar.php';
                 <!-- </div> -->
             </div>
             <script>
+                function castScoreboard(scheduleId) {
+                    const url = `scoreboard_router.php?schedule_id=${scheduleId}`;
+                    window.open(url, '_blank');
+                }
+
                 function notifyPlayers(scheduleId, teamAId, teamBId) {
                     // Initial confirmation
                     Swal.fire({
