@@ -24,6 +24,8 @@ let timerInterval;
 let shotClockInterval;
 let shotClockTime;
 let isShotClockRunning = false;
+let playerStats = JSON.parse(localStorage.getItem('playerStats') || '{}');
+
 
 // Initialize the game
 function initializeGame() {
@@ -801,10 +803,56 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+function submitPlayerStats() {
+    console.log('submitPlayerStats called');
+
+    const scheduleId = window.gameData.schedule_id;
+
+    const statsToSubmit = Object.entries(playerStats)
+        .filter(([key, value]) => value > 0)
+        .map(([key, value]) => {
+            const [, playerId, statConfigId] = key.match(/player_(\d+)_stat_(\d+)/);
+            return {
+                player_id: playerId,
+                stat_config_id: statConfigId,
+                stat_value: value
+            };
+        });
+
+    if (statsToSubmit.length === 0) {
+        return Promise.resolve(); // <- return resolved promise if nothing to do
+    }
+
+    console.log('Submitting stats to server:', statsToSubmit);
+
+    return fetch('save_player_stats.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            schedule_id: scheduleId,
+            stats: statsToSubmit
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            localStorage.removeItem('playerStats');
+            console.log('Player stats submitted successfully');
+        } else {
+            console.error('Submission failed:', data.message || 'Unable to submit player statistics.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
 function endMatch() {
     // Comprehensive logging and error checking
     console.group('End Match Process');
-    
+
     // Verify all required elements exist
     const scheduleIdEl = document.getElementById('schedule_id');
     const matchIdEl = document.getElementById('match-id');
@@ -828,7 +876,7 @@ function endMatch() {
             teamAId: !!teamAIdEl,
             teamBId: !!teamBIdEl
         });
-        
+
         // Fallback to global gameData if available
         if (window.gameData) {
             console.warn('Falling back to window.gameData', window.gameData);
@@ -896,80 +944,121 @@ function processEndMatch(matchData) {
                 confirmButtonText: 'Yes, End Match'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Send to appropriate endpoint
-                    fetch(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            schedule_id: matchData.schedule_id
-                        })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(response => {
-                        console.log('End Match Response:', response);
-                        
-                        if (response.success) {
-                            Swal.fire({
-                                title: 'Match Ended!',
-                                text: 'The match has concluded successfully.',
-                                icon: 'success',
-                                showCancelButton: true,
-                                confirmButtonText: 'View Summary',
-                                cancelButtonText: 'Back to Matches'
-                            }).then((result) => {
-                                // Clear state before redirecting
-                                stateManager.clear(); // Clear basketball state
-                                localStorage.removeItem('point_based_teamA_score');
-                                localStorage.removeItem('point_based_teamB_score');
-                                localStorage.removeItem('point_based_teamA_timeouts');
-                                localStorage.removeItem('point_based_teamB_timeouts');
-                                localStorage.removeItem('point_based_currentSet');
 
-                                if (result.isConfirmed) {
-                                    const matchId = response.match_id || matchData.match_id;
-                                    window.location.href = `match_summary.php?match_id=${matchId}&status=${response.status}`;
-                                } else {
-                                    window.location.href = 'match_list.php';
-                                }
-                            });
-                            resolve(response);
-                        } else {
-                            if (response.overtime_required) {
+                    // 🔁 Inline submitPlayerStats logic here
+                    const localStats = JSON.parse(localStorage.getItem('playerStats') || '{}');
+                    const statsToSubmit = Object.entries(localStats)
+                        .filter(([key, value]) => value > 0)
+                        .map(([key, value]) => {
+                            const [, playerId, statConfigId] = key.match(/player_(\d+)_stat_(\d+)/);
+                            return {
+                                player_id: playerId,
+                                stat_config_id: statConfigId,
+                                stat_value: value
+                            };
+                        });
+
+                    let submitStatsPromise = Promise.resolve();
+
+                    if (statsToSubmit.length > 0) {
+                        submitStatsPromise = fetch('save_player_stats.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                schedule_id: matchData.schedule_id,
+                                stats: statsToSubmit
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                localStorage.removeItem('playerStats');
+                                console.log('✅ Player stats submitted');
+                            } else {
+                                console.warn('⚠️ Player stats submission failed:', data.message);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('❌ Error submitting player stats:', err);
+                        });
+                    }
+
+                    // 📦 Proceed with match end after submitting stats
+                    submitStatsPromise.then(() => {
+                        fetch(endpoint, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                schedule_id: matchData.schedule_id
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(response => {
+                            console.log('End Match Response:', response);
+
+                            if (response.success) {
                                 Swal.fire({
-                                    title: 'Overtime Required',
-                                    text: response.error,
-                                    icon: 'info',
+                                    title: 'Match Ended!',
+                                    text: 'The match has concluded successfully.',
+                                    icon: 'success',
                                     showCancelButton: true,
-                                    confirmButtonText: 'Start Overtime',
-                                    cancelButtonText: 'Cancel'
+                                    confirmButtonText: 'View Summary',
+                                    cancelButtonText: 'Back to Matches'
                                 }).then((result) => {
+                                    // Clear state before redirecting
+                                    stateManager.clear();
+                                    localStorage.removeItem('point_based_teamA_score');
+                                    localStorage.removeItem('point_based_teamB_score');
+                                    localStorage.removeItem('point_based_teamA_timeouts');
+                                    localStorage.removeItem('point_based_teamB_timeouts');
+                                    localStorage.removeItem('point_based_currentSet');
+
                                     if (result.isConfirmed) {
-                                        document.getElementById('periodCounter').textContent = 'OT';
-                                        timeLeft = 5 * 60; // 5 minutes
-                                        pauseTimer();
-                                        sendUpdate();
+                                        const matchId = response.match_id || matchData.match_id;
+                                        window.location.href = `match_summary.php?match_id=${matchId}&status=${response.status}`;
+                                    } else {
+                                        window.location.href = 'match_list.php';
                                     }
                                 });
+                                resolve(response);
                             } else {
-                                throw new Error(response.error || 'Failed to end match');
+                                if (response.overtime_required) {
+                                    Swal.fire({
+                                        title: 'Overtime Required',
+                                        text: response.error,
+                                        icon: 'info',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Start Overtime',
+                                        cancelButtonText: 'Cancel'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            document.getElementById('periodCounter').textContent = 'OT';
+                                            timeLeft = 5 * 60; // 5 minutes
+                                            pauseTimer();
+                                            sendUpdate();
+                                        }
+                                    });
+                                } else {
+                                    throw new Error(response.error || 'Failed to end match');
+                                }
                             }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('End Match Error:', error);
-                        Swal.fire({
-                            title: 'Error',
-                            text: error.message || 'Failed to end match. Please try again.',
-                            icon: 'error'
+                        })
+                        .catch(error => {
+                            console.error('End Match Error:', error);
+                            Swal.fire({
+                                title: 'Error',
+                                text: error.message || 'Failed to end match. Please try again.',
+                                icon: 'error'
+                            });
+                            reject(error);
                         });
-                        reject(error);
                     });
                 } else {
                     reject(new Error('Match end cancelled'));

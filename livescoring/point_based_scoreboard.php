@@ -209,7 +209,7 @@ $conn->close();
     </div> <!-- Closing .scoreboard -->
 
     <!-- Settings Modal -->
-    <div id="settingsModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">
+    <!-- <div id="settingsModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">
         <h3 style="color: white; margin-bottom: 15px;">Game Settings</h3>
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <div>
@@ -239,7 +239,43 @@ $conn->close();
 
 
         </div>
+    </div> -->
+
+    <div id="settingsModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">
+        <h3 style="color: white; margin-bottom: 15px;">Game Settings</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+                <label style="color: white;">Period Length (minutes)</label>
+                <input type="number" id="periodLength" value="10" min="1" max="60" style="width: 60px; margin-left: 10px;">
+            </div>
+            <div>
+                <label style="color: white;">Number of Periods</label>
+                <input type="number" id="numberOfPeriods" value="4" min="1" max="10" style="width: 60px; margin-left: 10px;">
+            </div>
+            <div>
+                <label style="color: white;">Shot Clock Duration</label>
+                <input type="number" id="shotClockDuration" value="24" min="1" max="60" style="width: 60px; margin-left: 10px;">
+            </div>
+            <button class="score-button fullscreen-button" onclick="toggleFullscreen()">
+                <i class="fas fa-expand"></i>
+            </button>
+
+            <!-- <button class="score-button cast-button" onclick="requestCast()">
+                <i class="fas fa-tv"></i> Cast
+            </button> -->
+
+            <!-- Dynamic Link to Player Stats -->
+            <a href="player_statistics_panel.php?schedule_id=<?php echo $schedule_id; ?>&teamA_id=<?php echo $teamA_id; ?>&teamB_id=<?php echo $teamB_id; ?>&game_id=<?php echo $game_id; ?>" class="score-button" style="text-align: center; margin-top: 10px;">
+                <i class="fas fa-users me-2"></i> Go to Player Stats
+            </a>
+
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button class="score-button" onclick="saveSettings()">Save</button>
+                <button class="score-button" onclick="closeSettings()">Cancel</button>
+            </div>
+        </div>
     </div>
+
 
     <!-- Live Stream Settings Modal -->
     <!-- <div id="liveStreamModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">

@@ -67,6 +67,8 @@ $sets_won_query->close();
     <title>Set-Based Scoreboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+
     <link rel="stylesheet" href="set-based.css">
 </head>
 
@@ -80,6 +82,10 @@ $sets_won_query->close();
     <!-- End Match Button -->
     <button class="end-match" onclick="ScoreManager.endMatch()">
         <i class="fas fa-stop-circle"></i> End Match
+    </button>
+
+    <button class="score-button settings-button" onclick="openSettings()">
+        <i class="fas fa-cog"></i>
     </button>
 
     <div class="scoreboard">
@@ -163,6 +169,43 @@ $sets_won_query->close();
                 </div>
             </div>
         </div>
+        <div id="settingsModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">
+            <h3 style="color: white; margin-bottom: 15px;">Game Settings</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div hidden>
+                    <label style="color: white;">Period Length (minutes)</label>
+                    <input type="number" id="periodLength" value="10" min="1" max="60" style="width: 60px; margin-left: 10px;">
+                </div>
+                <div hidden>
+                    <label style="color: white;">Number of Periods</label>
+                    <input type="number" id="numberOfPeriods" value="4" min="1" max="10" style="width: 60px; margin-left: 10px;">
+                </div>
+                <div hidden>
+                    <label style="color: white;">Shot Clock Duration</label>
+                    <input type="number" id="shotClockDuration" value="24" min="1" max="60" style="width: 60px; margin-left: 10px;">
+                </div>
+                <button class="score-button fullscreen-button" onclick="toggleFullscreen()">
+                    <i class="fas fa-expand"></i>
+                </button>
+
+                <!-- <button class="score-button cast-button" onclick="requestCast()">
+                    <i class="fas fa-tv"></i> Cast
+                </button> -->
+
+                <!-- Dynamic Link to Player Stats -->
+                <a
+                    href="player_statistics_panel.php?schedule_id=<?php echo $schedule_id; ?>&teamA_id=<?php echo $teamA_id; ?>&teamB_id=<?php echo $teamB_id; ?>&game_id=<?php echo $game_id; ?>"
+                    class="score-button player-stats-button">
+                    <i class="fas fa-users me-2"></i> Go to Player Stats
+                </a>
+
+
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                    <!-- <button class="score-button" onclick="saveSettings()">Save</button> -->
+                    <button class="score-button" onclick="closeSettings()">Cancel</button>
+                </div>
+            </div>
+        </div>
 
 
     </div>
@@ -173,6 +216,42 @@ $sets_won_query->close();
 
     <script src="set-test.js"></script>
     <script>
+        function toggleFullscreen() {
+            const docElm = document.documentElement;
+
+            if (!document.fullscreenElement) {
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen();
+                } else if (docElm.mozRequestFullScreen) {
+                    /* Firefox */
+                    docElm.mozRequestFullScreen();
+                } else if (docElm.webkitRequestFullscreen) {
+                    /* Chrome, Safari & Opera */
+                    docElm.webkitRequestFullscreen();
+                } else if (docElm.msRequestFullscreen) {
+                    /* IE/Edge */
+                    docElm.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').style.display = 'block';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
         // Function to update the score of Team A or B
         function updateScore(team, change) {
             let scoreElement = document.getElementById(`score${team}`);
@@ -279,6 +358,54 @@ $sets_won_query->close();
                 display.style.cursor = 'default';
             });
         });
+
+        window.castReady = false;
+
+        // Google Cast SDK will call this when available
+        window.__onGCastApiAvailable = function(isAvailable) {
+            if (isAvailable) {
+                const context = cast.framework.CastContext.getInstance();
+
+                context.setOptions({
+                    receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+                    autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+                });
+
+                console.log("✅ Cast API initialized");
+                window.castReady = true;
+
+                // Enable the Cast button if you want (optional)
+                const castBtn = document.querySelector(".cast-button");
+                if (castBtn) castBtn.disabled = false;
+            }
+        };
+
+        function requestCast() {
+            if (!window.castReady) {
+                console.warn(" Cast API not ready yet.");
+                return;
+            }
+
+            const context = cast.framework.CastContext.getInstance();
+            const session = context.getCurrentSession();
+
+            if (!session) {
+                context.requestSession().then(() => {
+                    console.log("✅ Cast session started.");
+                }).catch(err => {
+                    console.error(" Cast session failed:", err);
+                });
+            } else {
+                console.log("ℹ️ Already casting.");
+            }
+        }
+
+        // Optional: disable button until Cast API is ready
+        document.addEventListener("DOMContentLoaded", () => {
+            const castBtn = document.querySelector(".cast-button");
+            if (castBtn) castBtn.disabled = true;
+        });
+    </script>
     </script>
     <!-- SweetAlert2 library -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

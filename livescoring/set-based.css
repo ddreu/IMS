@@ -288,6 +288,46 @@ button:hover {
   font-size: 6.5vw;
 }
 
+.settings-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.7em 1.5em;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  z-index: 100;
+}
+
+.settings-button:hover {
+  background-color: #2b6fc3;
+}
+.player-stats-button {
+  display: inline-block;
+  text-align: center;
+  margin-top: 10px;
+  text-decoration: none;
+  background-color: rgba(61, 145, 245, 0.15); /* same as buttons */
+  color: white;
+  font-size: 2vw;
+  border: none;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.player-stats-button:hover {
+  transform: scale(1.1);
+  background-color: #2b6fc3;
+  text-decoration: none;
+  color: white;
+}
+
 /* 📱 Responsive Adjustments */
 @media (max-width: 768px) {
   .digit {

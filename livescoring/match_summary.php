@@ -4,7 +4,7 @@ include_once '../connection/conn.php';
 $conn = con();
 
 // Get the match_id or schedule_id from the URL
-$user_role = $_SESSION['role'];
+$role = $_SESSION['role'];
 $match_id = isset($_GET['match_id']) ? intval($_GET['match_id']) : 0;
 $schedule_id = isset($_GET['schedule_id']) ? $_GET['schedule_id'] : null;
 $show_alert = isset($_GET['status']) && $_GET['status'] === 'success';
@@ -450,11 +450,14 @@ while ($row = $set_scores_result->fetch_assoc()) {
 
 
         // Include the appropriate sidebar based on the user role
-        if ($user_role === 'Committee') {
-            include '../committee/csidebar.php'; // Sidebar for committee
+        if ($role == 'Committee') {
+            include '../committee/csidebar.php';
+        } else if ($role == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';
         } else {
             include '../department_admin/sidebar.php';
         }
+
         ?>
     </nav>
     <div class="main">

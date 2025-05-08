@@ -45,6 +45,7 @@ $match_query->close();
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 
     <!-- Stylesheet -->
     <link rel="stylesheet" href="default_scoreboard.css" />
@@ -57,11 +58,51 @@ $match_query->close();
     <button type="button" class="end-match right" id="end-match-button">
         <i class="fas fa-stop-circle"></i> End Match
     </button>
+    <button class="score-button settings-button" onclick="openSettings()">
+        <i class="fas fa-cog"></i>
+    </button>
 
     <!-- Schedule ID -->
     <input type="hidden" id="schedule_id" value="<?php echo htmlspecialchars($schedule_id); ?>">
     <input type="hidden" id="match-id" value="<?php echo $match['match_id']; ?>">
 
+    <div id="settingsModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); padding: 20px; border-radius: 10px; z-index: 1000;">
+        <h3 style="color: white; margin-bottom: 15px;">Game Settings</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div hidden>
+                <label style="color: white;">Period Length (minutes)</label>
+                <input type="number" id="periodLength" value="10" min="1" max="60" style="width: 60px; margin-left: 10px;">
+            </div>
+            <div hidden>
+                <label style="color: white;">Number of Periods</label>
+                <input type="number" id="numberOfPeriods" value="4" min="1" max="10" style="width: 60px; margin-left: 10px;">
+            </div>
+            <div hidden>
+                <label style="color: white;">Shot Clock Duration</label>
+                <input type="number" id="shotClockDuration" value="24" min="1" max="60" style="width: 60px; margin-left: 10px;">
+            </div>
+            <button class="score-button fullscreen-button player-stats-button" onclick="toggleFullscreen()">
+                <i class="fas fa-expand"></i>
+            </button>
+
+            <!-- <button class="score-button cast-button player-stats-button" onclick="requestCast()">
+                <i class="fas fa-tv"></i> Cast
+            </button> -->
+
+            <!-- Dynamic Link to Player Stats -->
+            <a
+                href="player_statistics_panel.php?schedule_id=<?php echo $schedule_id; ?>&teamA_id=<?php echo $teamA_id; ?>&teamB_id=<?php echo $teamB_id; ?>&game_id=<?php echo $game_id; ?>"
+                class="score-button player-stats-button">
+                <i class="fas fa-users me-2"></i> Go to Player Stats
+            </a>
+
+
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <!-- <button class="score-button" onclick="saveSettings()">Save</button> -->
+                <button class="score-button player-stats-button" onclick="closeSettings()">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <div class="scoreboard">
         <!-- Team A -->
@@ -122,11 +163,11 @@ $match_query->close();
                 const savedState = localStorage.getItem('defaultScoreboardState');
                 if (savedState) {
                     const state = JSON.parse(savedState);
-                    
+
                     // Restore scores
                     teamAScore = state.teamAScore;
                     teamBScore = state.teamBScore;
-                    
+
                     // Update UI
                     teamAScoreValue.innerText = teamAScore;
                     teamBScoreValue.innerText = teamBScore;
@@ -187,7 +228,7 @@ $match_query->close();
             teamBScore = 0;
             teamAScoreValue.innerText = teamAScore;
             teamBScoreValue.innerText = teamBScore;
-            
+
             // Save state and sync with database
             stateManager.save();
             syncScoreWithDatabase();
@@ -197,6 +238,43 @@ $match_query->close();
         document.addEventListener('DOMContentLoaded', function() {
             stateManager.restore();
         });
+
+        function toggleFullscreen() {
+            const docElm = document.documentElement;
+
+            if (!document.fullscreenElement) {
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen();
+                } else if (docElm.mozRequestFullScreen) {
+                    /* Firefox */
+                    docElm.mozRequestFullScreen();
+                } else if (docElm.webkitRequestFullscreen) {
+                    /* Chrome, Safari & Opera */
+                    docElm.webkitRequestFullscreen();
+                } else if (docElm.msRequestFullscreen) {
+                    /* IE/Edge */
+                    docElm.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').style.display = 'block';
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
     </script>
 
 </body>

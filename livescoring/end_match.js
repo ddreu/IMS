@@ -46,6 +46,55 @@ function initializeEndMatchButton() {
                 });
 
                 if (result.isConfirmed) {
+
+
+
+
+                    const rawStats = localStorage.getItem('playerStats');
+if (rawStats) {
+    try {
+        const parsed = JSON.parse(rawStats);
+        const statsToSubmit = Object.entries(parsed)
+            .filter(([_, value]) => value > 0)
+            .map(([key, value]) => {
+                const match = key.match(/player_(\d+)_stat_(\d+)/);
+                if (!match) return null;
+                const [, playerId, statConfigId] = match;
+                return {
+                    player_id: playerId,
+                    stat_config_id: statConfigId,
+                    stat_value: value
+                };
+            }).filter(Boolean);
+
+        if (statsToSubmit.length > 0) {
+            console.log('*_Submitting player stats before ending match..._*');
+
+            await fetch('save_player_stats.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    schedule_id: scheduleId,
+                    stats: statsToSubmit
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('*_Player stats submitted successfully_*');
+                    localStorage.removeItem('playerStats');
+                } else {
+                    console.warn('*_Player stats submission failed_*:', data.message || 'Unknown reason');
+                }
+            })
+            .catch(err => {
+                console.error('*_Error submitting player stats_*:', err);
+            });
+        }
+    } catch (err) {
+        console.error('*_Invalid playerStats JSON_*:', err);
+    }
+}
                     const response = await fetch(endpoint, {
                         method: 'POST',
                         headers: {

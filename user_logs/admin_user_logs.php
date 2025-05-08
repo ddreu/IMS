@@ -135,11 +135,11 @@ $conn = con();
                     <tr>
                         <th>User</th>
                         <!--<th>Action</th>-->
-                        <th>Operation</th>
+                        <!-- <th>Operation</th> -->
                         <!--<th>Record ID</th>-->
                         <th>Description</th>
                         <th>Timestamp</th>
-                        <th>Details</th>
+                        <!-- <th>Details</th> -->
                     </tr>
                 </thead>
                 <tbody id="logsTable">
@@ -214,14 +214,14 @@ $conn = con();
                         const row = document.createElement('tr');
                         row.innerHTML = `
                     <td data-label="User">${log.full_name}</td>
-                    <td data-label="Operation">${log.table_name}</td>
+                  <!--  <td data-label="Operation">${log.table_name}</td> -->
                     <td data-label="Description">${log.log_description}</td>
                     <td data-label="Timestamp">${log.log_time}</td> <!-- Directly using formatted date from PHP -->
-                    <td data-label="Details">
+                  <!--  <td data-label="Details">
                         <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">
                             View Details
                         </button>
-                    </td>
+                    </td> -->
                 `;
                         logsTable.appendChild(row);
                     });

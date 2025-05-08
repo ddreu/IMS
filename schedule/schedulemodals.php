@@ -69,7 +69,7 @@
             </div>
             <div class="modal-body">
                 <form id="scheduleForm" method="POST" action="create_schedule.php">
-                    <?php if ($role === 'School Admin'): ?>
+                    <?php if ($role === 'School Admin' || $role === 'superadmin'): ?>
                         <div class="mb-3">
                             <label for="department" class="form-label">Department:</label>
                             <select id="department" name="department_id" class="form-select" required>

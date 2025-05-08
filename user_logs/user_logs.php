@@ -136,11 +136,11 @@ $conn = con();
                     <tr>
                         <th>User</th>
                         <!--<th>Action</th>-->
-                        <th>Operation</th>
+                        <!-- <th>Operation</th> -->
                         <!--<th>Record ID</th>-->
                         <th>Description</th>
                         <th>Timestamp</th>
-                        <th>Details</th>
+                        <!-- <th>Details</th> -->
                     </tr>
                 </thead>
                 <tbody id="logsTable">
@@ -227,49 +227,26 @@ $conn = con();
                     result.data.forEach(log => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                    <!-- <td data-label="User">${log.full_name}</td> -->
+                    <td data-label="User">${log.full_name}</td> 
 
-                    <td data-label="User">
-    <select class="form-select form-select-sm" onchange="updateLogUser(${log.log_id}, this.value)">
-        ${usersList.map(user => `
-           <!-- <option value="${user.id}" ${log.user_id == user.id ? 'selected' : ''}>
-                ${user.full_name}
-            </option> -->
-            <option value="${user.id}" ${log.user_id == user.id ? 'selected' : ''}>
-        ${user.full_name} - ${user.school_name}
-    </option>
-            
-        `).join('')}
-    </select>
-</td>
+                   
 
-                    <td data-label="Operation">${log.table_name}</td>
-<td data-label="Description">
-    <textarea class="form-control form-control-sm"
-              rows="2"
-              style="resize: vertical;"
-              onchange="updateLogDescription(${log.log_id}, this.value)">${log.log_description}</textarea>
+                  <!--  <td data-label="Operation">${log.table_name}</td> -->
+<td data-label="Description">${log.log_description}
+   
 </td>
 
 
-                  <td data-label="Timestamp">
-    <input type="datetime-local" class="form-control form-control-sm"
-           value="${log.log_time}"
-           onchange="updateLogTimestamp(${log.log_id}, this.value)">
-</td>
+                
 
-
-                    <!-- <td data-label="Timestamp">${log.log_time}</td> -->
+                    <td data-label="Timestamp">${log.log_time}</td>
                    <!-- <td data-label="Details">
                         <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">
                             View Details
                         </button>
                     </td> -->
 
-                    <td data-label="Details">
-    <button class="btn btn-sm btn-info" onclick="showDetails(${JSON.stringify(log).replace(/"/g, '&quot;')})">View</button>
-    <button class="btn btn-sm btn-danger" onclick="deleteLog(${log.log_id})">Delete</button>
-</td>
+                 
 
                 `;
                         logsTable.appendChild(row);
