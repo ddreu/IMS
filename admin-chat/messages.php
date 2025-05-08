@@ -64,11 +64,11 @@ session_start();
                     <span><?php echo htmlspecialchars($row['firstname'] . ' ' . $row['middleinitial'] . ' ' . $row['lastname']); ?></span>
                     <p>
                       <?php
-                      if ($row['status'] <= $date) {
-                        echo ' <i class="fas fa-circle text-secodary"></i> Offline';
-                      } else {
-                        echo ' <i class="fas fa-circle text-success"></i> Online';
-                      }
+                      // if ($row['status'] <= $date) {
+                      //   echo ' <i class="fas fa-circle text-secodary"></i> Offline';
+                      // } else {
+                      //   echo ' <i class="fas fa-circle text-success"></i> Online';
+                      // }
                       ?></p>
                   </div>
                   <!-- <div class="float-end">

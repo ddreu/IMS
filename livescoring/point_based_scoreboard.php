@@ -172,7 +172,7 @@ $conn->close();
                     <div class="shot-clock-control">
                         <!-- <button class="score-button" onclick="updateShotClock(-1)">-</button> -->
                         <div class="shot-clock" id="shotClock">24</div>
-                        <!--<button class="score-button" onclick="updateShotClock(1)">+</button>-->
+                        <!-- <button class="score-button" onclick="updateShotClock(1)">+</button> -->
                     </div>
                     <div class="label">SHOT CLOCK</div>
                 </div>

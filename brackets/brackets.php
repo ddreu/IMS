@@ -371,7 +371,7 @@ include '../navbar/navbar.php';
                                     <label for="bracketType">Bracket Type:</label>
                                     <select class="form-control" id="bracketTypeSelect" name="bracketType">
                                         <option value="single">Single Elimination</option>
-                                        <option value="double">Double Elimination</option>
+                                        <!-- <option value="double">Double Elimination</option> -->
                                         <option value="single_round_robin">Single Round Robin</option>
 
                                     </select>

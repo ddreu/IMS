@@ -245,9 +245,16 @@ if (isset($_SESSION['message']) && isset($_SESSION['message_type'])) {
                                                 echo '<td class="px-4">' . htmlspecialchars($row['email']) . '</td>';
                                                 echo '<td class="px-4"><span class="badge ' . getRoleBadgeClass($row['role']) . '">' . htmlspecialchars($row['role'] ?? 'N/A') . '</span></td>';
                                                 echo '<td class="px-4">' . htmlspecialchars($row['school_name'] ?? 'N/A') . '</td>';
-                                                $deptDisplay = ($row['role'] === 'Committee')
-                                                    ? ($row['committee_department_names'] ?? 'N/A')
-                                                    : ($row['department_name'] ?? 'N/A');
+                                                // $deptDisplay = ($row['role'] === 'Committee')
+                                                //     ? ($row['committee_department_names'] ?? 'N/A')
+                                                //     : ($row['department_name'] ?? 'N/A');
+                                                if ($row['role'] === 'Committee') {
+                                                    $mainDept = $row['department_name'] ?? '';
+                                                    $extraDepts = $row['committee_department_names'] ?? '';
+                                                    $deptDisplay = trim($mainDept . ($extraDepts ? ', ' . $extraDepts : '')) ?: 'N/A';
+                                                } else {
+                                                    $deptDisplay = $row['department_name'] ?? 'N/A';
+                                                }
 
                                                 echo '<td class="px-4">' . htmlspecialchars($deptDisplay) . '</td>';
                                                 echo '<td class="px-4">';

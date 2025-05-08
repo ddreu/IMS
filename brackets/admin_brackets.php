@@ -274,7 +274,7 @@ include '../navbar/navbar.php';
                                             <th>Total Teams</th>
                                             <th>Status</th>
                                             <th>Bracket Type</th>
-                                            <th>Created At</th>
+                                            <!-- <th>Created At</th> -->
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -447,7 +447,7 @@ include '../navbar/navbar.php';
     <td>${bracket.total_teams}</td>
     <td>${bracket.status}</td>
     <td>${bracket.bracket_type}</td>
-    <td>${new Date(bracket.created_at).toLocaleDateString()}</td>
+    <!-- <td>${new Date(bracket.created_at).toLocaleDateString()}</td> -->
     <td>
         <div class="dropdown">
             <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">

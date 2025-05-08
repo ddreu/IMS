@@ -77,7 +77,7 @@ if (!isset($_SESSION['unique_id'])) {
         <div class="details">
           <span><?php echo $row['firstname'] ?></span>
           <div class="status-dot">
-            <p><?php echo $online ?></p>
+            <!-- <p><?php echo $online ?></p> -->
           </div>
         </div>
 

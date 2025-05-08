@@ -59,8 +59,11 @@ while ($stat = $stats_result->fetch_assoc()) {
     $game_stats[] = $stat;
 }
 
+$excluded_stats = ['turnovers', 'fouls']; // Add any other bad stats here
+
+
 // Function to calculate player score based on stats and position
-function calculatePlayerScore($player, $game_stats)
+function calculatePlayerScore($player, $game_stats, $excluded_stats = [])
 {
     $score = 0;
     $position = strtolower($player['position']);
@@ -69,6 +72,11 @@ function calculatePlayerScore($player, $game_stats)
         $stat_name = strtolower($stat['stat_name']);
         if (isset($player['stats'][$stat['stat_name']])) {
             $stat_value = $player['stats'][$stat['stat_name']];
+
+            if (in_array($stat_name, $excluded_stats)) {
+                continue;
+            }
+
 
             // Base weights for different stats
             switch ($stat_name) {
@@ -209,12 +217,21 @@ $teamA_players = getPlayerStats($conn, $match['teamA_id'], $match_id);
 $teamB_players = getPlayerStats($conn, $match['teamB_id'], $match_id);
 
 // Find the Player of the Game
-$all_players = array_merge($teamA_players, $teamB_players);
+$winning_team_id = null;
+if ($match['score_teamA'] > $match['score_teamB']) {
+    $winning_team_id = $match['teamA_id'];
+    $all_players = $teamA_players;
+} elseif ($match['score_teamB'] > $match['score_teamA']) {
+    $winning_team_id = $match['teamB_id'];
+    $all_players = $teamB_players;
+} else {
+    $all_players = array_merge($teamA_players, $teamB_players); // fallback for a tie
+}
 $potg = null;
 $highest_score = 0;
 
 foreach ($all_players as $player) {
-    $player_score = calculatePlayerScore($player, $game_stats);
+    $player_score = calculatePlayerScore($player, $game_stats, $excluded_stats);
     if ($player_score > $highest_score) {
         $highest_score = $player_score;
         $potg = $player;
