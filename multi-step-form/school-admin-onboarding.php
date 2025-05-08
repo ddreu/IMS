@@ -57,10 +57,11 @@
                         <input type="checkbox" value="Table Tennis">
                         <i class="fas fa-table-tennis"></i> Table Tennis
                     </label>
-                    <label class="game-badge">
+
+                    <!-- <label class="game-badge">
                         <input type="checkbox" value="Football">
                         <i class="fas fa-futbol"></i> Football
-                    </label>
+                    </label> -->
                     <label class="game-badge">
                         <input type="checkbox" value="Chess">
                         <i class="fas fa-chess"></i> Chess
@@ -69,14 +70,14 @@
                         <input type="checkbox" value="Soccer">
                         <i class="fas fa-futbol"></i> Soccer
                     </label>
-                    <label class="game-badge">
+                    <!-- <label class="game-badge">
                         <input type="checkbox" value="Swimming">
                         <i class="fas fa-swimmer"></i> Swimming
                     </label>
                     <label class="game-badge">
                         <input type="checkbox" value="Track and Field">
                         <i class="fas fa-running"></i> Track & Field
-                    </label>
+                    </label> -->
                     <label class="game-badge">
                         <input type="checkbox" value="Others" id="others-checkbox">
                         <i class="fas fa-plus"></i> Others

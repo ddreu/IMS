@@ -203,22 +203,23 @@
             if (isset($_SESSION['school_id']) && $_SESSION['school_id']) {
                 $game_query = "SELECT game_id, game_name FROM games WHERE school_id = ? AND is_archived = 0";
                 $game_stmt = $conn->prepare($game_query);
-                $game_stmt->bind_param("i", $_SESSION['school_id']);  // Directly use the session value
+                $game_stmt->bind_param("i", $_SESSION['school_id']);
                 $game_stmt->execute();
                 $game_fetch_result = $game_stmt->get_result();
 
-                // Fetch and generate options for the dropdown
-                while ($game_row = $game_fetch_result->fetch_assoc()) {
-                    // $selected_option = ($game_row['game_id'] == $_SESSION['game_id']) ? 'selected' : ''; // Directly use the session value
-                    $selected_option = (isset($_SESSION['game_id']) && $_SESSION['game_id'] == $game_id) ? 'selected' : '';
+                // Safely get session game_id (if set)
+                $session_game_id = $_SESSION['game_id'] ?? null;
 
+                // Generate dropdown options
+                while ($game_row = $game_fetch_result->fetch_assoc()) {
+                    $selected_option = ($session_game_id && $game_row['game_id'] == $session_game_id) ? 'selected' : '';
                     $game_dropdown_options .= '<option value="' . $game_row['game_id'] . '" ' . $selected_option . '>' . htmlspecialchars($game_row['game_name']) . '</option>';
                 }
 
-                // Close the prepared statement after usage
                 $game_stmt->close();
             }
             ?>
+
 
 
             <!-- Game Dropdown -->
