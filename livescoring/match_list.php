@@ -593,12 +593,12 @@ include '../navbar/navbar.php';
                                                                             href="live-stream.php?schedule_id=<?= $row['schedule_id']; ?>&teamA_id=<?= $row['teamA_id']; ?>&teamB_id=<?= $row['teamB_id']; ?>&game_id=<?= $row['game_id']; ?>">
                                                                             Live Stream
                                                                         </a>
-                                                                    <li>
+                                                                        <!-- <li>
                                                                         <button class="dropdown-item" onclick="castScoreboard(<?= $row['schedule_id']; ?>)">
                                                                             Cast Scoreboard
                                                                         </button>
 
-                                                                    </li>
+                                                                    </li> -->
 
                                                                     </li>
                                                                 <?php elseif ($row['status'] === 'Finished'): ?>
