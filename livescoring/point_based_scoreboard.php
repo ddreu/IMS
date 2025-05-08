@@ -425,7 +425,7 @@ $conn->close();
 
             if (!session) {
                 context.requestSession().then(() => {
-                    console.log("✅ Cast session started.");
+                    console.log(" Cast session started.");
                 }).catch(err => {
                     console.error(" Cast session failed:", err);
                 });

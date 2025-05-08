@@ -209,7 +209,9 @@
 
                 // Fetch and generate options for the dropdown
                 while ($game_row = $game_fetch_result->fetch_assoc()) {
-                    $selected_option = ($game_row['game_id'] == $_SESSION['game_id']) ? 'selected' : ''; // Directly use the session value
+                    // $selected_option = ($game_row['game_id'] == $_SESSION['game_id']) ? 'selected' : ''; // Directly use the session value
+                    $selected_option = (isset($_SESSION['game_id']) && $_SESSION['game_id'] == $game_id) ? 'selected' : '';
+
                     $game_dropdown_options .= '<option value="' . $game_row['game_id'] . '" ' . $selected_option . '>' . htmlspecialchars($game_row['game_name']) . '</option>';
                 }
 

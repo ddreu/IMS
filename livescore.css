@@ -76,7 +76,7 @@
   color: #dc2626;
 }
 .match-title {
-  font-size: 4vw;
+  font-size: 1.1rem;
   font-weight: 600;
   margin: 0;
   color: #1a202c;
@@ -89,7 +89,7 @@
   background: rgba(255, 255, 255, 0.15);
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
-  font-size: 3vw;
+  font-size: 0.875rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;

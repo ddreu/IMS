@@ -117,6 +117,8 @@ function updatePeriod(change) {
 function startTimer() {
     if (!timerRunning && timeLeft > 0) {
         timerRunning = true;
+
+        // Start the countdown
         timerInterval = setInterval(() => {
             if (timeLeft > 0) {
                 timeLeft--;
@@ -127,8 +129,51 @@ function startTimer() {
                 alert('Period ended!');
             }
         }, 1000);
+
+        // Start background syncing every 3 seconds
+        timerUpdateInterval = setInterval(() => {
+            if (timerRunning) {
+                updateServerTimer(); // send to PHP backend
+            }
+        }, 3000);
     }
 }
+
+// This should be declared globally so you can clear it later
+let timerUpdateInterval;
+
+// Function to send current time to the backend
+function updateServerTimer() {
+    const schedule_id = window.gameData?.schedule_id;
+    const period = parseInt(document.getElementById('periodCounter').textContent);
+    const timer_status = timerRunning ? 'running' : 'paused';
+
+    if (!schedule_id) {
+        console.warn('Missing schedule_id for timer update');
+        return;
+    }
+
+    fetch('timer/update_timer.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            schedule_id,
+            time_remaining: timeLeft,
+            period,
+            timer_status
+        })
+    })
+    .then(res => res.ok ? res.text() : Promise.reject(res.statusText))
+    .then(result => {
+        console.log('Timer update successful:', result);
+    })
+    .catch(err => {
+        console.error('Timer update failed:', err);
+    });
+}
+
 
  // Define global toggle functions
  function initPlayerStatsToggle() {
@@ -452,11 +497,11 @@ function startTimer() {
              });
      }
  };
-
-
-function pauseTimer() {
+ function pauseTimer() {
     clearInterval(timerInterval);
+    clearInterval(timerUpdateInterval); // stop server sync
     timerRunning = false;
+    updateServerTimer(); // send final update on pause
 }
 
 function resetTimer() {
@@ -464,6 +509,18 @@ function resetTimer() {
     timeLeft = gameSettings.periodLength * 60;
     updateGameTimer();
 }
+
+
+// function pauseTimer() {
+//     clearInterval(timerInterval);
+//     timerRunning = false;
+// }
+
+// function resetTimer() {
+//     pauseTimer();
+//     timeLeft = gameSettings.periodLength * 60;
+//     updateGameTimer();
+// }
 
 // Shot clock controls
 function startShotClock() {
