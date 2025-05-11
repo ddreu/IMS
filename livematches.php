@@ -135,9 +135,13 @@ session_start();
 
             if (match.source_table === 'live_scores') {
                 vsContent += `
-                    <div class="period-info">
+                   <!-- <div class="period-info">
                         Period ${match.teamA.additional_info.period}
-                    </div>
+                    </div> -->
+                    <div class="period-info">
+    Period ${match.source_table === 'live_scores' && match.teamA.additional_info.period == 5 ? 'OT' : match.teamA.additional_info.period}
+</div>
+
                     ${match.teamA.additional_info.timer ? `
                         <div class="timer-display">
                             ${match.teamA.additional_info.timer}

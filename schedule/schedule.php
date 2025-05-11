@@ -313,6 +313,10 @@ include '../navbar/navbar.php';
                                     <button id="exportSchedules" class="btn btn-success">
                                         <i class="fas fa-file-excel"></i> Export Schedules
                                     </button>
+                                    <button id="exportSchedulesPDF" class="btn btn-danger">
+                                        <i class="fas fa-file-pdf"></i> Export PDF
+                                    </button>
+
                                 </div>
                             </div>
                             <div id="calendar"></div>
@@ -1194,6 +1198,7 @@ include '../navbar/navbar.php';
         });
     </script>
     <script src="js/schedule.js"></script>
+    <script src="js/schedulePDF.js"></script>
 </body>
 
 </html>

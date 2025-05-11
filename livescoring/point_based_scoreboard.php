@@ -246,15 +246,15 @@ $conn->close();
         <div style="display: flex; flex-direction: column; gap: 10px;">
             <div>
                 <label style="color: white;">Period Length (minutes)</label>
-                <input type="number" id="periodLength" value="10" min="1" max="60" style="width: 60px; margin-left: 10px;">
+                <input type="number" id="periodLength" value="10" min="1" max="60" onchange="applyPeriodLength(this.value)">
             </div>
             <div>
                 <label style="color: white;">Number of Periods</label>
-                <input type="number" id="numberOfPeriods" value="4" min="1" max="10" style="width: 60px; margin-left: 10px;">
+                <input type="number" id="numberOfPeriods" value="4" min="1" max="10" onchange="applyNumberOfPeriods(this.value)">
             </div>
             <div>
                 <label style="color: white;">Shot Clock Duration</label>
-                <input type="number" id="shotClockDuration" value="24" min="1" max="60" style="width: 60px; margin-left: 10px;">
+                <input type="number" id="shotClockDuration" value="24" min="1" max="60" onchange="applyShotClockDuration(this.value)">
             </div>
             <button class="score-button fullscreen-button" onclick="toggleFullscreen()">
                 <i class="fas fa-expand"></i>
@@ -268,9 +268,18 @@ $conn->close();
             <a href="player_statistics_panel.php?schedule_id=<?php echo $schedule_id; ?>&teamA_id=<?php echo $teamA_id; ?>&teamB_id=<?php echo $teamB_id; ?>&game_id=<?php echo $game_id; ?>" class="score-button" style="text-align: center; margin-top: 10px;">
                 <i class="fas fa-users me-2"></i> Go to Player Stats
             </a>
+            <div>
+                <label style="color: white;">
+                    <!-- <input type="checkbox" id="syncPlayerStatsToScore" onchange="applySyncToggle(this.checked)"> -->
+                    <input type="checkbox" id="syncPlayerStatsToScore" onchange="applySyncToggle(this.checked)">
+
+                    Sync player stats to team score
+                </label>
+            </div>
+
 
             <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                <button class="score-button" onclick="saveSettings()">Save</button>
+                <!-- <button class="score-button" onclick="saveSettings()">Save</button> -->
                 <button class="score-button" onclick="closeSettings()">Cancel</button>
             </div>
         </div>
@@ -324,6 +333,7 @@ $conn->close();
         </div>
     </div> -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="stats-sync.js"></script>
 
     <script>
         // Function to clear all saved state for this specific match

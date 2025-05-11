@@ -15,19 +15,19 @@ $team_query->execute();
 $team_result = $team_query->get_result()->fetch_assoc();
 
 // Prepare log description
-$description = "Preparing player statistics for match: " . 
-    ($team_result['teamA_name'] ?? 'Team A') . 
-    " vs " . 
+$description = "Preparing player statistics for match: " .
+    ($team_result['teamA_name'] ?? 'Team A') .
+    " vs " .
     ($team_result['teamB_name'] ?? 'Team B');
 
 // Log user action with error handling
 try {
     logUserAction(
-        $conn, 
-        $_SESSION['user_id'], 
-        'Player Statistics', 
-        'PREPARE', 
-        $_GET['schedule_id'], 
+        $conn,
+        $_SESSION['user_id'],
+        'Player Statistics',
+        'PREPARE',
+        $_GET['schedule_id'],
         $description
     );
 } catch (Exception $e) {
@@ -92,6 +92,7 @@ if (!$rules) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -101,6 +102,7 @@ if (!$rules) {
     <link rel="stylesheet" href="styles.css">
     <script defer src="script.js"></script>
 </head>
+
 <body class="bg-light">
     <div class="container-fluid">
         <div class="row bg-primary text-white py-3 mb-4 align-items-center">
@@ -109,6 +111,7 @@ if (!$rules) {
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
             </div>
+
             <div class="col text-center">
                 <h2 class="mb-0">Player Statistics</h2>
             </div>
@@ -169,39 +172,74 @@ if (!$rules) {
         document.addEventListener('DOMContentLoaded', function() {
             const gameId = <?= $_SESSION['game_id'] ?>;
             const scheduleId = <?= $_GET['schedule_id'] ?>;
-            let playerStats = JSON.parse(localStorage.getItem('playerStats') || '{}');
+            let playerStats = JSON.parse(localStorage.getItem(`playerStats_${scheduleId}`) || '{}');
+            let playerStatsMeta = JSON.parse(localStorage.getItem(`playerStatsMeta_${scheduleId}`) || '{}');
+            const pastStatsKey = `playerStatsPastSets_${scheduleId}`;
+            const pastStats = JSON.parse(localStorage.getItem(pastStatsKey) || '{}');
+
+
 
             // Function to save stats to local storage
             function saveStatsToLocalStorage() {
-                localStorage.setItem('playerStats', JSON.stringify(playerStats));
+                const statsKey = `playerStats_${scheduleId}`;
+                const metaKey = `playerStatsMeta_${scheduleId}`;
+
+                localStorage.setItem(statsKey, JSON.stringify(playerStats));
+                localStorage.setItem(metaKey, JSON.stringify(playerStatsMeta));
+
+                console.log(`🧠 *Saved player stats to localStorage* [${statsKey}]`);
+                console.table(playerStats);
+
+                console.log(`🧠 *Saved player stats meta to localStorage* [${metaKey}]`);
+                console.table(playerStatsMeta);
             }
 
+
             // Function to handle stat updates dynamically
+            // function updateStat(button, increment) {
+            //     const statRow = button.closest('.stat-row');
+            //     const statValue = statRow.querySelector('.stat-value');
+            //     const playerId = statRow.dataset.playerId;
+            //     const statConfigId = statRow.dataset.statConfigId;
+            //     const teamId = statRow.dataset.teamId; // ✅ ADD THIS LINE
+
+            //     let currentValue = parseInt(statValue.textContent);
+            //     let newValue = Math.max(0, currentValue + increment);
+
+            //     statValue.textContent = newValue;
+
+            //     const statKey = `team_${teamId}_player_${playerId}_stat_${statConfigId}`;
+            //     playerStats[statKey] = newValue;
+
+            //     saveStatsToLocalStorage();
+
+            //     statValue.classList.add('text-success');
+            //     setTimeout(() => statValue.classList.remove('text-success'), 500);
+            // }
             function updateStat(button, increment) {
-                // Find the closest stat row
                 const statRow = button.closest('.stat-row');
                 const statValue = statRow.querySelector('.stat-value');
                 const playerId = statRow.dataset.playerId;
                 const statConfigId = statRow.dataset.statConfigId;
+                const teamId = statRow.dataset.teamId;
 
-                // Get current value and calculate new value
-                let currentValue = parseInt(statValue.textContent);
-                let newValue = Math.max(0, currentValue + increment);
-                
-                // Update display
-                statValue.textContent = newValue;
+                const statKey = `team_${teamId}_player_${playerId}_stat_${statConfigId}`;
+                const pastValue = pastStats[statKey] || 0;
+                const currentValue = playerStats[statKey] || 0;
 
-                // Update tracking object
-                const statKey = `player_${playerId}_stat_${statConfigId}`;
+                const newValue = Math.max(0, currentValue + increment);
                 playerStats[statKey] = newValue;
 
-                // Save to local storage
+                // 👇 Only subtract visually
+                statValue.textContent = Math.max(0, newValue - pastValue);
+
                 saveStatsToLocalStorage();
 
-                // Optional: Highlight changes
                 statValue.classList.add('text-success');
                 setTimeout(() => statValue.classList.remove('text-success'), 500);
             }
+            /////////////
+
 
             // Function to submit all player stats
             function submitPlayerStats() {
@@ -209,13 +247,26 @@ if (!$rules) {
                 const statsToSubmit = Object.entries(playerStats)
                     .filter(([key, value]) => value > 0)
                     .map(([key, value]) => {
-                        const [, playerId, statConfigId] = key.match(/player_(\d+)_stat_(\d+)/);
+                        const match = key.match(/team_(\d+)_player_(\d+)_stat_(\d+)/);
+                        if (!match) return null;
+                        const [_, teamId, playerId, statConfigId] = match;
                         return {
-                            player_id: playerId,
-                            stat_config_id: statConfigId,
-                            stat_value: value
+                            player_id: parseInt(playerId),
+                            stat_config_id: parseInt(statConfigId),
+                            stat_value: parseInt(value)
                         };
-                    });
+                    })
+
+                // .map(([key, value]) => {
+                //     const [, teamId, playerId, statConfigId] = key.match(/team_(\d+)_player_(\d+)_stat_(\d+)/);
+                //     return {
+                //         team_id: teamId, // <-- include this
+                //         player_id: playerId,
+                //         stat_config_id: statConfigId,
+                //         stat_value: value
+                //     };
+
+                // });
 
                 // Check if there are any stats to submit
                 if (statsToSubmit.length === 0) {
@@ -254,42 +305,42 @@ if (!$rules) {
                             if (confirmResult.isConfirmed) {
                                 // Send stats to server
                                 fetch('save_player_stats.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({
-                                        schedule_id: scheduleId,
-                                        stats: statsToSubmit
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            schedule_id: scheduleId,
+                                            stats: statsToSubmit
+                                        })
                                     })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        // Get match_id from the server response
-                                        const matchId = data.match_id; // Assuming the server returns match_id
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            // Get match_id from the server response
+                                            const matchId = data.match_id; // Assuming the server returns match_id
 
-                                        // Clear local storage after successful submission
-                                        localStorage.removeItem('playerStats');
+                                            // Clear local storage after successful submission
+                                            localStorage.removeItem('playerStats');
 
-                                        // Redirect to match summary with match_id and schedule_id
-                                        window.location.href = `match_summary.php?match_id=${matchId}&schedule_id=${scheduleId}&status=success`;
-                                    } else {
+                                            // Redirect to match summary with match_id and schedule_id
+                                            window.location.href = `match_summary.php?match_id=${matchId}&schedule_id=${scheduleId}&status=success`;
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Submission Failed',
+                                                text: data.message || 'Unable to submit player statistics.'
+                                            });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
                                         Swal.fire({
                                             icon: 'error',
-                                            title: 'Submission Failed',
-                                            text: data.message || 'Unable to submit player statistics.'
+                                            title: 'Submission Error',
+                                            text: 'There was a problem submitting the statistics.'
                                         });
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Submission Error',
-                                        text: 'There was a problem submitting the statistics.'
                                     });
-                                });
                             }
                         });
                     }
@@ -319,39 +370,54 @@ if (!$rules) {
                     const playerItem = document.createElement('li');
                     playerItem.className = 'list-group-item';
                     playerItem.innerHTML = `<div class='player-name fw-bold'>${player.player_name}</div>`;
-                    
+
                     const statsContainer = document.createElement('div');
                     stats.forEach(stat => {
-                        const statKey = `player_${player.player_id}_stat_${stat.config_id}`;
-                        
+                        const statKey = `team_${player.team_id}_player_${player.player_id}_stat_${stat.config_id}`;
+
                         // Restore previous value from local storage if exists
                         playerStats[statKey] = playerStats[statKey] || 0;
-                        
+
+                        // ✅ Always render the UI
                         const statRow = document.createElement('div');
                         statRow.className = 'stat-row d-flex justify-content-between align-items-center mb-2';
+                        statRow.dataset.teamId = player.team_id;
+
                         statRow.dataset.playerId = player.player_id;
                         statRow.dataset.statConfigId = stat.config_id;
-                        
+
                         statRow.innerHTML = `
-                            <span class="stat-name fw-bold flex-grow-1">${stat.stat_name}</span>
-                            <div class="stat-controls d-flex align-items-center">
-                                <button class="btn btn-sm btn-outline-danger decrement-stat me-2">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <span class="stat-value badge bg-secondary fs-5">${playerStats[statKey]}</span>
-                                <button class="btn btn-sm btn-outline-success increment-stat ms-2">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        `;
-                        
-                        // Add event listeners using event delegation
+        <span class="stat-name fw-bold flex-grow-1">${stat.stat_name}</span>
+        <div class="stat-controls d-flex align-items-center">
+            <button class="btn btn-sm btn-outline-danger decrement-stat me-2">
+                <i class="fas fa-minus"></i>
+            </button>
+          <!--  <span class="stat-value badge bg-secondary fs-5">${playerStats[statKey]}</span> -->
+          <span class="stat-value badge bg-secondary fs-5">
+  ${Math.max(0, playerStats[statKey] - (pastStats[statKey] || 0))}
+</span>
+
+            <button class="btn btn-sm btn-outline-success increment-stat ms-2">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    `;
+
+                        // ✅ Save stat name meta (once per stat config)
+                        if (!playerStatsMeta[stat.config_id]) {
+                            playerStatsMeta[stat.config_id] = {
+                                stat_name: stat.stat_name
+                            };
+                        }
+
+                        // ✅ Add event listeners
                         statRow.querySelector('.increment-stat').addEventListener('click', (e) => updateStat(e.currentTarget, 1));
                         statRow.querySelector('.decrement-stat').addEventListener('click', (e) => updateStat(e.currentTarget, -1));
-                        
+
                         statsContainer.appendChild(statRow);
                     });
-                    
+
+
                     playerItem.appendChild(statsContainer);
                     (player.team_id === <?= $_GET['teamA_id'] ?> ? teamAList : teamBList).appendChild(playerItem);
                 });
@@ -359,7 +425,31 @@ if (!$rules) {
                 // Add event listener to submit button in header
                 document.getElementById('submitAllStats').addEventListener('click', submitPlayerStats);
             }
+
+            setInterval(() => {
+                const updatedPastStats = JSON.parse(localStorage.getItem(`playerStatsPastSets_${scheduleId}`) || '{}');
+                Object.assign(pastStats, updatedPastStats); // Update in-place
+
+                document.querySelectorAll('.stat-row').forEach(row => {
+                    const playerId = row.dataset.playerId;
+                    const statConfigId = row.dataset.statConfigId;
+                    const teamId = row.dataset.teamId;
+
+                    const statKey = `team_${teamId}_player_${playerId}_stat_${statConfigId}`;
+                    const currentValue = playerStats[statKey] || 0;
+                    const pastValue = pastStats[statKey] || 0;
+
+                    const statValueElement = row.querySelector('.stat-value');
+                    if (statValueElement) {
+                        statValueElement.textContent = Math.max(0, currentValue - pastValue);
+                    }
+                });
+
+                console.log('🔁 *Past stats updated from localStorage and UI refreshed*');
+            }, 3000);
+
         });
     </script>
 </body>
+
 </html>

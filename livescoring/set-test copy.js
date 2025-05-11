@@ -366,27 +366,17 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      //   const { teamA, teamB } = window.syncedTeamScores;
-      //   const scheduleId = this.scheduleId;
-      //   const currentSet =
-      //     parseInt(document.getElementById("currentSet").textContent) || 1;
-
-      //   // Load previous total scores for this set
-      //   const pastScoreKey = `past_set_total_${scheduleId}_set${currentSet - 1}`;
-      //   const pastTotals = JSON.parse(localStorage.getItem(pastScoreKey)) || {
-      //     teamA: 0,
-      //     teamB: 0,
-      //   };
-
       const { teamA, teamB } = window.syncedTeamScores;
       const scheduleId = this.scheduleId;
       const currentSet =
         parseInt(document.getElementById("currentSet").textContent) || 1;
 
-      // Use cumulative past stats
-      const pastTotals = getCumulativePastSetTotals(scheduleId, currentSet);
-
-      /////////////
+      // Load previous total scores for this set
+      const pastScoreKey = `past_set_total_${scheduleId}_set${currentSet - 1}`;
+      const pastTotals = JSON.parse(localStorage.getItem(pastScoreKey)) || {
+        teamA: 0,
+        teamB: 0,
+      };
 
       // Calculate set-specific scores
       const setScoreA = Math.max(0, teamA - pastTotals.teamA);
@@ -496,19 +486,6 @@ document.addEventListener("DOMContentLoaded", function () {
           teamB: data.teamB_score,
         })
       );
-
-      // ✅ Save past player stats snapshot too
-      const playerStatsKey = `playerStats_${this.scheduleId}`;
-      const pastStatsKey = `playerStatsPastSets_${this.scheduleId}`;
-
-      const currentStats = localStorage.getItem(playerStatsKey);
-      if (currentStats) {
-        localStorage.setItem(pastStatsKey, currentStats);
-        console.log(
-          "💾 Saved past player stats snapshot for set end:",
-          pastStatsKey
-        );
-      }
     },
 
     confirmEndSet: function () {
@@ -913,18 +890,4 @@ function disableManualScoreButtons(disable) {
     btn.disabled = disable;
     btn.title = disable ? "Disabled while stats sync is active" : "";
   });
-}
-
-function getCumulativePastSetTotals(scheduleId, currentSet) {
-  const totals = { teamA: 0, teamB: 0 };
-
-  for (let i = 1; i < currentSet; i++) {
-    const key = `past_set_total_${scheduleId}_set${i}`;
-    const snapshot = JSON.parse(localStorage.getItem(key) || "{}");
-
-    totals.teamA += snapshot.teamA || 0;
-    totals.teamB += snapshot.teamB || 0;
-  }
-
-  return totals;
 }

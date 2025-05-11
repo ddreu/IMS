@@ -1,17 +1,36 @@
 // Game settings
 let gameSettings = {
   periodLength: 10,
-  numberOfPeriods: 4,
+  numberOfPeriods: 5,
   shotClockDuration: 24,
   maxFouls: 5,
   maxTimeouts: 5,
   scoringUnit: 1, // Added scoringUnit property
   timeoutsPerPeriod: 5, // Added timeoutsPerPeriod property
 };
+let playerStats = {};
+// Load saved stats for use during match end
+playerStats = JSON.parse(
+  localStorage.getItem(`playerStats_${window.gameData.schedule_id}`) || "{}"
+);
 
 // Game settings and state
 let timerRunning = false;
 let timeLeft = 600; // 10 minutes in seconds
+
+const scoringStatKeywords = [
+  "point",
+  "score",
+  "Scores",
+  "spike",
+  "kill",
+  "goal",
+  "basket",
+  "ace",
+  "made",
+  "run",
+  "touchdown",
+];
 
 // Ensure game data is available
 if (!window.gameData) {
@@ -24,14 +43,48 @@ let timerInterval;
 let shotClockInterval;
 let shotClockTime;
 let isShotClockRunning = false;
-let playerStats = JSON.parse(localStorage.getItem("playerStats") || "{}");
+JSON.parse(
+  localStorage.getItem(`playerStats_${window.gameData.schedule_id}`) || "{}"
+);
+
+function isScoringStat(statName) {
+  const normalized = statName.trim().toLowerCase();
+
+  const stemmed = normalized.replace(/s$/, ""); // Remove trailing 's' if any
+
+  return scoringStatKeywords.some((keyword) => stemmed.includes(keyword));
+}
+
+function getTeamScoreFromPlayerStats(teamId, scoringStatIds, playerStatsData) {
+  if (!Array.isArray(scoringStatIds) || !window.players) return 0;
+
+  return window.players
+    .filter((player) => player.team_id === parseInt(teamId))
+    .reduce((total, player) => {
+      return scoringStatIds.reduce((sum, statId) => {
+        const key = `player_${player.player_id}_stat_${statId}`;
+        return sum + (parseInt(playerStatsData[key]) || 0);
+      }, total);
+    }, 0);
+}
+
+// const scoringStatIds = statsConfig
+//   .filter((stat) => isScoringStat(stat.stat_name))
+//   .map((stat) => stat.config_id);
 
 // Initialize the game
 function initializeGame() {
   timeLeft = gameSettings.periodLength * 60;
   shotClockTime = gameSettings.shotClockDuration;
   updateDisplays();
+  const syncCheckbox = document.getElementById("syncPlayerStatsToScore");
 
+  if (syncCheckbox) {
+    const isChecked = localStorage.getItem("syncPlayerStatsToScore") === "true";
+    syncCheckbox.checked = isChecked;
+
+    applySyncToggle(isChecked);
+  }
   // Initialize settings inputs
   document.getElementById("periodLength").value = gameSettings.periodLength;
   document.getElementById("numberOfPeriods").value =
@@ -44,6 +97,68 @@ function initializeGame() {
     gameSettings.maxTimeouts;
   document.getElementById("teamBTimeouts").textContent =
     gameSettings.maxTimeouts;
+}
+function displayPeriod(value) {
+  return value === 5 ? "OT" : value;
+}
+
+function fetchScoringStatIds(gameId) {
+  return fetch(`get_game_stats_config.php?game_id=${gameId}`)
+    .then((res) => res.json())
+    .then((stats) => {
+      if (!Array.isArray(stats)) throw new Error("Invalid config");
+
+      const ids = stats
+        .filter((stat) => isScoringStat(stat.stat_name))
+        .map((stat) => parseInt(stat.config_id));
+
+      window.scoringStatIds = ids;
+      console.log("Scoring stat IDs initialized:", ids);
+    })
+    .catch((err) => console.error("Error fetching scoring stat config:", err));
+}
+function disableManualScoreButtons(disabled) {
+  const buttons = document.querySelectorAll(
+    ".score-wrapper button[onclick^='updateScore']"
+  );
+  buttons.forEach((btn) => {
+    btn.disabled = disabled;
+    btn.style.opacity = disabled ? "0.5" : "1";
+    btn.style.pointerEvents = disabled ? "none" : "auto";
+  });
+}
+
+function syncTeamScoresIfEnabled() {
+  console.log("Syncing team scores...");
+
+  if (localStorage.getItem("syncPlayerStatsToScore") !== "true") return;
+
+  disableManualScoreButtons(true);
+
+  if (!window.syncedTeamScores) {
+    console.warn("⚠️ syncedTeamScores not available. Skipping sync.");
+    return;
+  }
+
+  const { teamA, teamB } = window.syncedTeamScores;
+
+  const teamAScore = String(teamA).padStart(2, "0");
+  const teamBScore = String(teamB).padStart(2, "0");
+
+  const teamAEl = document.getElementById("teamAScore");
+  const teamBEl = document.getElementById("teamBScore");
+
+  if (teamAEl) teamAEl.textContent = teamAScore;
+  if (teamBEl) teamBEl.textContent = teamBScore;
+
+  // ✅ Save and trigger update like manual button does
+  stateManager.save();
+  sendUpdate();
+
+  console.log("*✅ Synced scores to HTML elements & backend:*", {
+    teamA: teamAScore,
+    teamB: teamBScore,
+  });
 }
 
 // Update all displays
@@ -103,21 +218,44 @@ function updateTimeouts(team, change) {
 }
 
 // Period controls
+// function updatePeriod(change) {
+//   let periodElement = document.getElementById("periodCounter");
+//   let period = parseInt(periodElement.textContent);
+//   period = Math.max(1, Math.min(gameSettings.numberOfPeriods, period + change));
+//   // periodElement.textContent = period;
+//   periodElement.textContent = displayPeriod(period);
+//   stateManager.save();
+//   sendUpdate();
+
+//   if (change > 0) {
+//     // Reset timers for new period
+//     resetTimer();
+//     resetShotClock();
+//   }
+// }
 function updatePeriod(change) {
   let periodElement = document.getElementById("periodCounter");
-  let period = parseInt(periodElement.textContent);
-  period = Math.max(1, Math.min(gameSettings.numberOfPeriods, period + change));
-  periodElement.textContent = period;
+  let rawValue = periodElement.textContent;
+  let currentPeriod = rawValue === "OT" ? 5 : parseInt(rawValue);
+
+  if (isNaN(currentPeriod)) currentPeriod = 1; // fallback safety
+
+  let updatedPeriod = currentPeriod + change;
+  updatedPeriod = Math.max(
+    1,
+    Math.min(gameSettings.numberOfPeriods, updatedPeriod)
+  );
+
+  periodElement.textContent = displayPeriod(updatedPeriod);
   stateManager.save();
   sendUpdate();
 
   if (change > 0) {
-    // Reset timers for new period
     resetTimer();
     resetShotClock();
   }
 }
-
+///////
 // Timer controls
 function startTimer() {
   if (!timerRunning && timeLeft > 0) {
@@ -182,6 +320,30 @@ function updateServerTimer() {
     .catch((err) => {
       console.error("Timer update failed:", err);
     });
+}
+
+function applyPeriodLength(value) {
+  gameSettings.periodLength = parseInt(value);
+  resetTimer(); // Applies new time
+  console.log("*Period Length applied immediately*:", value);
+}
+
+function applyNumberOfPeriods(value) {
+  gameSettings.numberOfPeriods = parseInt(value);
+  console.log("*Number of Periods updated*:", value);
+}
+
+function applyShotClockDuration(value) {
+  gameSettings.shotClockDuration = parseInt(value);
+  resetShotClock(); // Applies new shot clock duration
+  console.log("*Shot Clock Duration applied immediately*:", value);
+}
+
+function applySyncToggle(enabled) {
+  localStorage.setItem("syncPlayerStatsToScore", enabled);
+  disableManualScoreButtons(enabled);
+  if (enabled) syncTeamScoresIfEnabled();
+  console.log("*Sync Player Stats to Score:*", enabled);
 }
 
 // Define global toggle functions
@@ -392,41 +554,53 @@ const playerStatsManager = {
 
     if (!teamAList || !teamBList) return;
 
-    // Clear existing content and show loading
     teamAList.innerHTML =
       '<li class="list-group-item text-center text-muted">Loading players...</li>';
     teamBList.innerHTML =
       '<li class="list-group-item text-center text-muted">Loading players...</li>';
 
-    // First fetch players
     fetch(`getPlayersByTeams.php?schedule_id=${scheduleId}`)
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch players");
-        }
+        if (!res.ok) throw new Error("Failed to fetch players");
         return res.json();
       })
       .then((players) => {
-        if (!Array.isArray(players)) {
+        if (!Array.isArray(players))
           throw new Error("Invalid player data received");
-        }
 
-        // Clear loading messages
+        // Save globally for syncing
+        window.players = players;
+
         teamAList.innerHTML = "";
         teamBList.innerHTML = "";
 
-        // Then fetch game stats
         return fetch(`get_game_stats_config.php?game_id=${gameId}`)
           .then((res) => {
-            if (!res.ok) {
-              throw new Error("Failed to fetch game stats config");
-            }
+            if (!res.ok) throw new Error("Failed to fetch game stats config");
             return res.json();
           })
           .then((stats) => {
-            if (!Array.isArray(stats)) {
+            if (!Array.isArray(stats))
               throw new Error("Invalid stats configuration received");
-            }
+
+            const scoringKeywords = [
+              "point",
+              "score",
+              "spike",
+              "kill",
+              "goal",
+              "basket",
+              "ace",
+              "made",
+              "run",
+              "touchdown",
+            ];
+            const isScoringStat = (name) =>
+              scoringKeywords.some((kw) => name.toLowerCase().includes(kw));
+            const scoringStatIds = stats
+              .filter((stat) => isScoringStat(stat.stat_name))
+              .map((stat) => parseInt(stat.config_id));
+            window.scoringStatIds = scoringStatIds;
 
             const template = document.getElementById("playerStatTemplate");
 
@@ -434,21 +608,17 @@ const playerStatsManager = {
               const playerItem = document.createElement("li");
               playerItem.className = "list-group-item";
 
-              // Create player header
               const playerHeader = document.createElement("div");
               playerHeader.className =
                 "d-flex justify-content-between align-items-center mb-3";
               playerHeader.innerHTML = `
-                                 <div class="player-name fw-bold">${
-                                   player.player_name
-                                 }</div>
-                                 <span class="badge bg-secondary">#${
-                                   player.jersey_number || "N/A"
-                                 }</span>
-                             `;
+                <div class="player-name fw-bold">${player.player_name}</div>
+                <span class="badge bg-secondary">#${
+                  player.jersey_number || "N/A"
+                }</span>
+              `;
               playerItem.appendChild(playerHeader);
 
-              // Create stats container
               const statsContainer = document.createElement("div");
               statsContainer.className = "player-stats-container";
 
@@ -462,26 +632,54 @@ const playerStatsManager = {
                 statName.textContent = stat.stat_name;
                 statValue.setAttribute("data-player-id", player.player_id);
                 statValue.setAttribute("data-stat-id", stat.config_id);
+                const statKey = `player_${player.player_id}_stat_${stat.config_id}`;
+                statValue.textContent = playerStats[statKey] || 0;
 
                 incrementBtn.onclick = () => {
                   const currentValue = parseInt(statValue.textContent);
-                  statValue.textContent = currentValue + 1;
+                  const newValue = currentValue + 1;
+                  statValue.textContent = newValue;
+                  playerStats[statKey] = newValue;
+                  localStorage.setItem(
+                    "playerStats",
+                    JSON.stringify(playerStats)
+                  );
+
                   this.updatePlayerStat(
                     player.player_id,
                     stat.config_id,
-                    currentValue + 1
+                    newValue
                   );
+
+                  if (
+                    localStorage.getItem("syncPlayerStatsToScore") === "true"
+                  ) {
+                    syncTeamScoresIfEnabled();
+                  }
                 };
 
                 decrementBtn.onclick = () => {
                   const currentValue = parseInt(statValue.textContent);
                   if (currentValue > 0) {
-                    statValue.textContent = currentValue - 1;
+                    const newValue = currentValue - 1;
+                    statValue.textContent = newValue;
+                    playerStats[statKey] = newValue;
+                    localStorage.setItem(
+                      "playerStats",
+                      JSON.stringify(playerStats)
+                    );
+
                     this.updatePlayerStat(
                       player.player_id,
                       stat.config_id,
-                      currentValue - 1
+                      newValue
                     );
+
+                    if (
+                      localStorage.getItem("syncPlayerStatsToScore") === "true"
+                    ) {
+                      syncTeamScoresIfEnabled();
+                    }
                   }
                 };
 
@@ -490,7 +688,6 @@ const playerStatsManager = {
 
               playerItem.appendChild(statsContainer);
 
-              // Add to appropriate team list
               if (player.team_id === parseInt(teamAId)) {
                 teamAList.appendChild(playerItem);
               } else {
@@ -512,6 +709,7 @@ const playerStatsManager = {
         });
       });
   },
+
   updatePlayerStat: function (playerId, statId, value) {
     const scheduleId = utils.getElement("schedule_id").value;
     fetch(`update_player_stat.php?schedule_id=${scheduleId}`, {
@@ -625,22 +823,26 @@ function closeSettings() {
   document.getElementById("settingsModal").style.display = "none";
 }
 
-function saveSettings() {
-  gameSettings.periodLength = parseInt(
-    document.getElementById("periodLength").value
-  );
-  gameSettings.numberOfPeriods = parseInt(
-    document.getElementById("numberOfPeriods").value
-  );
-  gameSettings.shotClockDuration = parseInt(
-    document.getElementById("shotClockDuration").value
-  );
+// function saveSettings() {
+//   gameSettings.periodLength = parseInt(
+//     document.getElementById("periodLength").value
+//   );
+//   gameSettings.numberOfPeriods = parseInt(
+//     document.getElementById("numberOfPeriods").value
+//   );
+//   gameSettings.shotClockDuration = parseInt(
+//     document.getElementById("shotClockDuration").value
+//   );
 
-  // Reset timers with new settings
-  resetTimer();
-  resetShotClock();
-  closeSettings();
-}
+//   const syncEnabled = document.getElementById("syncPlayerStatsToScore").checked;
+//   localStorage.setItem("syncPlayerStatsToScore", syncEnabled);
+
+//   disableManualScoreButtons(syncEnabled); // ← ADD THIS LINE
+
+//   resetTimer();
+//   resetShotClock();
+//   closeSettings();
+// }
 
 // Team name editing function
 function editTeamName(team) {
@@ -728,8 +930,10 @@ function sendUpdate() {
     parseInt(document.getElementById("teamATimeouts").textContent) || 0;
   const timeoutTeamB =
     parseInt(document.getElementById("teamBTimeouts").textContent) || 0;
-  const currentPeriod =
-    parseInt(document.getElementById("periodCounter").textContent) || 1;
+  // const currentPeriod =
+  //   parseInt(document.getElementById("periodCounter").textContent) || 1;
+  const rawPeriod = document.getElementById("periodCounter").textContent;
+  const currentPeriod = rawPeriod === "OT" ? 5 : parseInt(rawPeriod) || 1;
 
   const data = {
     schedule_id,
@@ -803,7 +1007,12 @@ const stateManager = {
       teamBFouls: document.getElementById("teamBFouls").textContent,
       teamATimeouts: document.getElementById("teamATimeouts").textContent,
       teamBTimeouts: document.getElementById("teamBTimeouts").textContent,
-      periodCounter: document.getElementById("periodCounter").textContent,
+      // periodCounter: document.getElementById("periodCounter").textContent,
+      periodCounter:
+        document.getElementById("periodCounter").textContent === "OT"
+          ? 5
+          : parseInt(document.getElementById("periodCounter").textContent),
+
       timeLeft: timeLeft,
       timerRunning: timerRunning,
     };
@@ -829,8 +1038,11 @@ const stateManager = {
         state.teamBTimeouts;
 
       // Restore period
-      document.getElementById("periodCounter").textContent =
-        state.periodCounter;
+      // document.getElementById("periodCounter").textContent =
+      //   state.periodCounter;
+      document.getElementById("periodCounter").textContent = displayPeriod(
+        parseInt(state.periodCounter)
+      );
 
       // Restore timer
       timeLeft = state.timeLeft;
@@ -927,8 +1139,54 @@ document.addEventListener("keydown", function (event) {
 // Initialize on page load
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Scoreboard initialized with game data:", window.gameData);
+  const scheduleId = window.gameData.schedule_id;
+  const statsKey = `playerStats_${scheduleId}`;
+  const metaKey = `playerStatsMeta_${scheduleId}`;
+
+  const loadedStats = JSON.parse(localStorage.getItem(statsKey) || "{}");
+  const loadedMeta = JSON.parse(localStorage.getItem(metaKey) || "{}");
+
+  playerStats = loadedStats; // assign to global
+
+  console.log(`📦 *Loaded stats from key:* ${statsKey}`);
+  console.table(loadedStats);
+
+  console.log(`📦 *Loaded stat meta from key:* ${metaKey}`);
+  console.table(loadedMeta);
+
+  // Show readable output
+  Object.entries(loadedStats).forEach(([key, value]) => {
+    const [, playerId, statId] = key.match(/player_(\d+)_stat_(\d+)/) || [];
+    const statName = loadedMeta[statId]?.stat_name || "Unknown Stat";
+    console.log(`🧾 Player ${playerId} - ${statName}: ${value}`);
+  });
+
   initializeGame();
   stateManager.restore();
+
+  // ✅ Load players so window.players gets set
+  playerStatsManager.loadPlayerStats();
+
+  Promise.all([
+    fetchScoringStatIds(window.gameData.game_id),
+    new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (
+          window.players &&
+          Array.isArray(window.players) &&
+          window.players.length > 0
+        ) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 100);
+    }),
+  ]).then(() => {
+    const syncEnabled =
+      localStorage.getItem("syncPlayerStatsToScore") === "true";
+    disableManualScoreButtons(syncEnabled);
+    syncTeamScoresIfEnabled(); // ← Will now actually trigger
+  });
 });
 
 // Initialize end match functionality
@@ -987,35 +1245,163 @@ function submitPlayerStats() {
     });
 }
 
+function getSubmittedPlayerStats() {
+  const localStats = JSON.parse(localStorage.getItem("playerStats") || "{}");
+
+  return Object.entries(localStats)
+    .filter(([_, value]) => value > 0)
+    .map(([key, value]) => {
+      const [, playerId, statConfigId] = key.match(/player_(\d+)_stat_(\d+)/);
+      return {
+        player_id: playerId,
+        stat_config_id: statConfigId,
+        stat_value: value,
+      };
+    });
+}
+
+// function endMatch() {
+//   // Comprehensive logging and error checking
+//   console.group("End Match Process");
+
+//   // Verify all required elements exist
+//   const scheduleIdEl = document.getElementById("schedule_id");
+//   const matchIdEl = document.getElementById("match-id");
+//   const gameIdEl = document.getElementById("game_id");
+//   const teamAIdEl = document.getElementById("teamA_id");
+//   const teamBIdEl = document.getElementById("teamB_id");
+
+//   // Log element existence
+//   console.log("Schedule ID Element:", scheduleIdEl);
+//   console.log("Match ID Element:", matchIdEl);
+//   console.log("Game ID Element:", gameIdEl);
+//   console.log("Team A ID Element:", teamAIdEl);
+//   console.log("Team B ID Element:", teamBIdEl);
+
+//   // Comprehensive null checks with detailed logging
+//   if (!scheduleIdEl || !matchIdEl || !gameIdEl || !teamAIdEl || !teamBIdEl) {
+//     console.error("Missing critical elements for end match", {
+//       scheduleId: !!scheduleIdEl,
+//       matchId: !!matchIdEl,
+//       gameId: !!gameIdEl,
+//       teamAId: !!teamAIdEl,
+//       teamBId: !!teamBIdEl,
+//     });
+
+//     // Fallback to global gameData if available
+//     if (window.gameData) {
+//       console.warn("Falling back to window.gameData", window.gameData);
+//       return processEndMatch(window.gameData);
+//     }
+
+//     utils.showAlert({
+//       icon: "error",
+//       title: "Error",
+//       text: "Unable to retrieve match information. Please refresh the page.",
+//     });
+//     return Promise.reject(new Error("Missing match information"));
+//   }
+
+//   // Collect match data
+//   const matchData = {
+//     schedule_id: scheduleIdEl.value,
+//     match_id: matchIdEl.value,
+//     game_id: gameIdEl.value,
+//     teamA_id: teamAIdEl.value,
+//     teamB_id: teamBIdEl.value,
+//     teamA_score: document.getElementById("teamAScore").textContent,
+//     teamB_score: document.getElementById("teamBScore").textContent,
+//     current_period: document.getElementById("periodCounter").textContent,
+//     time_remaining: document.getElementById("gameTimer").textContent,
+//   };
+
+//   const periodVal = document.getElementById("periodCounter").textContent;
+//   const teamAScore = parseInt(
+//     document.getElementById("teamAScore").textContent
+//   );
+//   const teamBScore = parseInt(
+//     document.getElementById("teamBScore").textContent
+//   );
+
+//   if (parseInt(periodVal) === 4 && teamAScore === teamBScore) {
+//     document.getElementById("periodCounter").textContent = "OT";
+//     matchData.current_period = 5; // For backend
+//     timeLeft = 5 * 60; // 5-minute OT
+//     pauseTimer();
+//     updateGameTimer();
+//     sendUpdate();
+
+//     Swal.fire({
+//       title: "Overtime Started",
+//       text: "Scores were tied. Overtime has begun.",
+//       icon: "info",
+//     });
+//     return; // Stop match from ending now
+//   }
+
+//   console.log("Match Data for End Match:", matchData);
+//   console.groupEnd();
+
+//   // return processEndMatch(matchData);
+//   return processEndMatch(matchData, window.globalPlayerStats || []);
+// }
+
 function endMatch() {
-  // Comprehensive logging and error checking
   console.group("End Match Process");
 
-  // Verify all required elements exist
+  const periodText = document.getElementById("periodCounter").textContent;
+  const teamAScore = parseInt(
+    document.getElementById("teamAScore").textContent
+  );
+  const teamBScore = parseInt(
+    document.getElementById("teamBScore").textContent
+  );
+  const periodNumber = periodText === "OT" ? 5 : parseInt(periodText);
+  const isTied = teamAScore === teamBScore;
+
+  // 🔴 Restrict ending in period 1
+  if (periodNumber === 1) {
+    Swal.fire({
+      title: "Cannot End Match",
+      text: "You cannot end the match in period 1.",
+      icon: "warning",
+    });
+    return;
+  }
+
+  // 🟠 Restrict ending if tied in any valid period
+  if (isTied) {
+    if (periodNumber === 4) {
+      document.getElementById("periodCounter").textContent = "OT";
+      timeLeft = 5 * 60;
+      pauseTimer();
+      updateGameTimer();
+      sendUpdate();
+
+      Swal.fire({
+        title: "Overtime Started",
+        text: "Scores were tied at the end of regulation.",
+        icon: "info",
+      });
+    } else {
+      Swal.fire({
+        title: "Cannot End Match",
+        text: "The game is tied. You must continue playing until there is a winner.",
+        icon: "warning",
+      });
+    }
+    return;
+  }
+
+  // ✅ Proceed to gather match data
   const scheduleIdEl = document.getElementById("schedule_id");
   const matchIdEl = document.getElementById("match-id");
   const gameIdEl = document.getElementById("game_id");
   const teamAIdEl = document.getElementById("teamA_id");
   const teamBIdEl = document.getElementById("teamB_id");
 
-  // Log element existence
-  console.log("Schedule ID Element:", scheduleIdEl);
-  console.log("Match ID Element:", matchIdEl);
-  console.log("Game ID Element:", gameIdEl);
-  console.log("Team A ID Element:", teamAIdEl);
-  console.log("Team B ID Element:", teamBIdEl);
-
-  // Comprehensive null checks with detailed logging
   if (!scheduleIdEl || !matchIdEl || !gameIdEl || !teamAIdEl || !teamBIdEl) {
-    console.error("Missing critical elements for end match", {
-      scheduleId: !!scheduleIdEl,
-      matchId: !!matchIdEl,
-      gameId: !!gameIdEl,
-      teamAId: !!teamAIdEl,
-      teamBId: !!teamBIdEl,
-    });
-
-    // Fallback to global gameData if available
+    console.error("Missing critical elements for end match");
     if (window.gameData) {
       console.warn("Falling back to window.gameData", window.gameData);
       return processEndMatch(window.gameData);
@@ -1029,50 +1415,28 @@ function endMatch() {
     return Promise.reject(new Error("Missing match information"));
   }
 
-  // Collect match data
   const matchData = {
     schedule_id: scheduleIdEl.value,
     match_id: matchIdEl.value,
     game_id: gameIdEl.value,
     teamA_id: teamAIdEl.value,
     teamB_id: teamBIdEl.value,
-    teamA_score: document.getElementById("teamAScore").textContent,
-    teamB_score: document.getElementById("teamBScore").textContent,
-    current_period: document.getElementById("periodCounter").textContent,
+    teamA_score: teamAScore,
+    teamB_score: teamBScore,
+    current_period: periodNumber,
     time_remaining: document.getElementById("gameTimer").textContent,
   };
-
-  const periodVal = document.getElementById("periodCounter").textContent;
-  const teamAScore = parseInt(
-    document.getElementById("teamAScore").textContent
-  );
-  const teamBScore = parseInt(
-    document.getElementById("teamBScore").textContent
-  );
-
-  if (parseInt(periodVal) === 4 && teamAScore === teamBScore) {
-    document.getElementById("periodCounter").textContent = "OT";
-    matchData.current_period = 5; // For backend
-    timeLeft = 5 * 60; // 5-minute OT
-    pauseTimer();
-    updateGameTimer();
-    sendUpdate();
-
-    Swal.fire({
-      title: "Overtime Started",
-      text: "Scores were tied. Overtime has begun.",
-      icon: "info",
-    });
-    return; // Stop match from ending now
-  }
 
   console.log("Match Data for End Match:", matchData);
   console.groupEnd();
 
-  return processEndMatch(matchData);
+  return processEndMatch(matchData, window.globalPlayerStats || []);
 }
 
-function processEndMatch(matchData) {
+/////////
+
+// function processEndMatch(matchData) {
+function processEndMatch(matchData, globalStats = []) {
   return new Promise((resolve, reject) => {
     // First fetch the bracket type
     fetch("helper/get_bracket_type.php", {
@@ -1108,21 +1472,42 @@ function processEndMatch(matchData) {
         }).then((result) => {
           if (result.isConfirmed) {
             // 🔁 Inline submitPlayerStats logic here
-            const localStats = JSON.parse(
-              localStorage.getItem("playerStats") || "{}"
-            );
-            const statsToSubmit = Object.entries(localStats)
-              .filter(([key, value]) => value > 0)
-              .map(([key, value]) => {
-                const [, playerId, statConfigId] = key.match(
-                  /player_(\d+)_stat_(\d+)/
-                );
-                return {
-                  player_id: playerId,
-                  stat_config_id: statConfigId,
-                  stat_value: value,
-                };
-              });
+            // const localStats = JSON.parse(
+            //   localStorage.getItem("playerStats") || "{}"
+            // );
+            // const statsToSubmit = Object.entries(localStats)
+            //   .filter(([key, value]) => value > 0)
+            //   .map(([key, value]) => {
+            //     const [, playerId, statConfigId] = key.match(
+            //       /player_(\d+)_stat_(\d+)/
+            //     );
+            //     return {
+            //       player_id: playerId,
+            //       stat_config_id: statConfigId,
+            //       stat_value: value,
+            //     };
+            //   });
+            const scheduleId = matchData.schedule_id;
+            const statsToSubmit = globalStats.length
+              ? globalStats
+              : Object.entries(
+                  JSON.parse(
+                    localStorage.getItem(`playerStats_${scheduleId}`) || "{}"
+                  )
+                )
+                  .filter(([_, value]) => value > 0)
+                  .map(([key, value]) => {
+                    const [, playerId, statConfigId] = key.match(
+                      /player_(\d+)_stat_(\d+)/
+                    );
+                    return {
+                      player_id: playerId,
+                      stat_config_id: statConfigId,
+                      stat_value: value,
+                    };
+                  });
+
+            ///////
 
             let submitStatsPromise = Promise.resolve();
 

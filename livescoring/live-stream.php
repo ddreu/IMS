@@ -160,14 +160,12 @@ include '../navbar/navbar.php';
 
 
         // Include the appropriate sidebar based on the user role
-        if ($user_role === 'Committee') {
-            include '../committee/csidebar.php'; // Sidebar for committee
-        } elseif ($user_role === 'Department Admin') {
-            include '../department_admin/sidebar.php';
-        } elseif ($user_role === 'School Admin') {
-            include '../school_admin/schooladminsidebar.php';
+        if ($role == 'Committee') {
+            include '../committee/csidebar.php';
+        } else if ($role == 'superadmin') {
+            include '../super_admin/sa_sidebar.php';
         } else {
-            include 'default_sidebar.php';
+            include '../department_admin/sidebar.php';
         }
         ?>
     </nav>

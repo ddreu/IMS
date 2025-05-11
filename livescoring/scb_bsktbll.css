@@ -16,6 +16,10 @@ body:-webkit-full-screen,
   height: 100%;
 }
 
+a {
+  text-decoration: none;
+}
+
 .control-container:-webkit-full-screen {
   gap: 20vw;
 }

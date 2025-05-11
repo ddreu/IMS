@@ -107,19 +107,19 @@ if (!$rules) {
     <div class="container-fluid">
         <div class="row bg-primary text-white py-3 mb-4 align-items-center">
             <div class="col-auto">
-                <button onclick="window.history.back();" class="btn btn-outline-light">
+                <a href="match_list.php" class="btn btn-outline-light">
                     <i class="fas fa-arrow-left"></i> Back
-                </button>
+                </a>
             </div>
 
             <div class="col text-center">
                 <h2 class="mb-0">Player Statistics</h2>
             </div>
-            <!-- <div class="col-auto">
+            <div class="col-auto">
                 <button class="btn btn-success" id="submitAllStats">
                     <i class="fas fa-save me-2"></i>Save Stats
                 </button>
-            </div> -->
+            </div>
         </div>
 
         <div class="container-fluid px-4">
@@ -174,9 +174,6 @@ if (!$rules) {
             const scheduleId = <?= $_GET['schedule_id'] ?>;
             let playerStats = JSON.parse(localStorage.getItem(`playerStats_${scheduleId}`) || '{}');
             let playerStatsMeta = JSON.parse(localStorage.getItem(`playerStatsMeta_${scheduleId}`) || '{}');
-            const pastStatsKey = `playerStatsPastSets_${scheduleId}`;
-            const pastStats = JSON.parse(localStorage.getItem(pastStatsKey) || '{}');
-
 
 
 
@@ -197,145 +194,133 @@ if (!$rules) {
 
 
             // Function to handle stat updates dynamically
-            // function updateStat(button, increment) {
-            //     const statRow = button.closest('.stat-row');
-            //     const statValue = statRow.querySelector('.stat-value');
-            //     const playerId = statRow.dataset.playerId;
-            //     const statConfigId = statRow.dataset.statConfigId;
-            //     const teamId = statRow.dataset.teamId; // ✅ ADD THIS LINE
-
-            //     let currentValue = parseInt(statValue.textContent);
-            //     let newValue = Math.max(0, currentValue + increment);
-
-            //     statValue.textContent = newValue;
-
-            //     const statKey = `team_${teamId}_player_${playerId}_stat_${statConfigId}`;
-            //     playerStats[statKey] = newValue;
-
-            //     saveStatsToLocalStorage();
-
-            //     statValue.classList.add('text-success');
-            //     setTimeout(() => statValue.classList.remove('text-success'), 500);
-            // }
             function updateStat(button, increment) {
                 const statRow = button.closest('.stat-row');
                 const statValue = statRow.querySelector('.stat-value');
                 const playerId = statRow.dataset.playerId;
                 const statConfigId = statRow.dataset.statConfigId;
-                const teamId = statRow.dataset.teamId;
+                const teamId = statRow.dataset.teamId; // ✅ ADD THIS LINE
+
+                let currentValue = parseInt(statValue.textContent);
+                let newValue = Math.max(0, currentValue + increment);
+
+                statValue.textContent = newValue;
 
                 const statKey = `team_${teamId}_player_${playerId}_stat_${statConfigId}`;
-                const pastValue = pastStats[statKey] || 0;
-                const currentValue = playerStats[statKey] || 0;
-
-                const newValue = Math.max(0, currentValue + increment);
                 playerStats[statKey] = newValue;
-
-                // 👇 Only subtract visually
-                statValue.textContent = Math.max(0, newValue - pastValue);
 
                 saveStatsToLocalStorage();
 
                 statValue.classList.add('text-success');
                 setTimeout(() => statValue.classList.remove('text-success'), 500);
             }
-            //////////
 
 
             // Function to submit all player stats
-            // function submitPlayerStats() {
-            //     // Collect stats for both teams
-            //     const statsToSubmit = Object.entries(playerStats)
-            //         .filter(([key, value]) => value > 0)
-            //         .map(([key, value]) => {
-            //             const [, teamId, playerId, statConfigId] = key.match(/team_(\d+)_player_(\d+)_stat_(\d+)/);
-            //             return {
-            //                 team_id: teamId, // <-- include this
-            //                 player_id: playerId,
-            //                 stat_config_id: statConfigId,
-            //                 stat_value: value
-            //             };
+            function submitPlayerStats() {
+                // Collect stats for both teams
+                const statsToSubmit = Object.entries(playerStats)
+                    .filter(([key, value]) => value > 0)
+                    .map(([key, value]) => {
+                        const match = key.match(/team_(\d+)_player_(\d+)_stat_(\d+)/);
+                        if (!match) return null;
+                        const [_, teamId, playerId, statConfigId] = match;
+                        return {
+                            player_id: parseInt(playerId),
+                            stat_config_id: parseInt(statConfigId),
+                            stat_value: parseInt(value)
+                        };
+                    })
 
-            //         });
+                // .map(([key, value]) => {
+                //     const [, teamId, playerId, statConfigId] = key.match(/team_(\d+)_player_(\d+)_stat_(\d+)/);
+                //     return {
+                //         team_id: teamId, // <-- include this
+                //         player_id: playerId,
+                //         stat_config_id: statConfigId,
+                //         stat_value: value
+                //     };
 
-            //     // Check if there are any stats to submit
-            //     if (statsToSubmit.length === 0) {
-            //         Swal.fire({
-            //             icon: 'info',
-            //             title: 'No Stats to Submit',
-            //             text: 'Please record some player statistics first.'
-            //         });
-            //         return;
-            //     }
+                // });
 
-            //     // First confirmation
-            //     Swal.fire({
-            //         title: 'Save Player Statistics',
-            //         text: 'Are you sure you want to save player statistics for both teams?',
-            //         icon: 'question',
-            //         showCancelButton: true,
-            //         confirmButtonColor: '#3085d6',
-            //         cancelButtonColor: '#d33',
-            //         confirmButtonText: 'Yes, Save Stats'
-            //     }).then((result) => {
-            //         if (result.isConfirmed) {
-            //             // Second confirmation with more details
-            //             Swal.fire({
-            //                 title: 'Confirm Submission',
-            //                 html: `
-            //                     <p>You are about to submit player statistics for:</p>
-            //                     <strong>Total Stats Entries: ${statsToSubmit.length}</strong>
-            //                 `,
-            //                 icon: 'warning',
-            //                 showCancelButton: true,
-            //                 confirmButtonColor: '#3085d6',
-            //                 cancelButtonColor: '#d33',
-            //                 confirmButtonText: 'Confirm Submission'
-            //             }).then((confirmResult) => {
-            //                 if (confirmResult.isConfirmed) {
-            //                     // Send stats to server
-            //                     fetch('save_player_stats.php', {
-            //                             method: 'POST',
-            //                             headers: {
-            //                                 'Content-Type': 'application/json',
-            //                             },
-            //                             body: JSON.stringify({
-            //                                 schedule_id: scheduleId,
-            //                                 stats: statsToSubmit
-            //                             })
-            //                         })
-            //                         .then(response => response.json())
-            //                         .then(data => {
-            //                             if (data.success) {
-            //                                 // Get match_id from the server response
-            //                                 const matchId = data.match_id; // Assuming the server returns match_id
+                // Check if there are any stats to submit
+                if (statsToSubmit.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Stats to Submit',
+                        text: 'Please record some player statistics first.'
+                    });
+                    return;
+                }
 
-            //                                 // Clear local storage after successful submission
-            //                                 localStorage.removeItem('playerStats');
+                // First confirmation
+                Swal.fire({
+                    title: 'Save Player Statistics',
+                    text: 'Are you sure you want to save player statistics for both teams?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, Save Stats'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Second confirmation with more details
+                        Swal.fire({
+                            title: 'Confirm Submission',
+                            html: `
+                                <p>You are about to submit player statistics for:</p>
+                                <strong>Total Stats Entries: ${statsToSubmit.length}</strong>
+                            `,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Confirm Submission'
+                        }).then((confirmResult) => {
+                            if (confirmResult.isConfirmed) {
+                                // Send stats to server
+                                fetch('save_player_stats.php', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            schedule_id: scheduleId,
+                                            stats: statsToSubmit
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            // Get match_id from the server response
+                                            const matchId = data.match_id; // Assuming the server returns match_id
 
-            //                                 // Redirect to match summary with match_id and schedule_id
-            //                                 window.location.href = `match_summary.php?match_id=${matchId}&schedule_id=${scheduleId}&status=success`;
-            //                             } else {
-            //                                 Swal.fire({
-            //                                     icon: 'error',
-            //                                     title: 'Submission Failed',
-            //                                     text: data.message || 'Unable to submit player statistics.'
-            //                                 });
-            //                             }
-            //                         })
-            //                         .catch(error => {
-            //                             console.error('Error:', error);
-            //                             Swal.fire({
-            //                                 icon: 'error',
-            //                                 title: 'Submission Error',
-            //                                 text: 'There was a problem submitting the statistics.'
-            //                             });
-            //                         });
-            //                 }
-            //             });
-            //         }
-            //     });
-            // }
+                                            // Clear local storage after successful submission
+                                            localStorage.removeItem('playerStats');
+
+                                            // Redirect to match summary with match_id and schedule_id
+                                            window.location.href = `match_summary.php?match_id=${matchId}&schedule_id=${scheduleId}&status=success`;
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Submission Failed',
+                                                text: data.message || 'Unable to submit player statistics.'
+                                            });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Submission Error',
+                                            text: 'There was a problem submitting the statistics.'
+                                        });
+                                    });
+                            }
+                        });
+                    }
+                });
+            }
 
             // Fetch game stats configuration
             fetch(`get_game_stats_config.php?game_id=${gameId}`)
@@ -382,11 +367,7 @@ if (!$rules) {
             <button class="btn btn-sm btn-outline-danger decrement-stat me-2">
                 <i class="fas fa-minus"></i>
             </button>
-           <!-- <span class="stat-value badge bg-secondary fs-5">${playerStats[statKey]}</span> -->
-           <span class="stat-value badge bg-secondary fs-5">
-  ${Math.max(0, playerStats[statKey] - (pastStats[statKey] || 0))}
-</span>
-
+            <span class="stat-value badge bg-secondary fs-5">${playerStats[statKey]}</span>
             <button class="btn btn-sm btn-outline-success increment-stat ms-2">
                 <i class="fas fa-plus"></i>
             </button>
@@ -413,38 +394,9 @@ if (!$rules) {
                 });
 
                 // Add event listener to submit button in header
-                // document.getElementById('submitAllStats').addEventListener('click', submitPlayerStats);
+                document.getElementById('submitAllStats').addEventListener('click', submitPlayerStats);
             }
-
-            setInterval(() => {
-                const updatedPastStats = JSON.parse(localStorage.getItem(`playerStatsPastSets_${scheduleId}`) || '{}');
-                Object.assign(pastStats, updatedPastStats); // Update in-place
-
-                document.querySelectorAll('.stat-row').forEach(row => {
-                    const playerId = row.dataset.playerId;
-                    const statConfigId = row.dataset.statConfigId;
-                    const teamId = row.dataset.teamId;
-
-                    const statKey = `team_${teamId}_player_${playerId}_stat_${statConfigId}`;
-                    const currentValue = playerStats[statKey] || 0;
-                    const pastValue = pastStats[statKey] || 0;
-
-                    const statValueElement = row.querySelector('.stat-value');
-                    if (statValueElement) {
-                        statValueElement.textContent = Math.max(0, currentValue - pastValue);
-                    }
-                });
-
-                console.log('🔁 *Past stats updated from localStorage and UI refreshed*');
-            }, 3000);
-
         });
-
-        // setInterval(() => {
-        //     const updatedPastStats = JSON.parse(localStorage.getItem(`playerStatsPastSets_${scheduleId}`) || '{}');
-        //     Object.assign(pastStats, updatedPastStats); // Update in-place so UI stays in sync
-        //     console.log('🔁 *Past stats updated from localStorage*');
-        // }, 3000); // every 3 seconds — adjust based on scoreboard update speed
     </script>
 </body>
 

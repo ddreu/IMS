@@ -199,6 +199,13 @@ $sets_won_query->close();
                     <i class="fas fa-users me-2"></i> Go to Player Stats
                 </a>
 
+                <div>
+                    <label style="color: white;">
+                        <input type="checkbox" id="syncPlayerStatsToScore" onchange="applySyncToggle(this.checked)">
+                        Sync player stats to team score
+                    </label>
+                </div>
+
 
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
                     <!-- <button class="score-button" onclick="saveSettings()">Save</button> -->
@@ -213,9 +220,37 @@ $sets_won_query->close();
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="stats-sync.js"></script>
     <script src="set-test.js"></script>
     <script>
+        window.gameData = {
+            schedule_id: '<?php echo htmlspecialchars($schedule_id); ?>',
+            game_id: '<?php echo htmlspecialchars($game_id); ?>',
+            teamA_id: '<?php echo htmlspecialchars($teamA_id); ?>',
+            teamB_id: '<?php echo htmlspecialchars($teamB_id); ?>',
+            match_id: '<?php echo htmlspecialchars($match['match_id']); ?>'
+        };
+
+        // function applySyncToggle(enabled) {
+        //     // Save to localStorage
+        //     localStorage.setItem("syncPlayerStatsToScore", enabled);
+
+        //     // Disable or enable score buttons
+        //     disableManualScoreButtons(enabled);
+
+        //     // Trigger an immediate sync if enabled
+        //     if (enabled && window.ScoreManager?.syncTeamScoresIfEnabled) {
+        //         ScoreManager.syncTeamScoresIfEnabled();
+        //     }
+        // }
+
+        function disableManualScoreButtons(disable) {
+            const buttons = document.querySelectorAll(
+                "#scoreA ~ button, #scoreB ~ button"
+            );
+            buttons.forEach((btn) => (btn.disabled = disable));
+        }
+
         function toggleFullscreen() {
             const docElm = document.documentElement;
 

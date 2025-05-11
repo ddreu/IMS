@@ -96,6 +96,14 @@ $match_query->close();
                 <i class="fas fa-users me-2"></i> Go to Player Stats
             </a>
 
+            <div>
+                <label style="color: white;">
+                    <input type="checkbox" id="syncPlayerStatsToScore" style="margin-right: 8px;">
+                    Sync Player Stats to Score
+                </label>
+            </div>
+
+
 
             <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
                 <!-- <button class="score-button" onclick="saveSettings()">Save</button> -->
@@ -130,7 +138,7 @@ $match_query->close();
     <!-- Script-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="end_match.js"></script>
-
+    <script src="stats-sync.js"></script>
     <script>
         let schedule_id = <?php echo json_encode($schedule_id); ?>;
         let game_id = <?php echo json_encode($game_id); ?>;
@@ -146,9 +154,73 @@ $match_query->close();
         let teamAScoreValue = document.getElementById("teamAScore");
         let teamBScoreValue = document.getElementById("teamBScore");
 
+
+        window.gameData = {
+            schedule_id: '<?php echo htmlspecialchars($schedule_id); ?>',
+            game_id: '<?php echo htmlspecialchars($game_id); ?>',
+            teamA_id: '<?php echo htmlspecialchars($teamA_id); ?>',
+            teamB_id: '<?php echo htmlspecialchars($teamB_id); ?>',
+            match_id: '<?php echo htmlspecialchars($match['match_id']); ?>'
+        };
         // Set the initial values in the UI
         teamAScoreValue.innerText = teamAScore;
         teamBScoreValue.innerText = teamBScore;
+
+        function applySyncToggle(enabled) {
+            localStorage.setItem("syncPlayerStatsToScore", enabled);
+            disableManualScoreButtons(enabled); // 🆕 this line handles button toggling
+            console.log("*_Sync player stats to score_* is", enabled ? "*_ENABLED_*" : "*_DISABLED_*");
+
+            // Optional: auto trigger score sync when enabling
+            if (enabled && typeof syncTeamScoresIfEnabled === "function") {
+                syncTeamScoresIfEnabled();
+            }
+        }
+
+        function disableManualScoreButtons(disable) {
+            const buttons = document.querySelectorAll(
+                ".btn-container button, #reset-btn"
+            );
+            buttons.forEach(btn => {
+                btn.disabled = disable;
+                btn.title = disable ? "Disabled while stats sync is active" : "";
+            });
+        }
+
+
+        function syncTeamScoresIfEnabled() {
+            console.log("Syncing team scores...");
+
+            if (localStorage.getItem("syncPlayerStatsToScore") !== "true") return;
+
+            disableManualScoreButtons(true);
+
+            if (!window.syncedTeamScores) {
+                console.warn("⚠️ syncedTeamScores not available. Skipping sync.");
+                return;
+            }
+
+            const {
+                teamA,
+                teamB
+            } = window.syncedTeamScores;
+
+            const newTeamAScore = parseInt(teamA) || 0;
+            const newTeamBScore = parseInt(teamB) || 0;
+
+            // Calculate deltas
+            const deltaA = newTeamAScore - teamAScore;
+            const deltaB = newTeamBScore - teamBScore;
+
+            if (deltaA !== 0) updateScore("teamA", deltaA);
+            if (deltaB !== 0) updateScore("teamB", deltaB);
+
+            console.log("*✅ Synced scores using updateScore()*", {
+                teamA: newTeamAScore,
+                teamB: newTeamBScore
+            });
+        }
+
 
         // State preservation functions
         const stateManager = {
@@ -237,7 +309,30 @@ $match_query->close();
         // Restore state on page load
         document.addEventListener('DOMContentLoaded', function() {
             stateManager.restore();
+
+            const syncCheckbox = document.getElementById("syncPlayerStatsToScore");
+            const syncEnabled = localStorage.getItem("syncPlayerStatsToScore") === "true";
+
+            if (syncCheckbox) {
+                syncCheckbox.checked = syncEnabled;
+                applySyncToggle(syncEnabled); // 🧠 This ensures sync logic runs immediately
+
+                syncCheckbox.addEventListener("change", function() {
+                    applySyncToggle(this.checked);
+                });
+            }
+
+            // 🆕 Poll for updated synced scores if sync is enabled
+            if (syncEnabled) {
+                const poll = setInterval(() => {
+                    if (window.syncedTeamScores) {
+                        clearInterval(poll);
+                        syncTeamScoresIfEnabled();
+                    }
+                }, 300);
+            }
         });
+
 
         function toggleFullscreen() {
             const docElm = document.documentElement;
