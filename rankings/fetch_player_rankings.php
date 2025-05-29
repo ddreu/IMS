@@ -16,34 +16,32 @@ if (!$department_id || !$school_id) {
     exit;
 }
 
-// Fetch all configured stats for this game (from game_stats_config)
-$statNamesQuery = "SELECT stat_name FROM game_stats_config WHERE game_id = ? AND is_archived = 0";
+// Fetch all stat columns from game configuration
+$statColumns = [];
+$statNamesQuery = "SELECT LOWER(TRIM(stat_name)) AS stat_name FROM game_stats_config WHERE game_id = ? AND is_archived = 0";
 $stmt = $conn->prepare($statNamesQuery);
 $stmt->bind_param('i', $game_id);
 $stmt->execute();
 $statNamesResult = $stmt->get_result();
-
-$statColumns = [];
 while ($row = $statNamesResult->fetch_assoc()) {
     $statColumns[] = $row['stat_name'];
 }
 
-// Initialize players
+// Initialize player list
+$players = [];
+
 $playersQuery = "
     SELECT 
         p.player_id,
-        p.player_firstname,
-        p.player_lastname,
-        gsc.grade_level,
-        d.department_name
+        CONCAT(TRIM(p.player_firstname), ' ', TRIM(p.player_lastname)) AS player_name
     FROM players p
     JOIN teams t ON p.team_id = t.team_id
     JOIN grade_section_course gsc ON t.grade_section_course_id = gsc.id
     JOIN departments d ON gsc.department_id = d.id
     WHERE d.id = ? 
-      AND d.school_id = ? 
-      " . ($grade_level ? "AND gsc.grade_level = ?" : "") . "
-    
+      AND d.school_id = ? " .
+    ($grade_level ? "AND gsc.grade_level = ?" : "") . "
+    GROUP BY p.player_id, player_name
 ";
 
 if ($grade_level) {
@@ -56,41 +54,28 @@ if ($grade_level) {
 
 $stmt->execute();
 $playersResult = $stmt->get_result();
-
-$players = [];
-
 while ($row = $playersResult->fetch_assoc()) {
-    $playerId = $row['player_id'];
-    $players[$playerId] = [
-        'player_name' => htmlspecialchars($row['player_firstname'] . ' ' . $row['player_lastname']),
-        'stats' => array_fill_keys($statColumns, 0),
-    ];
+    $playerId = (int)$row['player_id'];
+
+    if (!isset($players[$playerId])) {
+        $players[$playerId] = [
+            'player_name' => $row['player_name'],
+            'stats' => array_fill_keys($statColumns, 0),
+        ];
+    }
 }
 
-// Fetch all player stats
+
+// Fetch actual player stats
 $statsQuery = "
     SELECT 
         player_id,
-        stat_name,
-        SUM(stat_value) as total_stat
+        LOWER(TRIM(stat_name)) AS stat_name,
+        SUM(stat_value) AS total_stat
     FROM player_match_stats
-    WHERE game_id = ?
-    GROUP BY player_id, stat_name
+    WHERE game_id = ? AND is_archived = 0
+    GROUP BY player_id, LOWER(TRIM(stat_name))
 ";
-// $statsQuery = "
-//    SELECT 
-//     pms.player_id,
-//     pms.stat_name,
-//     SUM(pms.stat_value) AS total_stat
-// FROM player_match_stats pms
-// JOIN games g ON pms.game_id = g.game_id
-// WHERE pms.game_id = ? AND g.is_archived = 0
-// GROUP BY pms.player_id, pms.stat_name
-// ";
-$stmt = $conn->prepare($statsQuery);
-$stmt->bind_param('i', $game_id);
-$stmt->execute();
-$statsResult = $stmt->get_result();
 
 $stmt = $conn->prepare($statsQuery);
 $stmt->bind_param('i', $game_id);
@@ -98,19 +83,19 @@ $stmt->execute();
 $statsResult = $stmt->get_result();
 
 while ($row = $statsResult->fetch_assoc()) {
-    $playerId = $row['player_id'];
+    $playerId = (int)$row['player_id'];
     $statName = $row['stat_name'];
-    $statValue = (int) $row['total_stat'];
+    $statValue = (int)$row['total_stat'];
 
     if (isset($players[$playerId]) && in_array($statName, $statColumns)) {
         $players[$playerId]['stats'][$statName] = $statValue;
     }
 }
 
-// Final output
+// Output
 $response = [
     'stat_columns' => $statColumns,
-    'players' => array_values($players) // reset keys
+    'players' => array_values($players),
 ];
 
 echo json_encode($response);
