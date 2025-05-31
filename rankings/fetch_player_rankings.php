@@ -92,7 +92,6 @@ while ($row = $statsResult->fetch_assoc()) {
     }
 }
 
-
 // Output
 $response = [
     'stat_columns' => $statColumns,
