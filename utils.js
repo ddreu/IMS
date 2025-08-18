@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
-
 // Sidebar toggle functionality without jQuery
 document.addEventListener("DOMContentLoaded", function () {
   const sidebar = document.getElementById("sidebar");
